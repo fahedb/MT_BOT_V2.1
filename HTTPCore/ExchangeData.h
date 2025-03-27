@@ -1,0 +1,38 @@
+#include "HTTPServer.h"
+#include <nlohmann/json.hpp>
+#include <string>
+#pragma once
+
+
+class ExchangeData
+{
+	HTTPServer* m_httpsrv;
+public:
+	ExchangeData()
+	{
+		m_httpsrv = HTTPServer::getInstance();
+	}
+
+	void Set_NewOrder(std::string symbol, int long_short) { m_httpsrv->Get_RequestHandler()->Set_NewOrder(symbol, long_short); }
+	std::string Get_NextCandleStick_M1() { return m_httpsrv->Get_RequestHandler()->Get_NextCandle(); }
+	std::string Get_NextCandleStick_M1_JSON_DB() { return m_httpsrv->Get_RequestHandler()->Get_Next_DBCandle_M1(); }
+	bool IsCurr_QueueLocked() { return m_httpsrv->Get_RequestHandler()->IsLocked_CurrQueue(); }
+	bool IsDBHist_QueueLocked() { return m_httpsrv->Get_RequestHandler()->IsLocked_HistQueue(); }
+
+	bool IsScanningAllowed() { return m_httpsrv->Get_RequestHandler()->GetStatus_Scanning() == HTTP_PARAM_VALUE_Status_Running ? true : false; }
+	void DoneLoadingData() { m_httpsrv->Get_RequestHandler()->Set_LoadingData(false); }
+	static void Start_DataExchange() { RUN_HTTPSRV();}
+
+	void Push_NewConfig(std::vector<std::string> confvec) { m_httpsrv->Get_RequestHandler()->PushNewConfig(confvec); }
+	std::pair<std::string, std::string> Get_ConfToUpdate() { return m_httpsrv->Get_RequestHandler()->GetNextConfigToUpdate(); }
+
+private:
+	static void RUN_HTTPSRV()
+	{
+		HTTPServer* httpsrv = HTTPServer::getInstance();
+		httpsrv->RunServer();
+		httpsrv = nullptr;
+	}
+
+};
+

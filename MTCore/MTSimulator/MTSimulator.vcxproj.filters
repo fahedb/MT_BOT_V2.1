@@ -1,0 +1,363 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Tables">
+      <UniqueIdentifier>{ae88c218-ee08-4aea-bb12-3f08e4da54f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies">
+      <UniqueIdentifier>{f59e8eea-0b16-4009-b786-b63f2b0a6bde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SyncLogic">
+      <UniqueIdentifier>{3afef497-1036-4489-ba24-b06b05db584d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\SyncJobs">
+      <UniqueIdentifier>{0903d66b-b613-4523-8a46-a7c712847c10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\SyncJobs\Inc">
+      <UniqueIdentifier>{3161f0df-750d-4bd6-a0f4-43667b4b847d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\SyncJobs\src">
+      <UniqueIdentifier>{d5ff352b-e9d4-4cf8-b5ae-3666e5405701}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod">
+      <UniqueIdentifier>{f893ffe7-f351-4391-9223-3296d6171e2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DefinedTables">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Tables\NewOrdersTable">
+      <UniqueIdentifier>{34b9c984-c5a8-43db-ad08-b62ad3e9a5ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataProcessing">
+      <UniqueIdentifier>{9656d352-9ac3-4297-9ba7-dccfc02a86cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LogsLogic">
+      <UniqueIdentifier>{d62f0561-2be5-4e43-a503-659841ee1a7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CalcScoreLogic">
+      <UniqueIdentifier>{e1b62f85-0acd-4dad-b566-d78578633b43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CalcScoreLogic\Inc">
+      <UniqueIdentifier>{a49cd510-a78a-458a-be14-e933169aa953}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CalcScoreLogic\Src">
+      <UniqueIdentifier>{798ebbc5-02e4-42d7-a531-91b26650f3f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataBaseConnection">
+      <UniqueIdentifier>{0768fe96-c636-4638-8bc9-5bb2828f3209}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataBaseConnection\Inc">
+      <UniqueIdentifier>{eaeda08f-a06e-46ce-adcb-297136acb62e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataBaseConnection\Src">
+      <UniqueIdentifier>{98d120d8-4f12-4d1c-8772-8af1b4c04f5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataLoad">
+      <UniqueIdentifier>{1da6c0a2-c0c3-46c4-856f-17e353f13d59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataLoad\Inc">
+      <UniqueIdentifier>{71b2c584-6470-436c-bdbe-9ebfb48e1642}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataLoad\Src">
+      <UniqueIdentifier>{38b6f6a6-b910-4c34-a11e-6ca0d563b116}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataProcessing\Inc">
+      <UniqueIdentifier>{6e3026b3-7a00-4062-a79f-2b61efb6ae7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataProcessing\Src">
+      <UniqueIdentifier>{96b263b3-0b3c-4bc5-b83a-858ad0b560d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configs">
+      <UniqueIdentifier>{563aabcd-f792-4712-935e-5d189684c85c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ChartExportLogic">
+      <UniqueIdentifier>{ba4d185b-3683-40c5-8054-77155e55e948}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ChartExportLogic\Inc">
+      <UniqueIdentifier>{12aa39c4-6b11-4fca-939e-4750fafcd0d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ChartExportLogic\Src">
+      <UniqueIdentifier>{6a1afa6e-a4f8-4a69-87fc-797eb2c99177}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configs\Inc">
+      <UniqueIdentifier>{8f7aa8a3-a412-4e78-a8f3-2e83a70b4c4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configs\Src">
+      <UniqueIdentifier>{3920b26d-6cb8-4bbe-a356-3f8244b24d7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers">
+      <UniqueIdentifier>{78c44121-3fd8-47df-a456-7c14c67bf2a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\ChangeStructure">
+      <UniqueIdentifier>{0c3c7f46-edc4-4bcd-b665-464d316215e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\ChangeStructure\Inc">
+      <UniqueIdentifier>{07fe91fd-1034-412a-bc46-a0a88c2e7b8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\ChangeStructure\Src">
+      <UniqueIdentifier>{e140fb8e-b9f1-4fe0-b569-8cd020375682}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\DBMap">
+      <UniqueIdentifier>{249d3747-f8c1-412f-b9b1-63cc6e8d4e5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\DBMap\Inc">
+      <UniqueIdentifier>{a1d03644-53e4-40d1-baf0-9a8da0b71859}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\DBMap\Src">
+      <UniqueIdentifier>{eedddd3e-052f-466b-819e-62aa543c910a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\ExternalDataStruct">
+      <UniqueIdentifier>{b29b4fe5-2f41-4761-a8d7-565815457f42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\ExternalDataStruct\Inc">
+      <UniqueIdentifier>{e3eba251-af74-4b0b-a05c-99a5aaa71ba7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DefinedTables\Inc">
+      <UniqueIdentifier>{ad65a694-5b24-455e-a512-eef31b836606}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LogsLogic\Inc">
+      <UniqueIdentifier>{afb6af4e-485d-4c75-9905-4f0e974ee88e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LogsLogic\Src">
+      <UniqueIdentifier>{ed41a6cd-4d26-4fcd-bbbb-721647bcf855}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Inc">
+      <UniqueIdentifier>{68e523ae-99eb-4bac-8591-976818de4c32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Src">
+      <UniqueIdentifier>{7d06b0a5-496d-425a-a2a8-280f8b99395a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\PricesTables">
+      <UniqueIdentifier>{2e26a098-9515-4c68-803c-a33c7bbd5bd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\PricesTables\XAUUSD_Tables">
+      <UniqueIdentifier>{29dfbbdd-f4f2-44de-8c12-850e86d1925d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\PricesTables\XAUUSD_Tables\Inc">
+      <UniqueIdentifier>{3273e585-c60b-4958-b15a-fbcc061188f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\PricesTables\XAUUSD_Tables\Src">
+      <UniqueIdentifier>{45327f18-80c8-47ae-8829-bfaa5cae9c92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\PricesTables\EURUSD_Tables">
+      <UniqueIdentifier>{dd279eb2-f217-47b5-9207-f08974b46fae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\PricesTables\EURUSD_Tables\Inc">
+      <UniqueIdentifier>{724d3734-69b6-4a01-be2c-38cd411ac920}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\PricesTables\EURUSD_Tables\src">
+      <UniqueIdentifier>{c399465c-2d2c-4d70-90b5-c103122a51d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\AllTablesBase">
+      <UniqueIdentifier>{8b2f389f-e67a-4d0d-b596-5713b3d4447e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\PricesTables\BasePrices_Tables">
+      <UniqueIdentifier>{74e2ed80-ee16-4642-811a-1e193123c20d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\PricesTables\BasePrices_Tables\inc">
+      <UniqueIdentifier>{52311aac-5637-40cc-969c-cbff4942719d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\PricesTables\BasePrices_Tables\src">
+      <UniqueIdentifier>{fe55dcde-e62b-4dc4-a231-fdfc027d9fa5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\NewOrdersTable\Inc">
+      <UniqueIdentifier>{73e5b2bd-9752-472b-af13-4574ba0b3d93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\NewOrdersTable\Src">
+      <UniqueIdentifier>{728fa96e-8c24-4075-9091-79ccfb082d1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Cache">
+      <UniqueIdentifier>{6c32ae2b-28b0-4d6f-b9bb-f248672aca1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\JsonHandler">
+      <UniqueIdentifier>{95092a76-edc0-4a80-a14b-dd562d87c6b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MultiThreading">
+      <UniqueIdentifier>{46014bd2-60e8-4559-961a-b0ec43189477}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\ConfigsTable">
+      <UniqueIdentifier>{b2322148-1064-466b-8eab-a3b1e2b1cc03}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="StartPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BTables.cpp">
+      <Filter>Tables\AllTablesBase</Filter>
+    </ClCompile>
+    <ClCompile Include="SynchronizeCurrentDBBase.cpp">
+      <Filter>SyncLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="EURUSD_CurrentTable.cpp">
+      <Filter>Tables\PricesTables\EURUSD_Tables\src</Filter>
+    </ClCompile>
+    <ClCompile Include="SyncJobs_Table.cpp">
+      <Filter>Tables\SyncJobs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="BasePricesTable.cpp">
+      <Filter>Tables\PricesTables\BasePrices_Tables\src</Filter>
+    </ClCompile>
+    <ClCompile Include="ChangeData.cpp">
+      <Filter>DataStructers\ChangeStructure\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="IndicatorStructres.cpp">
+      <Filter>DataStructers\ChangeStructure\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="DBMap.cpp">
+      <Filter>DataStructers\DBMap\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreCalcs.cpp">
+      <Filter>CalcScoreLogic\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="DataBaseConnection.cpp">
+      <Filter>DataBaseConnection\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="DataLoad.cpp">
+      <Filter>DataLoad\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessData.cpp">
+      <Filter>DataProcessing\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="MTChart.cpp">
+      <Filter>ChartExportLogic\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternExporter.cpp">
+      <Filter>ChartExportLogic\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Configrations.cpp">
+      <Filter>Configs\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>LogsLogic\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternGod.cpp">
+      <Filter>Strategies\PatternGod\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="XAUUSD_CurrentTable.cpp">
+      <Filter>Tables\PricesTables\XAUUSD_Tables\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="XAUUSD_OneMinTable.cpp">
+      <Filter>Tables\PricesTables\XAUUSD_Tables\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="OrdersToExecute.cpp">
+      <Filter>Tables\NewOrdersTable\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="TempCache.cpp">
+      <Filter>Cache</Filter>
+    </ClCompile>
+    <ClCompile Include="MyJSONHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JasonHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>MultiThreading</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigsTable.cpp">
+      <Filter>Tables\ConfigsTable</Filter>
+    </ClCompile>
+    <ClCompile Include="HTTP_Lgger.cpp">
+      <Filter>LogsLogic\Src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BTables.h">
+      <Filter>Tables\AllTablesBase</Filter>
+    </ClInclude>
+    <ClInclude Include="SynchronizeCurrentDBBase.h">
+      <Filter>SyncLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="EURUSD_CurrentTable.h">
+      <Filter>Tables\PricesTables\EURUSD_Tables\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="SyncJobs_Table.h">
+      <Filter>Tables\SyncJobs\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="BasePricesTable.h">
+      <Filter>Tables\PricesTables\BasePrices_Tables\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="ChangeData.h">
+      <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="IndicatorStructres.h">
+      <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="DBMap.h">
+      <Filter>DataStructers\DBMap\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreCalcs.h">
+      <Filter>CalcScoreLogic\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="DataBaseConnection.h">
+      <Filter>DataBaseConnection\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessData.h">
+      <Filter>DataProcessing\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="MTChart.h">
+      <Filter>ChartExportLogic\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternExporter.h">
+      <Filter>ChartExportLogic\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Configrations.h">
+      <Filter>Configs\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigsDefs.h">
+      <Filter>Configs\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="CandleData.h">
+      <Filter>DataStructers\ExternalDataStruct\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="DefinedTables.h">
+      <Filter>DefinedTables\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>LogsLogic\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternGod.h">
+      <Filter>Strategies\PatternGod\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="XAUUSD_CurrentTable.h">
+      <Filter>Tables\PricesTables\XAUUSD_Tables\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="XAUUSD_OneMinTable.h">
+      <Filter>Tables\PricesTables\XAUUSD_Tables\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="OrdersToExecute.h">
+      <Filter>Tables\NewOrdersTable\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="DataLoad.h">
+      <Filter>DataLoad\Src</Filter>
+    </ClInclude>
+    <ClInclude Include="TempCache.h">
+      <Filter>Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="MyJSONHandler.h">
+      <Filter>DefinedTables</Filter>
+    </ClInclude>
+    <ClInclude Include="JasonHandler.h">
+      <Filter>DefinedTables</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>MultiThreading</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigsTable.h">
+      <Filter>Tables\ConfigsTable</Filter>
+    </ClInclude>
+    <ClInclude Include="HTTP_Lgger.h">
+      <Filter>LogsLogic\Inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

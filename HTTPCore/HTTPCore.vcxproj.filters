@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="HTTP_server">
+      <UniqueIdentifier>{3a8092c2-68d2-400f-820f-960df6a61a1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services">
+      <UniqueIdentifier>{18ba5e16-16ea-4c37-9bc9-d2f4e5150f2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RequestsHandle">
+      <UniqueIdentifier>{95456564-476d-4165-9b43-90634e403012}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTP_client">
+      <UniqueIdentifier>{7a1d87c9-02b4-4a9c-85ea-ac1e80b32e00}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Run.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HTTPServer.cpp">
+      <Filter>HTTP_server</Filter>
+    </ClCompile>
+    <ClCompile Include="ExchangeData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RequestHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HTTPClient.cpp">
+      <Filter>HTTP_client</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HTTPServer.h">
+      <Filter>HTTP_server</Filter>
+    </ClInclude>
+    <ClInclude Include="ExchangeData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServicesDef.h">
+      <Filter>Services</Filter>
+    </ClInclude>
+    <ClInclude Include="RequestHandler.h">
+      <Filter>RequestsHandle</Filter>
+    </ClInclude>
+    <ClInclude Include="HTTPClient.h">
+      <Filter>HTTP_client</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

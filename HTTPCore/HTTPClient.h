@@ -1,0 +1,46 @@
+#pragma once
+#include "httplib.h"
+#include "ServicesDef.h"
+#include "RequestHandler.h"
+
+class HTTPClient
+{
+private:
+
+    httplib::Client m_client = httplib::Client("localhost:8080");
+    int m_port =0;
+    std::string m_host;
+    HTTPClient()
+    {
+        m_host = "localhost"; // Need to implement a logic for a cfg for this
+        m_port = 8080; // Need to implement a logic for a cfg for this
+        
+        std::ofstream log("C:\\MTDB\\logdll2.txt", std::ios::app);
+        log << "HTTPClient Constructor Called\n";
+        log.close();
+        std::string srv = m_host + ":" + std::to_string(m_port);
+    }
+public:
+    httplib::Result Send_Get(std::string service,httplib::Headers headers = httplib::Headers())
+    {
+         return m_client.Get(service,headers);
+    }
+    httplib::Result Send_Post(std::string service,std::string body ="{}",std::string content_type = "application/json", httplib::Headers headers = httplib::Headers())
+    {
+        return  m_client.Post(service, headers, body, content_type);
+    }
+    ~HTTPClient()
+    {
+        m_client.stop();
+    }
+    HTTPClient(const HTTPClient&) = delete;
+    HTTPClient& operator=(const HTTPClient&) = delete;
+
+    // Static method to get the instance of the Singleton
+    static HTTPClient& getInstance() {
+        static HTTPClient instance; // Guaranteed to be destroyed and instantiated on first use
+        return instance;
+    }
+
+};
+

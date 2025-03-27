@@ -86,7 +86,7 @@ inline IndicatorScore EmaScoreCalcs::CalcPlaceScore_Logic(IndicatorValues hist, 
 	 }
 	 return score;
  }
- IndicatorScore RsiScoreCalcs::Calc_AllLensScores(ChangeNode* ChNHistory, ChangeNode* ChNcurr)
+ IndicatorScore RsiScoreCalcs::Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr)
  {
 	 double weight = Configrations::getInstance()->Get_Policy()->RSI_Wieght;
 	 IndicatorScore score;

@@ -64,6 +64,7 @@ std::vector<std::vector<std::string>> Configrations::Get_AllConfigRows_DB()
 
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_RSI_WIEGHT));
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_EMA_WIEGHT));
+    allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_ZLSMA_WIEGHT));
 
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_STOP_LOSS_DIFF));
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_TAKE_PROFIT_DIFF));
@@ -145,6 +146,7 @@ void Configrations::Init_PatternPolicy()
     m_policy.EMA_len_for_Pattern_Export = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT));
     m_policy.RSI_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_RSI_WIEGHT));
     m_policy.EMA_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_EMA_WIEGHT));
+    m_policy.ZLSMA_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_ZLSMA_WIEGHT));
     
     m_policy.SL_diff = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_STOP_LOSS_DIFF));
     m_policy.TP_diff = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TAKE_PROFIT_DIFF));

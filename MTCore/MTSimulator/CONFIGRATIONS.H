@@ -40,6 +40,7 @@ struct ConfigrationsPolicy {
     int EMA_len_for_Pattern_Export = 0;
     int RSI_Wieght = 0;
     int EMA_Wieght = 0;
+    int ZLSMA_Wieght = 0;
     int SL_start = 0;
     int TP_start = 0;
 

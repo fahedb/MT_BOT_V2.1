@@ -241,9 +241,9 @@ ScoresResult PatternGod::CheckForOneMinNodeMatch(ChangeNode* historyNode, Change
 	// Calc all the scores
 	//score.basicScore = BasincCandleScoreCalcs::CalcScore(historyNode, currentNode);
 	score.basicScore = 0;
-	score.rsiScore = RsiScoreCalcs::Calc_AllLensScores(historyNode, currentNode); 
+	score.rsiScore = RsiScoreCalcs::Calc_AllLensScore(historyNode, currentNode); 
 	score.emaScore = EmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
-
+	score.zlsmaScore = ZlsmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
 	//score.gravityScore = GravityScoreCalcs::CalcScore(historyNode, currentNode); 
 
 	// Sum all the scores into one Object
@@ -391,7 +391,8 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* re
 			"TimePoint: " + time + "\n" +
 			"    | Total Score: " + std::to_string(score.totalScore.total) + "\n" +
 			"    | EMA: " + std::to_string(score.emaScore.total) + "\n" +
-			"    | RSI: " + std::to_string(score.rsiScore.total) + "\n";
+			"    | RSI: " + std::to_string(score.rsiScore.total) + "\n"
+			"    | ZLSMA: " + std::to_string(score.zlsmaScore.total);
 	}
 
 	logger.WriteLog(allTimePoints, false, true);

@@ -30,6 +30,7 @@ struct ScoresResult {
 	int basicScore  =0;
 	int gravityScore=0;
 	IndicatorScore rsiScore;
+	IndicatorScore zlsmaScore;
 	IndicatorScore emaScore;
 	IndicatorScore totalScore;
 	ScoresResult();

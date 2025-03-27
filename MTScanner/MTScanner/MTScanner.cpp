@@ -33,6 +33,7 @@ int main(int argc, char* argv[])
 	std::thread http_thread(ExchangeData::Start_DataExchange);
 	if (IsItDataLoading(argc, argv))
 	{
+		//testing commit
 		LoadJson_Data_ToDBFile();
 	}
 	else {

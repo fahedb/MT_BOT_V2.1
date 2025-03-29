@@ -5,6 +5,7 @@
 #include <ctime>
 #include <iomanip>
 #include <sstream>
+
 #include "Configrations.h"
 #include "HTTP_Lgger.h"
 
@@ -25,16 +26,9 @@ public:
         return instance;
     }
     void WriteLog(std::string log, bool newSection = false, bool sendToLogServer = false, LogType logType = LogType::LOG);
-    void LogPatternPngs(std::vector<std::string> paths,std::string barP,std::string indL)
-    {
-        std::string body = "";
-        for (int i = 0; i < paths.size(); i++) { body += paths.at(i) + "\n"; }
-
-        httplib::Headers headers;
-        headers.insert(std::make_pair("IndicatorLen", indL));
-        headers.insert(std::make_pair("BarPeriod", barP));
-        m_httpLogger->Export_Patterns_Log(body, "text", headers);
-    }
+    void Http_Send_Log(std::string log, LogType logType) { m_httpLogger->Send_Log(log, "text", httplib::Headers(), logType); }
+    void Http_Send_Patterns(std::vector<std::string> paths, std::string barP, std::string indL);
+    void LogPatternPngs(std::vector<std::string> paths, std::string barP, std::string indL) { std::thread(&Logger::Http_Send_Patterns, this, paths, barP, indL).detach(); }
 private:
     std::string GetFormattedCurrTime();
     std::ofstream* m_logFile;

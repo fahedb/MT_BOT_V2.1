@@ -36,11 +36,14 @@ struct DirectionStats {
 	double firstSumPips = 0.0;
 	double firstSumSquaredPips = 0.0;
 
+	std::vector <std::pair<int,int>> firstIndexes;
+	std::vector<std::pair<int,int>> generalIndexes;
 
-	void add_general(double pipChange, CommonDirection dir) {
+	void add_general(double pipChange, CommonDirection dir,int candleIdx) {
 		generalTotal++;
 		generalSumPips += pipChange;
 		generalSumSquaredPips += pipChange * pipChange;
+		generalIndexes.push_back(std::make_pair(candleIdx,pipChange));
 
 		switch (dir) {
 		case CommonDirection::UP: generalUpCount++; break;
@@ -53,6 +56,18 @@ struct DirectionStats {
 		return (generalTotal == 0) ? 0.0 : generalSumPips / generalTotal;
 	}
 
+	double meanIndexes_general() const {
+		int indexesSum = 0;
+
+		for (int i = 0; i < generalIndexes.size(); i++)
+		{
+			indexesSum += generalIndexes.at(i).first;
+		}
+		return double(indexesSum) / double(generalIndexes.size());
+	}
+
+	std::vector < std::pair<int, int>> get_Indexes_and_changePips_First() { return firstIndexes; }
+
 	double stddev_general() const {
 		if (generalTotal == 0) return 0.0;
 		double avg = mean_general();
@@ -60,10 +75,11 @@ struct DirectionStats {
 	}
 
 
-	void add_first(double pipChange, CommonDirection dir) {
+	void add_first(double pipChange, CommonDirection dir,int candleIdx) {
 		firstTotal++;
 		firstSumPips += pipChange;
 		firstSumSquaredPips += pipChange * pipChange;
+		firstIndexes.push_back(std::make_pair(candleIdx,pipChange));
 
 		switch (dir)
 		{
@@ -76,6 +92,18 @@ struct DirectionStats {
 	double mean_first() const {
 		return (firstTotal == 0) ? 0.0 : firstSumPips / firstTotal;
 	}
+
+	double meanIndexes_first() const {
+		int indexesSum = 0;
+
+		for (int i = 0 ;i < firstIndexes.size(); i++)
+		{
+			indexesSum += firstIndexes.at(i).first;
+		}
+		return double(indexesSum) / double(firstIndexes.size());
+	}
+
+	std::vector < std::pair<int, int>> get_Indexes_and_changePips_General() { return generalIndexes; }
 
 	double stddev_first() const {
 		if (firstTotal == 0) return 0.0;
@@ -109,6 +137,7 @@ public:
 	{
 		m_Db_Work.CloseConnection();
 	}
+	void PrepareAndSend_FinalDecLog(DirectionStats& stats, std::vector<ChangeNode*>* potentioalRes);
 	void filterByHighScores(std::vector<std::pair< ChangeNode*, ScoresResult>>& localResults2D);
 	void SortScores(std::vector<std::pair< ChangeNode*, ScoresResult>>& localResults2D);
 	void FilterDuplicatesTimeLines(std::vector<std::pair< ChangeNode*, ScoresResult>>& localResults2D);
@@ -117,8 +146,8 @@ public:
 	int ScanForOneMinPatters(std::vector<ChangeNode*>*);
 	int ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* resultNodes);
 	int DetectCommonDirection(std::vector<ChangeNode*>* potentioalRes);
-	CommonDirection CalcGeneralPipsChange(ChangeNode* start, int pipsChangeToCount, int* outPipChange);
-	CommonDirection CalcFirstPipsChange(ChangeNode* start, int pipsChangeToCount, int* outPipChange);
+	CommonDirection CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stat, int pipsChangeToCount);
+	CommonDirection CalcFirstPipsChange(ChangeNode* start, DirectionStats* stat, int pipsChangeToCount);
 private:
 	void Send_TraddeSignal(std::string pair, int type);
 	bool Trade_Decession_Logic(DirectionStats stats);

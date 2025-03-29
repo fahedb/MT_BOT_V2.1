@@ -31,6 +31,7 @@ std::string m_lastTimePoint = "";
 int main(int argc, char* argv[])
 {	
 	std::thread http_thread(ExchangeData::Start_DataExchange);
+
 	if (IsItDataLoading(argc, argv))
 	{
 		LoadJson_Data_ToDBFile();

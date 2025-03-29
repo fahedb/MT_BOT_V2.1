@@ -125,59 +125,27 @@ int PatternGod::DetectCommonDirection(std::vector<ChangeNode*>* potentioalRes)
 	{
 		int generalPipChange = 0;
 		int firstPipChange = 0;
-		CommonDirection generalDir = CalcGeneralPipsChange(node, policy->Pattern_Min_PipsChange_ToCount, &generalPipChange);
-		CommonDirection firstDir = CalcFirstPipsChange(node, policy->Pattern_Min_PipsChange_ToCount,	 &firstPipChange);
-		stats.add_general(generalPipChange, generalDir);
-		stats.add_first(firstPipChange, firstDir);
+
+		CommonDirection generalDir = CalcGeneralPipsChange(node, &stats,policy->Pattern_Min_PipsChange_ToCount);
+		CommonDirection firstDir = CalcFirstPipsChange(node,&stats ,policy->Pattern_Min_PipsChange_ToCount );
+		
 	}
-
-	double general_upPercent = (double(	 stats.generalUpCount) /   stats.generalTotal) * 100.0;
-	double general_downPercent = (double(stats.generalDownCount) / stats.generalTotal) * 100.0;
-	double general_blurPercent = (double(stats.generalBlurCount) / stats.generalTotal) * 100.0;
-
-
-	double first_upPercent = (double  (stats.firstUpCount) /	   stats.firstTotal) * 100.0;
-	double first_downPercent = (double(stats.firstDownCount) / stats.firstTotal) * 100.0;
-	double first_blurPercent = (double(stats.firstBlurCount) / stats.firstTotal) * 100.0;
-
-	bool tradeDecRes =  Trade_Decession_Logic(stats);
-	Logger::getInstance().WriteLog("Patterns count found: " + std::to_string(potentioalRes->size()) ,false, true);
-
-	std::string general_summeryLog = "Stats Summary (General decession calcs !!):\n" +
-		std::string("UP: ") + std::to_string(general_upPercent) + "%\n" +
-		"DOWN: " + std::to_string(general_downPercent) + "%\n" +
-		"NOISE: " + std::to_string(general_blurPercent) + "%\n" +
-		"Mean Pip Change: " + std::to_string(stats.mean_general()) + "\n" +
-		"StdDev Pip Change: " + std::to_string(stats.stddev_general());
-
-	std::string first_summeryLog = "Stats Summary (First decession calcs !!):\n" +
-		std::string("UP: ") + std::to_string(first_upPercent) + "%\n" +
-		"DOWN: " + std::to_string(first_downPercent) + "%\n" +
-		"NOISE: " + std::to_string(first_blurPercent) + "%\n" +
-		"Mean Pip Change: " + std::to_string(stats.mean_first()) + "\n" +
-		"StdDev Pip Change: " + std::to_string(stats.stddev_first());
-
-
-	Logger::getInstance().WriteLog(general_summeryLog,false, true);
-	Logger::getInstance().WriteLog(first_summeryLog,false, true);
-
-	if (tradeDecRes) Logger::getInstance().WriteLog(general_summeryLog, false, true, LogType::SPECIAL_LOG);
-	if (tradeDecRes) Logger::getInstance().WriteLog(first_summeryLog, false, true, LogType::SPECIAL_LOG);
-	  
+	PrepareAndSend_FinalDecLog(stats, potentioalRes);
 	Send_For_PNGExport(potentioalRes);
 	return -1;
 }
 
-CommonDirection PatternGod::CalcFirstPipsChange(ChangeNode* start, int pipsChangeToCount, int* outPipChange)
+CommonDirection PatternGod::CalcFirstPipsChange(ChangeNode* start, DirectionStats* stats, int pipsChangeToCount)
 {
 	int indexStart = m_historyDB_Map.GetIdx_Of_TimePoint(start->point_DateTime);
 	int futureLen = Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles;
 	int pipChange = 0;
-
+	int candlesCounter = 0;
 	bool upD = false, downD = false;
 	for (int i = indexStart; i < indexStart + futureLen && i < m_historyTL->size(); i++)
 	{
 		pipChange += m_historyTL->at(i)->Pip_Change;
+		candlesCounter++;
 		if (pipChange >= pipsChangeToCount) 
 		{
 			upD = true; 
@@ -190,36 +158,49 @@ CommonDirection PatternGod::CalcFirstPipsChange(ChangeNode* start, int pipsChang
 			break;
 		}
 	}
+	CommonDirection dire;
+	if (upD) dire = CommonDirection::UP;
+	else if (downD) dire = CommonDirection::DOWN;
+	else dire = CommonDirection::BLUR;
 
-	if (outPipChange) *outPipChange = pipChange;
-
-	if (upD) return CommonDirection::UP;
-	if (downD) return CommonDirection::DOWN;
-	return CommonDirection::BLUR;
+	stats->add_first(pipChange, dire, candlesCounter);
+	return dire;
 }
 
 
-CommonDirection PatternGod::CalcGeneralPipsChange(ChangeNode* start, int pipsChangeToCount, int* outPipChange)
+CommonDirection PatternGod::CalcGeneralPipsChange(ChangeNode* start,DirectionStats* stats, int pipsChangeToCount)
 {
 	int indexStart = m_historyDB_Map.GetIdx_Of_TimePoint(start->point_DateTime);
 	int futureLen = Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles;
 	int pipChange = 0;
+	int candlesCounter = 0;
 
 	bool upD = false, downD = false;
+	
 	for (int i = indexStart; i < indexStart + futureLen && i < m_historyTL->size(); i++)
 	{
+		candlesCounter++;
 		pipChange += m_historyTL->at(i)->Pip_Change;
-		if (pipChange >= pipsChangeToCount) upD = true;
-		if (pipChange <= -pipsChangeToCount) downD = true;
+		if (pipChange >= pipsChangeToCount)
+		{
+			upD = true;
+		}
+
+		if (pipChange <= -pipsChangeToCount) {
+			downD = true;
+		}
+
 		if (upD && downD) break;
 	}
 
-	if (outPipChange) *outPipChange = pipChange;
+	CommonDirection dire;
+	if (upD && downD) dire = CommonDirection::BLUR;
+	if (upD) dire = CommonDirection::UP;
+	if (downD) dire = CommonDirection::DOWN;
+	else dire = CommonDirection::BLUR;
 
-	if (upD && downD) return CommonDirection::BLUR;
-	if (upD) return CommonDirection::UP;
-	if (downD) return CommonDirection::DOWN;
-	return CommonDirection::BLUR;
+	stats->add_general(pipChange, dire, candlesCounter);
+	return dire;
 }
 
 void PatternGod::BuildDBHistoryMap()
@@ -388,7 +369,7 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* re
 		const ScoresResult& score = result.second;
 
 		allTimePoints +=
-			"TimePoint: " + time + "\n" +
+			"\nTimePoint: " + time + "\n" +
 			"    | Total Score: " + std::to_string(score.totalScore.total) + "\n" +
 			"    | EMA: " + std::to_string(score.emaScore.total) + "\n" +
 			"    | RSI: " + std::to_string(score.rsiScore.total) + "\n"
@@ -398,6 +379,70 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* re
 	logger.WriteLog(allTimePoints, false, true);
 
 	return static_cast<int>(resultNodes->size());
+
+}
+
+void PatternGod::PrepareAndSend_FinalDecLog(DirectionStats& stats, std::vector<ChangeNode*>* potentioalRes)
+{
+
+	double general_upPercent = (double(stats.generalUpCount) / stats.generalTotal) * 100.0;
+	double general_downPercent = (double(stats.generalDownCount) / stats.generalTotal) * 100.0;
+	double general_blurPercent = (double(stats.generalBlurCount) / stats.generalTotal) * 100.0;
+
+
+	double first_upPercent = (double(stats.firstUpCount) / stats.firstTotal) * 100.0;
+	double first_downPercent = (double(stats.firstDownCount) / stats.firstTotal) * 100.0;
+	double first_blurPercent = (double(stats.firstBlurCount) / stats.firstTotal) * 100.0;
+
+	bool tradeDecRes = Trade_Decession_Logic(stats); // Take a deccession to enter a trade
+
+	Logger::getInstance().WriteLog("Patterns count found: " + std::to_string(potentioalRes->size()), false, true);
+
+	std::string general_summeryLog = "Stats Summary (General decession calcs !!):\n" +
+		std::string("UP: ") + std::to_string(general_upPercent) + "%\n" +
+		"DOWN: " + std::to_string(general_downPercent) + "%\n" +
+		"NOISE: " + std::to_string(general_blurPercent) + "%\n" +
+		"Mean Pip Change: " + std::to_string(stats.mean_general()) + "\n" +
+		"StdDev Pip Change: " + std::to_string(stats.stddev_general()) +"\n" +
+		"Mean indexes: " + std::to_string(stats.meanIndexes_general());
+
+	std::string first_summeryLog = "Stats Summary (First decession calcs !!):\n" +
+		std::string("UP: ") + std::to_string(first_upPercent) + "%\n" +
+		"DOWN: " + std::to_string(first_downPercent) + "%\n" +
+		"NOISE: " + std::to_string(first_blurPercent) + "%\n" +
+		"Mean Pip Change: " + std::to_string(stats.mean_first()) + "\n" +
+		"StdDev Pip Change: " + std::to_string(stats.stddev_first()) + "\n" +
+		"Mean indexes: " + std::to_string(stats.meanIndexes_first());
+
+	auto indexes_first = stats.get_Indexes_and_changePips_First();
+	auto indexes_general = stats.get_Indexes_and_changePips_General();
+
+	std::string indexesSummery_first = "Indexes Summery (first)\n";
+	std::string indexesSummery_general = "Indexes Summery (general)\n";
+
+	for (int i = 0; i < indexes_first.size(); i++)
+	{
+		indexesSummery_first += std::to_string(i) + std::string(": ") + std::to_string(indexes_first.at(i).first) + std::string(" | ")
+			+ std::to_string(indexes_first.at(i).second) + std::string("\n");
+	}
+
+	for (int i = 0; i < indexes_general.size(); i++)
+	{
+		indexesSummery_general += std::to_string(i) + std::string(": ") + std::to_string(indexes_general.at(i).first) + std::string(" | ")
+			+ std::to_string(indexes_general.at(i).second) + std::string("\n");
+	}
+
+
+	Logger::getInstance().WriteLog(general_summeryLog, false, true);
+	Logger::getInstance().WriteLog(indexesSummery_first, false, true);
+	Logger::getInstance().WriteLog(first_summeryLog, false, true);
+	Logger::getInstance().WriteLog(indexesSummery_general, false, true);
+
+	if (tradeDecRes) Logger::getInstance().WriteLog(general_summeryLog, false, true, LogType::SPECIAL_LOG);
+	if (tradeDecRes) Logger::getInstance().WriteLog(indexesSummery_general, false, true, LogType::SPECIAL_LOG);
+
+	if (tradeDecRes) Logger::getInstance().WriteLog(first_summeryLog, false, true, LogType::SPECIAL_LOG);
+	if (tradeDecRes) Logger::getInstance().WriteLog(indexesSummery_first, false, true, LogType::SPECIAL_LOG);
 
 }
 

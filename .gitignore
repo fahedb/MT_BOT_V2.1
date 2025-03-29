@@ -1,0 +1,35 @@
+# Visual Studio
+.vs/
+*.vcxproj.user
+*.vcxproj.filters
+*.suo
+*.user
+*.dbmdl
+*.bak
+
+# Build results
+Debug/
+Release/
+x64/
+*.obj
+*.lib
+*.pdb
+*.exp
+*.log
+*.tlog
+*.lastbuildstate
+*.idb
+*.ipch
+*.iobj
+*.ipdb
+*.exe
+*.dll
+*.recipe
+
+# Others
+*.cache
+*.tmp
+*.log
+*.sdf
+*.opendb
+*.VC.db

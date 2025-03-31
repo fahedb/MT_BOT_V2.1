@@ -46,6 +46,8 @@ struct ConfigrationsPolicy {
 
     int TP_diff = 0;
     int SL_diff = 0;
+
+    int TimeBetweenScans = 0;
 };
 
 class Configrations // SingleTon class for all configrations of the program

@@ -73,6 +73,8 @@ std::vector<std::vector<std::string>> Configrations::Get_AllConfigRows_DB()
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_TAKE_PROFIT_START));
     
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT));
+
+    allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
     return allConfigs;
 }
 
@@ -153,4 +155,6 @@ void Configrations::Init_PatternPolicy()
 
     m_policy.SL_start = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_STOP_LOSS_START));
     m_policy.TP_start = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TAKE_PROFIT_START));
+
+    m_policy.TimeBetweenScans = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
 }

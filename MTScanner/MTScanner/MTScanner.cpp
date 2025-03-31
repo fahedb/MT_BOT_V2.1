@@ -93,12 +93,13 @@ void DefualtProgramStart()
 	
 	std::vector<ChangeNode*> chnVec;
 	UpdateCurrentTimeLine(&chnVec, &table);
-
+	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+	int timeBetweenScans = policy->TimeBetweenScans;
 	while (true)
 	{
 		UpdateConfigs();
-		logger.WriteLog("Sleep for " + std::to_string(30) + " seconds...",true,true);
-		Sleep(30000); // Sleep for 5 seconds before start a new scan
+		logger.WriteLog("Sleep for " + std::to_string(timeBetweenScans) + " seconds...",true,true);
+		Sleep(timeBetweenScans * 1000); // Sleep for 5 seconds before start a new scan
 		Configrations::getInstance()->RefreshPolicy(); // Refresh all policies 
 		UpdateCurrentTimeLine(&chnVec, &table);
 		OneMinutePatternGodLogic(&patternScaner,chnVec); // Start scanning

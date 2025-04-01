@@ -13,6 +13,8 @@
 #define HTTP_SERVICE_NewBar_M1			"/NewBar_M1"
 #define HTTP_SERVICE_NewBar_JSON_DB_M1	"/NewBar_JSON_DB_M1"
 
+#define HTTP_SERVICE_Get_OrdersSummey_CSV "/OrdersSummery_CSV"
+
 #define HTTP_SERVICE_TruncateCurrTimeLine_M1 "/TruncateCurrTimeLine_M1" // TODO: Need to implement a logic for this
 
 // Headers

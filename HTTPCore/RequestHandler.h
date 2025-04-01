@@ -32,6 +32,9 @@ private:
 	std::stack<Http_OrderStruct> m_ordersToExecute;
 	bool m_CurrQueue_locked = false;
 	bool m_HistQueue_locked = false;
+	
+	std::mutex m_tradeQueueMutex;
+
 
 	bool m_runningStatus = true;
 	bool m_loadingDataStatus = true;
@@ -148,20 +151,25 @@ public:
 
 	bool IsLocked_CurrQueue() { return m_CurrQueue_locked; }
 	bool IsLocked_HistQueue() { return m_HistQueue_locked; }
+
+	
 	void Handle_IsThereAnTrade(httplib::Response& res) // Returns 
 	{
+		std::lock_guard<std::mutex> lock(m_tradeQueueMutex);
 		if (!m_ordersToExecute.size())
 			return;
 		Http_OrderStruct newOrder = m_ordersToExecute.top();
-		
+	
 		while (!m_ordersToExecute.empty()) // i'm using queue for futher usage, but currently i need only the front item
 			m_ordersToExecute.pop();
-
+		
+		
 		res.set_header(HTTP_PARAM_Symbol, newOrder.symbol);
 		res.set_header(HTTP_PARAM_TradeType, newOrder.long_short ? HTTP_PARAM_VALUE_TradeType_Short : HTTP_PARAM_VALUE_TradeType_Long);
 	}
 	void Set_NewOrder(std::string symbol, int long_short)
 	{
+		std::lock_guard<std::mutex> lock(m_tradeQueueMutex);
 		Http_OrderStruct newOrder;
 		newOrder.long_short = long_short;
 		newOrder.symbol = symbol;

@@ -187,6 +187,12 @@
     <Filter Include="Tables\ConfigsTable">
       <UniqueIdentifier>{b2322148-1064-466b-8eab-a3b1e2b1cc03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataExport">
+      <UniqueIdentifier>{e47bbe13-9c26-4c07-a949-9698825921fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\SeqTable">
+      <UniqueIdentifier>{c1ca3ca3-9ce3-4602-ba6f-d691c97dcb09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -269,6 +275,12 @@
     </ClCompile>
     <ClCompile Include="HTTP_Lgger.cpp">
       <Filter>LogsLogic\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="CSVExportData.cpp">
+      <Filter>DataExport</Filter>
+    </ClCompile>
+    <ClCompile Include="SeqNumTable.cpp">
+      <Filter>Tables\SeqTable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -358,6 +370,12 @@
     </ClInclude>
     <ClInclude Include="HTTP_Lgger.h">
       <Filter>LogsLogic\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="CSVExportData.h">
+      <Filter>DataExport</Filter>
+    </ClInclude>
+    <ClInclude Include="SeqNumTable.h">
+      <Filter>Tables\SeqTable</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

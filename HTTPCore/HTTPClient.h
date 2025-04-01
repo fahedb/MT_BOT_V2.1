@@ -14,11 +14,8 @@ private:
     {
         m_host = "localhost"; // Need to implement a logic for a cfg for this
         m_port = 8080; // Need to implement a logic for a cfg for this
-        
-        std::ofstream log("C:\\MTDB\\logdll2.txt", std::ios::app);
-        log << "HTTPClient Constructor Called\n";
-        log.close();
         std::string srv = m_host + ":" + std::to_string(m_port);
+        m_client.set_keep_alive(true);
     }
 public:
     httplib::Result Send_Get(std::string service,httplib::Headers headers = httplib::Headers())

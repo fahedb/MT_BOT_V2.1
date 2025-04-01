@@ -170,8 +170,8 @@ void OneMinutePatternGodLogic(PatternGod* patternScan, std::vector<ChangeNode*> 
 
 	if (!currentTimeLine.size())
 	{
-		logger.WriteLog("No current time line.", false, true);
-		logger.WriteLog("Sleeping for 5 minutes.", false, true);
+		logger.WriteLog("No current time line.", false, true, LogType::ERR);
+		logger.WriteLog("Sleeping for 5 minutes.", false, true, LogType::ERR);
 		Sleep(5 * 60000);
 		return;
 	}

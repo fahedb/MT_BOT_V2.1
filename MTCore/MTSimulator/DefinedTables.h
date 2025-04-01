@@ -19,6 +19,8 @@
 
 #define DEF_TABLE_Configs "configs"
 
+#define DEF_TABLE_SEQ_NUMS "seq_nums"
+
 // Columns Names		  ////////////
 //		Authour: Fahed				//
 //		MasterPeice Soft LTD.		//
@@ -89,6 +91,9 @@
 #define DEF_COLUMN_ConfigExplain "config_explain"
 #define DEF_COLUMN_ConfigPermission "config_permission"
 
+
+#define DEF_COLUMN_ENTITY "entity"
+#define DEF_COLUMN_SEQ "seq"
 
 // Columns num			   ////////////
 //		Authour: Fahed				//

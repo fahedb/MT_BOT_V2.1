@@ -106,7 +106,7 @@ async def log_worker():
                         f"📏 <b>Indicator Length:</b> {indL}\n"
                         f"⏱️ <b>Bar Period:</b> {barP}"
                     ),
-                    parse_mode="html"
+                    parse_mode="html",force_document=True
                 )
 
                 # שליחת התבניות הדומות

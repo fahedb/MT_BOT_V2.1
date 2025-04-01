@@ -74,35 +74,51 @@ bool PatternGod::Trade_Decession_Logic(DirectionStats stats)
 	double downPercent = (double(stats.generalDownCount) / stats.generalTotal) * 100.0;
 	double blurPercent = (double(stats.generalBlurCount) / stats.generalTotal) * 100.0;
 
+	double meanPips = stats.mean_general();
+
 	if (stats.generalTotal >= policy->Patter_Min_Patterns_ToTake_Action)
 	{
-		if (upPercent > policy->Pattern_Min_Percent_To_ExecuteOrder
-			&& std::fabs(stats.mean_general()) >= policy->Min_MeanPips_ToExecute_Order)
+		bool isStrongUp = upPercent > policy->Pattern_Min_Percent_To_ExecuteOrder
+			&& (meanPips) >= policy->Min_MeanPips_ToExecute_Order;
+
+		bool isStrongDown = downPercent > policy->Pattern_Min_Percent_To_ExecuteOrder
+			&& (meanPips) <= -policy->Min_MeanPips_ToExecute_Order;
+
+		if (isStrongUp)
 		{
 			Send_TraddeSignal("XAUUSD", 0);
 			return true;
 		}
-		else if (downPercent > policy->Pattern_Min_Percent_To_ExecuteOrder
-			&& std::fabs(stats.mean_general()) >= policy->Min_MeanPips_ToExecute_Order)
+		else if (isStrongDown)
 		{
 			Send_TraddeSignal("XAUUSD", 1);
 			return true;
 		}
-		else if (policy->Pattern_Activate_Alternative_ExecuteOrder
-			&& blurPercent <= policy->Pattern_Max_Noise_To_ExecuteOrder_Alternative
-			&& std::fabs(downPercent - upPercent) >= policy->Pattern_Diff_Percent_To_ExecuteOrder_Alternative
-			&& std::fabs(stats.mean_general()) >= (policy->Min_MeanPips_ToExecute_Order + 10))
+		else if (policy->Pattern_Activate_Alternative_ExecuteOrder)
 		{
-			if (upPercent > downPercent) Send_TraddeSignal("XAUUSD", 0);
-			else Send_TraddeSignal("XAUUSD", 1);
+			bool isAlternativeAllowed = blurPercent <= policy->Pattern_Max_Noise_To_ExecuteOrder_Alternative
+				&& std::fabs(downPercent - upPercent) >= policy->Pattern_Diff_Percent_To_ExecuteOrder_Alternative;
 
-			return true;
-		}
-		else
-		{
-			Cur_Orders_InRow = 0;
+			if (isAlternativeAllowed)
+			{
+				bool isAlternativeUp = upPercent > downPercent && (meanPips) >= (policy->Min_MeanPips_ToExecute_Order + 10);
+				bool isAlternativeDown = downPercent > upPercent && (meanPips) <= -(policy->Min_MeanPips_ToExecute_Order + 10);
+
+				if (isAlternativeUp)
+				{
+					Send_TraddeSignal("XAUUSD", 0);
+					return true;
+				}
+				else if (isAlternativeDown)
+				{
+					Send_TraddeSignal("XAUUSD", 1);
+					return true;
+				}
+			}
 		}
 	}
+
+	Cur_Orders_InRow = 0;
 	return false;
 
 }
@@ -132,6 +148,7 @@ int PatternGod::DetectCommonDirection(std::vector<ChangeNode*>* potentioalRes)
 	}
 	PrepareAndSend_FinalDecLog(stats, potentioalRes);
 	Send_For_PNGExport(potentioalRes);
+
 	return -1;
 }
 
@@ -194,9 +211,8 @@ CommonDirection PatternGod::CalcGeneralPipsChange(ChangeNode* start,DirectionSta
 	}
 
 	CommonDirection dire;
-	if (upD && downD) dire = CommonDirection::BLUR;
-	if (upD) dire = CommonDirection::UP;
-	if (downD) dire = CommonDirection::DOWN;
+	if(upD) dire = CommonDirection::UP;
+	else if (downD) dire = CommonDirection::DOWN;
 	else dire = CommonDirection::BLUR;
 
 	stats->add_general(pipChange, dire, candlesCounter);
@@ -215,6 +231,36 @@ void PatternGod::BuildDBHistoryMap()
 			Logger::getInstance().WriteLog("!!!!! Duplicate point_DateTime in DB: " + timeKey + " !!!!!!", false, true);
 		}
 	}
+}
+void PatternGod::Export_DataToCSV(DirectionStats stats)
+{
+
+	double general_upPercent = (double(stats.generalUpCount) / stats.generalTotal) * 100.0;
+	double general_downPercent = (double(stats.generalDownCount) / stats.generalTotal) * 100.0;
+	double general_blurPercent = (double(stats.generalBlurCount) / stats.generalTotal) * 100.0;
+
+	double first_upPercent = (double(stats.firstUpCount) / stats.firstTotal) * 100.0;
+	double first_downPercent = (double(stats.firstDownCount) / stats.firstTotal) * 100.0;
+	double first_blurPercent = (double(stats.firstBlurCount) / stats.firstTotal) * 100.0;
+	
+	CSVExportData exData("ordersSummery.csv");
+	exData.InsertNewColumn(std::to_string(general_upPercent));
+	exData.InsertNewColumn(std::to_string(general_downPercent));
+	exData.InsertNewColumn(std::to_string(general_blurPercent));
+	exData.InsertNewColumn(std::to_string(stats.mean_general()));
+	exData.InsertNewColumn(std::to_string(stats.stddev_general()));
+	exData.InsertNewColumn(std::to_string(stats.meanIndexes_general()));
+
+
+	exData.InsertNewColumn(std::to_string(first_upPercent));
+	exData.InsertNewColumn(std::to_string(first_downPercent));
+	exData.InsertNewColumn(std::to_string(first_blurPercent));
+	exData.InsertNewColumn(std::to_string(stats.mean_first()));
+	exData.InsertNewColumn(std::to_string(stats.stddev_first()));
+	exData.InsertNewColumn(std::to_string(stats.meanIndexes_first()));
+
+	exData.NewRow();
+	exData.DoneInsertingData();
 }
 ScoresResult PatternGod::CheckForOneMinNodeMatch(ChangeNode* historyNode, ChangeNode* currentNode)
 {
@@ -443,6 +489,7 @@ void PatternGod::PrepareAndSend_FinalDecLog(DirectionStats& stats, std::vector<C
 
 	if (tradeDecRes) Logger::getInstance().WriteLog(first_summeryLog, false, true, LogType::SPECIAL_LOG);
 	if (tradeDecRes) Logger::getInstance().WriteLog(indexesSummery_first, false, true, LogType::SPECIAL_LOG);
+	if (tradeDecRes) Export_DataToCSV(stats);
 
 }
 

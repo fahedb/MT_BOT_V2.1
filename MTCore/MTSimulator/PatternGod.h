@@ -4,6 +4,7 @@
 #include "DBMap.h"
 #include <algorithm>
 #include "DataBaseConnection.h"
+#include "CSVExportData.h"
 #include <queue>
 #define STAIRS_VISION 3
 
@@ -155,6 +156,7 @@ private:
 	std::string GetFormattedCurrentTime();
 	ScoresResult CheckForOneMinNodeMatch(ChangeNode* historyNode, ChangeNode* currentNode); 
 	void BuildDBHistoryMap();
+	void Export_DataToCSV(DirectionStats stats);
 	bool Time_Check(TimeWindow);
 	DataBaseConnection m_Db_Work;
 	DBMap m_historyDB_Map;

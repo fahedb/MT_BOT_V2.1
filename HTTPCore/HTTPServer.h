@@ -93,6 +93,11 @@ private:
         res.set_header("Status", "Success");
     }
 
+
+    void Handle_Get_CSV_OrdersSummery(const httplib::Request& req, httplib::Response& res)
+    {
+        res.body = "C:\\MTDB\\ordersSummery.csv";
+    }
     std::string fix_encoding(const std::string& str) {
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
         std::wstring wide_str = converter.from_bytes(str); // המרה ל-Wide String
@@ -138,6 +143,10 @@ public:
             this->Handle_JSON_DB_NewBarM1(req, res); // Get new history time line bar
             });
 
+        m_srv.Get(HTTP_SERVICE_Get_OrdersSummey_CSV, [this](const httplib::Request& req, httplib::Response& res)
+            {
+                this->Handle_Get_CSV_OrdersSummery(req, res);
+            });
         m_srv.listen("0.0.0.0", m_port);
     }
     HTTPServer(const HTTPServer&) = delete;

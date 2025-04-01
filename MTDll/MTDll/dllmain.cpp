@@ -82,7 +82,11 @@ int CheckForNewOrders_DB()
 int CheckForNewOrders_HTTP()
 {
     httplib::Result res = HTTPClient::getInstance().Send_Get(HTTP_SERVICE_IsThereAnTrade);
-
+    if (!res)
+    {
+        Logger::getInstance().WriteLog("DLL Error while trying to send an HTTP request to server" ,false,true,LogType::SPECIAL_LOG);
+        return -1;
+    }
     std::string symbol = res->get_header_value(HTTP_PARAM_Symbol);
     std::string type = res->get_header_value(HTTP_PARAM_TradeType);
     
@@ -99,11 +103,14 @@ bool InsertNewBar_HTTP_M1(char* timePoint, char* symbol, CandleStruct data)
     // TODO: insert new fresh record to current table
     nlohmann::json_abi_v3_11_3::json j = JasonHandler::Build_Json_ForCandle(std::string(timePoint), *data);
     std::string body = j.dump();
-    std::ofstream file("C:\\MTDB\\logdll.txt");
-    file << body << "\n";
-    file.close();
     httplib::Result res = HTTPClient::getInstance().Send_Post(HTTP_SERVICE_NewBar_M1, body);
     
+    if (!res)
+    {
+        Logger::getInstance().WriteLog("DLL Error while trying to send an HTTP request to server", false, true, LogType::SPECIAL_LOG);
+        return false;
+    }
+
     if (res && res->status == 200)
         return true;
     return false;
@@ -111,14 +118,16 @@ bool InsertNewBar_HTTP_M1(char* timePoint, char* symbol, CandleStruct data)
 
 bool InsertNewBar_HTTP_M1_JSON_DB(char* timePoint, char* symbol, CandleStruct data)
 {
-    std::ofstream file("C:\\MTDB\\JsonBackUp_XAUUSD.json", std::ios::app);
     // TODO: insert new fresh record to current table
     nlohmann::json_abi_v3_11_3::json j = JasonHandler::Build_Json_ForCandle(std::string(timePoint), *data);
     std::string body = j.dump();
-    file << body << "\n";
-    file.close();
 
     httplib::Result res = HTTPClient::getInstance().Send_Post(HTTP_SERVICE_NewBar_JSON_DB_M1, body);
+    if (!res)
+    {
+        Logger::getInstance().WriteLog("DLL Error while trying to send an HTTP request to server", false, true, LogType::SPECIAL_LOG);
+        return -1;
+    }
     if (res && res->status == 200)
         return true;
     return false;
@@ -141,7 +150,7 @@ double Get_MainTrade_Size()
     httplib::Headers headers;
     headers.insert(std::make_pair(HTTP_PARAM_ConfigName, "MAIN_ORDER_SIZE_IN_LOT"));
     httplib::Result res = HTTPClient::getInstance().Send_Get(HTTP_SERVICE_MTScanner_GetConfig, headers);
-
+    
     if (res && res->status == 200)
     {
         std::string value = res->get_header_value(HTTP_PARAM_ConfigValue);

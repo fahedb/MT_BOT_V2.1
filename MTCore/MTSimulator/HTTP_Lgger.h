@@ -4,6 +4,7 @@
 
 const std::string logService = "/LogMessage";
 const std::string SpecialLogService = "/SpecialLogMessage";
+const std::string ErrLogService = "/ErrMessage";
 const std::string PatternsExportService = "/PatternsExport";
 
 
@@ -23,7 +24,7 @@ private:
     std::string m_host;
     HTTP_Logger()
     {
-
+        m_client.set_keep_alive(true);
     }
 public:
 
@@ -36,7 +37,17 @@ public:
 
     httplib::Result Send_Log(std::string body = "{}", std::string content_type = "text", httplib::Headers headers = httplib::Headers(),LogType logType = LogType::LOG)
     {
-        return  m_client.Post(logType == LogType::LOG ? logService : SpecialLogService, headers, body, content_type);
+        std::string logSrv;
+        if (logType == LogType::LOG)
+            logSrv = logService;
+        else if (logType == LogType::SPECIAL_LOG)
+            logSrv = SpecialLogService;
+        else if (logType == LogType::ERR)
+            logSrv = ErrLogService;
+        else
+            logSrv = logService;
+
+        return  m_client.Post(logSrv, headers, body, content_type);
     }
 
     httplib::Result Export_Patterns_Log(std::string body = "{}", std::string content_type = "text", httplib::Headers headers = httplib::Headers())

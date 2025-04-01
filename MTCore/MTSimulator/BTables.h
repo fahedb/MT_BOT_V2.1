@@ -120,6 +120,7 @@ protected:
 			if (m_allSelectedJsonRows_MultiThreaded.at(threadIdx).size())
 				return m_allSelectedJsonRows_MultiThreaded.at(threadIdx).size();
 		}
+		return 0;
 	}
 	std::vector<FileSelectionNode*>* GetSelectedRowsFromFile() { return &m_allSelectedFileRows; }
 	JsonSelectionNode* GetNextJsonSelection() 

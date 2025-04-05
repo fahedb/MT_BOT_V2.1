@@ -48,6 +48,8 @@ struct ConfigrationsPolicy {
     int SL_diff = 0;
 
     int TimeBetweenScans = 0;
+
+    bool Export_Patterns_PNG_To_Telegram = false;
 };
 
 class Configrations // SingleTon class for all configrations of the program

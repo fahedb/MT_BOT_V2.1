@@ -75,6 +75,8 @@ std::vector<std::vector<std::string>> Configrations::Get_AllConfigRows_DB()
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT));
 
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
+
+    allConfigs.push_back(ReadConfigRow_DB(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM));
     return allConfigs;
 }
 
@@ -157,4 +159,5 @@ void Configrations::Init_PatternPolicy()
     m_policy.TP_start = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TAKE_PROFIT_START));
 
     m_policy.TimeBetweenScans = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
+    m_policy.Export_Patterns_PNG_To_Telegram = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
 }

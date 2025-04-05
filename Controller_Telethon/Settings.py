@@ -5,7 +5,7 @@ SERVER_URL = "http://localhost:8080"
 HEADER_CONFIG_NAME ="ConfigName"
 HEADER_CONFIG_VALUE = "ConfigValue"
 HEADER_CONFIG_PERMISIION = "ConfigPermission"
-
+HEADER_CSV_FILE_ORDERS_SUMMERY = "OrdersSummeryPath"
 HEADER_STATUS_CURRENTSTATUS = "Status"
 
 HEADER_STATUS_VALUE_STOPPED = "Stopped"
@@ -132,3 +132,23 @@ def Get_Config_FromServer(config):
     except requests.exceptions.RequestException as e:
         print(f"❌ שגיאה בביצוע הבקשה: {e}")
         return None
+
+
+def Get_OrdersSummery():
+    service = "/OrdersSummery_CSV"
+    reqUrl = SERVER_URL + service
+    session = requests.Session()
+    try:
+        response = session.get(reqUrl, timeout=5)  # קריאה עם זמן מקסימום של 5 שניות
+        response.raise_for_status()  
+        filePath = response.headers.get(HEADER_CSV_FILE_ORDERS_SUMMERY,"Unkown")
+        # שליפת ההדרים
+        if(response.status_code == 200):
+            return filePath
+        else:
+            return ""
+        
+    except requests.exceptions.RequestException as e:
+        print(f"❌ שגיאה בביצוע הבקשה: {e}")
+        return None
+    

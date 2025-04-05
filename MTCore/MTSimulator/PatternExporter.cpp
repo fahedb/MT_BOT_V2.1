@@ -20,10 +20,12 @@ void PatternExporter::Export_All_Pattens_ToPNG(std::vector<ChangeNode*>* currPat
 	Export_RelationalPatterns_EMA5_ToPNG(currPattern, similarPatterns, containerFolder);
 	Export_RelationalPatterns_EMA1_ToPNG(currPattern, similarPatterns, containerFolder);
 
-	Logger::getInstance().LogPatternPngs(m_m15_patternsPaths, "M15","L" + std::to_string(Configrations::getInstance()->Get_Policy()->EMA_len_for_Pattern_Export));
-	Logger::getInstance().LogPatternPngs(m_m5_patternsPaths, "M5","L" + std::to_string(Configrations::getInstance()->Get_Policy()->EMA_len_for_Pattern_Export));
-	Logger::getInstance().LogPatternPngs(m_m1_patternsPaths, "M1", "L" +std::to_string(Configrations::getInstance()->Get_Policy()->EMA_len_for_Pattern_Export));
-
+	if (Configrations::getInstance()->Get_Policy()->Export_Patterns_PNG_To_Telegram)
+	{
+		Logger::getInstance().LogPatternPngs(m_m15_patternsPaths, "M15", "L" + std::to_string(Configrations::getInstance()->Get_Policy()->EMA_len_for_Pattern_Export));
+		Logger::getInstance().LogPatternPngs(m_m5_patternsPaths, "M5", "L" + std::to_string(Configrations::getInstance()->Get_Policy()->EMA_len_for_Pattern_Export));
+		Logger::getInstance().LogPatternPngs(m_m1_patternsPaths, "M1", "L" + std::to_string(Configrations::getInstance()->Get_Policy()->EMA_len_for_Pattern_Export));
+	}
 	m_m15_patternsPaths.clear();
 	m_m5_patternsPaths.clear();
 	m_m1_patternsPaths.clear();

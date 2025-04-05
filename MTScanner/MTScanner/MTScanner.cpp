@@ -16,9 +16,12 @@
 #include "ExchangeData.h"
 #include <queue>
 #include "MyJSONHandler.h"
+#include "JasonHandler.h"
+#include "TimeLine.h"
+#include "StatisticsDecession.h"
 
 std::vector<ChangeNode*> LoadHistoryToVector();
-void OneMinutePatternGodLogic(PatternGod* patternScan, std::vector<ChangeNode*> currentTimeLine);
+void OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator, std::vector<ChangeNode*> currentTimeLine);
 void LoadDataFromFileToDBLogic();
 void DefualtProgramStart();
 void UpdateCurrentTimeLine(std::vector<ChangeNode*>* timeLine, BasePricesTable* table);
@@ -87,8 +90,10 @@ void DefualtProgramStart()
 	std::future<void> cleanupTask = std::async(std::launch::async, [&tb]() {
 		tb.RemoveSelect();
 		});
-	
-	PatternGod patternScaner(&history); // Init a PatternGod object for patterns Scanning
+	TimeLine historyTimeLine(&history);
+	PatternGod patternScaner(&historyTimeLine); // Init a PatternGod object for patterns Scanning
+	StatisticsDecession statisticsCalcucator(&historyTimeLine);
+
 	XAUUSD_CurrentTable table;
 	
 	std::vector<ChangeNode*> chnVec;
@@ -102,7 +107,7 @@ void DefualtProgramStart()
 		Sleep(timeBetweenScans * 1000); // Sleep for 5 seconds before start a new scan
 		Configrations::getInstance()->RefreshPolicy(); // Refresh all policies 
 		UpdateCurrentTimeLine(&chnVec, &table);
-		OneMinutePatternGodLogic(&patternScaner,chnVec); // Start scanning
+		OneMinutePatternGodLogic(&patternScaner,&statisticsCalcucator ,chnVec); // Start scanning
 	}
 
 }
@@ -162,7 +167,7 @@ void LoadDataFromFileToDBLogic() // Old Logic
 	}
 }
 
-void OneMinutePatternGodLogic(PatternGod* patternScan, std::vector<ChangeNode*> currentTimeLine)
+void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* statisticsCalcucator, std::vector<ChangeNode*> currentTimeLine)
 {
 	//std::vector<ChangeNode*> currentTimeLine; // Vector to store curr changeNodes
 	Logger& logger = Logger::getInstance();
@@ -183,14 +188,18 @@ void OneMinutePatternGodLogic(PatternGod* patternScan, std::vector<ChangeNode*> 
 		std::cout << "\n\nNo new data, Last point time: " << m_lastTimePoint << std::endl;
 		return;
 	}
-	m_lastTimePoint = currentTimeLine.at(0)->point_DateTime;
-	logger.WriteLog("!!!!!!!!!!!!		Start New Period Scan		!!!!!!!!!", true,true);
-	logger.WriteLog("Current TimePoint: " + m_lastTimePoint, false, true);
-	logger.WriteLog("Scanning period bars count: " + std::to_string(currentTimeLine.size()), false, true);
 
-	std::vector<ChangeNode*> results; // Vector to the Head of every time point
+	std::string startScanLog = std::string("!!!!!!!!!!!!		Start New Period Scan		!!!!!!!!!\n\n") +
+		std::string("Current TimePoint: ") + m_lastTimePoint + "\n" +
+		"Scanning period bars count: " + std::to_string(currentTimeLine.size());
+	logger.WriteLog(startScanLog, true,true);
+	
+	m_lastTimePoint = currentTimeLine.at(0)->point_DateTime;
+	std::vector<ChangeNode*> results; // Vector for the End of every time period
 
 	patternScan->Set_NewCurrentPeriod(&currentTimeLine); // Set a new Current Period for PatternScan object for the new scan
+	statisticsCalcucator->Set_NewCurrentPeriod(&currentTimeLine); // Set a new current period for Statistics calc
+
 	ExchangeData exh;
 
 	if (!exh.IsScanningAllowed())
@@ -201,7 +210,7 @@ void OneMinutePatternGodLogic(PatternGod* patternScan, std::vector<ChangeNode*> 
 
 	if (patternScan->ScanForOneMinPatterns_MultiThreaded(&results)) // Scan for patterns
 	{
-		int orderRes = patternScan->DetectCommonDirection(&results);
+		int orderRes = statisticsCalcucator->DetectCommonDirection(&results);
 		if (orderRes != -1) // Check for common direction
 		{
 			logger.WriteLog("New Order Set.", false, true);

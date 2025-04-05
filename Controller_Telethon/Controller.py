@@ -2,6 +2,7 @@
 import asyncio
 from telethon import TelegramClient, events, Button
 from Settings import (
+    Get_OrdersSummery,
     Get_Config_FromServer,
     Get_MTScanner_Status,
     Run_MTScanner,
@@ -82,6 +83,7 @@ async def show_main_menu(event):
     buttons = [
         [Button.inline("▶️ הרצת הבוט", b"run_bot"), Button.inline("⏹ עצירת הבוט", b"stop_bot")],
         [Button.inline("📊 סטטוס הבוט", b"status_bot")],
+        [Button.inline("📈📉סיכום נתוני עסקאות",b"orders_summery")],
         [Button.inline("⚙️ הגדרות", b"settings")],
     ]
     await event.respond("🎛 **תפריט ראשי**\nבחר פעולה:", buttons=buttons)
@@ -252,6 +254,15 @@ async def callback_handler(event):
 
         await event.respond(response_message, parse_mode="html")
         await show_main_menu(event)
+    elif data == "orders_summery":
+        csvFilePath = Get_OrdersSummery()
+        if(len(csvFilePath) > 0):
+            senderDetails = await event.get_sender()
+            user_id = event.sender_id
+            user_Name = senderDetails.username if senderDetails.username else user_id
+            await client.send_file(channel_id,csvFilePath,caption=f"<b>משתמש ביקש סיכומי עסקאות</b>\n"
+            f"👤 <b>משתמש:</b> {user_Name}\n",parse_mode="html",force_document=True)
+             
 
     else:
         await event.edit("❌ פיצ'ר זה תחת פיתוח, יתווסף בקרוב.")

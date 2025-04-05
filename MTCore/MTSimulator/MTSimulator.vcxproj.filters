@@ -193,6 +193,12 @@
     <Filter Include="Tables\SeqTable">
       <UniqueIdentifier>{c1ca3ca3-9ce3-4602-ba6f-d691c97dcb09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataStructers\DirectionStats">
+      <UniqueIdentifier>{3ddff9dc-fda8-482e-acee-e07330e9af4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\TimeLine">
+      <UniqueIdentifier>{776242d9-645a-437e-aab8-e742508a1c64}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -264,9 +270,6 @@
     <ClCompile Include="MyJSONHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="JasonHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ThreadPool.cpp">
       <Filter>MultiThreading</Filter>
     </ClCompile>
@@ -281,6 +284,18 @@
     </ClCompile>
     <ClCompile Include="SeqNumTable.cpp">
       <Filter>Tables\SeqTable</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionStats.cpp">
+      <Filter>DataStructers\DirectionStats</Filter>
+    </ClCompile>
+    <ClCompile Include="JasonHandler.cpp">
+      <Filter>DataStructers\JsonHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeLine.cpp">
+      <Filter>DataStructers\TimeLine</Filter>
+    </ClCompile>
+    <ClCompile Include="StatisticsDecession.cpp">
+      <Filter>Strategies\PatternGod\Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -359,9 +374,6 @@
     <ClInclude Include="MyJSONHandler.h">
       <Filter>DefinedTables</Filter>
     </ClInclude>
-    <ClInclude Include="JasonHandler.h">
-      <Filter>DefinedTables</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadPool.h">
       <Filter>MultiThreading</Filter>
     </ClInclude>
@@ -376,6 +388,18 @@
     </ClInclude>
     <ClInclude Include="SeqNumTable.h">
       <Filter>Tables\SeqTable</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionStats.h">
+      <Filter>DataStructers\DirectionStats</Filter>
+    </ClInclude>
+    <ClInclude Include="JasonHandler.h">
+      <Filter>DataStructers\JsonHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLine.h">
+      <Filter>DataStructers\TimeLine</Filter>
+    </ClInclude>
+    <ClInclude Include="StatisticsDecession.h">
+      <Filter>Strategies\PatternGod\Inc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

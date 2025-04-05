@@ -155,6 +155,7 @@
     <ClCompile Include="DataBaseConnection.cpp" />
     <ClCompile Include="DataLoad.cpp" />
     <ClCompile Include="DBMap.cpp" />
+    <ClCompile Include="DirectionStats.cpp" />
     <ClCompile Include="EURUSD_CurrentTable.cpp" />
     <ClCompile Include="HTTP_Lgger.cpp" />
     <ClCompile Include="IndicatorStructres.cpp" />
@@ -169,10 +170,12 @@
     <ClCompile Include="ScoreCalcs.cpp" />
     <ClCompile Include="SeqNumTable.cpp" />
     <ClCompile Include="StartPoint.cpp" />
+    <ClCompile Include="StatisticsDecession.cpp" />
     <ClCompile Include="SynchronizeCurrentDBBase.cpp" />
     <ClCompile Include="SyncJobs_Table.cpp" />
     <ClCompile Include="TempCache.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
+    <ClCompile Include="TimeLine.cpp" />
     <ClCompile Include="XAUUSD_CurrentTable.cpp" />
     <ClCompile Include="XAUUSD_OneMinTable.cpp" />
   </ItemGroup>
@@ -189,6 +192,7 @@
     <ClInclude Include="DataLoad.h" />
     <ClInclude Include="DBMap.h" />
     <ClInclude Include="DefinedTables.h" />
+    <ClInclude Include="DirectionStats.h" />
     <ClInclude Include="EURUSD_CurrentTable.h" />
     <ClInclude Include="HTTP_Lgger.h" />
     <ClInclude Include="IndicatorStructres.h" />
@@ -202,10 +206,12 @@
     <ClInclude Include="ProcessData.h" />
     <ClInclude Include="ScoreCalcs.h" />
     <ClInclude Include="SeqNumTable.h" />
+    <ClInclude Include="StatisticsDecession.h" />
     <ClInclude Include="SynchronizeCurrentDBBase.h" />
     <ClInclude Include="SyncJobs_Table.h" />
     <ClInclude Include="TempCache.h" />
     <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="TimeLine.h" />
     <ClInclude Include="XAUUSD_CurrentTable.h" />
     <ClInclude Include="XAUUSD_OneMinTable.h" />
   </ItemGroup>

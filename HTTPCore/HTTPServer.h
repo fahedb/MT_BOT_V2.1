@@ -96,7 +96,7 @@ private:
 
     void Handle_Get_CSV_OrdersSummery(const httplib::Request& req, httplib::Response& res)
     {
-        res.body = "C:\\MTDB\\ordersSummery.csv";
+        res.set_header("OrdersSummeryPath", "C:\\MTDB\\ordersSummery.csv");
     }
     std::string fix_encoding(const std::string& str) {
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;

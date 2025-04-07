@@ -1,6 +1,5 @@
 #include "BTables.h"
 #include <iomanip>
-#include "DataLoad.h"
 #include <map>
 #include <future>      // std::async, std::future
 
@@ -105,6 +104,40 @@ bool BTables::UpdateDB(std::string insertSQL) {
 		return false;
 
 	}
+}
+
+void BTables::RemoveSelection()
+{
+	for (int i = 0; i < m_allSelectedRows.size(); i++)
+	{
+		delete m_allSelectedRows.at(i);
+	}
+	m_allSelectedRows.clear();
+
+	for (int i = 0; i < m_allSelectedFileRows.size(); i++)
+	{
+		delete m_allSelectedFileRows.at(i);
+	}
+	m_allSelectedFileRows.clear();
+
+	for (int i = 0; i < m_allSelectedJsonRows.size(); i++)
+	{
+		JsonSelectionNode* j = m_allSelectedJsonRows.front();
+		delete j;
+		j = nullptr;
+		m_allSelectedJsonRows.pop();
+	}
+
+	for (int i = 0; i < m_allSelectedJsonRows_MultiThreaded.size(); i++)
+	{
+		for (int t = 0; t < m_allSelectedJsonRows_MultiThreaded.at(i).size(); t++)
+		{
+			JsonSelectionNode* j = m_allSelectedJsonRows_MultiThreaded.at(i).at(t);
+			delete j;
+		}
+		m_allSelectedJsonRows_MultiThreaded.at(i).clear();
+	}
+	m_allSelectedJsonRows_MultiThreaded.clear();
 }
 
 bool BTables::SelectFromFile(int cols)
@@ -212,6 +245,32 @@ bool BTables::SelectFromJsonFile_MultiThreaded()
 	}
 	reads2D.clear();
 	return true;
+}
+
+JsonSelectionNode* BTables::GetNextJsonSelection()
+{
+	if (!m_allSelectedJsonRows.size())
+		return nullptr;
+	JsonSelectionNode* j = m_allSelectedJsonRows.front();
+	m_allSelectedJsonRows.pop();
+	return j;
+}
+
+JsonSelectionNode* BTables::GetNextJsonSelection_MultiThreaded(int threadIdx)
+{
+	if (threadIdx >= m_allSelectedJsonRows_MultiThreaded.size())
+		return nullptr;
+
+	size_t currIdx = m_jsonsThreadIdxsPlaces[threadIdx];
+	auto& jsonRows = m_allSelectedJsonRows_MultiThreaded[threadIdx];
+
+	if (currIdx >= jsonRows.size())
+		return nullptr;
+
+	JsonSelectionNode* j = jsonRows[currIdx];
+	m_jsonsThreadIdxsPlaces[threadIdx] = currIdx + 1;
+	return j;
+
 }
 
 long BTables::GetFileLinesCount(const std::string& filePath)

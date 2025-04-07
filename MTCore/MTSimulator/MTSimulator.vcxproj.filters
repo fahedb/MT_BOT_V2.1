@@ -11,18 +11,6 @@
     <Filter Include="Strategies">
       <UniqueIdentifier>{f59e8eea-0b16-4009-b786-b63f2b0a6bde}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SyncLogic">
-      <UniqueIdentifier>{3afef497-1036-4489-ba24-b06b05db584d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tables\SyncJobs">
-      <UniqueIdentifier>{0903d66b-b613-4523-8a46-a7c712847c10}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tables\SyncJobs\Inc">
-      <UniqueIdentifier>{3161f0df-750d-4bd6-a0f4-43667b4b847d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tables\SyncJobs\src">
-      <UniqueIdentifier>{d5ff352b-e9d4-4cf8-b5ae-3666e5405701}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Strategies\PatternGod">
       <UniqueIdentifier>{f893ffe7-f351-4391-9223-3296d6171e2a}</UniqueIdentifier>
     </Filter>
@@ -56,15 +44,6 @@
     </Filter>
     <Filter Include="DataBaseConnection\Src">
       <UniqueIdentifier>{98d120d8-4f12-4d1c-8772-8af1b4c04f5a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DataLoad">
-      <UniqueIdentifier>{1da6c0a2-c0c3-46c4-856f-17e353f13d59}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DataLoad\Inc">
-      <UniqueIdentifier>{71b2c584-6470-436c-bdbe-9ebfb48e1642}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DataLoad\Src">
-      <UniqueIdentifier>{38b6f6a6-b910-4c34-a11e-6ca0d563b116}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataProcessing\Inc">
       <UniqueIdentifier>{6e3026b3-7a00-4062-a79f-2b61efb6ae7d}</UniqueIdentifier>
@@ -199,6 +178,9 @@
     <Filter Include="DataStructers\TimeLine">
       <UniqueIdentifier>{776242d9-645a-437e-aab8-e742508a1c64}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataStructers\SelectionNodesStructures">
+      <UniqueIdentifier>{c45887ea-92c8-4970-89ac-a6fdf02067bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -207,14 +189,8 @@
     <ClCompile Include="BTables.cpp">
       <Filter>Tables\AllTablesBase</Filter>
     </ClCompile>
-    <ClCompile Include="SynchronizeCurrentDBBase.cpp">
-      <Filter>SyncLogic</Filter>
-    </ClCompile>
     <ClCompile Include="EURUSD_CurrentTable.cpp">
       <Filter>Tables\PricesTables\EURUSD_Tables\src</Filter>
-    </ClCompile>
-    <ClCompile Include="SyncJobs_Table.cpp">
-      <Filter>Tables\SyncJobs\src</Filter>
     </ClCompile>
     <ClCompile Include="BasePricesTable.cpp">
       <Filter>Tables\PricesTables\BasePrices_Tables\src</Filter>
@@ -233,9 +209,6 @@
     </ClCompile>
     <ClCompile Include="DataBaseConnection.cpp">
       <Filter>DataBaseConnection\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="DataLoad.cpp">
-      <Filter>DataLoad\Src</Filter>
     </ClCompile>
     <ClCompile Include="ProcessData.cpp">
       <Filter>DataProcessing\Src</Filter>
@@ -297,19 +270,22 @@
     <ClCompile Include="StatisticsDecession.cpp">
       <Filter>Strategies\PatternGod\Src</Filter>
     </ClCompile>
+    <ClCompile Include="DataExporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChangeDataBuilder.cpp">
+      <Filter>DataStructers\ChangeStructure\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectionNodes.cpp">
+      <Filter>DataStructers\SelectionNodesStructures</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BTables.h">
       <Filter>Tables\AllTablesBase</Filter>
     </ClInclude>
-    <ClInclude Include="SynchronizeCurrentDBBase.h">
-      <Filter>SyncLogic</Filter>
-    </ClInclude>
     <ClInclude Include="EURUSD_CurrentTable.h">
       <Filter>Tables\PricesTables\EURUSD_Tables\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="SyncJobs_Table.h">
-      <Filter>Tables\SyncJobs\Inc</Filter>
     </ClInclude>
     <ClInclude Include="BasePricesTable.h">
       <Filter>Tables\PricesTables\BasePrices_Tables\inc</Filter>
@@ -365,9 +341,6 @@
     <ClInclude Include="OrdersToExecute.h">
       <Filter>Tables\NewOrdersTable\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="DataLoad.h">
-      <Filter>DataLoad\Src</Filter>
-    </ClInclude>
     <ClInclude Include="TempCache.h">
       <Filter>Cache</Filter>
     </ClInclude>
@@ -400,6 +373,15 @@
     </ClInclude>
     <ClInclude Include="StatisticsDecession.h">
       <Filter>Strategies\PatternGod\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="DataExporter.h">
+      <Filter>DefinedTables</Filter>
+    </ClInclude>
+    <ClInclude Include="ChangeDataBuilder.h">
+      <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectionNodes.h">
+      <Filter>DataStructers\SelectionNodesStructures</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

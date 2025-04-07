@@ -85,10 +85,6 @@ private:
     }
     void Handle_JSON_DB_NewBarM1(const httplib::Request& req, httplib::Response& res)
     {
-        while (m_requests.IsLocked_HistQueue())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(50)); // Sleep and try again
-        }
         m_requests.Handle_JSON_DB_NewBar_M1(req.body);
         res.set_header("Status", "Success");
     }

@@ -30,8 +30,8 @@ private:
 	std::vector<ConfigStruct> m_confVec;
 
 	std::stack<Http_OrderStruct> m_ordersToExecute;
-	bool m_CurrQueue_locked = false;
-	bool m_HistQueue_locked = false;
+	std::mutex m_CurrQueue_locker;
+	std::mutex m_HistQueue_locker;
 	
 	std::mutex m_tradeQueueMutex;
 
@@ -103,28 +103,26 @@ public:
 	{
 		if (!body.length())
 			return;
-		m_CurrQueue_locked = true;
+		std::lock_guard<std::mutex> lock(m_CurrQueue_locker);
 		m_candlesBodies.push(body);
-		m_CurrQueue_locked = false;
 	}
 
 	void Handle_JSON_DB_NewBar_M1(std::string body)
 	{
 		if (!body.length())
 			return;
-		m_HistQueue_locked = true;
+		std::lock_guard<std::mutex> lock(m_HistQueue_locker);
 		m_candlesBodies_history.push(body);
-		m_HistQueue_locked = false;
 	}
 
 	std::string Get_NextCandle()
 	{
-		m_CurrQueue_locked = true;
 		if (!m_candlesBodies.size())
 			return "";
+		std::lock_guard<std::mutex> lock(m_CurrQueue_locker);
+
 		std::string body = m_candlesBodies.front();
 		m_candlesBodies.pop();
-		m_CurrQueue_locked = false;
 		return body;
 	}
 
@@ -132,10 +130,11 @@ public:
 	{
 		if (!m_candlesBodies_history.size())
 			return "";
-		m_HistQueue_locked = true;
+
+		std::lock_guard<std::mutex> lock(m_HistQueue_locker);
+		
 		std::string body = m_candlesBodies_history.front();
 		m_candlesBodies_history.pop();
-		m_HistQueue_locked = false;
 		return body;
 	}
 
@@ -149,10 +148,6 @@ public:
 	void Set_RunningStatus(bool status) { m_runningStatus = status; }
 	void Set_LoadingData(bool status) { m_loadingDataStatus = status; }
 
-	bool IsLocked_CurrQueue() { return m_CurrQueue_locked; }
-	bool IsLocked_HistQueue() { return m_HistQueue_locked; }
-
-	
 	void Handle_IsThereAnTrade(httplib::Response& res) // Returns 
 	{
 		std::lock_guard<std::mutex> lock(m_tradeQueueMutex);

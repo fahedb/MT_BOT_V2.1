@@ -16,8 +16,6 @@ public:
 	void Set_NewOrder(std::string symbol, int long_short) { m_httpsrv->Get_RequestHandler()->Set_NewOrder(symbol, long_short); }
 	std::string Get_NextCandleStick_M1() { return m_httpsrv->Get_RequestHandler()->Get_NextCandle(); }
 	std::string Get_NextCandleStick_M1_JSON_DB() { return m_httpsrv->Get_RequestHandler()->Get_Next_DBCandle_M1(); }
-	bool IsCurr_QueueLocked() { return m_httpsrv->Get_RequestHandler()->IsLocked_CurrQueue(); }
-	bool IsDBHist_QueueLocked() { return m_httpsrv->Get_RequestHandler()->IsLocked_HistQueue(); }
 
 	bool IsScanningAllowed() { return m_httpsrv->Get_RequestHandler()->GetStatus_Scanning() == HTTP_PARAM_VALUE_Status_Running ? true : false; }
 	void DoneLoadingData() { m_httpsrv->Get_RequestHandler()->Set_LoadingData(false); }

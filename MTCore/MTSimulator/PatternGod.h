@@ -50,11 +50,11 @@ public:
 	void SortScores(std::vector<std::pair< ChangeNode*, ScoresResult>>& localResults2D);
 	void FilterDuplicatesTimeLines(std::vector<std::pair< ChangeNode*, ScoresResult>>& localResults2D);
 	void Set_NewCurrentPeriod(std::vector<ChangeNode*>* currentTimeLine) { m_currentTL = currentTimeLine; }
-	ScoresResult CompareOneMinNodesPeriods(int startIdx);
+	inline ScoresResult CompareOneMinNodesPeriods(int startIdx);
 	int ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* resultNodes);
 private:
 	std::string GetFormattedCurrentTime();
-	ScoresResult CheckForOneMinNodeMatch(ChangeNode* historyNode, ChangeNode* currentNode); 
+	inline ScoresResult CheckForOneMinNodeMatch(ChangeNode* historyNode, ChangeNode* currentNode); 
 	void BuildDBHistoryMap();
 	bool Time_Check(TimeWindow);
 	

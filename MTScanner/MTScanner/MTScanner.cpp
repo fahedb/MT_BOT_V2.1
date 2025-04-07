@@ -1,13 +1,10 @@
-﻿#include "DataLoad.h"
-
+﻿
 #include "EURUSD_CurrentTable.h"
 #include "XAUUSD_OneMinTable.h"
 #include "XAUUSD_CurrentTable.h"
 #include "PatternGod.h"
-#include "SynchronizeCurrentDBBase.h"
 #include "DataFeeder.h"
 #include "DataBaseConnection.h"
-#include "DataLoad.h"
 #include "Configrations.h"
 #include <thread> 
 #include <future>
@@ -22,11 +19,11 @@
 
 std::vector<ChangeNode*> LoadHistoryToVector();
 void OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator, std::vector<ChangeNode*> currentTimeLine);
-void LoadDataFromFileToDBLogic();
 void DefualtProgramStart();
 void UpdateCurrentTimeLine(std::vector<ChangeNode*>* timeLine, BasePricesTable* table);
 void LoadJson_Data_ToDBFile();
 bool IsItDataLoading(int argc, char* argv[]);
+
 std::vector<ChangeNode*> LoadHistoryToVector_MultiThreaded(XAUUSD_OneMinTable* tb);
 std::vector<ChangeNode*> LoadChangeNodesForThread(int threadIdx, XAUUSD_OneMinTable* tb);
 std::string m_lastTimePoint = "";
@@ -99,11 +96,10 @@ void DefualtProgramStart()
 	std::vector<ChangeNode*> chnVec;
 	UpdateCurrentTimeLine(&chnVec, &table);
 	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
-	int timeBetweenScans = policy->TimeBetweenScans;
 	while (true)
 	{
 		UpdateConfigs();
-		logger.WriteLog("Sleep for " + std::to_string(timeBetweenScans) + " seconds...",true,true);
+		int timeBetweenScans = policy->TimeBetweenScans;
 		Sleep(timeBetweenScans * 1000); // Sleep for 5 seconds before start a new scan
 		Configrations::getInstance()->RefreshPolicy(); // Refresh all policies 
 		UpdateCurrentTimeLine(&chnVec, &table);
@@ -118,9 +114,6 @@ void UpdateCurrentTimeLine(std::vector<ChangeNode*>* timeLine, BasePricesTable* 
 		return;
 
 	ExchangeData exChData;
-
-	if (exChData.IsCurr_QueueLocked())
-		return;
 
 	std::string body = exChData.Get_NextCandleStick_M1();
 	Logger& logger = Logger::getInstance();
@@ -155,17 +148,6 @@ void UpdateCurrentTimeLine(std::vector<ChangeNode*>* timeLine, BasePricesTable* 
 	return;
 }
 
-void LoadDataFromFileToDBLogic() // Old Logic
-{
-	bool sw = true;
-	while (sw)
-	{
-		int lastIdx = 0;
-		DataBaseConnection Db_work2;
-		DataLoad dl("C:\\Users\\fahed.b\\Desktop\\Data\\1MinData\\AllData.txt", "EURUSD_OneMinTimeLinePrices", Db_work2.Get_EnvHandler(), Db_work2.Get_DBConnection());
-		sw = dl.Load(&lastIdx);
-	}
-}
 
 void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* statisticsCalcucator, std::vector<ChangeNode*> currentTimeLine)
 {
@@ -316,51 +298,6 @@ std::vector<ChangeNode*> LoadChangeNodesForThread(int threadIdx, XAUUSD_OneMinTa
 }
 
 
-
-
-std::vector<ChangeNode*> LoadHistoryToVector()
-{
-	Logger& logger = Logger::getInstance();
-	XAUUSD_OneMinTable tb(Configrations::getInstance()->Get_DB_FileDir());
-	tb.Set_DATA_DB_FileName(Configrations::getInstance()->Get_DB_FileDir() + tb.GetDB_PhysicalFileName_Json());
-	
-	logger.WriteLog("Pulling data from DB...");
-	tb.Set_MultiThreadedRead();
-	tb.SelectDataFromJsonFile();
-
-	logger.WriteLog("Done pulling from DB.");
-	logger.WriteLog("Start Loading data into RAM...");
-
-	std::vector<ChangeNode*> hitoryTimeLine;
-	logger.WriteLog("Trying to reserve " + std::to_string(tb.GetSelected_Count()) + " Data cells...");
-	hitoryTimeLine.reserve(static_cast<size_t>(tb.GetSelected_Count()));
-	logger.WriteLog("Done reserving.");
-
-	ChangeNode* changeN;
-	changeN = tb.GetNextChangeNode();
-	long changeNodesCounter = 0;
-	while (changeN && changeN->activePoint)
-	{
-		changeNodesCounter++;
-		hitoryTimeLine.push_back(changeN);
-		changeN = tb.GetNextChangeNode(changeN);
-		if (!(changeNodesCounter % 100000))
-		{
-			logger.WriteLog("Done building " + std::to_string(changeNodesCounter) + " ChangeNodes.");
-		}
-	}
-	logger.WriteLog("Done Loading data into RAM.");
-	logger.WriteLog("Start Realeasing Rows Memory...");
-	
-	tb.RemoveSelect();
-	
-	logger.WriteLog("Done Realeasing Rows Memory.");
-	logger.WriteLog("History candles loaded to memory: " + std::to_string(hitoryTimeLine.size()));
-
-	return hitoryTimeLine;
-}
-
-
 void LoadJson_Data_ToDBFile()
 {
 	std::string dbFilePath = Configrations::getInstance()->Get_DB_FileDir() + Configrations::getInstance()->Get_ConfigValue(DBFILE_XAUUSD_M1_DATA_JSON);
@@ -371,10 +308,6 @@ void LoadJson_Data_ToDBFile()
 	logger.WriteLog("Start reciveing data!", true);
 	while (true)
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-		if (exChData.IsDBHist_QueueLocked())
-			continue;
-
 		std::string body = exChData.Get_NextCandleStick_M1_JSON_DB();
 		if (body.length())
 		{

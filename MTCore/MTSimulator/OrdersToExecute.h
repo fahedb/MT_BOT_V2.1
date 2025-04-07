@@ -76,7 +76,7 @@ private:
 		std::string query = "select top 1 * from " + m_tableName + " (NOLOCK) where " +
 			DEF_COLUMN_ActionSubmitted + " = 0 order by " + DEF_COLUMN_PriceDateTime + " desc;";
 
-		return FreeStyleSelectFromDB(query, 4);
+		return SelectFromDB(query, 4);
 	}
 };
 

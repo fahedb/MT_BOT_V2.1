@@ -6,7 +6,8 @@
 #include "DBMap.h"
 #include "TimeLine.h"
 #include "PatternExporter.h"
-#include "CSVExportData.h"
+#include "DataExporter.h"
+#include <thread>
 
 class StatisticsDecession
 {
@@ -40,6 +41,7 @@ public:
 
 		ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
 		DirectionStats stats;
+		stats.timePoint = m_currentTL->at(m_currentTL->size() - 1)->point_DateTime;
 
 		for (ChangeNode* node : *potentioalRes)
 		{
@@ -51,8 +53,7 @@ public:
 
 		}
 		bool decRes = Trade_Decession_Logic(stats);
-		Export_AllData(stats,decRes);
-
+		std::thread(DataExporter::Export_All_Statistics_Data, std::ref(stats), potentioalRes, decRes).detach();
 		Send_For_PNGExport(potentioalRes);
 
 		return -1;
@@ -62,96 +63,8 @@ public:
 private:
 
 	void Send_For_PNGExport(std::vector<ChangeNode*>* potentioalRes);
-
-	void Export_DataToJson(DirectionStats& stats, bool tradeDecRes = false);
-
-	void Export_AllData(DirectionStats& stats,bool tradeDecRes)
-	{
-		std::vector<std::string> summery_logs = PrepareSummeryLogs(stats); // Prepare all summery logs in vector
-
-		for (int i = 0; i < summery_logs.size(); i++)
-		{
-			Logger::getInstance().WriteLog(summery_logs.at(i), false, true); // Send summery logs to logs
-			if (tradeDecRes)Logger::getInstance().WriteLog(summery_logs.at(i), false, true, LogType::SPECIAL_LOG); // if there is a trade send, send also to SPECIAL log
-		}
-
-		Export_DataToJson(stats, false);
-		if (tradeDecRes) Export_DataToJson(stats,true);
-
-		if (tradeDecRes) Export_DataToCSV(stats);
-
-	}
-	std::vector<std::string> PrepareSummeryLogs(DirectionStats& stats);
-
-	void Export_DataToCSV(DirectionStats& stats);
-
-	CommonDirection CalcFirstPipsChange(ChangeNode* start, DirectionStats* stats, int pipsChangeToCount)
-	{
-		int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTime);
-		int futureLen = Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles;
-		int pipChange = 0;
-		int candlesCounter = 0;
-		bool upD = false, downD = false;
-		for (int i = indexStart; i < indexStart + futureLen && i < m_historyTL->size(); i++)
-		{
-			pipChange += m_historyTL->at(i)->Pip_Change;
-			candlesCounter++;
-			if (pipChange >= pipsChangeToCount)
-			{
-				upD = true;
-				break;
-
-			}
-			if (pipChange <= -pipsChangeToCount)
-			{
-				downD = true;
-				break;
-			}
-		}
-		CommonDirection dire;
-		if (upD) dire = CommonDirection::UP;
-		else if (downD) dire = CommonDirection::DOWN;
-		else dire = CommonDirection::BLUR;
-
-		stats->add(pipChange, dire, candlesCounter, StatsType::First);
-		return dire;
-	}
-
-
-	CommonDirection CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stats, int pipsChangeToCount)
-	{
-		int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTime);
-		int futureLen = Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles;
-		int pipChange = 0;
-		int candlesCounter = 0;
-
-		bool upD = false, downD = false;
-
-		for (int i = indexStart; i < indexStart + futureLen && i < m_historyTL->size(); i++)
-		{
-			candlesCounter++;
-			pipChange += m_historyTL->at(i)->Pip_Change;
-			stats->addStep_ForCandleIdx(pipChange, candlesCounter - 1);
-			if (pipChange >= pipsChangeToCount)
-			{
-				upD = true;
-			}
-
-			if (pipChange <= -pipsChangeToCount) {
-				downD = true;
-			}
-		}
-
-		CommonDirection dire;
-		if (upD) dire = CommonDirection::UP;
-		else if (downD) dire = CommonDirection::DOWN;
-		else dire = CommonDirection::BLUR;
-
-		stats->add(pipChange, dire, candlesCounter, StatsType::General);
-		return dire;
-	}
-
-
+	CommonDirection CalcFirstPipsChange(ChangeNode* start, DirectionStats* stats, int pipsChangeToCount);
+	CommonDirection CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stats, int pipsChangeToCount);
 	bool Trade_Decession_Logic(DirectionStats& stats);
 
 	void Send_TraddeSignal(std::string pair, int type)

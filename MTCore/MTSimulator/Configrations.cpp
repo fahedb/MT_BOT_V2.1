@@ -159,5 +159,5 @@ void Configrations::Init_PatternPolicy()
     m_policy.TP_start = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TAKE_PROFIT_START));
 
     m_policy.TimeBetweenScans = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
-    m_policy.Export_Patterns_PNG_To_Telegram = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
+    m_policy.Export_Patterns_PNG_To_Telegram = std::stoi(Get_ConfigValue_DB(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM)) > 0 ? true : false;
 }

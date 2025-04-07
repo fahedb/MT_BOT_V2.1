@@ -43,8 +43,6 @@ public:
 	static IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr);
 	static IndicatorScore CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr,IndicatorLen len = IndicatorLen::L30,double weight = 30.0);
 private:
-	static bool CheckSlopeDirectior(double hist, double curr);
-
 	static IndicatorScore CalcSlopScore_Logic(IndicatorValues hist, IndicatorValues curr,double rsiWeight = 30.0);
 };
 
@@ -93,58 +91,11 @@ public:
 		return score;
 	}
 
-	static inline IndicatorScore CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr, IndicatorLen len /*IndicatorLen::L30*/, double weight)
-	{
-		IndicatorScore score;
-		IndicatorValues hist = ChNHistory->Get_Indicator_Pointer(IndicatorType::ZLSMA, len)->Get_IndicatorValues();
-		IndicatorValues curr = ChNcurr->Get_Indicator_Pointer(IndicatorType::ZLSMA, len)->Get_IndicatorValues();
-
-		score = ZlsmaScoreCalcs::CalcSlopScore_Logic(hist, curr, weight);
-
-		double histLow = ChNHistory->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
-		double currLow = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
-
-		double histRange = ChNHistory->Get_Entity(HTTP_BODY_MEMBER_HighPrice) - histLow;
-		double currRange = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_HighPrice) - currLow;
-
-		score += ZlsmaScoreCalcs::CalcPlaceScore_Logic(hist, histRange, histLow, curr, currRange, currLow, weight);
-
-		score.calcTotal();
-		return score;
-	}
+	static IndicatorScore CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr, IndicatorLen len /*IndicatorLen::L30*/, double weight);
 private:
 
-	static inline IndicatorScore CalcPlaceScore_Logic(IndicatorValues hist, double histRange, double histLow, IndicatorValues curr, double currRange, double currLow, double weight)
-	{
-
-		double normHist = (hist.M1 - histLow) / histRange;
-		double normCurr = (curr.M1 - currLow) / currRange;
-
-		IndicatorScore score;
-		score.M1 = RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.M5 = RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.M15 = RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.M30 = RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.H1 = RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.H4 = RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-
-		return score;
-
-	}
-
-	static inline IndicatorScore CalcSlopScore_Logic(IndicatorValues hist, IndicatorValues curr, double weight)
-	{
-		IndicatorScore score;
-		score.M1 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M1, curr.m_Slope_M1, weight);
-		score.M5 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M5, curr.m_Slope_M5, weight);
-		score.M15 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M15, curr.m_Slope_M15, weight);
-		score.M30 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M30, curr.m_Slope_M30, weight);
-		score.H1 = RelativeScoreCalcs::CalcScore(hist.m_Slope_H1, curr.m_Slope_H1, weight);
-		score.H4 = RelativeScoreCalcs::CalcScore(hist.m_Slope_H4, curr.m_Slope_H4, weight);
-
-		return score;
-	}
-
+	static IndicatorScore CalcPlaceScore_Logic(IndicatorValues hist, double histRange, double histLow, IndicatorValues curr, double currRange, double currLow, double weight);
+	static IndicatorScore CalcSlopScore_Logic(IndicatorValues hist, IndicatorValues curr, double weight);
 };
 
 

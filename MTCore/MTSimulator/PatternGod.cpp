@@ -115,8 +115,8 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* re
 			ScoresResult resScore = CompareOneMinNodesPeriods(i);
 			if (resScore.totalScore.total > scoreToAct) {
 				if (i + m_currentTL->size() < m_historyTL->size()) {
-					localResults.push_back(m_historyTL->at(i + m_currentTL->size())); // Get the end of the period
-					localResults2D.push_back(std::pair<ChangeNode*, ScoresResult>(m_historyTL->at(i + m_currentTL->size()), ScoresResult(resScore)));
+					localResults.push_back(m_historyTL->at(i + m_currentTL->size() - 1)); // Get the end of the period
+					localResults2D.push_back(std::pair<ChangeNode*, ScoresResult>(m_historyTL->at(i + m_currentTL->size() - 1), ScoresResult(resScore)));
 				}
 			}
 			else

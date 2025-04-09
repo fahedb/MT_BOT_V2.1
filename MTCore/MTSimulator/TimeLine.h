@@ -10,14 +10,22 @@ class TimeLine
 public:
     // Deleted copy constructor and assignment operator to prevent copies
     
-    TimeLine(std::vector<ChangeNode*>* TL) {
+    TimeLine(std::vector<ChangeNode*>* TL,bool ownership = false) {
         m_TL = TL;
         Init_TimeLineDB();
-    }
-    ~TimeLine()
-    {
+        m_selfOwnership = ownership;
     }
 
+    ~TimeLine()
+    {
+        if (m_selfOwnership)
+        {
+            m_TL->clear();
+            delete m_TL;
+            m_DB_Map.~DBMap();
+        }
+    }
+    void Set_SelfOwnership(bool selfOwner) { m_selfOwnership = selfOwner; }
 
     std::vector<ChangeNode*>* Get_TimeLine() { return m_TL; }
     DBMap* Get_DBMap() { return &m_DB_Map; }
@@ -26,6 +34,7 @@ private:
 
     std::vector<ChangeNode*>* m_TL;
     DBMap m_DB_Map;
+    bool m_selfOwnership;
     // Private constructor to prevent instantiation
     
     void Init_TimeLineDB() {

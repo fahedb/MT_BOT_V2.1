@@ -4,7 +4,7 @@ std::mutex DataExporter::m_jsonFileLocker;
 std::mutex DataExporter::m_csvFileLocker;
 
 
-void DataExporter::Export_All_Statistics_Data(DirectionStats& stats, std::vector<ChangeNode*>* potentialRes, bool tradeDecRes)
+void DataExporter::Export_All_Statistics_Data(DirectionStats& stats, bool tradeDecRes)
 {
 	std::vector<std::string> summery_logs = PrepareSummeryLogs(stats); // Prepare all summery logs in vector
 
@@ -13,8 +13,9 @@ void DataExporter::Export_All_Statistics_Data(DirectionStats& stats, std::vector
 		Logger::getInstance().WriteLog(summery_logs.at(i), false, true); // Send summery logs to logs
 		if (tradeDecRes)Logger::getInstance().WriteLog(summery_logs.at(i), false, true, LogType::SPECIAL_LOG); // if there is a trade, send also to SPECIAL log
 	}
-
+	
 	Export_DataToJson(stats, false);
+	Send_For_PNGExport(stats);
 	if (tradeDecRes) Export_DataToJson(stats, true);
 
 	if (tradeDecRes) Export_DataToCSV(stats);
@@ -92,15 +93,21 @@ void DataExporter::Export_DataToJson(DirectionStats& stats, bool tradeDecRes)
 {
 	auto j = JasonHandler::Build_Json_ForStats(stats);
 	std::string filePath = "C:\\MTDB\\";
-	if (tradeDecRes)
-		filePath += "OrderSummery.json";
-	else
-		filePath += "AllSummery.json";
+	filePath += "AllSummery.json";
 	std::lock_guard<std::mutex> lock(m_jsonFileLocker);
-
 	std::ofstream file(filePath, std::ios::app);
 	file << j.dump() << "\n";
 	file.close();
+
+	if (tradeDecRes)
+	{
+		std::string ordersfilePath = "C:\\MTDB\\";
+		ordersfilePath += "OrderSummery.json";
+		std::ofstream ordersFile(ordersfilePath, std::ios::app);
+		ordersFile << j.dump() << "\n";
+		ordersFile.close();
+	}
+
 }
 
 void DataExporter::Export_DataToCSV(DirectionStats& stats)
@@ -138,3 +145,14 @@ void DataExporter::Export_DataToCSV(DirectionStats& stats)
 	exData.NewRow();
 	exData.DoneInsertingData();
 }
+
+void DataExporter::Send_For_PNGExport(DirectionStats& stats)
+{
+	std::vector<std::vector<ChangeNode*>* > patternsVec;
+	for (int i = 0; i < stats.m_patterns.size(); i++)
+	{
+		patternsVec.push_back(stats.m_patterns.at(i).Get_TimeLine());
+	}
+	PatternExporter::Export_All_Pattens_ToPNG(stats.m_currPattern.Get_TimeLine(), &patternsVec);
+}
+

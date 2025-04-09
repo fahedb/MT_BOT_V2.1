@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include "TimeLine.h"
 
 enum class CommonDirection
 {
@@ -94,14 +95,18 @@ struct DirectionGroupStats
 		return std::sqrt((SumSquaredPips / Total) - (avg * avg));
 	}
 
+
 };
+
 
 struct DirectionStats {
 	std::string timePoint;
 	DirectionGroupStats general;
 	DirectionGroupStats first;
 	StepsMean stepsMean;
-
+	std::vector<TimeLine> m_patterns;
+	TimeLine m_currPattern;
+	bool m_tradeRes;
 	DirectionGroupStats& GetGroupStats(StatsType type)
 	{
 		switch (type)
@@ -140,5 +145,15 @@ struct DirectionStats {
 	int Get_TotalCount(StatsType sType) { return GetGroupStats(sType).Total; }
 	double Get_Mean_For_CandleIdx(int candleIdx) { return stepsMean.GetMeanForCandleIdx(candleIdx); }
 	std::vector<double> GetAllMeansUpTo(int maxIndex = -1) { return stepsMean.GetAllMeansUpTo(maxIndex); }
+
+	void Add_Pattern(TimeLine pattern) { m_patterns.push_back(pattern); }
+	void Add_Patterns(std::vector<TimeLine>* patterns)
+	{
+		for (int i = 0; i < patterns->size(); i++)
+			m_patterns.push_back(patterns->at(i));
+	}
+	void Add_CurrPattern(TimeLine currPatter) { m_currPattern = currPatter; }
+	void Set_TradeRes(bool tradeRes) { m_tradeRes = tradeRes; }
+
 };
 

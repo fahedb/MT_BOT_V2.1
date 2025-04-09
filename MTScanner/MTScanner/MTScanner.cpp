@@ -16,9 +16,12 @@
 #include "JasonHandler.h"
 #include "TimeLine.h"
 #include "StatisticsDecession.h"
+#include "TradesManager.h"
+#include "DataExporter.h"
+#include "TimeLineBuilder.h"
 
-std::vector<ChangeNode*> LoadHistoryToVector();
-void OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator, std::vector<ChangeNode*> currentTimeLine);
+
+void OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator,TimeLine* history ,std::vector<ChangeNode*> currentTimeLine);
 void DefualtProgramStart();
 void UpdateCurrentTimeLine(std::vector<ChangeNode*>* timeLine, BasePricesTable* table);
 void LoadJson_Data_ToDBFile();
@@ -103,7 +106,7 @@ void DefualtProgramStart()
 		Sleep(timeBetweenScans * 1000); // Sleep for 5 seconds before start a new scan
 		Configrations::getInstance()->RefreshPolicy(); // Refresh all policies 
 		UpdateCurrentTimeLine(&chnVec, &table);
-		OneMinutePatternGodLogic(&patternScaner,&statisticsCalcucator ,chnVec); // Start scanning
+		OneMinutePatternGodLogic(&patternScaner,&statisticsCalcucator,&history ,chnVec); // Start scanning
 	}
 
 }
@@ -149,7 +152,7 @@ void UpdateCurrentTimeLine(std::vector<ChangeNode*>* timeLine, BasePricesTable* 
 }
 
 
-void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* statisticsCalcucator, std::vector<ChangeNode*> currentTimeLine)
+void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* statisticsCalcucator,TimeLine* history, std::vector<ChangeNode*> currentTimeLine)
 {
 	//std::vector<ChangeNode*> currentTimeLine; // Vector to store curr changeNodes
 	Logger& logger = Logger::getInstance();
@@ -183,21 +186,22 @@ void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* stati
 	statisticsCalcucator->Set_NewCurrentPeriod(&currentTimeLine); // Set a new current period for Statistics calc
 
 	ExchangeData exh;
+	TradesManager* tradeMngr = TradesManager::getInstance();
 
 	if (!exh.IsScanningAllowed())
 	{
 		logger.WriteLog("Scanning Stopped by user, skipping scanning...", false, true);
 		return;
 	}
-
+	
 	if (patternScan->ScanForOneMinPatterns_MultiThreaded(&results)) // Scan for patterns
 	{
-		int orderRes = statisticsCalcucator->DetectCommonDirection(&results);
-		if (orderRes != -1) // Check for common direction
-		{
-			logger.WriteLog("New Order Set.", false, true);
-			exh.Set_NewOrder("XAUUSD", orderRes);
-		}
+		DirectionStats stats = statisticsCalcucator->DetectCommonDirection(&results);	
+		bool tradeRes = tradeMngr->CheckForTrade_PatternGod(stats);
+		std::vector<TimeLine> similarPatterns = TimeLineBuilder::Build_TimeLine_Patterns(history, &results, currentTimeLine.size(), Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles);
+		stats.Add_Patterns(&similarPatterns);
+		stats.Add_CurrPattern(TimeLine(&currentTimeLine, false));
+		DataExporter::Export_All_Statistics_Data(stats,tradeRes);
 	}
 	else
 		logger.WriteLog("Didn't find any patterns with min score !!", false, true);
@@ -224,7 +228,7 @@ std::vector<ChangeNode*> LoadHistoryToVector_MultiThreaded(XAUUSD_OneMinTable* t
 
 	logger.WriteLog("Trying to reserve " + std::to_string(tb->GetSelected_Count_MultiThreaded(0) * threadCount) + " Data cells...");
 
-	hitoryTimeLine.reserve(static_cast<size_t>(tb->GetSelected_Count_MultiThreaded(0) * threadCount ));
+	hitoryTimeLine.reserve(static_cast<size_t>(tb->GetSelected_Count_MultiThreaded(0)) * static_cast<size_t>(threadCount));
 	logger.WriteLog("Done reserving.");
 
 	logger.WriteLog("Threads Available for parallel Build: " + std::to_string(threadCount), false, true);

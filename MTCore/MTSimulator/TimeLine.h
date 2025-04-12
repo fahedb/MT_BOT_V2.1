@@ -8,21 +8,35 @@ class TimeLine
 {
 
 public:
-    // Deleted copy constructor and assignment operator to prevent copies
-    
+    TimeLine(TimeLine&& other) noexcept
+    {
+        m_TL = other.m_TL;
+        m_DB_Map = std::move(other.m_DB_Map);
+        m_selfOwnership = other.m_selfOwnership;
+
+        other.m_TL = nullptr;
+        other.m_selfOwnership = false;
+    }
+
     TimeLine(std::vector<ChangeNode*>* TL,bool ownership = false) {
         m_TL = TL;
         Init_TimeLineDB();
         m_selfOwnership = ownership;
     }
+    TimeLine(const TimeLine& other)
+    {
+        m_selfOwnership = true; 
+        m_TL = new std::vector<ChangeNode*>(*other.m_TL);
+        m_DB_Map = other.m_DB_Map;
+    }
 
+    TimeLine& operator=(const TimeLine&) = delete;
     ~TimeLine()
     {
         if (m_selfOwnership)
         {
             m_TL->clear();
             delete m_TL;
-            m_DB_Map.~DBMap();
         }
     }
     void Set_SelfOwnership(bool selfOwner) { m_selfOwnership = selfOwner; }

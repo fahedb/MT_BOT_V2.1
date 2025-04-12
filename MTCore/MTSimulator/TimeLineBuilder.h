@@ -28,8 +28,14 @@ public:
 		{
 			int indexStart = history->Get_DBMap()->GetIdx_Of_TimePoint(head->at(i)->point_DateTime);
 
-			std::vector<ChangeNode*>* currTimeLine = new std::vector<ChangeNode*>(history->Get_TimeLine()->begin() + (static_cast<size_t>(indexStart) - static_cast<size_t>(timeLineLen)), history->Get_TimeLine()->begin() + (static_cast<size_t>(indexStart) + static_cast<size_t>(futureLen)));
-			similarPatterns.push_back(TimeLine(currTimeLine, true));
+			size_t histSize = history->Get_TimeLine()->size();
+			if (indexStart >= timeLineLen && static_cast<size_t>(indexStart) + static_cast<size_t>(futureLen) <= histSize) {
+				auto* currTimeLine = new std::vector<ChangeNode*>(
+					history->Get_TimeLine()->begin() + (static_cast<size_t>(indexStart) - static_cast<size_t>(timeLineLen)),
+					history->Get_TimeLine()->begin() + (static_cast<size_t>(indexStart) + static_cast<size_t>(futureLen)));
+				similarPatterns.emplace_back(currTimeLine, true);
+			}
+
 		}
 		return similarPatterns;
 	}

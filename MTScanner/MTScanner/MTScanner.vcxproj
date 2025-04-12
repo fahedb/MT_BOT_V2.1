@@ -111,6 +111,8 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\MTCore\MTSimulator\;$(SolutionDir)..\HTTPCore</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

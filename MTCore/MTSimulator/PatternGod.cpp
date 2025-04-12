@@ -54,22 +54,6 @@ void PatternGod::BuildDBHistoryMap() // Function to build a map for the time poi
 	}
 }
 
-ScoresResult PatternGod::CheckForOneMinNodeMatch(ChangeNode* historyNode, ChangeNode* currentNode) // Funtion to calc the matching score between 2 single noeds
-{
-	ScoresResult score;
-	// Calc all the scores
-	//score.basicScore = BasincCandleScoreCalcs::CalcScore(historyNode, currentNode);
-	score.basicScore = 0;
-	score.rsiScore = RsiScoreCalcs::Calc_AllLensScore(historyNode, currentNode); 
-	score.emaScore = EmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
-	score.zlsmaScore = ZlsmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
-	//score.gravityScore = GravityScoreCalcs::CalcScore(historyNode, currentNode); 
-
-	// Sum all the scores into one Object
-	score.calcTotalResult();
-	return score;
-}
-
 
 ScoresResult PatternGod::CompareOneMinNodesPeriods(int startIdx) // compare between periods of time in the history time line and the whole current time line
 {
@@ -79,10 +63,20 @@ ScoresResult PatternGod::CompareOneMinNodesPeriods(int startIdx) // compare betw
 	int currentSize = static_cast<int>(m_currentTL->size());
 	int historyRemaining = static_cast<int>(m_historyTL->size()) - startIdx;
 	int limit = (currentSize < historyRemaining) ? currentSize : historyRemaining;
+	int currTotalScore = 0;
+	int maxScorePossible = policy->maxScorePossibleForChangeNodes;
+	int totalMinScoretoAct = limit * policy->Score_Min_TotalScore_ToAct_PerCandle;
 
 	for (int i = 0; i < limit; ++i)
 	{
-		periodScore += CheckForOneMinNodeMatch(m_currentTL->at(i), m_historyTL->at(startIdx + i));
+		periodScore += ProxyScoreCalcs::CompareChangeNodes(m_currentTL->at(i), m_historyTL->at(static_cast<size_t>(startIdx) + static_cast<size_t>(i)));
+		currTotalScore += periodScore.totalScore.total;
+
+		int remainingCandles = limit - i;
+		int maxFutureScore = remainingCandles * maxScorePossible;
+		if (currTotalScore + maxFutureScore < totalMinScoretoAct)
+			break;
+
 	}
 
 	return periodScore;
@@ -107,13 +101,19 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* re
 
 	// Function to process a chunk of the loop
 	auto processChunk = [&](int start, int end, int threadIndex) {
+		int estimatedItems = (end - start) / 5 + 10;
 		ScoresResult localMaxScore;
+		
 		std::vector<ChangeNode*> localResults;
-		std::vector<std::pair< ChangeNode*, ScoresResult>> localResults2D;
+		localResults.reserve(estimatedItems);
 
+		std::vector<std::pair< ChangeNode*, ScoresResult>> localResults2D;
+		localResults2D.reserve(estimatedItems);
+		
 		for (int i = start; i < end; i++) {
 			ScoresResult resScore = CompareOneMinNodesPeriods(i);
-			if (resScore.totalScore.total > scoreToAct) {
+			int localScoreToAct = scoreToAct;
+			if (resScore.totalScore.total > localScoreToAct) {
 				if (i + m_currentTL->size() < m_historyTL->size()) {
 					localResults.push_back(m_historyTL->at(i + m_currentTL->size() - 1)); // Get the end of the period
 					localResults2D.push_back(std::pair<ChangeNode*, ScoresResult>(m_historyTL->at(i + m_currentTL->size() - 1), ScoresResult(resScore)));
@@ -168,21 +168,22 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* re
 		resultNodes->push_back(resultNodes2D.at(i).first);
 	}
 
-	std::string allTimePoints = "All paterns time points:\n";
-	for (const auto& result : resultNodes2D)
-	{
-		const std::string& time = result.first->point_DateTime;
-		const ScoresResult& score = result.second;
+	std::ostringstream logStream;
+	logStream << "All patterns time points:\n";
 
-		allTimePoints +=
-			"\nTimePoint: " + time + "\n" +
-			"    | Total Score: " + std::to_string(score.totalScore.total) + "\n" +
-			"    | EMA: " + std::to_string(score.emaScore.total) + "\n" +
-			"    | RSI: " + std::to_string(score.rsiScore.total) + "\n"
-			"    | ZLSMA: " + std::to_string(score.zlsmaScore.total);
+	for (const auto& result : resultNodes2D) {
+		const auto& time = result.first->point_DateTime;
+		const auto& score = result.second;
+
+		logStream
+			<< "\nTimePoint: " << time << "\n"
+			<< "    | Total Score: " << score.totalScore.total << "\n"
+			<< "    | EMA: " << score.emaScore.total << "\n"
+			<< "    | RSI: " << score.rsiScore.total << "\n"
+			<< "    | ZLSMA: " << score.zlsmaScore.total;
 	}
 
-	logger.WriteLog(allTimePoints, false, true);
+	logger.WriteLog(logStream.str(), false, true);
 
 	return static_cast<int>(resultNodes->size());
 

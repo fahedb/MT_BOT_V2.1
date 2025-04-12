@@ -54,7 +54,6 @@ public:
 	int ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* resultNodes);
 private:
 	std::string GetFormattedCurrentTime();
-	inline ScoresResult CheckForOneMinNodeMatch(ChangeNode* historyNode, ChangeNode* currentNode); 
 	void BuildDBHistoryMap();
 	bool Time_Check(TimeWindow);
 	

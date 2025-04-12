@@ -176,6 +176,8 @@
     <ClCompile Include="TempCache.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="TimeLine.cpp" />
+    <ClCompile Include="TimeLineBuilder.cpp" />
+    <ClCompile Include="TradesManager.cpp" />
     <ClCompile Include="XAUUSD_CurrentTable.cpp" />
     <ClCompile Include="XAUUSD_OneMinTable.cpp" />
   </ItemGroup>
@@ -212,6 +214,8 @@
     <ClInclude Include="TempCache.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="TimeLine.h" />
+    <ClInclude Include="TimeLineBuilder.h" />
+    <ClInclude Include="TradesManager.h" />
     <ClInclude Include="XAUUSD_CurrentTable.h" />
     <ClInclude Include="XAUUSD_OneMinTable.h" />
   </ItemGroup>

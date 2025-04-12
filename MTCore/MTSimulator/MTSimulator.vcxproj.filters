@@ -181,6 +181,9 @@
     <Filter Include="DataStructers\SelectionNodesStructures">
       <UniqueIdentifier>{c45887ea-92c8-4970-89ac-a6fdf02067bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TradesManager">
+      <UniqueIdentifier>{4f8a0330-4e4f-48ef-a7d3-95fe412ee034}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -278,6 +281,12 @@
     </ClCompile>
     <ClCompile Include="SelectionNodes.cpp">
       <Filter>DataStructers\SelectionNodesStructures</Filter>
+    </ClCompile>
+    <ClCompile Include="TradesManager.cpp">
+      <Filter>TradesManager</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeLineBuilder.cpp">
+      <Filter>DataStructers\TimeLine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -382,6 +391,12 @@
     </ClInclude>
     <ClInclude Include="SelectionNodes.h">
       <Filter>DataStructers\SelectionNodesStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="TradesManager.h">
+      <Filter>TradesManager</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLineBuilder.h">
+      <Filter>DataStructers\TimeLine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

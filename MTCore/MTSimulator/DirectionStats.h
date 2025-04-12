@@ -105,7 +105,7 @@ struct DirectionStats {
 	DirectionGroupStats first;
 	StepsMean stepsMean;
 	std::vector<TimeLine> m_patterns;
-	TimeLine m_currPattern;
+	TimeLine* m_currPattern;
 	bool m_tradeRes;
 	DirectionGroupStats& GetGroupStats(StatsType type)
 	{
@@ -152,7 +152,7 @@ struct DirectionStats {
 		for (int i = 0; i < patterns->size(); i++)
 			m_patterns.push_back(patterns->at(i));
 	}
-	void Add_CurrPattern(TimeLine currPatter) { m_currPattern = currPatter; }
+	void Add_CurrPattern(TimeLine currPatter) { m_currPattern = new TimeLine(currPatter); }
 	void Set_TradeRes(bool tradeRes) { m_tradeRes = tradeRes; }
 
 };

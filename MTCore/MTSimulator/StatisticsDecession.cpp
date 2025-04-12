@@ -61,8 +61,8 @@ CommonDirection StatisticsDecession::CalcGeneralPipsChange(ChangeNode* start, Di
 	}
 
 	CommonDirection dire;
-	if (upD) dire = CommonDirection::UP;
-	else if (downD) dire = CommonDirection::DOWN;
+	if (upD && !downD) dire = CommonDirection::UP;
+	else if (downD && !upD) dire = CommonDirection::DOWN;
 	else dire = CommonDirection::BLUR;
 
 	stats->add(pipChange, dire, candlesCounter, StatsType::General);

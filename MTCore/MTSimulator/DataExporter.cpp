@@ -43,7 +43,8 @@ std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
 		"NOISE: " + std::to_string(general_blurPercent) + "%\n" +
 		"Mean Pip Change: " + std::to_string(stats.mean(StatsType::General)) + "\n" +
 		"StdDev Pip Change: " + std::to_string(stats.stddev(StatsType::General)) + "\n" +
-		"Mean indexes: " + std::to_string(stats.meanIndexes(StatsType::General));
+		"Mean indexes: " + std::to_string(stats.meanIndexes(StatsType::General)) + "\n\n\n" +
+		"Trade res:" + (stats.m_tradeRes ? " True" : " False");
 
 	std::string first_summeryLog = "Stats Summary (First decession calcs !!):\n" +
 		std::string("Time Point: ") + stats.timePoint + "\n" +
@@ -153,6 +154,6 @@ void DataExporter::Send_For_PNGExport(DirectionStats& stats)
 	{
 		patternsVec.push_back(stats.m_patterns.at(i).Get_TimeLine());
 	}
-	PatternExporter::Export_All_Pattens_ToPNG(stats.m_currPattern.Get_TimeLine(), &patternsVec);
+	PatternExporter::Export_All_Pattens_ToPNG(stats.m_currPattern->Get_TimeLine(), &patternsVec);
 }
 

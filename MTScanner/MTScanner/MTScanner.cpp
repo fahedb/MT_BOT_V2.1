@@ -19,7 +19,7 @@
 #include "TradesManager.h"
 #include "DataExporter.h"
 #include "TimeLineBuilder.h"
-
+#include "ScoreCalcs.h"
 
 void OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator,TimeLine* history ,std::vector<ChangeNode*> currentTimeLine);
 void DefualtProgramStart();
@@ -70,6 +70,7 @@ void UpdateConfigs()
 	ExchangeData exh;
 	std::pair<std::string, std::string> conf = exh.Get_ConfToUpdate();
 	Configrations* configarions = Configrations::getInstance();
+	
 	while (conf.first.length())
 	{
 		configarions->UpdateConfigValue_DB(conf.first, conf.second);
@@ -99,14 +100,17 @@ void DefualtProgramStart()
 	std::vector<ChangeNode*> chnVec;
 	UpdateCurrentTimeLine(&chnVec, &table);
 	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+	UpdateConfigs();
+	Configrations::getInstance()->RefreshPolicy(); // Refresh all policies
 	while (true)
 	{
+		
+		UpdateCurrentTimeLine(&chnVec, &table);
+		OneMinutePatternGodLogic(&patternScaner,&statisticsCalcucator,&historyTimeLine,chnVec); // Start scanning
 		UpdateConfigs();
+		Configrations::getInstance()->RefreshPolicy(); // Refresh all policies 
 		int timeBetweenScans = policy->TimeBetweenScans;
 		Sleep(timeBetweenScans * 1000); // Sleep for 5 seconds before start a new scan
-		Configrations::getInstance()->RefreshPolicy(); // Refresh all policies 
-		UpdateCurrentTimeLine(&chnVec, &table);
-		OneMinutePatternGodLogic(&patternScaner,&statisticsCalcucator,&history ,chnVec); // Start scanning
 	}
 
 }
@@ -115,6 +119,9 @@ void UpdateCurrentTimeLine(std::vector<ChangeNode*>* timeLine, BasePricesTable* 
 {
 	if (!timeLine)
 		return;
+
+	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+
 
 	ExchangeData exChData;
 
@@ -130,12 +137,12 @@ void UpdateCurrentTimeLine(std::vector<ChangeNode*>* timeLine, BasePricesTable* 
 		table->Insert_NewCandleBody(selectionJ);
 		ChangeNode* chn = table->GetNextChangeNode();
 		if (chn) {
-			while (timeLine->size() > Configrations::getInstance()->Get_Policy()->Pattern_CurrentTimeLineLen)
+			while (timeLine->size() > policy->Pattern_CurrentTimeLineLen)
 			{
 				delete timeLine->at(0);
 				timeLine->erase(timeLine->begin());
 			}
-			if (timeLine->size() >= Configrations::getInstance()->Get_Policy()->Pattern_CurrentTimeLineLen) // Delete old objects
+			if (timeLine->size() >= policy->Pattern_CurrentTimeLineLen) // Delete old objects
 			{
 				delete timeLine->at(0);
 				timeLine->erase(timeLine->begin());
@@ -147,6 +154,9 @@ void UpdateCurrentTimeLine(std::vector<ChangeNode*>* timeLine, BasePricesTable* 
 	}
 	else {
 		logger.WriteLog("No new Bars to recieve");
+		if (timeLine->size())
+			policy->maxScorePossibleForChangeNodes = ProxyScoreCalcs::CalcMaxScorePossible(timeLine->at(0)).totalScore.total;
+
 	}
 	return;
 }

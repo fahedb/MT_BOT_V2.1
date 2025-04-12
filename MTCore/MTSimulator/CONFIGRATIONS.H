@@ -50,6 +50,8 @@ struct ConfigrationsPolicy {
     int TimeBetweenScans = 0;
 
     bool Export_Patterns_PNG_To_Telegram = false;
+
+    int maxScorePossibleForChangeNodes = 0;
 };
 
 class Configrations // SingleTon class for all configrations of the program

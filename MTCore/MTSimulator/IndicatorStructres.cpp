@@ -127,7 +127,7 @@ IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
 	M30 += other.M30;
 	H1 += other.H1;
 	H4 += other.H4;
-	total += other.total; // או שתחזור לקרוא ל־calcTotal, תלוי בלוגיקה שלך
+	calcTotal();
 	return *this;
 }
 
@@ -163,7 +163,9 @@ ScoresResult& ScoresResult::operator+=(const ScoresResult& other) {
 	rsiScore += other.rsiScore;
 	emaScore += other.emaScore;
 	zlsmaScore += other.zlsmaScore;
-	totalScore += other.totalScore;
+	totalScore = combineScores();
+	totalScore.calcTotal();
+
 	return *this;
 }
 
@@ -179,7 +181,7 @@ ScoresResult ScoresResult::operator+(const ScoresResult& other) const {
 	result.emaScore = emaScore + other.emaScore;
 	result.zlsmaScore = zlsmaScore + other.zlsmaScore;
 	// Combine total scores (no need to recalculate; just sum them)
-	result.totalScore = totalScore + other.totalScore;
+	result.calcTotalResult();
 
 	return result;
 }

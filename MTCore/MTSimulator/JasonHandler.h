@@ -50,9 +50,9 @@ private:
 		DirectionGroupStats grpStats = stats.GetGroupStatsByName(son);
 		(*j)[stats.timePoint][son] =
 		{
-			{JSON_BODY_MEMBER_UP, std::to_string( (grpStats.UpCount / grpStats.Total) * 100.0 )},
-			{JSON_BODY_MEMBER_DOWN, std::to_string((grpStats.DownCount / grpStats.Total) * 100.0) },
-			{JSON_BODY_MEMBER_NOISE, std::to_string((grpStats.BlurCount / grpStats.Total) * 100.0)},
+			{JSON_BODY_MEMBER_UP, std::to_string( (static_cast<double>(grpStats.UpCount) / static_cast<double>(grpStats.Total)) * 100.0 )},
+			{JSON_BODY_MEMBER_DOWN, std::to_string((static_cast<double>(grpStats.DownCount) / static_cast<double>(grpStats.Total)) * 100.0) },
+			{JSON_BODY_MEMBER_NOISE, std::to_string((static_cast<double>(grpStats.BlurCount) / static_cast<double>(grpStats.Total)) * 100.0)},
 
 			{JSON_BODY_MEMBER_MEAN, std::to_string(grpStats.mean())},
 			{JSON_BODY_MEMBER_STDDEV, std::to_string(grpStats.stddev())},

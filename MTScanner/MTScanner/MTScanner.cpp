@@ -110,6 +110,7 @@ void DefualtProgramStart()
 		UpdateConfigs();
 		Configrations::getInstance()->RefreshPolicy(); // Refresh all policies 
 		int timeBetweenScans = policy->TimeBetweenScans;
+		logger.WriteLog("Sleep for " + std::to_string(timeBetweenScans) + " seconds...");
 		Sleep(timeBetweenScans * 1000); // Sleep for 5 seconds before start a new scan
 	}
 

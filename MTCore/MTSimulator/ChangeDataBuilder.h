@@ -2,12 +2,26 @@
 #include "LOGGER.H"
 #include "ProcessData.h"
 #include "SelectionNodes.h"
+#include "DirectionStats.h"
 
 #pragma once
 
 class ChangeDataBuilder
 {
 public:
+	static DirectionStats BuildDirectionStats(JsonSelectionNode* selectionJ)
+	{
+		Logger& logger = Logger::getInstance();
+		std::map<std::string, std::string> mapy;
+		Http_Utils::ExtractAllValues(*(selectionJ->Get_Json()), mapy);
+		for (auto it = mapy.begin(); it != mapy.end(); ++it) {
+
+			std::vector<std::string> CurrKey = Http_Utils::SplitKey(it->first);
+			std::string cleanedValue = Http_Utils::ExtractValuesFrom(it->second);
+		
+		}
+	}
+
 	static ChangeNode* BuildChangeNode(JsonSelectionNode* selectionJ)
 	{
 		Logger& logger = Logger::getInstance();

@@ -15,12 +15,8 @@ class RelativeScoreCalcs
 public:
 	static inline int CalcScore(double hist, double curr, double weight = 10) // This code runs billions of times, so i tried to make it so fast, even if it's hard to understand
 	{
-		if (hist * curr < 0.0)
-			return 0;
 		if (hist == 0 && curr == 0)
 			return weight;
-
-		const double w = weight;
 
 		const double absHist = std::abs(hist);
 		const double absCurr = std::abs(curr);
@@ -28,7 +24,7 @@ public:
 		const double maxV = absHist > absCurr ? absHist : absCurr;
 
 		const double matching = 1.0 - (diff / maxV);
-		return static_cast<int>(matching * w);
+		return static_cast<int>(matching * weight);
 	}
 };
 
@@ -40,7 +36,19 @@ public:
 class RsiScoreCalcs
 {
 public:
-	static IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr);
+
+	static inline IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr)
+	{
+		double weight = Configrations::getInstance()->Get_Policy()->RSI_Wieght;
+		IndicatorScore score;
+		score += RsiScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L10, weight);
+		score += RsiScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L15, weight);
+		score += RsiScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L20, weight);
+		score += RsiScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L25, weight);
+		score += RsiScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L30, weight);
+		return score;
+
+	}
 
 	inline static IndicatorScore CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr, IndicatorLen len, double weight)
 	{
@@ -76,7 +84,19 @@ public:
 
 class EmaScoreCalcs {
 public:
-	static IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr);
+
+	static inline IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr)
+	{
+		double weight = Configrations::getInstance()->Get_Policy()->EMA_Wieght;
+		IndicatorScore score = EmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L10, weight);
+		score = score + EmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L15, weight);
+		score = score + EmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L20, weight);
+		score = score + EmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L25, weight);
+		score = score + EmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L30, weight);
+
+		return score;
+	}
+
 private:
 	inline static IndicatorScore CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr, IndicatorLen len /*IndicatorLen::L30*/, double weight)
 	{
@@ -116,14 +136,16 @@ private:
 	}
 };
 
-/// <GravityScoreCalcs >
-/// Gravity Candle Score Calcs for Gravity Score calcs
-/// <RSIScoreCalcs>
+/// <VolumeScoreCalcs>
+/// Volume Candle Score Calcs for Volume Score calcs
+/// <VolumeScoreCalcs >
 
-class GravityScoreCalcs 
+class VolumeScoreCalcs 
 {
 public:
-	static int CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr);
+	static int CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr) {
+		ChNHistory->Get_Indicator_Pointer(IndicatorType::VOLUME, IndicatorLen::NONE);
+	}
 };
 
 
@@ -132,7 +154,20 @@ public:
 /// <ZlsmaScoreCalcs>
 class ZlsmaScoreCalcs {
 public:
-	static IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr);
+
+	static inline IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr)
+	{
+		double weight = Configrations::getInstance()->Get_Policy()->ZLSMA_Wieght;
+		IndicatorScore score = ZlsmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L10, weight);
+		score = score + ZlsmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L15, weight);
+		score = score + ZlsmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L20, weight);
+		score = score + ZlsmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L25, weight);
+		score = score + ZlsmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L30, weight);
+
+		return score;
+	}
+
+
 private:
 	static inline IndicatorScore CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr, IndicatorLen len /*IndicatorLen::L30*/, double weight)
 	{

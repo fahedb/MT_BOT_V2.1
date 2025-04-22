@@ -57,6 +57,7 @@ std::vector<std::vector<std::string>> Configrations::Get_AllConfigRows_DB()
 
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT));
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_PATTERN_MINIMUM_PIPS_CHANGE_TOCOUNT));
+    allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_SAVED_STATS_NUM));
     
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_MAIN_ORDER_SIZE_IN_LOT));
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_SUPPORT_ORDER_SIZE_IN_LOT));
@@ -147,6 +148,8 @@ void Configrations::Init_PatternPolicy()
     m_policy.Sleep_Minuts_after_Max_Orders_InRow = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_SLEEP_MINUTS_AFTER_MAX_ORDERS_INROW));
 
     m_policy.Pattern_CurrentTimeLineLen = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_CURR_TIME_LINE_LEN));
+    m_policy.SavedDirectionStaticsNum = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_SAVED_STATS_NUM));
+
     m_policy.EMA_len_for_Pattern_Export = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT));
     m_policy.RSI_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_RSI_WIEGHT));
     m_policy.EMA_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_EMA_WIEGHT));

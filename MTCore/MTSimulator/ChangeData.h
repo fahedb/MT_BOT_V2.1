@@ -11,7 +11,6 @@
 
 #define INVALID_DATA -1;
 
-
 class ChangeNode
 {
 public:
@@ -20,7 +19,6 @@ public:
 		point_DateTime = "";
 		Increase_Decrease = false;
 		m_PointPlace = _Points::_Points_DEFUALT;
-		m_gravity = nullptr;
 		Increase_Decrease = false;
 		activePoint = false;
 	}
@@ -35,9 +33,8 @@ public:
 		}
 		return -1.0;
 	}
-	void Set_Entity(const std::string& key, double val) {
-		m_entitiesMap[key] = val;
-	}
+	void Set_Entity(const std::string& key, double val) { m_entitiesMap[key] = val; }
+
 	std::map<std::string, double> m_entitiesMap;
 	std::string symbol;
 	bool Increase_Decrease = false;
@@ -46,9 +43,7 @@ public:
 	bool activePoint=false;
 	_Points m_PointPlace;
 public:
-	void SetGravity(Gravity curr) { m_gravity = new Gravity_Ind(Get_Entity(HTTP_BODY_MEMBER_OpenPrice), Get_Entity(HTTP_BODY_MEMBER_ClosePrice), curr); }
 	void SetPoints(_Points points) { m_PointPlace = points; }
-	Gravity_Ind* GetGravityInd();
 	
 	_Points GetPoints() { return m_PointPlace; }
 	void Set_Indicator(IndicatorType type, IndicatorLen len, IndicatorValues val, bool forceInsert = false) { m_indMap.Set_Indicator(type, len, val,forceInsert); }
@@ -56,7 +51,6 @@ public:
 	IndicatorMap* Get_Indicators_Map() { return &m_indMap; }
 private:
 	IndicatorMap m_indMap;
-	Gravity_Ind* m_gravity;
 };
 
 class Http_Utils
@@ -67,6 +61,7 @@ public:
 		if (type == HTTP_BODY_MEMBER_IND_EMA)	return IndicatorType::EMA;
 		if (type == HTTP_BODY_MEMBER_IND_RSI)	return IndicatorType::RSI;
 		if (type == HTTP_BODY_MEMBER_IND_ZLSMA) return IndicatorType::ZLSMA;
+		if (type == HTTP_BODY_MEMBER_IND_VOLUME) return IndicatorType::VOLUME;
 
 		return IndicatorType::NONE;
 	}
@@ -78,6 +73,7 @@ public:
 		if (len == HTTP_BODY_MEMBER_IND_LEN_20) return IndicatorLen::L20;
 		if (len == HTTP_BODY_MEMBER_IND_LEN_25) return IndicatorLen::L25;
 		if (len == HTTP_BODY_MEMBER_IND_LEN_30) return IndicatorLen::L30;
+		if (len == HTTP_BODY_MEMBER_IND_LEN_NONE) return IndicatorLen::NONE;
 
 		return IndicatorLen::NONE;
 	}

@@ -33,12 +33,7 @@
 
  }*/
 
- Gravity_Ind* ChangeNode::GetGravityInd()
- {
-	 if (m_gravity)
-		 return m_gravity;
-	 return nullptr;
- }
+
  ////////////////////////////////////////////////////
 /////////// END OF ChangeNode class Functions////
 ////////////////////////////////////////////////////

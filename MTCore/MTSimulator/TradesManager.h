@@ -3,6 +3,7 @@
 #include "..\..\HTTPCore\ExchangeData.h"
 #include "CONFIGRATIONS.H"
 #include "DirectionStats.h"
+#include "OrderStruct.h"
 
 /// <summary>
 /// This Class is responsible for send a trades 
@@ -26,7 +27,7 @@ public:
     }
 
 public:
-    bool CheckForTrade_PatternGod(DirectionStats& stats) // Function to check for trades for PatternGod and statistics Stats
+	OrderStruct CheckForTrade_PatternGod(DirectionStats& stats) // Function to check for trades for PatternGod and statistics Stats
     {
 
 		ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
@@ -37,6 +38,7 @@ public:
 		double blurPercent = (double(stats.Get_BlurCount(StatsType::General)) / generalCount) * 100.0;
 
 		double meanPips = stats.mean(StatsType::General);
+		OrderStruct order;
 
 		if (generalCount >= policy->Patter_Min_Patterns_ToTake_Action)
 		{
@@ -50,13 +52,13 @@ public:
 			{
 				Send_TraddeSignal("XAUUSD", 0);
 				stats.Set_TradeRes(true);
-				return true;
+				order.ActivateOrder(OrderType::LONG, stats.timePoint, stats.timePoint, CoinsPair::XAUUSD);
 			}
 			else if (isStrongDown)
 			{
 				Send_TraddeSignal("XAUUSD", 1);
 				stats.Set_TradeRes(true);
-				return true;
+				order.ActivateOrder(OrderType::SHORT, stats.timePoint, stats.timePoint, CoinsPair::XAUUSD);
 			}
 			else if (policy->Pattern_Activate_Alternative_ExecuteOrder)
 			{
@@ -72,13 +74,13 @@ public:
 					{
 						Send_TraddeSignal("XAUUSD", 0);
 						stats.Set_TradeRes(true);
-						return true;
+						order.ActivateOrder(OrderType::LONG, stats.timePoint, stats.timePoint, CoinsPair::XAUUSD);
 					}
 					else if (isAlternativeDown)
 					{
 						Send_TraddeSignal("XAUUSD", 1);
 						stats.Set_TradeRes(true);
-						return true;
+						order.ActivateOrder(OrderType::SHORT, stats.timePoint, stats.timePoint, CoinsPair::XAUUSD);
 					}
 				}
 			}
@@ -86,7 +88,7 @@ public:
 
 		Cur_Orders_InRow = 0;
 		stats.Set_TradeRes(false);
-		return false;
+		return order;
 
     }
 

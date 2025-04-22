@@ -6,19 +6,27 @@ std::mutex DataExporter::m_csvFileLocker;
 
 void DataExporter::Export_All_Statistics_Data(DirectionStats& stats, bool tradeDecRes)
 {
+	Logger& logger = Logger::getInstance();
 	std::vector<std::string> summery_logs = PrepareSummeryLogs(stats); // Prepare all summery logs in vector
 
 	for (int i = 0; i < summery_logs.size(); i++)
 	{
-		Logger::getInstance().WriteLog(summery_logs.at(i), false, true); // Send summery logs to logs
+		logger.WriteLog(summery_logs.at(i), false, true); // Send summery logs to logs
 		if (tradeDecRes)Logger::getInstance().WriteLog(summery_logs.at(i), false, true, LogType::SPECIAL_LOG); // if there is a trade, send also to SPECIAL log
 	}
-	
+	logger.WriteLog("Start export data to json...");
 	Export_DataToJson(stats, false);
+	logger.WriteLog("Done export data to json");
+
+	logger.WriteLog("Start export pngs...");
 	Send_For_PNGExport(stats);
+	logger.WriteLog("Done export pngs");
+
 	if (tradeDecRes) Export_DataToJson(stats, true);
 
 	if (tradeDecRes) Export_DataToCSV(stats);
+	logger.WriteLog("Done export all data");
+
 }
 
 std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
@@ -32,6 +40,11 @@ std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
 	double first_upPercent = (double(stats.Get_UpCount(StatsType::First)) / totalCount_first) * 100.0;
 	double first_downPercent = (double(stats.Get_DownCount(StatsType::First)) / totalCount_first) * 100.0;
 	double first_blurPercent = (double(stats.Get_BlurCount(StatsType::First)) / totalCount_first) * 100.0;
+
+	int totalCount_highest = stats.Get_TotalCount(StatsType::Highest);
+	double highest_upPercent = (double(stats.Get_UpCount(StatsType::Highest)) / totalCount_highest) * 100.0;
+	double highest_downPercent = (double(stats.Get_DownCount(StatsType::Highest)) / totalCount_highest) * 100.0;
+	double highest_blurPercent = (double(stats.Get_BlurCount(StatsType::Highest)) / totalCount_highest) * 100.0;
 
 	Logger::getInstance().WriteLog("Patterns count found: " + std::to_string(stats.Get_TotalCount(StatsType::General)), false, true);
 
@@ -55,11 +68,23 @@ std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
 		"StdDev Pip Change: " + std::to_string(stats.stddev(StatsType::First)) + "\n" +
 		"Mean indexes: " + std::to_string(stats.meanIndexes(StatsType::First));
 
+	std::string highest_summeryLog = "Stats Summary (Highest decession calcs !!):\n" +
+		std::string("Time Point: ") + stats.timePoint + "\n" +
+		std::string("UP: ") + std::to_string(highest_upPercent) + "%\n" +
+		"DOWN: " + std::to_string(highest_downPercent) + "%\n" +
+		"NOISE: " + std::to_string(highest_blurPercent) + "%\n" +
+		"Mean Pip Change: " + std::to_string(stats.mean(StatsType::Highest)) + "\n" +
+		"StdDev Pip Change: " + std::to_string(stats.stddev(StatsType::Highest)) + "\n" +
+		"Mean indexes: " + std::to_string(stats.meanIndexes(StatsType::Highest));
+
+
 	auto indexes_first = stats.get_Indexes_and_changePips(StatsType::First);
 	auto indexes_general = stats.get_Indexes_and_changePips(StatsType::General);
+	auto indexes_highest = stats.get_Indexes_and_changePips(StatsType::Highest);
 
 	std::string indexesSummery_first = "Indexes Summery (first)\n";
 	std::string indexesSummery_general = "Indexes Summery (general)\n";
+	std::string indexesSummery_highest = "Indexes Summery (highest)\n";
 
 	for (int i = 0; i < indexes_first.size(); i++)
 	{
@@ -72,8 +97,16 @@ std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
 		indexesSummery_general += std::to_string(i) + std::string(": ") + std::to_string(indexes_general.at(i).first) + std::string(" | ")
 			+ std::to_string(indexes_general.at(i).second) + std::string("\n");
 	}
+
+	for (int i = 0; i < indexes_highest.size(); i++)
+	{
+		indexesSummery_highest += std::to_string(i) + std::string(": ") + std::to_string(indexes_highest.at(i).first) + std::string(" | ")
+			+ std::to_string(indexes_highest.at(i).second) + std::string("\n");
+	}
+
 	general_summeryLog += std::string("\n\n") + indexesSummery_general;
 	first_summeryLog += std::string("\n\n") + indexesSummery_first;
+	highest_summeryLog += std::string("\n\n") + indexesSummery_highest;
 
 	std::string stepsMeansLog = "Steps Means details:\n\n";
 	auto stepMeans_vec = stats.GetAllMeansUpTo();
@@ -86,6 +119,7 @@ std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
 	std::vector<std::string> summery_logs;
 	summery_logs.push_back(general_summeryLog);
 	summery_logs.push_back(first_summeryLog);
+	summery_logs.push_back(highest_summeryLog);
 	summery_logs.push_back(stepsMeansLog);
 	return summery_logs;
 }

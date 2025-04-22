@@ -20,6 +20,8 @@
 #include "DataExporter.h"
 #include "TimeLineBuilder.h"
 #include "ScoreCalcs.h"
+#include "ChangeDataBuilder.h"
+#include "SelectionNodes.h"
 
 void OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator,TimeLine* history ,std::vector<ChangeNode*> currentTimeLine);
 void DefualtProgramStart();
@@ -208,15 +210,16 @@ void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* stati
 	if (patternScan->ScanForOneMinPatterns_MultiThreaded(&results)) // Scan for patterns
 	{
 		DirectionStats stats = statisticsCalcucator->DetectCommonDirection(&results);	
-		bool tradeRes = tradeMngr->CheckForTrade_PatternGod(stats);
+		OrderStruct tradeRes = tradeMngr->CheckForTrade_PatternGod(stats);
 		std::vector<TimeLine> similarPatterns = TimeLineBuilder::Build_TimeLine_Patterns(history, &results, currentTimeLine.size(), Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles);
 		stats.Add_Patterns(&similarPatterns);
 		stats.Add_CurrPattern(TimeLine(&currentTimeLine, false));
-		DataExporter::Export_All_Statistics_Data(stats,tradeRes);
+		DataExporter::Export_All_Statistics_Data(stats, tradeRes.IsActive());
 	}
 	else
 		logger.WriteLog("Didn't find any patterns with min score !!", false, true);
 
+	logger.WriteLog("Done scanning and exporting data.");
 	currentTimeLine.clear(); // Clear the current time line and get ready for the next scan
 
 }

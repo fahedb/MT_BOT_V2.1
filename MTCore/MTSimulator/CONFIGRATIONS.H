@@ -35,6 +35,9 @@ struct ConfigrationsPolicy {
     double Min_MeanPips_ToExecute_Order = 0.0;
     double Pattern_Min_PipsChange_ToCount = 0.0;
     int Pattern_CurrentTimeLineLen = 0;
+
+    int SavedDirectionStaticsNum = 0;
+
     int Max_Orders_InRow = 0;
     int Sleep_Minuts_after_Max_Orders_InRow = 0;
     int EMA_len_for_Pattern_Export = 0;

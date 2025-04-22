@@ -13,7 +13,8 @@ enum class CommonDirection
 enum class StatsType
 {
 	General = 0,
-	First = 1
+	First = 1,
+	Highest =2
 };
 
 struct StepsMean
@@ -103,6 +104,7 @@ struct DirectionStats {
 	std::string timePoint;
 	DirectionGroupStats general;
 	DirectionGroupStats first;
+	DirectionGroupStats highest;
 	StepsMean stepsMean;
 	std::vector<TimeLine> m_patterns;
 	TimeLine* m_currPattern;
@@ -117,6 +119,9 @@ struct DirectionStats {
 		case StatsType::First:
 			return first;
 			break;
+		case StatsType::Highest:
+			return highest;
+			break;
 		default:
 			return general;
 			break;
@@ -126,14 +131,11 @@ struct DirectionStats {
 	{
 		if (son == "First") return first;
 		if (son == "General") return general;
+		if (son == "Highest") return highest;
 		return general;
 	}
 	void addStep_ForCandleIdx(double pipChange, int candleIdx) { stepsMean.addStep(pipChange, candleIdx); }
-	void add(double pipChange, CommonDirection dir, int candleIdx, StatsType sType)
-	{
-		if (sType == StatsType::First) first.add(pipChange, dir, candleIdx);
-		if (sType == StatsType::General) general.add(pipChange, dir, candleIdx);
-	}
+	void add(double pipChange, CommonDirection dir, int candleIdx, StatsType sType) { GetGroupStats(sType).add(pipChange, dir, candleIdx); }
 	double mean(StatsType sType) { return GetGroupStats(sType).mean(); }
 	double meanIndexes(StatsType sType) { return GetGroupStats(sType).meanIndexes(); }
 	double stddev(StatsType sType) { return GetGroupStats(sType).stddev(); }
@@ -154,6 +156,29 @@ struct DirectionStats {
 	}
 	void Add_CurrPattern(TimeLine currPatter) { m_currPattern = new TimeLine(currPatter); }
 	void Set_TradeRes(bool tradeRes) { m_tradeRes = tradeRes; }
-
 };
 
+
+// Structs to load json to
+struct CandleIndexDetail {
+	int candleIdx;
+	int indexInArray;
+	int pipChange;
+};
+
+struct DirectionGroupStatsJson {
+	std::vector<CandleIndexDetail> candleIndexDetails;
+	double up = 0;
+	double down = 0;
+	double noise = 0;
+	double mean = 0;
+	double stddev = 0;
+	double meanIndexes = 0;
+};
+
+struct DirectionStatsJson {
+	std::string timePoint;
+	DirectionGroupStatsJson first;
+	DirectionGroupStatsJson general;
+	std::vector<std::pair<int, double>> stepsMeans;
+};

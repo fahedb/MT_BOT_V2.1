@@ -49,6 +49,7 @@ enum struct IndicatorType
 	EMA = 0,
 	RSI = 1,
 	ZLSMA = 2,
+	VOLUME = 3,
 	NONE = -1
 };
 
@@ -108,22 +109,6 @@ struct IndicatorValues {
 	double m_Slope_H4;
 };
 
-struct Gravity
-{
-	int m_TotalTicks = 0;
-	int m_UpperTicks = 0;
-	int m_lowerTicks = 0;
-	double m_GravityStren = 0.0;
-	GravityType m_type = GravityType::NOT_INITIALIZED;
-public:
-	void CalcGravityMembers(double open, double close);
-
-private:
-	void setGravityType(double open, double close);
-	void calcGravityLevel();
-
-};
-
 
 class BaseIndicator
 {
@@ -138,21 +123,11 @@ protected:
 	IndicatorValues m_curr_BarValues;
 };
 
-class Gravity_Ind
+class Volume_Ind : public BaseIndicator
 {
 public:
-
-	Gravity_Ind(double open, double close, Gravity currGravity);
-	Gravity* GetGravity() { return &m_value_M1; }
-
-protected:
-	Gravity m_value_M1;
-	double m_Slope_M1;
-private:
-	void Assign_Invalid_Data() {m_Slope_M1 = 0;}
+	Volume_Ind(IndicatorValues curr) : BaseIndicator(curr) {};
 };
-
-
 
 class RSI_Ind : public BaseIndicator
 {

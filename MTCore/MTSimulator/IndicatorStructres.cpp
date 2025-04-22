@@ -26,45 +26,6 @@ BaseIndicator::BaseIndicator(IndicatorValues curr) {
 ///			Author: Fahed.b				  //////////
 ////////////////////////////////////////////////////
 
-void Gravity::CalcGravityMembers(double open, double close)
-{
-	calcGravityLevel();
-	setGravityType(open, close);
-}
-
-void Gravity::setGravityType(double close, double open)
-{
-	GravityType newType;
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
-
-	if (m_GravityStren < GRAVITY_MIN_STRONG_LEVEL)
-	{
-		newType = (close > open) ? GravityType::Random_Asc : GravityType::Random_Desc;
-	}
-	else if (m_UpperTicks > m_lowerTicks)
-	{
-		newType = (close > open) ? GravityType::High_Asc : GravityType::High_Desc;
-	}
-	else
-	{
-		newType = (close > open) ? GravityType::Low_Asc : GravityType::Low_Desc;
-	}
-
-	m_type = newType;
-
-}
-
-void Gravity::calcGravityLevel()
-{
-	int strongSide;
-	if (m_UpperTicks > m_lowerTicks)
-		strongSide = m_UpperTicks;
-	else
-		strongSide = -1 * m_lowerTicks;
-
-	m_GravityStren = ((double)strongSide / (double)m_TotalTicks);
-	m_GravityStren *= 100.0;
-}
 
 ////////////////////////////////////////////////////
 /////////// END OF Gravity Values Structer class Functions////
@@ -75,15 +36,6 @@ void Gravity::calcGravityLevel()
 ///			Author: Fahed.b				  //////////
 ////////////////////////////////////////////////////
 
-Gravity_Ind::Gravity_Ind(double open, double close, Gravity currGravity)
-{
-	m_value_M1.m_TotalTicks = currGravity.m_TotalTicks;
-	m_value_M1.m_UpperTicks = currGravity.m_UpperTicks;
-	m_value_M1.m_lowerTicks = currGravity.m_lowerTicks;
-	m_value_M1.CalcGravityMembers(open, close);
-	Assign_Invalid_Data();
-
-}
 ////////////////////////////////////////////////////
 /////////// END OF Gravity Indricator class Functions////
 ////////////////////////////////////////////////////
@@ -333,6 +285,8 @@ BaseIndicator* IndicatorMap::Get_IndicatorObject(IndicatorType type, IndicatorVa
 		return new RSI_Ind(val);
 	case IndicatorType::ZLSMA:
 		return new ZLSMA_Ind(val);
+	case IndicatorType::VOLUME:
+		return new Volume_Ind(val);
 	default:
 		return nullptr;
 	}

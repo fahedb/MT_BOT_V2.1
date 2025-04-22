@@ -34,7 +34,7 @@ public :
         SQLFreeHandle(SQL_HANDLE_DBC, m_DBConnectionHandler);
         SQLFreeHandle(SQL_HANDLE_ENV, m_envHandler);
     }
-
+    bool IsConnected();
 
 private:
     SQLHENV m_envHandler;

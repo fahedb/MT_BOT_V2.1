@@ -110,3 +110,16 @@ DataBaseConnection::DataBaseConnection(std::string connString)
         std::cout << "Connection to SQL Server failed.\n";
     }
 }
+
+
+bool DataBaseConnection::IsConnected() {
+    if (!m_DBConnectionHandler || !m_envHandler)
+        return false;
+
+    SQLRETURN ret;
+    SQLUINTEGER connStatus = 0;
+
+    ret = SQLGetConnectAttr(m_DBConnectionHandler, SQL_ATTR_CONNECTION_DEAD, &connStatus, 0, NULL);
+
+    return (SQL_SUCCEEDED(ret) && connStatus == SQL_CD_FALSE); // אם False - החיבור חי
+}

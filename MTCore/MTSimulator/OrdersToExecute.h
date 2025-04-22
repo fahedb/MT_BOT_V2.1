@@ -2,6 +2,7 @@
 #include "BTables.h"
 #include "DefinedTables.h"
 #include <string.h>
+
 struct NewOrderStructure
 {
 	int Long_Short;

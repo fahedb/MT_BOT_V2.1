@@ -1,11 +1,11 @@
 #include <map>
 #include <vector>
 #include <string>
+
 #pragma once
 class TempCache // Singleton class for cache data -- No need to use currently -- for future usage
 {
 public:
-
     TempCache()
     {
 

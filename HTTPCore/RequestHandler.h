@@ -10,6 +10,7 @@ struct Http_OrderStruct
 {
 	std::string symbol;
 	int long_short = 0;
+	int orderSeqNum = 0;
 };
 
 struct ConfigStruct

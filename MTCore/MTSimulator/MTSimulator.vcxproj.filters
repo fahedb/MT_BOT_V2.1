@@ -184,6 +184,21 @@
     <Filter Include="TradesManager">
       <UniqueIdentifier>{4f8a0330-4e4f-48ef-a7d3-95fe412ee034}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataStructers\DirectionStats\Inc">
+      <UniqueIdentifier>{f618bb74-8134-42cd-ab1c-e1e968c718dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\DirectionStats\Src">
+      <UniqueIdentifier>{063490e7-2a15-48ec-82f7-7d2e5da9eb1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\TradeStructure">
+      <UniqueIdentifier>{251cc464-0486-4710-81cf-937d9e91f771}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\TradeStructure\Inc">
+      <UniqueIdentifier>{b77e464b-614a-42b1-ac57-44bedfb3a45d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\TradeStructure\Src">
+      <UniqueIdentifier>{a1d2f478-7942-4a10-9dd5-97c57f4e4540}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -261,9 +276,6 @@
     <ClCompile Include="SeqNumTable.cpp">
       <Filter>Tables\SeqTable</Filter>
     </ClCompile>
-    <ClCompile Include="DirectionStats.cpp">
-      <Filter>DataStructers\DirectionStats</Filter>
-    </ClCompile>
     <ClCompile Include="JasonHandler.cpp">
       <Filter>DataStructers\JsonHandler</Filter>
     </ClCompile>
@@ -287,6 +299,21 @@
     </ClCompile>
     <ClCompile Include="TimeLineBuilder.cpp">
       <Filter>DataStructers\TimeLine</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionStats.cpp">
+      <Filter>DataStructers\DirectionStats\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Static_DBConnection.cpp">
+      <Filter>DataBaseConnection\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="OrderStruct.cpp">
+      <Filter>DataStructers\TradeStructure\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="OrdersStructCache.cpp">
+      <Filter>DataStructers\TradeStructure\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionStatsCache.cpp">
+      <Filter>DataStructers\DirectionStats\Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -371,9 +398,6 @@
     <ClInclude Include="SeqNumTable.h">
       <Filter>Tables\SeqTable</Filter>
     </ClInclude>
-    <ClInclude Include="DirectionStats.h">
-      <Filter>DataStructers\DirectionStats</Filter>
-    </ClInclude>
     <ClInclude Include="JasonHandler.h">
       <Filter>DataStructers\JsonHandler</Filter>
     </ClInclude>
@@ -397,6 +421,27 @@
     </ClInclude>
     <ClInclude Include="TimeLineBuilder.h">
       <Filter>DataStructers\TimeLine</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionStats.h">
+      <Filter>DataStructers\DirectionStats\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="CoinsPair.h">
+      <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Static_DBConnection.h">
+      <Filter>DataBaseConnection\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="OrderType.h">
+      <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="OrderStruct.h">
+      <Filter>DataStructers\TradeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="OrdersStructCache.h">
+      <Filter>DataStructers\TradeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionStatsCache.h">
+      <Filter>DataStructers\DirectionStats\Inc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -157,6 +157,7 @@
     <ClCompile Include="DataExporter.cpp" />
     <ClCompile Include="DBMap.cpp" />
     <ClCompile Include="DirectionStats.cpp" />
+    <ClCompile Include="DirectionStatsCache.cpp" />
     <ClCompile Include="EURUSD_CurrentTable.cpp" />
     <ClCompile Include="HTTP_Lgger.cpp" />
     <ClCompile Include="IndicatorStructres.cpp" />
@@ -164,7 +165,9 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="MTChart.cpp" />
     <ClCompile Include="MyJSONHandler.cpp" />
+    <ClCompile Include="OrdersStructCache.cpp" />
     <ClCompile Include="OrdersToExecute.cpp" />
+    <ClCompile Include="OrderStruct.cpp" />
     <ClCompile Include="PatternExporter.cpp" />
     <ClCompile Include="PatternGod.cpp" />
     <ClCompile Include="ProcessData.cpp" />
@@ -172,6 +175,7 @@
     <ClCompile Include="SelectionNodes.cpp" />
     <ClCompile Include="SeqNumTable.cpp" />
     <ClCompile Include="StartPoint.cpp" />
+    <ClCompile Include="Static_DBConnection.cpp" />
     <ClCompile Include="StatisticsDecession.cpp" />
     <ClCompile Include="TempCache.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
@@ -187,6 +191,7 @@
     <ClInclude Include="CandleData.h" />
     <ClInclude Include="ChangeData.h" />
     <ClInclude Include="ChangeDataBuilder.h" />
+    <ClInclude Include="CoinsPair.h" />
     <ClInclude Include="Configrations.h" />
     <ClInclude Include="ConfigsDefs.h" />
     <ClInclude Include="ConfigsTable.h" />
@@ -196,6 +201,7 @@
     <ClInclude Include="DBMap.h" />
     <ClInclude Include="DefinedTables.h" />
     <ClInclude Include="DirectionStats.h" />
+    <ClInclude Include="DirectionStatsCache.h" />
     <ClInclude Include="EURUSD_CurrentTable.h" />
     <ClInclude Include="HTTP_Lgger.h" />
     <ClInclude Include="IndicatorStructres.h" />
@@ -203,13 +209,17 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MTChart.h" />
     <ClInclude Include="MyJSONHandler.h" />
+    <ClInclude Include="OrdersStructCache.h" />
     <ClInclude Include="OrdersToExecute.h" />
+    <ClInclude Include="OrderStruct.h" />
+    <ClInclude Include="OrderType.h" />
     <ClInclude Include="PatternExporter.h" />
     <ClInclude Include="PatternGod.h" />
     <ClInclude Include="ProcessData.h" />
     <ClInclude Include="ScoreCalcs.h" />
     <ClInclude Include="SelectionNodes.h" />
     <ClInclude Include="SeqNumTable.h" />
+    <ClInclude Include="Static_DBConnection.h" />
     <ClInclude Include="StatisticsDecession.h" />
     <ClInclude Include="TempCache.h" />
     <ClInclude Include="ThreadPool.h" />

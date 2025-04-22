@@ -45,8 +45,9 @@ public:
 			int generalPipChange = 0;
 			int firstPipChange = 0;
 
-			CommonDirection generalDir = CalcGeneralPipsChange(node, &stats, policy->Pattern_Min_PipsChange_ToCount);
-			CommonDirection firstDir = CalcFirstPipsChange(node, &stats, policy->Pattern_Min_PipsChange_ToCount);
+			CommonDirection generalDir = CalcGeneralPipsChange(node, &stats);
+			CommonDirection firstDir = CalcFirstPipsChange(node, &stats);
+			CommonDirection HighestDir = CalcHighestPipsChange(node, &stats);
 
 		}
 		
@@ -55,8 +56,9 @@ public:
 
 	void Set_NewCurrentPeriod(std::vector<ChangeNode*>* currentTimeLine) { m_currentTL = currentTimeLine; }
 private:
-	CommonDirection CalcFirstPipsChange(ChangeNode* start, DirectionStats* stats, int pipsChangeToCount);
-	CommonDirection CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stats, int pipsChangeToCount);
+	CommonDirection CalcFirstPipsChange(ChangeNode* start, DirectionStats* stats);
+	CommonDirection CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stats);
+	CommonDirection CalcHighestPipsChange(ChangeNode* start, DirectionStats* stats);
 
 };
 

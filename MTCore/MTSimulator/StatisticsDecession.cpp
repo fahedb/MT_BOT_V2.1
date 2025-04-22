@@ -2,13 +2,74 @@
 #include "JasonHandler.h"
 
 
-CommonDirection StatisticsDecession::CalcFirstPipsChange(ChangeNode* start, DirectionStats* stats, int pipsChangeToCount)
+CommonDirection StatisticsDecession::CalcHighestPipsChange(ChangeNode* start, DirectionStats* stats)
 {
+	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+	int pipsChangeToCount = policy->Pattern_Min_PipsChange_ToCount;
+	int futureLen = policy->Score_Future_Vision_Candles;
+
 	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTime);
-	int futureLen = Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles;
+	int pipChange = 0;
+	int candlesCounter = 0;
+
+	int maxChange = 1;
+	int maxChangeCanleIdx = 0;
+	int minChange = -1;
+	int minChangeCanleIdx = 0;
+
+	bool upD = false, downD = false;
+	for (int i = indexStart; i < indexStart + futureLen && i < m_historyTL->size(); i++)
+	{
+		pipChange += m_historyTL->at(i)->Pip_Change;
+		candlesCounter++;
+
+		if (maxChange < pipChange)
+		{
+			maxChange = pipChange;
+			maxChangeCanleIdx = candlesCounter;
+		}
+
+		if (minChange > pipChange)
+		{
+			minChange = pipChange;
+			minChangeCanleIdx = candlesCounter;
+		}
+	}
+
+	CommonDirection dire;
+	
+	if (std::abs(maxChange) > std::abs(minChange))
+	{
+		pipChange = maxChange;
+		candlesCounter = maxChangeCanleIdx;
+		dire = CommonDirection::UP;
+	}
+	else
+	{
+
+		pipChange = minChange;
+		candlesCounter = minChangeCanleIdx;
+		dire = CommonDirection::DOWN;
+	}
+
+	stats->add(pipChange, dire, candlesCounter, StatsType::Highest);
+	return dire;
+}
+
+
+CommonDirection StatisticsDecession::CalcFirstPipsChange(ChangeNode* start, DirectionStats* stats)
+{
+	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+
+	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTime);
+	
+	int pipsChangeToCount = policy->Pattern_Min_PipsChange_ToCount;
+	int futureLen = policy->Score_Future_Vision_Candles;
+
 	int pipChange = 0;
 	int candlesCounter = 0;
 	bool upD = false, downD = false;
+	
 	for (int i = indexStart; i < indexStart + futureLen && i < m_historyTL->size(); i++)
 	{
 		pipChange += m_historyTL->at(i)->Pip_Change;
@@ -36,10 +97,13 @@ CommonDirection StatisticsDecession::CalcFirstPipsChange(ChangeNode* start, Dire
 
 
 
-CommonDirection StatisticsDecession::CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stats, int pipsChangeToCount)
+CommonDirection StatisticsDecession::CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stats)
 {
+	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+	int pipsChangeToCount = policy->Pattern_Min_PipsChange_ToCount;
+	int futureLen = policy->Score_Future_Vision_Candles;
+
 	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTime);
-	int futureLen = Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles;
 	int pipChange = 0;
 	int candlesCounter = 0;
 

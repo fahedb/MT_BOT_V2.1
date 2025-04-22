@@ -1,0 +1,49 @@
+#include "OrderStruct.h"
+
+#pragma once
+class OrderEntityCache
+{
+	std::vector<OrderEntity> m_ordersRep;
+	
+public:
+	void Add_NewOrder(OrderEntity order) { m_ordersRep.push_back(order); }
+
+	OrderEntity* Get_Order(long seqNum)
+	{
+		for (int i = 0; i < m_ordersRep.size(); i++)
+		{
+			if (m_ordersRep.at(i).Get_OrderSeqNum() == seqNum)
+				return &m_ordersRep.at(i);
+		}
+		return nullptr;
+	}
+
+	OrderEntity* Get_Order(std::string timePoint)
+	{
+		for (int i = 0; i < m_ordersRep.size(); i++)
+			if (m_ordersRep.at(i).Get_TimePoint() == timePoint)
+				return &m_ordersRep.at(i);
+		return nullptr;
+	}
+
+	void RefreshOrders()
+	{
+		for (int i = static_cast<int>(m_ordersRep.size()) - 1; i >= 0; --i)
+			if (m_ordersRep[i].Get_OrderStatus() == OrderStatus::CLOSED)
+				m_ordersRep.erase(m_ordersRep.begin() + i);
+	}
+	static OrderEntityCache* getInstance() {
+		static OrderEntityCache instance; // Guaranteed to be destroyed and instantiated on first use
+		return &instance;
+	}
+
+private:
+	OrderEntityCache() {}
+	OrderEntityCache(const OrderEntityCache&) = delete;
+	OrderEntityCache& operator=(const OrderEntityCache&) = delete;
+
+	// Static method to get the instance of the Singleton
+
+
+};
+

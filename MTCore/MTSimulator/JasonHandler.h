@@ -20,6 +20,7 @@ public:
 
 		Add_Calcs_toJson_Stats(&j, "First", stats);
 		Add_Calcs_toJson_Stats(&j, "General", stats);
+		Add_Calcs_toJson_Stats(&j, "Highest", stats);
 		return j;
 	}
 

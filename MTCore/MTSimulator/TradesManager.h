@@ -27,7 +27,7 @@ public:
     }
 
 public:
-	OrderStruct CheckForTrade_PatternGod(DirectionStats& stats) // Function to check for trades for PatternGod and statistics Stats
+	OrderEntity CheckForTrade_PatternGod(DirectionStats& stats) // Function to check for trades for PatternGod and statistics Stats
     {
 
 		ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
@@ -38,7 +38,7 @@ public:
 		double blurPercent = (double(stats.Get_BlurCount(StatsType::General)) / generalCount) * 100.0;
 
 		double meanPips = stats.mean(StatsType::General);
-		OrderStruct order;
+		OrderEntity order;
 
 		if (generalCount >= policy->Patter_Min_Patterns_ToTake_Action)
 		{

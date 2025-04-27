@@ -180,7 +180,8 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* re
 			<< "    | Total Score: " << score.totalScore.total << "\n"
 			<< "    | EMA: " << score.emaScore.total << "\n"
 			<< "    | RSI: " << score.rsiScore.total << "\n"
-			<< "    | ZLSMA: " << score.zlsmaScore.total;
+			<< "    | ZLSMA: " << score.zlsmaScore.total << "\n"
+			<< "	| VOLUME: " << score.volumeScore.total;
 	}
 
 	logger.WriteLog(logStream.str(), false, true);

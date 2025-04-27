@@ -51,7 +51,10 @@ public:
 private:
 	std::string GetTableName() { return m_tableName; }
 
-	SQLSelectionNode* Get_SQLSelectionNode(std::string selectQ) { SelectFromDB(selectQ, GetColsNum()); }
+	SQLSelectionNode* Get_SQLSelectionNode(std::string selectQ) { 
+		SelectFromDB(selectQ, GetColsNum());
+		return GetSelectedRows()->size() ? GetSelectedRows()->at(0) : nullptr ;
+	}
 
 	bool UpdateSeqNum(EntityType entT, int seq)
 	{

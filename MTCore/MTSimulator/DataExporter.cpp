@@ -6,6 +6,7 @@ std::mutex DataExporter::m_csvFileLocker;
 
 void DataExporter::Export_All_Statistics_Data(DirectionStats& stats, bool tradeDecRes)
 {
+	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
 	Logger& logger = Logger::getInstance();
 	std::vector<std::string> summery_logs = PrepareSummeryLogs(stats); // Prepare all summery logs in vector
 
@@ -14,13 +15,17 @@ void DataExporter::Export_All_Statistics_Data(DirectionStats& stats, bool tradeD
 		logger.WriteLog(summery_logs.at(i), false, true); // Send summery logs to logs
 		if (tradeDecRes)Logger::getInstance().WriteLog(summery_logs.at(i), false, true, LogType::SPECIAL_LOG); // if there is a trade, send also to SPECIAL log
 	}
+
 	logger.WriteLog("Start export data to json...");
 	Export_DataToJson(stats, false);
 	logger.WriteLog("Done export data to json");
 
-	logger.WriteLog("Start export pngs...");
-	Send_For_PNGExport(stats);
-	logger.WriteLog("Done export pngs");
+	if (policy->Enable_Patterns_PNG_Export)
+	{
+		logger.WriteLog("Start export pngs...");
+		Send_For_PNGExport(stats);
+		logger.WriteLog("Done export pngs");
+	}
 
 	if (tradeDecRes) Export_DataToJson(stats, true);
 

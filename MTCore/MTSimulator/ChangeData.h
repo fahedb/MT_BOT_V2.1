@@ -6,7 +6,7 @@
 #include "../../HTTPCore/ServicesDef.h"
 #include <iostream>
 #include <sstream>
-
+#include <string_view>
 #pragma once
 
 #define INVALID_DATA -1;
@@ -35,7 +35,8 @@ public:
 	}
 	void Set_Entity(const std::string& key, double val) { m_entitiesMap[key] = val; }
 
-	std::map<std::string, double> m_entitiesMap;
+	std::unordered_map<std::string, double> m_entitiesMap;
+
 	std::string symbol;
 	bool Increase_Decrease = false;
 	int	Pip_Change=0;
@@ -96,38 +97,43 @@ public:
 		return BarPeriod::NONE;
 	}
 
-	static void ExtractAllValues(const nlohmann::json_abi_v3_11_3::json& j, std::map<std::string, std::string>& resultMap, const std::string& parentKey = "") {
+	static void ExtractAllValues(const nlohmann::json& j, std::map<std::string, std::string>& resultMap, std::string& keyBuffer) {
 		if (j.is_object()) {
 			for (auto it = j.begin(); it != j.end(); ++it) {
-				const std::string& key = it.key();   // המפתח
-				const nlohmann::json_abi_v3_11_3::json& value = it.value();     // הערך
-				ExtractAllValues(value, resultMap, parentKey.empty() ? key : parentKey + "." + key);
+				size_t oldSize = keyBuffer.size();
+				if (!keyBuffer.empty()) keyBuffer += ".";
+				keyBuffer += it.key();
+				ExtractAllValues(it.value(), resultMap, keyBuffer);
+				keyBuffer.resize(oldSize); // מחזיר את keyBuffer למצב הקודם
 			}
 		}
 		else if (j.is_array()) {
 			for (size_t i = 0; i < j.size(); ++i) {
-				ExtractAllValues(j[i], resultMap, parentKey + "[" + std::to_string(i) + "]");
+				size_t oldSize = keyBuffer.size();
+				keyBuffer += "[" + std::to_string(i) + "]";
+				ExtractAllValues(j[i], resultMap, keyBuffer);
+				keyBuffer.resize(oldSize);
 			}
 		}
 		else {
-			resultMap[parentKey] = j.dump(); 
+			resultMap[keyBuffer] = j.dump();
 		}
 	}
-	static std::vector<std::string> SplitKey(const std::string& key, char delimiter = '.')
-	{
-		std::vector<std::string> result;
-		size_t start = 0;
-		size_t end = 0;
 
-		while ((end = key.find(delimiter, start)) != std::string::npos) {
+	static std::vector<std::string> SplitKey(const std::string& key, char delimiter = '.') {
+		std::vector<std::string> result;
+		result.reserve(15); 
+
+		size_t start = 0;
+		while (true) {
+			size_t end = key.find(delimiter, start);
+			if (end == std::string::npos) {
+				result.emplace_back(key.substr(start));
+				break;
+			}
 			result.emplace_back(key.substr(start, end - start));
 			start = end + 1;
 		}
-
-		if (start < key.size()) {
-			result.emplace_back(key.substr(start));
-		}
-
 		return result;
 	}
 

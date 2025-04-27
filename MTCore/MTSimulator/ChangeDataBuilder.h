@@ -78,7 +78,8 @@ public:
 		Logger& logger = Logger::getInstance();
 		ChangeNode* chN = new ChangeNode();
 		std::map<std::string, std::string> mapy;
-		Http_Utils::ExtractAllValues(*(selectionJ->Get_Json()), mapy);
+        std::string keyBuffer;
+		Http_Utils::ExtractAllValues(*(selectionJ->Get_Json()), mapy, keyBuffer);
 		bool timePointSwitch = false;
 		for (auto it = mapy.begin(); it != mapy.end(); ++it) {
 

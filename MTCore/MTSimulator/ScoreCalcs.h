@@ -23,7 +23,7 @@ public:
 		const double diff = std::abs(hist - curr);
 		const double maxV = absHist > absCurr ? absHist : absCurr;
 
-		const double matching = 1.0 - (diff / maxV);
+		const double matching = std::fmax(0.0, 1.0 - (diff / maxV));
 		return static_cast<int>(matching * weight);
 	}
 };
@@ -76,6 +76,64 @@ public:
 	}
 };
 
+class General_MA_ScoreCalcs
+{
+public:
+	static inline IndicatorScore CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr, double histLow, double histHigh, double currLow, double currHigh, IndicatorType type, IndicatorLen len /*IndicatorLen::L30*/, double weight)
+	{
+		IndicatorScore score;
+		auto histIndPointer = ChNHistory->Get_Indicator_Pointer(type, len);
+		auto currIndPointer = ChNcurr->Get_Indicator_Pointer(type, len);
+
+		const IndicatorValues& hist = histIndPointer->Get_IndicatorValues();
+		const IndicatorValues& curr = currIndPointer->Get_IndicatorValues();
+
+		/// Slope of ema score
+		score.M1 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M1, curr.m_Slope_M1, weight);
+		score.M5 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M5, curr.m_Slope_M5, weight);
+		score.M15 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M15, curr.m_Slope_M15, weight);
+		score.M30 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M30, curr.m_Slope_M30, weight);
+		score.H1 = RelativeScoreCalcs::CalcScore(hist.m_Slope_H1, curr.m_Slope_H1, weight);
+		score.H4 = RelativeScoreCalcs::CalcScore(hist.m_Slope_H4, curr.m_Slope_H4, weight);
+
+
+		double histRange = histHigh - histLow;
+		double currRange = currHigh - currLow;
+
+
+		double normHist =0;
+		double normCurr =0;
+
+		normHist = (hist.M1 - histLow) / histRange;
+		normCurr = (curr.M1 - currLow) / currRange;
+		score.M1 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
+
+		normHist = (hist.M5 - histLow) / histRange;
+		normCurr = (curr.M5 - currLow) / currRange;
+		score.M5 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
+
+		normHist = (hist.M15 - histLow) / histRange;
+		normCurr = (curr.M15 - currLow) / currRange;
+		score.M15 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
+
+		normHist = (hist.M30 - histLow) / histRange;
+		normCurr = (curr.M30 - currLow) / currRange;
+		score.M30 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
+
+		normHist = (hist.H1 - histLow) / histRange;
+		normCurr = (curr.H1 - currLow) / currRange;
+		score.H1 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
+
+		normHist = (hist.H4 - histLow) / histRange;
+		normCurr = (curr.H4 - currLow) / currRange;
+		score.H4 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
+		score.calcTotal();
+
+		return score;
+
+	}
+};
+
 
 /// <EmaScoreCalcs>
 /// EMA Candle Score Calcs for EMA Score calcs
@@ -88,50 +146,17 @@ public:
 	static inline IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr)
 	{
 		double weight = Configrations::getInstance()->Get_Policy()->EMA_Wieght;
-		IndicatorScore score = EmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L10, weight);
-		score = score + EmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L15, weight);
-		score = score + EmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L20, weight);
-		score = score + EmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L25, weight);
-		score = score + EmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L30, weight);
-
-		return score;
-	}
-
-private:
-	inline static IndicatorScore CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr, IndicatorLen len /*IndicatorLen::L30*/, double weight)
-	{
-		IndicatorScore score;
-		const IndicatorValues& hist = ChNHistory->Get_Indicator_Pointer(IndicatorType::EMA, len)->Get_IndicatorValues();
-		const IndicatorValues& curr = ChNcurr->Get_Indicator_Pointer(IndicatorType::EMA, len)->Get_IndicatorValues();
-
-		/// Slope of ema score
-		score.M1 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M1, curr.m_Slope_M1, weight);
-		score.M5 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M5, curr.m_Slope_M5, weight);
-		score.M15 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M15, curr.m_Slope_M15, weight);
-		score.M30 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M30, curr.m_Slope_M30, weight);
-		score.H1 = RelativeScoreCalcs::CalcScore(hist.m_Slope_H1, curr.m_Slope_H1, weight);
-		score.H4 = RelativeScoreCalcs::CalcScore(hist.m_Slope_H4, curr.m_Slope_H4, weight);
-
 		double histLow = ChNHistory->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
+		double histHigh = ChNHistory->Get_Entity(HTTP_BODY_MEMBER_HighPrice);
+
 		double currLow = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
+		double currHigh = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_HighPrice);
 
-		double histRange = ChNHistory->Get_Entity(HTTP_BODY_MEMBER_HighPrice) - histLow;
-		double currRange = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_HighPrice) - currLow;
-
-
-		/// Place of ema compared to candle body calcs
-
-		double normHist = (hist.M1 - histLow) / histRange;
-		double normCurr = (curr.M1 - currLow) / currRange;
-
-		score.M1 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.M5 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.M15 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.M30 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.H1 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.H4 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.calcTotal();
-
+		IndicatorScore score = General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::EMA, IndicatorLen::L10, weight);
+		score = score + General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::EMA, IndicatorLen::L15, weight);
+		score = score + General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::EMA, IndicatorLen::L20, weight);
+		score = score + General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::EMA, IndicatorLen::L25, weight);
+		score = score + General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::EMA, IndicatorLen::L30, weight);
 		return score;
 	}
 };
@@ -143,8 +168,35 @@ private:
 class VolumeScoreCalcs 
 {
 public:
-	static int CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr) {
-		ChNHistory->Get_Indicator_Pointer(IndicatorType::VOLUME, IndicatorLen::NONE);
+	static IndicatorScore CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr) {
+		auto histIndPointer = ChNHistory->Get_Indicator_Pointer(IndicatorType::VOLUME, IndicatorLen::NONE);
+		auto currIndPointer = ChNcurr->Get_Indicator_Pointer(IndicatorType::VOLUME, IndicatorLen::NONE);
+
+		IndicatorScore score;
+
+		if (histIndPointer || currIndPointer)
+			return score;
+
+		int weight = Configrations::getInstance()->Get_Policy()->VOLUME_Wieght;
+
+		IndicatorValues histindV = histIndPointer->Get_IndicatorValues();
+		IndicatorValues currindV = currIndPointer->Get_IndicatorValues();
+
+		score.M1 =	RelativeScoreCalcs::CalcScore(histindV.M1, currindV.M1, weight);
+		score.M5 =	RelativeScoreCalcs::CalcScore(histindV.M5, currindV.M5, weight);
+		score.M15 = RelativeScoreCalcs::CalcScore(histindV.M15, currindV.M15, weight);
+		score.M30 = RelativeScoreCalcs::CalcScore(histindV.M30, currindV.M30, weight);
+		score.H1 =	RelativeScoreCalcs::CalcScore(histindV.H1, currindV.H1, weight);
+		score.H4 =	RelativeScoreCalcs::CalcScore(histindV.H4, currindV.H4, weight);
+
+		score.M1  += RelativeScoreCalcs::CalcScore(histindV.m_Slope_M1,  currindV.m_Slope_M1, weight);
+		score.M5  += RelativeScoreCalcs::CalcScore(histindV.m_Slope_M5,  currindV.m_Slope_M5, weight);
+		score.M15 += RelativeScoreCalcs::CalcScore(histindV.m_Slope_M15, currindV.m_Slope_M15, weight);
+		score.M30 += RelativeScoreCalcs::CalcScore(histindV.m_Slope_M30, currindV.m_Slope_M30, weight);
+		score.H1  += RelativeScoreCalcs::CalcScore(histindV.m_Slope_H1,  currindV.m_Slope_H1, weight);
+		score.H4  += RelativeScoreCalcs::CalcScore(histindV.m_Slope_H4,  currindV.m_Slope_H4, weight);
+
+		return score;
 	}
 };
 
@@ -158,51 +210,20 @@ public:
 	static inline IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr)
 	{
 		double weight = Configrations::getInstance()->Get_Policy()->ZLSMA_Wieght;
-		IndicatorScore score = ZlsmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L10, weight);
-		score = score + ZlsmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L15, weight);
-		score = score + ZlsmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L20, weight);
-		score = score + ZlsmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L25, weight);
-		score = score + ZlsmaScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L30, weight);
+
+		double histLow =  ChNHistory->Get_Entity(HTTP_BODY_MEMBER_LowPrice) ;
+		double histHigh = ChNHistory->Get_Entity(HTTP_BODY_MEMBER_HighPrice);
+
+		double currLow  = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
+		double currHigh = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_HighPrice);
+
+		IndicatorScore score = General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, IndicatorLen::L10, weight);
+		score += General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, IndicatorLen::L15, weight);
+		score += General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, IndicatorLen::L20, weight);
+		score += General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, IndicatorLen::L25, weight);
+		score += General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, IndicatorLen::L30, weight);
 
 		return score;
-	}
-
-
-private:
-	static inline IndicatorScore CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr, IndicatorLen len /*IndicatorLen::L30*/, double weight)
-	{
-		IndicatorScore score;
-		const IndicatorValues& hist = ChNHistory->Get_Indicator_Pointer(IndicatorType::ZLSMA, len)->Get_IndicatorValues();
-		const IndicatorValues& curr = ChNcurr->Get_Indicator_Pointer(IndicatorType::ZLSMA, len)->Get_IndicatorValues();
-
-		/// Slope of ema score
-		score.M1 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M1, curr.m_Slope_M1, weight);
-		score.M5 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M5, curr.m_Slope_M5, weight);
-		score.M15 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M15, curr.m_Slope_M15, weight);
-		score.M30 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M30, curr.m_Slope_M30, weight);
-		score.H1 = RelativeScoreCalcs::CalcScore(hist.m_Slope_H1, curr.m_Slope_H1, weight);
-		score.H4 = RelativeScoreCalcs::CalcScore(hist.m_Slope_H4, curr.m_Slope_H4, weight);
-
-		double histLow = ChNHistory->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
-		double currLow = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
-
-		double histRange = ChNHistory->Get_Entity(HTTP_BODY_MEMBER_HighPrice) - histLow;
-		double currRange = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_HighPrice) - currLow;
-
-
-		double normHist = (hist.M1 - histLow) / histRange;
-		double normCurr = (curr.M1 - currLow) / currRange;
-
-		score.M1 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.M5 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.M15 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.M30 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.H1 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.H4 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-		score.calcTotal();
-
-		return score;
-
 	}
 };
 
@@ -217,11 +238,10 @@ public:
 	{
 		ScoresResult score;
 		// Calc all the scores
-		score.basicScore = 0; // Not in use anymore
 		score.rsiScore = RsiScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
 		score.emaScore = EmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
 		score.zlsmaScore = ZlsmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
-
+		score.volumeScore = VolumeScoreCalcs::CalcScore(historyNode, currentNode);
 		// Sum all the scores into one Object
 		score.calcTotalResult();
 		return score;

@@ -96,25 +96,23 @@ IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
 
 inline ScoresResult::ScoresResult()
 {
-	basicScore = 0;
-	gravityScore = 0;
 }
 
 void ScoresResult::calcTotalResult() {
 	rsiScore.calcTotal();
 	emaScore.calcTotal();
 	zlsmaScore.calcTotal();
-
+	volumeScore.calcTotal();
 	totalScore = combineScores();
 	totalScore.calcTotal();
 }
 
 ScoresResult& ScoresResult::operator+=(const ScoresResult& other) {
-	basicScore += other.basicScore;
-	gravityScore += other.gravityScore;
+
 	rsiScore += other.rsiScore;
 	emaScore += other.emaScore;
 	zlsmaScore += other.zlsmaScore;
+	volumeScore += other.volumeScore;
 	totalScore = combineScores();
 	totalScore.calcTotal();
 
@@ -124,14 +122,11 @@ ScoresResult& ScoresResult::operator+=(const ScoresResult& other) {
 ScoresResult ScoresResult::operator+(const ScoresResult& other) const {
 	ScoresResult result;
 
-	// Add scalar scores
-	result.basicScore = basicScore + other.basicScore;
-	result.gravityScore = gravityScore + other.gravityScore;
-
 	// Add IndicatorScore fields
 	result.rsiScore = rsiScore + other.rsiScore;
 	result.emaScore = emaScore + other.emaScore;
 	result.zlsmaScore = zlsmaScore + other.zlsmaScore;
+	result.volumeScore = volumeScore + other.volumeScore;
 	// Combine total scores (no need to recalculate; just sum them)
 	result.calcTotalResult();
 
@@ -142,12 +137,12 @@ ScoresResult ScoresResult::operator+(const ScoresResult& other) const {
 
 IndicatorScore ScoresResult::combineScores() const {
 	IndicatorScore combined;
-	combined.M1 = basicScore + gravityScore + rsiScore.M1 + emaScore.M1 + zlsmaScore.M1;
-	combined.M5 = rsiScore.M5 + emaScore.M5 + zlsmaScore.M5;
-	combined.M15 = rsiScore.M15 + emaScore.M15 + zlsmaScore.M15;
-	combined.M30 = rsiScore.M30 + emaScore.M30 + zlsmaScore.M30;
-	combined.H1 = rsiScore.H1 + emaScore.H1 + zlsmaScore.H1;
-	combined.H4 = rsiScore.H4 + emaScore.H4 + zlsmaScore.H4;
+	combined.M1 =	rsiScore.M1		+ emaScore.M1	+ zlsmaScore.M1		+ volumeScore.M1;
+	combined.M5 =	rsiScore.M5		+ emaScore.M5	+ zlsmaScore.M5		+ volumeScore.M5;
+	combined.M15 =	rsiScore.M15	+ emaScore.M15	+ zlsmaScore.M15	+ volumeScore.M15;
+	combined.M30 =	rsiScore.M30	+ emaScore.M30	+ zlsmaScore.M30	+ volumeScore.M30;
+	combined.H1 =	rsiScore.H1		+ emaScore.H1	+ zlsmaScore.H1		+ volumeScore.H1;
+	combined.H4 =	rsiScore.H4		+ emaScore.H4	+ zlsmaScore.H4		+ volumeScore.H4;
 
 	return combined;
 }

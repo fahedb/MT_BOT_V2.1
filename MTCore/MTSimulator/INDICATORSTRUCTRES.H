@@ -1,6 +1,8 @@
 #pragma once
 #include "Configrations.h"
 #include <map>
+#include <unordered_map>
+#include <array>
 #define GRAVITY_MIN_STRONG_LEVEL 70.0
 
 enum struct _Points {
@@ -27,11 +29,10 @@ struct IndicatorScore {
 };
 
 struct ScoresResult {
-	int basicScore  =0;
-	int gravityScore=0;
 	IndicatorScore rsiScore;
 	IndicatorScore zlsmaScore;
 	IndicatorScore emaScore;
+	IndicatorScore volumeScore;
 	IndicatorScore totalScore;
 	ScoresResult();
 	// Calculates and updates the total score based on other scores
@@ -149,10 +150,21 @@ public:
 };
 
 
+namespace std {
+	template <>
+	struct hash<std::pair<IndicatorType, IndicatorLen>> {
+		size_t operator()(const std::pair<IndicatorType, IndicatorLen>& k) const {
+			return std::hash<int>()(static_cast<int>(k.first)) ^
+				(std::hash<int>()(static_cast<int>(k.second)) << 1);
+		}
+	};
+}
+
 class IndicatorMap
 {
 private:
-	std::map<std::pair<IndicatorType, IndicatorLen>, BaseIndicator*> m_map;
+	std::unordered_map<std::pair<IndicatorType, IndicatorLen>, BaseIndicator*> m_map;
+
 	BaseIndicator* Get_IndicatorObject(IndicatorType type, IndicatorValues val); // Getting a pointer of an allocated indicator Object
 public:
 	IndicatorMap(); // Contructor

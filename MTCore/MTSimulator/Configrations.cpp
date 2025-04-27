@@ -66,6 +66,7 @@ std::vector<std::vector<std::string>> Configrations::Get_AllConfigRows_DB()
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_RSI_WIEGHT));
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_EMA_WIEGHT));
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_ZLSMA_WIEGHT));
+    allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_VOLUME_WIEGHT));
 
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_STOP_LOSS_DIFF));
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_TAKE_PROFIT_DIFF));
@@ -78,6 +79,7 @@ std::vector<std::vector<std::string>> Configrations::Get_AllConfigRows_DB()
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
 
     allConfigs.push_back(ReadConfigRow_DB(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM));
+    allConfigs.push_back(ReadConfigRow_DB(CONFG_DEF_ENABLE_PATTERNS_PNG_EXPORT));
     return allConfigs;
 }
 
@@ -154,6 +156,7 @@ void Configrations::Init_PatternPolicy()
     m_policy.RSI_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_RSI_WIEGHT));
     m_policy.EMA_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_EMA_WIEGHT));
     m_policy.ZLSMA_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_ZLSMA_WIEGHT));
+    m_policy.VOLUME_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_VOLUME_WIEGHT));
     
     m_policy.SL_diff = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_STOP_LOSS_DIFF));
     m_policy.TP_diff = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TAKE_PROFIT_DIFF));
@@ -163,4 +166,5 @@ void Configrations::Init_PatternPolicy()
 
     m_policy.TimeBetweenScans = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
     m_policy.Export_Patterns_PNG_To_Telegram = std::stoi(Get_ConfigValue_DB(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM)) > 0 ? true : false;
+    m_policy.Enable_Patterns_PNG_Export = std::stoi(Get_ConfigValue_DB(CONFG_DEF_ENABLE_PATTERNS_PNG_EXPORT)) > 0 ? true : false;
 }

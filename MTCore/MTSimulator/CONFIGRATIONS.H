@@ -44,6 +44,7 @@ struct ConfigrationsPolicy {
     int RSI_Wieght = 0;
     int EMA_Wieght = 0;
     int ZLSMA_Wieght = 0;
+    int VOLUME_Wieght = 0;
     int SL_start = 0;
     int TP_start = 0;
 
@@ -53,7 +54,7 @@ struct ConfigrationsPolicy {
     int TimeBetweenScans = 0;
 
     bool Export_Patterns_PNG_To_Telegram = false;
-
+    bool Enable_Patterns_PNG_Export = false;
     int maxScorePossibleForChangeNodes = 0;
 };
 

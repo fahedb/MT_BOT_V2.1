@@ -22,6 +22,7 @@
 #include "ScoreCalcs.h"
 #include "ChangeDataBuilder.h"
 #include "SelectionNodes.h"
+#include "OrdersStructCache.h"
 
 void OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator,TimeLine* history ,std::vector<ChangeNode*> currentTimeLine);
 void DefualtProgramStart();
@@ -34,9 +35,9 @@ std::vector<ChangeNode*> LoadChangeNodesForThread(int threadIdx, XAUUSD_OneMinTa
 std::string m_lastTimePoint = "";
 
 int main(int argc, char* argv[])
-{	
+{
 	std::thread http_thread(ExchangeData::Start_DataExchange);
-
+	
 	if (IsItDataLoading(argc, argv))
 	{
 		LoadJson_Data_ToDBFile();
@@ -206,11 +207,15 @@ void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* stati
 		logger.WriteLog("Scanning Stopped by user, skipping scanning...", false, true);
 		return;
 	}
-	
 	if (patternScan->ScanForOneMinPatterns_MultiThreaded(&results)) // Scan for patterns
 	{
-		DirectionStats stats = statisticsCalcucator->DetectCommonDirection(&results);	
-		OrderStruct tradeRes = tradeMngr->CheckForTrade_PatternGod(stats);
+		logger.WriteLog("Start detecting common direction...", false, false);
+		DirectionStats stats = statisticsCalcucator->DetectCommonDirection(&results);
+		logger.WriteLog("Done detecting common direction.", false, false);
+
+		logger.WriteLog("Start Checking for a potentail trade...", false, false);
+		OrderEntity tradeRes = tradeMngr->CheckForTrade_PatternGod(stats);
+
 		std::vector<TimeLine> similarPatterns = TimeLineBuilder::Build_TimeLine_Patterns(history, &results, currentTimeLine.size(), Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles);
 		stats.Add_Patterns(&similarPatterns);
 		stats.Add_CurrPattern(TimeLine(&currentTimeLine, false));

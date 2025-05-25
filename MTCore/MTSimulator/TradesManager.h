@@ -4,7 +4,7 @@
 #include "CONFIGRATIONS.H"
 #include "DirectionStats.h"
 #include "OrderStruct.h"
-
+#include "OrdersStructCache.h"
 /// <summary>
 /// This Class is responsible for send a trades 
 /// Though DirectionStats object that we get from StatisticsDecession Class
@@ -15,6 +15,8 @@ class TradesManager
 private:
 	int m_orderCode;
 	int Cur_Orders_InRow;
+	OrderEntityCache* m_ordersCache;
+
 public:
     // Deleted copy constructor and assignment operator to prevent copies
     TradesManager(const TradesManager&) = delete;
@@ -27,18 +29,42 @@ public:
     }
 
 public:
-	OrderEntity CheckForTrade_PatternGod(DirectionStats& stats) // Function to check for trades for PatternGod and statistics Stats
-    {
+	OrderEntity* Get_Order_ByIdx(int idx) { return m_ordersCache->Get_Order_byIdx(idx);}
+	OrderEntity* Get_Order(long seq) { return m_ordersCache->Get_Order(seq); }
+	OrderEntity* Get_Order(std::string timePoint) { return m_ordersCache->Get_Order(timePoint); }
+	int Get_OrdersCount() { return m_ordersCache->Get_OrdersCount(); }
+	
+	OrderEntity* CheckForTrade_PatternGod(DirectionStats& stats);
 
+	CommonDirection CalcCommonDirection(DirectionStats& stats)
+	{
+		if (!stats.IsActive())
+			return CommonDirection::BLUR;
+
+		CommonDirection general = CheckDirection(stats, StatsType::General);
+		CommonDirection first = CheckDirection(stats, StatsType::First);
+		CommonDirection highest= CheckDirection(stats, StatsType::Highest);
+		
+		if (highest == first)
+			return highest;
+		if (general == highest)
+			return highest;
+		return CommonDirection::BLUR;
+	}
+	
+
+private: 
+
+	CommonDirection CheckDirection(DirectionStats& stats,StatsType stype)
+	{
 		ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
 
-		int generalCount = stats.Get_TotalCount(StatsType::General);
-		double upPercent = (double(stats.Get_UpCount(StatsType::General)) / generalCount) * 100.0;
-		double downPercent = (double(stats.Get_DownCount(StatsType::General)) / generalCount) * 100.0;
-		double blurPercent = (double(stats.Get_BlurCount(StatsType::General)) / generalCount) * 100.0;
+		int generalCount = stats.Get_TotalCount(stype);
+		double upPercent = (double(stats.Get_UpCount(stype)) / generalCount) * 100.0;
+		double downPercent = (double(stats.Get_DownCount(stype)) / generalCount) * 100.0;
+		double blurPercent = (double(stats.Get_BlurCount(stype)) / generalCount) * 100.0;
 
 		double meanPips = stats.mean(StatsType::General);
-		OrderEntity order;
 
 		if (generalCount >= policy->Patter_Min_Patterns_ToTake_Action)
 		{
@@ -50,15 +76,11 @@ public:
 
 			if (isStrongUp)
 			{
-				Send_TraddeSignal("XAUUSD", 0);
-				stats.Set_TradeRes(true);
-				order.ActivateOrder(OrderType::LONG, stats.timePoint, stats.timePoint, CoinsPair::XAUUSD);
+				return CommonDirection::UP;
 			}
 			else if (isStrongDown)
 			{
-				Send_TraddeSignal("XAUUSD", 1);
-				stats.Set_TradeRes(true);
-				order.ActivateOrder(OrderType::SHORT, stats.timePoint, stats.timePoint, CoinsPair::XAUUSD);
+				return CommonDirection::DOWN;
 			}
 			else if (policy->Pattern_Activate_Alternative_ExecuteOrder)
 			{
@@ -72,27 +94,18 @@ public:
 
 					if (isAlternativeUp)
 					{
-						Send_TraddeSignal("XAUUSD", 0);
-						stats.Set_TradeRes(true);
-						order.ActivateOrder(OrderType::LONG, stats.timePoint, stats.timePoint, CoinsPair::XAUUSD);
+						return CommonDirection::UP;
 					}
 					else if (isAlternativeDown)
 					{
-						Send_TraddeSignal("XAUUSD", 1);
-						stats.Set_TradeRes(true);
-						order.ActivateOrder(OrderType::SHORT, stats.timePoint, stats.timePoint, CoinsPair::XAUUSD);
+						return CommonDirection::DOWN;
 					}
 				}
 			}
 		}
 
-		Cur_Orders_InRow = 0;
-		stats.Set_TradeRes(false);
-		return order;
-
-    }
-
-private: 
+		return CommonDirection::BLUR;
+	}
 
 	void Send_TraddeSignal(std::string pair, int type)
 	{
@@ -105,6 +118,7 @@ private:
     {
 		Cur_Orders_InRow = 0;
 		m_orderCode = 0; // TODO: Need to emplement a logic to get orderCode from seqnum table
+		m_ordersCache = OrderEntityCache::getInstance();
     }
     ~TradesManager()
     {

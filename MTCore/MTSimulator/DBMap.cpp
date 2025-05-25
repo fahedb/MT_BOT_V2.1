@@ -6,5 +6,6 @@ int DBMap::GetIdx_Of_TimePoint(std::string dateTime)
 	{
 		return pr->second;
 	}
+	return -1;
 }
 

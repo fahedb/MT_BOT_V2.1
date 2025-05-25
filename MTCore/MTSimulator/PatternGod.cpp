@@ -82,12 +82,11 @@ ScoresResult PatternGod::CompareOneMinNodesPeriods(int startIdx) // compare betw
 	return periodScore;
 }
 
-int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* resultNodes) // Compare every X candles of the history to the current timeLine
+int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector < std::pair< ChangeNode*, ScoresResult>>& resultNodes2D) // Compare every X candles of the history to the current timeLine
 {
 		// Mutex for thread-safe access to shared resources
 	std::mutex loggerMutex, resultMutex, local2DResult;
 
-	std::vector < std::pair< ChangeNode*, ScoresResult>> resultNodes2D;
 	Logger& logger = Logger::getInstance();
 	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
 	int scoreToAct = static_cast<int> (m_currentTL->size()) * static_cast<double> (policy->Score_Min_TotalScore_ToAct_PerCandle);
@@ -101,11 +100,8 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* re
 
 	// Function to process a chunk of the loop
 	auto processChunk = [&](int start, int end, int threadIndex) {
-		int estimatedItems = (end - start) / 5 + 10;
+		int estimatedItems = 20;
 		ScoresResult localMaxScore;
-		
-		std::vector<ChangeNode*> localResults;
-		localResults.reserve(estimatedItems);
 
 		std::vector<std::pair< ChangeNode*, ScoresResult>> localResults2D;
 		localResults2D.reserve(estimatedItems);
@@ -115,7 +111,6 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* re
 			int localScoreToAct = scoreToAct;
 			if (resScore.totalScore.total > localScoreToAct) {
 				if (i + m_currentTL->size() < m_historyTL->size()) {
-					localResults.push_back(m_historyTL->at(i + m_currentTL->size() - 1)); // Get the end of the period
 					localResults2D.push_back(std::pair<ChangeNode*, ScoresResult>(m_historyTL->at(i + m_currentTL->size() - 1), ScoresResult(resScore)));
 				}
 			}
@@ -135,8 +130,6 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* re
 
 		{
 			std::lock_guard<std::mutex> lock(resultMutex);
-			resultNodes->insert(resultNodes->end(), localResults.begin(), localResults.end());
-			
 			if (maxScore.totalScore.total < localMaxScore.totalScore.total)
 				maxScore = localMaxScore;
 		}
@@ -162,11 +155,7 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* re
 	SortScores(resultNodes2D);
 	FilterDuplicatesTimeLines(resultNodes2D);
 	filterByHighScores(resultNodes2D);
-	resultNodes->clear();
-	for (int i = 0; i < resultNodes2D.size(); i++)
-	{
-		resultNodes->push_back(resultNodes2D.at(i).first);
-	}
+
 
 	std::ostringstream logStream;
 	logStream << "All patterns time points:\n";
@@ -186,7 +175,7 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* re
 
 	logger.WriteLog(logStream.str(), false, true);
 
-	return static_cast<int>(resultNodes->size());
+	return static_cast<int>(resultNodes2D.size());
 
 }
 

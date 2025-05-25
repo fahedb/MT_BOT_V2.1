@@ -5,6 +5,7 @@
 #include "httplib.h"
 #include <queue>
 #include <stack>
+#include "..\MTCore\MTSimulator\Converts.h"
 
 struct Http_OrderStruct
 {
@@ -18,7 +19,8 @@ struct ConfigStruct
 	std::string label;
 	std::string value;
 	std::string explain;
-	int permission;
+	int m_permission;
+	int m_catagory;
 	bool need_To_Update;
 };
 
@@ -94,7 +96,8 @@ public:
 		configStruct.label = conf.at(0);
 		configStruct.value = conf.at(1);
 		configStruct.explain = conf.at(2);
-		configStruct.permission = std::stoi(conf.at(3));
+		configStruct.m_permission = Converts::ToInt(conf.at(3));
+		configStruct.m_catagory = Converts::ToInt(conf.at(4));
 		configStruct.need_To_Update = false;
 
 		m_confVec.push_back(configStruct);

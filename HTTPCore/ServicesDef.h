@@ -26,6 +26,7 @@
 #define HTTP_PARAM_ConfigValue "ConfigValue"
 #define HTTP_PARAM_ConfigExplain "ConfigExplain"
 #define HTTP_PARAM_ConfigPermission "ConfigPermission"
+#define HTTP_PARAM_ConfigCatagory "ConfigCatagory"
 
 // Headers Values
 #define HTTP_PARAM_VALUE_TradeType_Long "Long"

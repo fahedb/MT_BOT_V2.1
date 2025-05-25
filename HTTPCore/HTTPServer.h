@@ -50,7 +50,8 @@ private:
         res.body = explain_utf8;
 
         res.set_header("Content-Type", "text/plain; charset=UTF-8");
-        res.set_header(HTTP_PARAM_ConfigPermission, std::to_string(confSt.permission));
+        res.set_header(HTTP_PARAM_ConfigCatagory, std::to_string(confSt.m_catagory));
+        res.set_header(HTTP_PARAM_ConfigPermission, std::to_string(confSt.m_permission));
 
     }
 

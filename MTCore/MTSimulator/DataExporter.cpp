@@ -54,7 +54,7 @@ std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
 	Logger::getInstance().WriteLog("Patterns count found: " + std::to_string(stats.Get_TotalCount(StatsType::General)), false, true);
 
 	std::string general_summeryLog = "Stats Summary (General decession calcs !!):\n" +
-		std::string("Time Point: ") + stats.timePoint + "\n" +
+		std::string("Time Point: ") + stats.Get_TimePoint() + "\n" +
 		std::string("Patterns Count: ") + std::to_string(stats.Get_TotalCount(StatsType::General)) + "\n" +
 		std::string("UP: ") + std::to_string(general_upPercent) + "%\n" +
 		"DOWN: " + std::to_string(general_downPercent) + "%\n" +
@@ -62,10 +62,10 @@ std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
 		"Mean Pip Change: " + std::to_string(stats.mean(StatsType::General)) + "\n" +
 		"StdDev Pip Change: " + std::to_string(stats.stddev(StatsType::General)) + "\n" +
 		"Mean indexes: " + std::to_string(stats.meanIndexes(StatsType::General)) + "\n\n\n" +
-		"Trade res:" + (stats.m_tradeRes ? " True" : " False");
+		"Trade res:" + (stats.Get_TradeRes() ? " True" : " False");
 
 	std::string first_summeryLog = "Stats Summary (First decession calcs !!):\n" +
-		std::string("Time Point: ") + stats.timePoint + "\n" +
+		std::string("Time Point: ") + stats.Get_TimePoint() + "\n" +
 		std::string("UP: ") + std::to_string(first_upPercent) + "%\n" +
 		"DOWN: " + std::to_string(first_downPercent) + "%\n" +
 		"NOISE: " + std::to_string(first_blurPercent) + "%\n" +
@@ -74,7 +74,7 @@ std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
 		"Mean indexes: " + std::to_string(stats.meanIndexes(StatsType::First));
 
 	std::string highest_summeryLog = "Stats Summary (Highest decession calcs !!):\n" +
-		std::string("Time Point: ") + stats.timePoint + "\n" +
+		std::string("Time Point: ") + stats.Get_TimePoint() + "\n" +
 		std::string("UP: ") + std::to_string(highest_upPercent) + "%\n" +
 		"DOWN: " + std::to_string(highest_downPercent) + "%\n" +
 		"NOISE: " + std::to_string(highest_blurPercent) + "%\n" +
@@ -83,9 +83,9 @@ std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
 		"Mean indexes: " + std::to_string(stats.meanIndexes(StatsType::Highest));
 
 
-	auto indexes_first = stats.get_Indexes_and_changePips(StatsType::First);
-	auto indexes_general = stats.get_Indexes_and_changePips(StatsType::General);
-	auto indexes_highest = stats.get_Indexes_and_changePips(StatsType::Highest);
+	auto indexes_first = stats.Get_Indexes_and_changePips(StatsType::First);
+	auto indexes_general = stats.Get_Indexes_and_changePips(StatsType::General);
+	auto indexes_highest = stats.Get_Indexes_and_changePips(StatsType::Highest);
 
 	std::string indexesSummery_first = "Indexes Summery (first)\n";
 	std::string indexesSummery_general = "Indexes Summery (general)\n";
@@ -165,7 +165,7 @@ void DataExporter::Export_DataToCSV(DirectionStats& stats)
 	std::lock_guard<std::mutex> lock(m_csvFileLocker);
 
 	CSVExportData exData("ordersSummery.csv");
-	exData.InsertNewColumn(stats.timePoint);
+	exData.InsertNewColumn(stats.Get_TimePoint());
 
 	exData.InsertNewColumn(std::to_string(general_upPercent));
 	exData.InsertNewColumn(std::to_string(general_downPercent));
@@ -189,10 +189,12 @@ void DataExporter::Export_DataToCSV(DirectionStats& stats)
 void DataExporter::Send_For_PNGExport(DirectionStats& stats)
 {
 	std::vector<std::vector<ChangeNode*>* > patternsVec;
-	for (int i = 0; i < stats.m_patterns.size(); i++)
+	TimeLine* currPattern = stats.Get_CurrPattern();
+	std::vector<TimeLineScored>* similarPatterns = stats.Get_SimilarPatterns();
+	for (int i = 0; i < similarPatterns->size(); i++)
 	{
-		patternsVec.push_back(stats.m_patterns.at(i).Get_TimeLine());
+		patternsVec.push_back(similarPatterns->at(i).GetTimeLine()->Get_TimeLine());
 	}
-	PatternExporter::Export_All_Pattens_ToPNG(stats.m_currPattern->Get_TimeLine(), &patternsVec);
+	PatternExporter::Export_All_Pattens_ToPNG(currPattern->Get_TimeLine(), &patternsVec);
 }
 

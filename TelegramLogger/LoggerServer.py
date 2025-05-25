@@ -6,11 +6,20 @@ import uvicorn
 # === הגדרות ===
 api_id = 23246402
 api_hash = "a7b0f858ed8460c807f63ceaae0a0495"
-channel_id = -1002261776362
+defualt_channel_id = -1002261776362
 special_channel_id = -1002601966909
+tracing_channel_id = -1002697425648
+error_channel_id = -1002645538128
+summery_channel_id = -1002587754408
 
 client = TelegramClient("bot_session", api_id, api_hash)
 log_queue = asyncio.Queue()
+
+ERROR_MESSAGE = 0
+REGULAR_MESSAGE = 1
+SPECIAL_MESSAGE = 2
+TRACING_MESSAGE = 3
+SUMMERY_MESSAGE = 4
 
 app = FastAPI()
 
@@ -42,7 +51,7 @@ async def log_message(request: Request):
         message_body = message_body.decode("utf-8").strip()
         if not message_body:
             return {"status": "error", "message": "Empty log"}
-        await log_queue.put((f"📢📢📢📢\n {message_body}", False))
+        await log_queue.put((f"📢📢📢📢\n {message_body}", REGULAR_MESSAGE))
         return {"status": "queued"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -55,10 +64,50 @@ async def log_message_special(request: Request):
         message_body = message_body.decode("utf-8").strip()
         if not message_body:
             return {"status": "error", "message": "Empty special log"}
-        await log_queue.put((f"📢📢📢📢\n {message_body}", True))
+        await log_queue.put((f"📢📢📢📢\n {message_body}", SPECIAL_MESSAGE))
         return {"status": "queued"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+# ==== API: ERROR LOG ====
+@app.post("/ErrMessage")
+async def log_err_message(request: Request):
+    try:
+        message_body = await request.body()
+        message_body = message_body.decode("utf-8").strip()
+        if not message_body:
+            return {"status": "error", "message": "Empty special log"}
+        await log_queue.put((f"⚠️💥🛑❌⚠️💥🛑❌\n {message_body}", ERROR_MESSAGE))
+        return {"status": "queued"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+# ==== API: TRADE TRACING LOG ====
+@app.post("/TraceTradeLogMessage")
+async def trace_trade_message(request: Request):
+    try:
+        message_body = await request.body()
+        message_body = message_body.decode("utf-8").strip()
+        if not message_body:
+            return {"status": "error", "message": "Empty special log"}
+        await log_queue.put((f"🛰️🛰️🛰️🛰️🛰️\n {message_body}", TRACING_MESSAGE))
+        return {"status": "queued"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+# ==== API: TRADE TRACING LOG ====
+@app.post("/BestDirectionSummery")
+async def trace_trade_message(request: Request):
+    try:
+        message_body = await request.body()
+        message_body = message_body.decode("utf-8").strip()
+        if not message_body:
+            return {"status": "error", "message": "Empty special log"}
+        await log_queue.put((f"🧠🧠🧠🧠🧠\n {message_body}", SUMMERY_MESSAGE))
+        return {"status": "queued"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 
 # ==== API: שליחת תמונות לתבניות ====
 @app.post("/PatternsExport")
@@ -99,7 +148,7 @@ async def log_worker():
 
                 # שליחת התבנית הנוכחית
                 await client.send_file(
-                    channel_id,
+                    defualt_channel_id,
                     pngs[0],
                     caption=(
                         f"🟢 <b>Current TimeLine Pattern</b>\n\n"
@@ -125,9 +174,22 @@ async def log_worker():
                     )
             else:
                 # שליחת הודעת טקסט
-                msg, is_special = task
+                msg, messageType = task
+
+                channelToSend = defualt_channel_id
+                if messageType == REGULAR_MESSAGE:
+                    channelToSend = defualt_channel_id
+                elif messageType == ERROR_MESSAGE:
+                    channelToSend = error_channel_id
+                elif messageType == SPECIAL_MESSAGE:
+                    channelToSend = special_channel_id
+                elif messageType == TRACING_MESSAGE:
+                    channelToSend = tracing_channel_id
+                elif messageType == SUMMERY_MESSAGE:
+                    channelToSend = summery_channel_id
+
                 await client.send_message(
-                    special_channel_id if is_special else channel_id,
+                    channelToSend,
                     msg,
                     parse_mode="html"
                 )

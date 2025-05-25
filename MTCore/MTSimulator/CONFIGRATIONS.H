@@ -56,6 +56,12 @@ struct ConfigrationsPolicy {
     bool Export_Patterns_PNG_To_Telegram = false;
     bool Enable_Patterns_PNG_Export = false;
     int maxScorePossibleForChangeNodes = 0;
+
+    bool EnableTradeTracing = false;
+    
+    bool EnableDynamicTimeLine_TradeTracing = false;
+
+    int TraceCurrTimeLineLen = 0;
 };
 
 class Configrations // SingleTon class for all configrations of the program

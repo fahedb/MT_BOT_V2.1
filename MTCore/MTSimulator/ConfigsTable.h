@@ -1,7 +1,7 @@
 #pragma once
 #include "BTables.h"
 #include "DefinedTables.h"
-#define ConfigsTablesCols 5
+#define ConfigsTablesCols 6
 
 class ConfigsTable : BTables
 {
@@ -23,6 +23,7 @@ public:
 		selected.push_back(GetSelectedRows()->at(0)->GetColumn(2)); //value 
 		selected.push_back(GetSelectedRows()->at(0)->GetColumn(3)); //explain 
 		selected.push_back(GetSelectedRows()->at(0)->GetColumn(4)); //permission
+		selected.push_back(GetSelectedRows()->at(0)->GetColumn(5)); //catagory
 
 		return selected;
 	}
@@ -32,10 +33,10 @@ public:
 			+ std::string(DEF_COLUMN_ConfigName) + " = \'" + config + "\';";
 		return UpdateDB(updateCmd);
 	}
-private:
 	virtual int tableCols() {
 		return ConfigsTablesCols;
 	}
+private:
 
 };
 

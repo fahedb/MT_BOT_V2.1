@@ -3,6 +3,8 @@
 #include <vector>
 #include <cmath>
 #include "TimeLine.h"
+#include "TimeLineScored.h"
+#include "CoinsPair.h"
 
 enum class CommonDirection
 {
@@ -78,6 +80,19 @@ struct DirectionGroupStats
 		return (Total == 0) ? 0.0 : SumPips / Total;
 	}
 
+	double pure_mean(CommonDirection dir) {
+		int total = 0;
+		int sum = 0;
+		for (int i = 0; i < Indexes.size(); i++)
+		{
+			if (pureDirection(Indexes.at(i).second) == dir)
+			{
+				total++;
+				sum += Indexes.at(i).second;
+			}
+		}
+		return (total == 0) ? 0.0 : sum / total;
+	}
 
 	double meanIndexes() const {
 		int indexesSum = 0;
@@ -95,90 +110,100 @@ struct DirectionGroupStats
 		double avg = mean();
 		return std::sqrt((SumSquaredPips / Total) - (avg * avg));
 	}
-
+private:
+	CommonDirection pureDirection(int pipChange)
+	{
+		if (pipChange > 0) return CommonDirection::UP;
+		if (pipChange < 0) return CommonDirection::DOWN;
+		return CommonDirection::BLUR;
+	}
 
 };
 
 
-struct DirectionStats {
-	std::string timePoint;
+class DirectionStats {
+private:
 	DirectionGroupStats general;
 	DirectionGroupStats first;
 	DirectionGroupStats highest;
 	StepsMean stepsMean;
-	std::vector<TimeLine> m_patterns;
+	std::vector<TimeLineScored> m_patterns_wScores;
 	TimeLine* m_currPattern;
 	bool m_tradeRes;
-	DirectionGroupStats& GetGroupStats(StatsType type)
+	bool m_active;
+	std::string m_timePoint;
+	CoinsPair m_pair;
+
+
+	DirectionGroupStats& GetGroupStats(StatsType type);
+
+public:
+
+	DirectionStats(const DirectionStats& other)
+		: m_patterns_wScores(other.m_patterns_wScores),
+		m_currPattern(other.m_currPattern ? new TimeLine(*other.m_currPattern) : nullptr ),
+		m_tradeRes(other.m_tradeRes),
+		m_active(other.m_active),
+		m_timePoint(other.m_timePoint),
+		m_pair(other.m_pair)
 	{
-		switch (type)
+	}
+
+	DirectionStats()
+	{
+		m_tradeRes = false;
+		m_currPattern = nullptr;
+		m_pair == CoinsPair::NONE;
+		m_active = false;
+	}
+
+	~DirectionStats()
+	{
+		if (m_currPattern)
 		{
-		case StatsType::General:
-			return general;
-			break;
-		case StatsType::First:
-			return first;
-			break;
-		case StatsType::Highest:
-			return highest;
-			break;
-		default:
-			return general;
-			break;
+			delete m_currPattern;
+			m_currPattern = nullptr;
 		}
 	}
-	DirectionGroupStats& GetGroupStatsByName(const std::string& son)
-	{
-		if (son == "First") return first;
-		if (son == "General") return general;
-		if (son == "Highest") return highest;
-		return general;
-	}
-	void addStep_ForCandleIdx(double pipChange, int candleIdx) { stepsMean.addStep(pipChange, candleIdx); }
+
+	DirectionStats& operator=(const DirectionStats&) = delete; // Delete copy assignment operator 
+
+	void Activate() { m_active = true; }
+	bool IsActive() { return m_active; }
+	void Set_TradeRes(bool tradeRes) { m_tradeRes = tradeRes; }
+	bool Get_TradeRes() { return m_tradeRes; };
+
+	std::vector<double> GetAllMeansUpTo(int maxIndex = -1) { return stepsMean.GetAllMeansUpTo(maxIndex); }
+
 	void add(double pipChange, CommonDirection dir, int candleIdx, StatsType sType) { GetGroupStats(sType).add(pipChange, dir, candleIdx); }
-	double mean(StatsType sType) { return GetGroupStats(sType).mean(); }
-	double meanIndexes(StatsType sType) { return GetGroupStats(sType).meanIndexes(); }
-	double stddev(StatsType sType) { return GetGroupStats(sType).stddev(); }
-	std::vector < std::pair<int, int>> get_Indexes_and_changePips(StatsType sType) { return GetGroupStats(sType).get_Indexes_and_changePips(); }
+	void addStep_ForCandleIdx(double pipChange, int candleIdx) { stepsMean.addStep(pipChange, candleIdx); }
 
 	int Get_UpCount(StatsType sType) { return GetGroupStats(sType).UpCount; }
 	int Get_DownCount(StatsType sType) { return GetGroupStats(sType).DownCount; }
 	int Get_BlurCount(StatsType sType) { return GetGroupStats(sType).BlurCount; }
 	int Get_TotalCount(StatsType sType) { return GetGroupStats(sType).Total; }
+
+	TimeLine* Get_CurrPattern() { return m_currPattern; }
+	std::vector<TimeLineScored>* Get_SimilarPatterns() { return &m_patterns_wScores; }
+
+	double Get_PureMean(StatsType sType, CommonDirection dir) { return GetGroupStats(sType).pure_mean(dir); }
+
+	double stddev(StatsType sType) { return GetGroupStats(sType).stddev(); }
+	double mean(StatsType sType) { return GetGroupStats(sType).mean(); }
+	double meanIndexes(StatsType sType) { return GetGroupStats(sType).meanIndexes(); }
+	
 	double Get_Mean_For_CandleIdx(int candleIdx) { return stepsMean.GetMeanForCandleIdx(candleIdx); }
-	std::vector<double> GetAllMeansUpTo(int maxIndex = -1) { return stepsMean.GetAllMeansUpTo(maxIndex); }
+	std::vector < std::pair<int, int>> Get_Indexes_and_changePips(StatsType sType) { return GetGroupStats(sType).get_Indexes_and_changePips(); }
 
-	void Add_Pattern(TimeLine pattern) { m_patterns.push_back(pattern); }
-	void Add_Patterns(std::vector<TimeLine>* patterns)
-	{
-		for (int i = 0; i < patterns->size(); i++)
-			m_patterns.push_back(patterns->at(i));
-	}
+	void Add_Pattern(TimeLineScored pattern) { m_patterns_wScores.push_back(pattern); }
+	void Add_Patterns(std::vector<TimeLineScored>* patterns);
 	void Add_CurrPattern(TimeLine currPatter) { m_currPattern = new TimeLine(currPatter); }
-	void Set_TradeRes(bool tradeRes) { m_tradeRes = tradeRes; }
-};
 
+	void Set_PairCoint(CoinsPair pair) { m_pair = pair; }
+	CoinsPair Get_PairCoint(CoinsPair& pair) { return m_pair; }
 
-// Structs to load json to
-struct CandleIndexDetail {
-	int candleIdx;
-	int indexInArray;
-	int pipChange;
-};
+	void Set_TimePoint(std::string timePoint) { m_timePoint = timePoint; }
+	std::string Get_TimePoint() { return m_timePoint; }
 
-struct DirectionGroupStatsJson {
-	std::vector<CandleIndexDetail> candleIndexDetails;
-	double up = 0;
-	double down = 0;
-	double noise = 0;
-	double mean = 0;
-	double stddev = 0;
-	double meanIndexes = 0;
-};
-
-struct DirectionStatsJson {
-	std::string timePoint;
-	DirectionGroupStatsJson first;
-	DirectionGroupStatsJson general;
-	std::vector<std::pair<int, double>> stepsMeans;
+	DirectionGroupStats& GetGroupStatsByName(const std::string& son);
 };

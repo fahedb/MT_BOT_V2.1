@@ -43,6 +43,12 @@ public:
 
 	bool activePoint=false;
 	_Points m_PointPlace;
+
+	double m_openPrice;
+	double m_closePrice;
+	double m_highPrice;
+	double m_lowPrice;
+
 public:
 	void SetPoints(_Points points) { m_PointPlace = points; }
 	

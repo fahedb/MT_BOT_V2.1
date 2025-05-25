@@ -1,4 +1,6 @@
 #include "TimeLine.h"
+#include "TimeLineScored.h"
+
 #pragma once
 /// <summary>
 /// Class to build time lines, there is diffrent methods that can help building time line 
@@ -20,13 +22,13 @@ public:
 		return similarPattern;
 	}
 
-	static std::vector<TimeLine> Build_TimeLine_Patterns(TimeLine* history,std::vector<ChangeNode*>* head, int patternLen,int futureLen = 0)
+	static std::vector<TimeLine> Build_TimeLine_Patterns(TimeLine* history,std::vector<ChangeNode*>* heads, int patternLen,int futureLen = 0)
 	{
 		std::vector<TimeLine> similarPatterns;
 		int timeLineLen = patternLen;
-		for (int i = 0; i < head->size(); i++)
+		for (int i = 0; i < heads->size(); i++)
 		{
-			int indexStart = history->Get_DBMap()->GetIdx_Of_TimePoint(head->at(i)->point_DateTime);
+			int indexStart = history->Get_DBMap()->GetIdx_Of_TimePoint(heads->at(i)->point_DateTime);
 
 			size_t histSize = history->Get_TimeLine()->size();
 			if (indexStart >= timeLineLen && static_cast<size_t>(indexStart) + static_cast<size_t>(futureLen) <= histSize) {
@@ -38,6 +40,43 @@ public:
 
 		}
 		return similarPatterns;
+	}
+
+	static std::vector<TimeLineScored> Build_TimeLineScored_Patterns(TimeLine* history, std::vector<std::pair<ChangeNode*,ScoresResult>>* heads, int patternLen, int futureLen = 0)
+	{
+		std::vector<TimeLineScored> similarPatterns;
+		similarPatterns.reserve(heads->size());
+
+		int timeLineLen = patternLen;
+		for (int i = 0; i < heads->size(); i++)
+		{
+			int indexStart = history->Get_DBMap()->GetIdx_Of_TimePoint(heads->at(i).first->point_DateTime);
+
+			size_t histSize = history->Get_TimeLine()->size();
+			if (indexStart >= timeLineLen && static_cast<size_t>(indexStart) + static_cast<size_t>(futureLen) <= histSize) {
+				auto* currTimeLine = new std::vector<ChangeNode*>(
+					history->Get_TimeLine()->begin() + (static_cast<size_t>(indexStart) - static_cast<size_t>(timeLineLen)),
+					history->Get_TimeLine()->begin() + (static_cast<size_t>(indexStart) + static_cast<size_t>(futureLen)));
+
+				TimeLine tl(currTimeLine, true);
+				TimeLineScored tlScored(tl, heads->at(i).second);
+				similarPatterns.push_back(tlScored);
+			}
+
+		}
+		return similarPatterns;
+	}
+
+
+	static std::vector<ChangeNode*> SplitChangeNodeFromScores(std::vector<std::pair<ChangeNode*, ScoresResult>>* line)
+	{
+		std::vector<ChangeNode*> resNodes;
+		resNodes.reserve(line->size());
+		for (int i = 0; i < line->size(); i++)
+		{
+			resNodes.push_back(line->at(i).first);
+		}
+		return resNodes;
 	}
 };
 

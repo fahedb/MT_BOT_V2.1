@@ -51,7 +51,7 @@ public:
 	void FilterDuplicatesTimeLines(std::vector<std::pair< ChangeNode*, ScoresResult>>& localResults2D);
 	void Set_NewCurrentPeriod(std::vector<ChangeNode*>* currentTimeLine) { m_currentTL = currentTimeLine; }
 	inline ScoresResult CompareOneMinNodesPeriods(int startIdx);
-	int ScanForOneMinPatterns_MultiThreaded(std::vector<ChangeNode*>* resultNodes);
+	int ScanForOneMinPatterns_MultiThreaded(std::vector < std::pair< ChangeNode*, ScoresResult>>& resultNodes);
 private:
 	std::string GetFormattedCurrentTime();
 	void BuildDBHistoryMap();

@@ -15,8 +15,8 @@ class RelativeScoreCalcs
 public:
 	static inline int CalcScore(double hist, double curr, double weight = 10) // This code runs billions of times, so i tried to make it so fast, even if it's hard to understand
 	{
-		if (hist == 0 && curr == 0)
-			return weight;
+		if (hist == curr)
+			return static_cast<int>(weight);
 
 		const double absHist = std::abs(hist);
 		const double absCurr = std::abs(curr);
@@ -146,11 +146,11 @@ public:
 	static inline IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr)
 	{
 		double weight = Configrations::getInstance()->Get_Policy()->EMA_Wieght;
-		double histLow = ChNHistory->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
-		double histHigh = ChNHistory->Get_Entity(HTTP_BODY_MEMBER_HighPrice);
+		double histLow = ChNHistory->m_lowPrice;
+		double histHigh = ChNHistory->m_highPrice;
 
-		double currLow = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
-		double currHigh = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_HighPrice);
+		double currLow = ChNcurr->m_lowPrice;
+		double currHigh = ChNcurr->m_highPrice;
 
 		IndicatorScore score = General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::EMA, IndicatorLen::L10, weight);
 		score = score + General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::EMA, IndicatorLen::L15, weight);
@@ -174,7 +174,7 @@ public:
 
 		IndicatorScore score;
 
-		if (histIndPointer || currIndPointer)
+		if (!histIndPointer || !currIndPointer)
 			return score;
 
 		int weight = Configrations::getInstance()->Get_Policy()->VOLUME_Wieght;
@@ -211,11 +211,11 @@ public:
 	{
 		double weight = Configrations::getInstance()->Get_Policy()->ZLSMA_Wieght;
 
-		double histLow =  ChNHistory->Get_Entity(HTTP_BODY_MEMBER_LowPrice) ;
-		double histHigh = ChNHistory->Get_Entity(HTTP_BODY_MEMBER_HighPrice);
+		double histLow =  ChNHistory->m_lowPrice ;
+		double histHigh = ChNHistory->m_highPrice;
 
-		double currLow  = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
-		double currHigh = ChNcurr->Get_Entity(HTTP_BODY_MEMBER_HighPrice);
+		double currLow = ChNcurr->m_lowPrice;
+		double currHigh = ChNcurr->m_highPrice;
 
 		IndicatorScore score = General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, IndicatorLen::L10, weight);
 		score += General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, IndicatorLen::L15, weight);
@@ -246,4 +246,51 @@ public:
 		score.calcTotalResult();
 		return score;
 	}
+
+	static ScoresResult CalcAverageScore(ScoresResult score, int timeLineLen)
+	{
+		ScoresResult average;
+		average.emaScore.M1 = score.emaScore.M1 / timeLineLen;
+		average.emaScore.M5 = score.emaScore.M5 / timeLineLen;
+		average.emaScore.M15 = score.emaScore.M15 / timeLineLen;
+		average.emaScore.M30 = score.emaScore.M30 / timeLineLen;
+		average.emaScore.H1 = score.emaScore.H1 / timeLineLen;
+		average.emaScore.H4 = score.emaScore.H4 / timeLineLen;
+		average.emaScore.total = score.emaScore.total / timeLineLen;
+
+		average.zlsmaScore.M1 = score.zlsmaScore.M1 / timeLineLen;
+		average.zlsmaScore.M5 = score.zlsmaScore.M5 / timeLineLen;
+		average.zlsmaScore.M15 = score.zlsmaScore.M15 / timeLineLen;
+		average.zlsmaScore.M30 = score.zlsmaScore.M30 / timeLineLen;
+		average.zlsmaScore.H1 = score.zlsmaScore.H1 / timeLineLen;
+		average.zlsmaScore.H4 = score.zlsmaScore.H4 / timeLineLen;
+		average.zlsmaScore.total = score.zlsmaScore.total / timeLineLen;
+
+		average.rsiScore.M1 = score.rsiScore.M1 / timeLineLen;
+		average.rsiScore.M5 = score.rsiScore.M5 / timeLineLen;
+		average.rsiScore.M15 = score.rsiScore.M15 / timeLineLen;
+		average.rsiScore.M30 = score.rsiScore.M30 / timeLineLen;
+		average.rsiScore.H1 = score.rsiScore.H1 / timeLineLen;
+		average.rsiScore.H4 = score.rsiScore.H4 / timeLineLen;
+		average.rsiScore.total = score.rsiScore.total / timeLineLen;
+
+		average.volumeScore.M1 = score.volumeScore.M1 / timeLineLen;
+		average.volumeScore.M5 = score.volumeScore.M5 / timeLineLen;
+		average.volumeScore.M15 = score.volumeScore.M15 / timeLineLen;
+		average.volumeScore.M30 = score.volumeScore.M30 / timeLineLen;
+		average.volumeScore.H1 = score.volumeScore.H1 / timeLineLen;
+		average.volumeScore.H4 = score.volumeScore.H4 / timeLineLen;
+		average.volumeScore.total = score.volumeScore.total / timeLineLen;
+
+		average.totalScore.M1 = score.totalScore.M1 / timeLineLen;
+		average.totalScore.M5 = score.totalScore.M5 / timeLineLen;
+		average.totalScore.M15 = score.totalScore.M15 / timeLineLen;
+		average.totalScore.M30 = score.totalScore.M30 / timeLineLen;
+		average.totalScore.H1 = score.totalScore.H1 / timeLineLen;
+		average.totalScore.H4 = score.totalScore.H4 / timeLineLen;
+		average.totalScore.total = score.totalScore.total / timeLineLen;
+
+		return average;
+	}
+
 };

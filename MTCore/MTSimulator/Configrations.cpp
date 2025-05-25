@@ -1,5 +1,7 @@
 #include "Configrations.h"
 #include "ConfigsTable.h"
+#include "Converts.h"
+
 std::string Configrations::DefualtConfigValues(std::string config)
 {
     if (config == CONFIG_DEF_FILES_DB_DIR)
@@ -80,6 +82,9 @@ std::vector<std::vector<std::string>> Configrations::Get_AllConfigRows_DB()
 
     allConfigs.push_back(ReadConfigRow_DB(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM));
     allConfigs.push_back(ReadConfigRow_DB(CONFG_DEF_ENABLE_PATTERNS_PNG_EXPORT));
+    allConfigs.push_back(ReadConfigRow_DB(CONFG_DEF_TRACE_CURR_TIMELINE_LEN));
+    allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_ENABLE_TRADE_TRACING));
+    allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_ENABLE_DYNAMIC_TIMELINE_TRADE_TRACING));
     return allConfigs;
 }
 
@@ -89,11 +94,12 @@ std::vector<std::string> Configrations::ReadConfigRow_DB(std::string config,std:
     std::vector<std::string> conf = confTable.GetConfigRow(config);
     if (conf.size())
         return conf;
-    std::vector<std::string> cacheConf(4);
+    std::vector<std::string> cacheConf(confTable.tableCols());
     cacheConf[0] = config;
     cacheConf[1] = defualt;
     cacheConf[2] = "Not found In DB\nTook it from cache !!";
-    cacheConf[3] = "1";
+    cacheConf[3] = "1"; // Permission
+    cacheConf[4] = "1"; // Catagory
     return cacheConf;
 }
 
@@ -121,50 +127,54 @@ std::string Configrations::ReadConfigValue(std::string config)
 void Configrations::Init_PatternPolicy()
 {
     m_policy.Score_Min_TotalScore_ToAct_PerCandle =
-        std::stod(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT));
+        Converts::ToDouble(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT));
 
-    m_policy.Score_Future_Vision_Candles = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_FUTURE_VISION_CANDLES));
+    m_policy.Score_Future_Vision_Candles = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_FUTURE_VISION_CANDLES));
 
     m_policy.Patter_Min_Patterns_ToTake_Action =
-        std::stod(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MINIMUM_PATTERNS_TO_TAKE_ACTION));
+        Converts::ToDouble(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MINIMUM_PATTERNS_TO_TAKE_ACTION));
     m_policy.Patter_Max_Patterns_To_Find =
-        std::stod(Get_ConfigValue_DB(CONFG_DEF_PATTERN_MAX_PATTERNS_TO_FIND)); 
+        Converts::ToDouble(Get_ConfigValue_DB(CONFG_DEF_PATTERN_MAX_PATTERNS_TO_FIND));
     m_policy.Pattern_Min_Percent_To_ExecuteOrder =
-        std::stod(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MINIMUM_PERCENT_TO_EXECUTE_ORDER)); 
+        Converts::ToDouble(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MINIMUM_PERCENT_TO_EXECUTE_ORDER));
     m_policy.Pattern_TopScore_ThresholdRatio =
-        std::stod(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_THRESHOLD_RATIO_TOP_SCORES));
+        Converts::ToDouble(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_THRESHOLD_RATIO_TOP_SCORES));
 
     m_policy.Pattern_Diff_Percent_To_ExecuteOrder_Alternative =
-        std::stod(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_DIFF_PERCENT_TO_EXECUTE_ORDER_ALTERNATIVE));
+        Converts::ToDouble(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_DIFF_PERCENT_TO_EXECUTE_ORDER_ALTERNATIVE));
     m_policy.Pattern_Max_Noise_To_ExecuteOrder_Alternative =
-        std::stod(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MAX_NOISE_PERCENT_TO_EXECUTE_ORDER_ALTERNATIVE));
+        Converts::ToDouble(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MAX_NOISE_PERCENT_TO_EXECUTE_ORDER_ALTERNATIVE));
     m_policy.Pattern_Activate_Alternative_ExecuteOrder =
-        std::stod(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_ACTIVATE_ALTERNATIVE_EXECUTE_ORDER));
+        Converts::ToDouble(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_ACTIVATE_ALTERNATIVE_EXECUTE_ORDER));
 
     m_policy.Pattern_Min_PipsChange_ToCount =
-        std::stod(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MINIMUM_PIPS_CHANGE_TOCOUNT)); // Need to implement a logic
+        Converts::ToDouble(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MINIMUM_PIPS_CHANGE_TOCOUNT)); // Need to implement a logic
     
-    m_policy.Min_MeanPips_ToExecute_Order = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_MEAN_PIPS_TO_EXECUTE_ORDER));
+    m_policy.Min_MeanPips_ToExecute_Order = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_MEAN_PIPS_TO_EXECUTE_ORDER));
 
-    m_policy.Max_Orders_InRow = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MAX_ORDERS_INROW));
-    m_policy.Sleep_Minuts_after_Max_Orders_InRow = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_SLEEP_MINUTS_AFTER_MAX_ORDERS_INROW));
+    m_policy.Max_Orders_InRow = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MAX_ORDERS_INROW));
+    m_policy.Sleep_Minuts_after_Max_Orders_InRow = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_SLEEP_MINUTS_AFTER_MAX_ORDERS_INROW));
 
-    m_policy.Pattern_CurrentTimeLineLen = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_CURR_TIME_LINE_LEN));
-    m_policy.SavedDirectionStaticsNum = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_SAVED_STATS_NUM));
+    m_policy.Pattern_CurrentTimeLineLen = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_CURR_TIME_LINE_LEN));
+    m_policy.SavedDirectionStaticsNum = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_SAVED_STATS_NUM));
 
-    m_policy.EMA_len_for_Pattern_Export = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT));
-    m_policy.RSI_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_RSI_WIEGHT));
-    m_policy.EMA_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_EMA_WIEGHT));
-    m_policy.ZLSMA_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_ZLSMA_WIEGHT));
-    m_policy.VOLUME_Wieght = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_VOLUME_WIEGHT));
+    m_policy.EMA_len_for_Pattern_Export = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT));
+    m_policy.RSI_Wieght =    Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_RSI_WIEGHT));
+    m_policy.EMA_Wieght =    Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_EMA_WIEGHT));
+    m_policy.ZLSMA_Wieght =  Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_ZLSMA_WIEGHT));
+    m_policy.VOLUME_Wieght = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_VOLUME_WIEGHT));
     
-    m_policy.SL_diff = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_STOP_LOSS_DIFF));
-    m_policy.TP_diff = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TAKE_PROFIT_DIFF));
+    m_policy.SL_diff = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_STOP_LOSS_DIFF));
+    m_policy.TP_diff = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_TAKE_PROFIT_DIFF));
 
-    m_policy.SL_start = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_STOP_LOSS_START));
-    m_policy.TP_start = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TAKE_PROFIT_START));
+    m_policy.SL_start = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_STOP_LOSS_START));
+    m_policy.TP_start = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_TAKE_PROFIT_START));
 
-    m_policy.TimeBetweenScans = std::stoi(Get_ConfigValue_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
-    m_policy.Export_Patterns_PNG_To_Telegram = std::stoi(Get_ConfigValue_DB(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM)) > 0 ? true : false;
-    m_policy.Enable_Patterns_PNG_Export = std::stoi(Get_ConfigValue_DB(CONFG_DEF_ENABLE_PATTERNS_PNG_EXPORT)) > 0 ? true : false;
+    m_policy.TimeBetweenScans = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
+    m_policy.Export_Patterns_PNG_To_Telegram = Converts::ToInt(Get_ConfigValue_DB(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM)) > 0 ? true : false;
+    m_policy.Enable_Patterns_PNG_Export = Converts::ToInt(Get_ConfigValue_DB(CONFG_DEF_ENABLE_PATTERNS_PNG_EXPORT)) > 0 ? true : false;
+
+    m_policy.TraceCurrTimeLineLen = Converts::ToInt(Get_ConfigValue_DB(CONFG_DEF_TRACE_CURR_TIMELINE_LEN));
+    m_policy.EnableTradeTracing =   Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_ENABLE_TRADE_TRACING)) > 0 ? true : false;
+    m_policy.EnableDynamicTimeLine_TradeTracing = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_ENABLE_DYNAMIC_TIMELINE_TRADE_TRACING)) > 0 ? true : false;
 }

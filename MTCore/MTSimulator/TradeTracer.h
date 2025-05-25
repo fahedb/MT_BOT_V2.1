@@ -1,0 +1,101 @@
+#include "CONFIGRATIONS.H"
+#include "TradesManager.h"
+#include "PatternGod.h"
+#include "Static_CurrentTimeLineRep.h"
+#include "StatisticsDecession.h"
+#include "DirectionStatsCache.h"
+#include "ScoreCalcs.h"
+#include "TimeLineBuilder.h"
+
+enum class TradeTracingType
+{
+	DynamicTracing,
+	ConstTracing,
+	NONE
+};
+
+#pragma once
+class TradeTracer
+{
+public:
+	static void RunTracer(TimeLine* historyTL)
+	{
+		if (!historyTL)
+		{
+			Logger::getInstance().WriteLog("No valid history time line for TradeTracing", false, true, LogType::SPECIAL_LOG);
+			return;
+		}
+
+		TradeTracer* tracer = new TradeTracer();
+		tracer->TraceTrades(historyTL);
+	}
+private:
+	PatternGod* m_patternScanner;
+	StatisticsDecession* m_statisticsEngine;
+	ConfigrationsPolicy* m_policy;
+	TradesManager* m_trader;
+	TimeLine* m_historyTL;
+
+	DirectionStats GetRelativeStats(OrderEntity* order, TradeTracingType forceTradeTracing = TradeTracingType::NONE);
+
+	void TraceTrades(TimeLine* historyTL)
+	{
+		m_policy = Configrations::getInstance()->Get_Policy();
+		m_trader = TradesManager::getInstance();
+		m_historyTL = historyTL;
+		m_statisticsEngine = new StatisticsDecession(historyTL);
+		m_patternScanner = new PatternGod(historyTL);
+
+		while (true)
+		{
+			Sleep(m_policy->TimeBetweenScans * 1000);
+			int ordersCount = m_trader->Get_OrdersCount();
+			for (int i = 0; i < ordersCount; i++)
+			{
+				OrderEntity* order = m_trader->Get_Order_ByIdx(i);
+				DirectionStats stats = GetRelativeStats(order);
+				ActOnOrder(order, stats);
+
+			}
+		}
+	}
+
+private:
+	void ActOnOrder(OrderEntity* order,DirectionStats& stats)
+	{
+		if (!order )
+		{
+			Logger::getInstance().WriteLog("No valid order for TradeTracing", false, true, LogType::SPECIAL_LOG);
+			return;
+		}
+
+		if (!stats.IsActive())
+		{
+			Logger::getInstance().WriteLog("Stats For order " + std::to_string(order->Get_OrderSeqNum()) + " is not active\nClosing Order !!", false, true, LogType::TRADE_TRACE_LOG);
+			order->CloseOrder();
+			return;
+		}
+
+		CommonDirection newDirection = m_trader->CalcCommonDirection(stats);
+		CommonDirection desiredDirection = order->Get_OrderType() == OrderType::LONG ? CommonDirection::UP : CommonDirection::DOWN;
+
+		if (desiredDirection == newDirection)
+		{
+			Logger::getInstance().WriteLog("Order " + std::to_string(order->Get_OrderSeqNum()) + " is in the right direction, Keeping it open", false, true, LogType::TRADE_TRACE_LOG);
+		}
+		else
+		{
+			std::string desiredDirStr = desiredDirection == CommonDirection::UP ? "UP" : "DOWN";
+			std::string newDirStr = newDirection == CommonDirection::UP ? "UP" : "DOWN";
+			Logger::getInstance().WriteLog("Order " + std::to_string(order->Get_OrderSeqNum()) + " is in the wrong direction, Closing it\n"
+				+ "Desired direction: " + desiredDirStr + "\nDirection found: " + newDirStr, false, true, LogType::TRADE_TRACE_LOG);
+
+			order->CloseOrder();
+		}
+	}
+
+	DirectionStats DynamicTradeTracing(OrderEntity* order);
+	DirectionStats ConstTradeTracing(OrderEntity* order) { return *(DirectionStatsCache::getInstance()->Get_LastStats()); }
+
+};
+

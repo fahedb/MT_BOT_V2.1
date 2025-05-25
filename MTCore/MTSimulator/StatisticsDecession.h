@@ -30,7 +30,7 @@ public:
 		m_orderCode = 0; // Need an logic to implement from DB
 	}
 
-	DirectionStats DetectCommonDirection(std::vector<ChangeNode*>* potentioalRes) // TODO: Need to change the logic here to TimeLine
+	DirectionStats DetectCommonDirection(std::vector<ChangeNode*>* potentioalRes,int futureLen =0) // TODO: Need to change the logic here to TimeLine
 	{
 		DirectionStats stats;
 
@@ -38,16 +38,20 @@ public:
 			return stats;
 
 		ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
-		stats.timePoint = m_currentTL->at(m_currentTL->size() - 1)->point_DateTime;
+		stats.Set_TimePoint(m_currentTL->at(m_currentTL->size() - 1)->point_DateTime);
+		stats.Activate();
+
+		if (!futureLen)
+			futureLen = policy->Score_Future_Vision_Candles;
 
 		for (ChangeNode* node : *potentioalRes)
 		{
 			int generalPipChange = 0;
 			int firstPipChange = 0;
 
-			CommonDirection generalDir = CalcGeneralPipsChange(node, &stats);
-			CommonDirection firstDir = CalcFirstPipsChange(node, &stats);
-			CommonDirection HighestDir = CalcHighestPipsChange(node, &stats);
+			CommonDirection generalDir =	CalcGeneralPipsChange(node, &stats, futureLen);
+			CommonDirection firstDir =		CalcFirstPipsChange(node, &stats, futureLen);
+			CommonDirection HighestDir =	CalcHighestPipsChange(node, &stats, futureLen);
 
 		}
 		
@@ -56,9 +60,9 @@ public:
 
 	void Set_NewCurrentPeriod(std::vector<ChangeNode*>* currentTimeLine) { m_currentTL = currentTimeLine; }
 private:
-	CommonDirection CalcFirstPipsChange(ChangeNode* start, DirectionStats* stats);
-	CommonDirection CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stats);
-	CommonDirection CalcHighestPipsChange(ChangeNode* start, DirectionStats* stats);
+	CommonDirection CalcFirstPipsChange  (ChangeNode* start, DirectionStats* stats,int futureLen);
+	CommonDirection CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stats,int futureLen);
+	CommonDirection CalcHighestPipsChange(ChangeNode* start, DirectionStats* stats,int futureLen);
 
 };
 

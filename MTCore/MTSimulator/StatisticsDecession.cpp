@@ -2,11 +2,10 @@
 #include "JasonHandler.h"
 
 
-CommonDirection StatisticsDecession::CalcHighestPipsChange(ChangeNode* start, DirectionStats* stats)
+CommonDirection StatisticsDecession::CalcHighestPipsChange(ChangeNode* start, DirectionStats* stats,int futureLen)
 {
 	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
 	int pipsChangeToCount = policy->Pattern_Min_PipsChange_ToCount;
-	int futureLen = policy->Score_Future_Vision_Candles;
 
 	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTime);
 	int pipChange = 0;
@@ -57,14 +56,12 @@ CommonDirection StatisticsDecession::CalcHighestPipsChange(ChangeNode* start, Di
 }
 
 
-CommonDirection StatisticsDecession::CalcFirstPipsChange(ChangeNode* start, DirectionStats* stats)
+CommonDirection StatisticsDecession::CalcFirstPipsChange(ChangeNode* start, DirectionStats* stats,int futureLen)
 {
 	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
 
 	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTime);
-	
 	int pipsChangeToCount = policy->Pattern_Min_PipsChange_ToCount;
-	int futureLen = policy->Score_Future_Vision_Candles;
 
 	int pipChange = 0;
 	int candlesCounter = 0;
@@ -97,11 +94,10 @@ CommonDirection StatisticsDecession::CalcFirstPipsChange(ChangeNode* start, Dire
 
 
 
-CommonDirection StatisticsDecession::CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stats)
+CommonDirection StatisticsDecession::CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stats,int futureLen)
 {
 	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
 	int pipsChangeToCount = policy->Pattern_Min_PipsChange_ToCount;
-	int futureLen = policy->Score_Future_Vision_Candles;
 
 	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTime);
 	int pipChange = 0;

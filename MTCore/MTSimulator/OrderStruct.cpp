@@ -2,6 +2,7 @@
 
 void OrderEntity::ActivateOrder(OrderType long_short, std::string timePoint, std::string statisticsTimePoint, CoinsPair pair)
 {
+	std::lock_guard<std::mutex> lock(m_orderLocker);
 	m_orderType = long_short;
 	m_timePoint = timePoint;
 	m_statisticsTimePoint = statisticsTimePoint;

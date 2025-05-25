@@ -10,7 +10,6 @@ void Logger::WriteLog(std::string log, bool newSection,bool sendToLogServer, Log
     if (sendToLogServer)
     {
         std::thread(&Logger::Http_Send_Log, this, log, logType).detach();
-       // m_httpLogger->Send_Log(log, "text", httplib::Headers(), logType);
     }
     std::string logToPrint = "";
     if (newSection)

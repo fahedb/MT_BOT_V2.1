@@ -1,6 +1,7 @@
 #pragma once
 #include "BTables.h"
 #include "DefinedTables.h"
+#include "Converts.h"
 #include <string.h>
 
 #define SeqNumTablesCols 2
@@ -29,7 +30,7 @@ public:
 
 		std::string cmmd = "Select * from " + GetTableName() + " where " + DEF_COLUMN_ENTITY + " = \'" + ent + "\'";
 		SQLSelectionNode* selection = Get_SQLSelectionNode(cmmd);
-		int seqnum = std::stoi(selection->GetColumn(1));
+		int seqnum = Converts::ToInt(selection->GetColumn(1));
 		int newSeqNum = seqnum + 1;
 		RemoveSelection();
 		UpdateSeqNum(entT, newSeqNum);
@@ -42,7 +43,7 @@ public:
 
 		std::string cmmd = "Select * from " + GetTableName() + " where " + DEF_COLUMN_ENTITY + " = \'" + ent + "\'";
 		SQLSelectionNode* selection = Get_SQLSelectionNode(cmmd);
-		int seqnum = std::stoi(selection->GetColumn(1));
+		int seqnum = Converts::ToInt(selection->GetColumn(1));
 		RemoveSelection();
 		return seqnum;
 

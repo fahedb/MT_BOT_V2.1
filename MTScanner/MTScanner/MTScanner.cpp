@@ -22,11 +22,13 @@
 #include "ScoreCalcs.h"
 #include "ChangeDataBuilder.h"
 #include "SelectionNodes.h"
+#include "TradeTracer.h"
 #include "OrdersStructCache.h"
+#include "Static_CurrentTimeLineRep.h"
 
-void OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator,TimeLine* history ,std::vector<ChangeNode*> currentTimeLine);
+void OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator,TimeLine* history);
 void DefualtProgramStart();
-void UpdateCurrentTimeLine(std::vector<ChangeNode*>* timeLine, BasePricesTable* table);
+void UpdateCurrentTimeLine(BasePricesTable* table);
 void LoadJson_Data_ToDBFile();
 bool IsItDataLoading(int argc, char* argv[]);
 
@@ -37,7 +39,6 @@ std::string m_lastTimePoint = "";
 int main(int argc, char* argv[])
 {
 	std::thread http_thread(ExchangeData::Start_DataExchange);
-	
 	if (IsItDataLoading(argc, argv))
 	{
 		LoadJson_Data_ToDBFile();
@@ -45,7 +46,6 @@ int main(int argc, char* argv[])
 	else {
 		DefualtProgramStart();
 	}
-	
 	http_thread.join();
 }
 
@@ -94,85 +94,72 @@ void DefualtProgramStart()
 	std::future<void> cleanupTask = std::async(std::launch::async, [&tb]() {
 		tb.RemoveSelect();
 		});
+
 	TimeLine historyTimeLine(&history);
+	
+	std::thread tracer_thread(TradeTracer::RunTracer, &historyTimeLine);
+
+
 	PatternGod patternScaner(&historyTimeLine); // Init a PatternGod object for patterns Scanning
 	StatisticsDecession statisticsCalcucator(&historyTimeLine);
 
 	XAUUSD_CurrentTable table;
 	
-	std::vector<ChangeNode*> chnVec;
-	UpdateCurrentTimeLine(&chnVec, &table);
+	UpdateCurrentTimeLine(&table);
 	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
 	UpdateConfigs();
 	Configrations::getInstance()->RefreshPolicy(); // Refresh all policies
 	while (true)
 	{
 		
-		UpdateCurrentTimeLine(&chnVec, &table);
-		OneMinutePatternGodLogic(&patternScaner,&statisticsCalcucator,&historyTimeLine,chnVec); // Start scanning
+		UpdateCurrentTimeLine(&table);
+		OneMinutePatternGodLogic(&patternScaner,&statisticsCalcucator,&historyTimeLine); // Start scanning
 		UpdateConfigs();
 		Configrations::getInstance()->RefreshPolicy(); // Refresh all policies 
 		int timeBetweenScans = policy->TimeBetweenScans;
 		logger.WriteLog("Sleep for " + std::to_string(timeBetweenScans) + " seconds...");
 		Sleep(timeBetweenScans * 1000); // Sleep for 5 seconds before start a new scan
 	}
-
+	tracer_thread.join();
 }
 
-void UpdateCurrentTimeLine(std::vector<ChangeNode*>* timeLine, BasePricesTable* table)
+void UpdateCurrentTimeLine(BasePricesTable* table)
 {
-	if (!timeLine)
-		return;
-
 	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
-
-
 	ExchangeData exChData;
 
 	std::string body = exChData.Get_NextCandleStick_M1();
 	Logger& logger = Logger::getInstance();
-	// Remove the first element
-	if (body.length()) {
+	Static_CurrentTimeLineRep* currTimeLineRep = Static_CurrentTimeLineRep::getInstance();
+
+	while (body.length())
+	{
 		logger.WriteLog("Recieved a new bar by HTTP Client");
+
 		nlohmann::json_abi_v3_11_3::json select = nlohmann::json::parse(body);
-
 		JsonSelectionNode* selectionJ = new JsonSelectionNode(select);
-
 		table->Insert_NewCandleBody(selectionJ);
+		
 		ChangeNode* chn = table->GetNextChangeNode();
-		if (chn) {
-			while (timeLine->size() > policy->Pattern_CurrentTimeLineLen)
-			{
-				delete timeLine->at(0);
-				timeLine->erase(timeLine->begin());
-			}
-			if (timeLine->size() >= policy->Pattern_CurrentTimeLineLen) // Delete old objects
-			{
-				delete timeLine->at(0);
-				timeLine->erase(timeLine->begin());
-			}
-			timeLine->push_back(chn); // Push new candle data
-		}
-
-		UpdateCurrentTimeLine(timeLine, table); // Keep calling this till there is no data in the http queue
+		currTimeLineRep->Set_NewBar(chn, true);
 	}
-	else {
-		logger.WriteLog("No new Bars to recieve");
-		if (timeLine->size())
-			policy->maxScorePossibleForChangeNodes = ProxyScoreCalcs::CalcMaxScorePossible(timeLine->at(0)).totalScore.total;
 
-	}
-	return;
+	logger.WriteLog("No new Bars to recieve");
+
+	if (currTimeLineRep->Get_CurrTimeLine()->Get_TimeLineLen()) // Getting the max score possible for 2 nodes match
+		policy->maxScorePossibleForChangeNodes = ProxyScoreCalcs::CalcMaxScorePossible(currTimeLineRep->Get_CurrTimeLine()->Get_TimeLine()->at(0)).totalScore.total;
+
 }
 
 
-void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* statisticsCalcucator,TimeLine* history, std::vector<ChangeNode*> currentTimeLine)
+void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* statisticsCalcucator,TimeLine* history)
 {
 	//std::vector<ChangeNode*> currentTimeLine; // Vector to store curr changeNodes
 	Logger& logger = Logger::getInstance();
 
+	std::vector<ChangeNode*>* currentTimeLine = Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine();
 
-	if (!currentTimeLine.size())
+	if (!currentTimeLine || !currentTimeLine->size())
 	{
 		logger.WriteLog("No current time line.", false, true, LogType::ERR);
 		logger.WriteLog("Sleeping for 5 minutes.", false, true, LogType::ERR);
@@ -180,24 +167,23 @@ void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* stati
 		return;
 	}
 	
-	logger.WriteLog("current time line size: " + std::to_string(currentTimeLine.size()));
-	if (currentTimeLine.at(0)->point_DateTime == m_lastTimePoint) // If the last time point scanned == to the current time point (start of the current vector) don't continue
+	logger.WriteLog("current time line size: " + std::to_string(currentTimeLine->size()));
+	if (currentTimeLine->at(0)->point_DateTime == m_lastTimePoint) // If the last time point scanned == to the current time point (start of the current vector) don't continue
 	{
-		currentTimeLine.clear();
 		std::cout << "\n\nNo new data, Last point time: " << m_lastTimePoint << std::endl;
 		return;
 	}
 
 	std::string startScanLog = std::string("!!!!!!!!!!!!		Start New Period Scan		!!!!!!!!!\n\n") +
 		std::string("Current TimePoint: ") + m_lastTimePoint + "\n" +
-		"Scanning period bars count: " + std::to_string(currentTimeLine.size());
+		"Scanning period bars count: " + std::to_string(currentTimeLine->size());
 	logger.WriteLog(startScanLog, true,true);
 	
-	m_lastTimePoint = currentTimeLine.at(0)->point_DateTime;
-	std::vector<ChangeNode*> results; // Vector for the End of every time period
+	m_lastTimePoint = currentTimeLine->at(0)->point_DateTime;
+	std::vector<std::pair<ChangeNode*,ScoresResult>> results; // Vector for the End of every time period
 
-	patternScan->Set_NewCurrentPeriod(&currentTimeLine); // Set a new Current Period for PatternScan object for the new scan
-	statisticsCalcucator->Set_NewCurrentPeriod(&currentTimeLine); // Set a new current period for Statistics calc
+	patternScan->Set_NewCurrentPeriod(currentTimeLine); // Set a new Current Period for PatternScan object for the new scan
+	statisticsCalcucator->Set_NewCurrentPeriod(currentTimeLine); // Set a new current period for Statistics calc
 
 	ExchangeData exh;
 	TradesManager* tradeMngr = TradesManager::getInstance();
@@ -207,25 +193,30 @@ void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* stati
 		logger.WriteLog("Scanning Stopped by user, skipping scanning...", false, true);
 		return;
 	}
-	if (patternScan->ScanForOneMinPatterns_MultiThreaded(&results)) // Scan for patterns
+	if (patternScan->ScanForOneMinPatterns_MultiThreaded(results)) // Scan for patterns
 	{
 		logger.WriteLog("Start detecting common direction...", false, false);
-		DirectionStats stats = statisticsCalcucator->DetectCommonDirection(&results);
+
+		std::vector<ChangeNode*> headsOfPotentialRes = TimeLineBuilder::SplitChangeNodeFromScores(&results);
+		DirectionStats stats = statisticsCalcucator->DetectCommonDirection(&headsOfPotentialRes);
+		
+		DirectionStatsCache::getInstance()->Add_NewStat(stats);
+
 		logger.WriteLog("Done detecting common direction.", false, false);
 
 		logger.WriteLog("Start Checking for a potentail trade...", false, false);
-		OrderEntity tradeRes = tradeMngr->CheckForTrade_PatternGod(stats);
-
-		std::vector<TimeLine> similarPatterns = TimeLineBuilder::Build_TimeLine_Patterns(history, &results, currentTimeLine.size(), Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles);
+		OrderEntity* tradeRes = tradeMngr->CheckForTrade_PatternGod(stats);
+		
+		std::vector<TimeLineScored> similarPatterns = TimeLineBuilder::Build_TimeLineScored_Patterns(history, &results, currentTimeLine->size(), Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles);
 		stats.Add_Patterns(&similarPatterns);
-		stats.Add_CurrPattern(TimeLine(&currentTimeLine, false));
-		DataExporter::Export_All_Statistics_Data(stats, tradeRes.IsActive());
+		stats.Add_CurrPattern(TimeLine(new std::vector<ChangeNode*>(*currentTimeLine), true));
+
+		DataExporter::Export_All_Statistics_Data(stats, tradeRes ? tradeRes->IsActive() : false);
 	}
 	else
 		logger.WriteLog("Didn't find any patterns with min score !!", false, true);
 
 	logger.WriteLog("Done scanning and exporting data.");
-	currentTimeLine.clear(); // Clear the current time line and get ready for the next scan
 
 }
 std::vector<ChangeNode*> LoadHistoryToVector_MultiThreaded(XAUUSD_OneMinTable* tb) // Need to change name

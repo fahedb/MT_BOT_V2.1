@@ -23,6 +23,13 @@ public:
         Init_TimeLineDB();
         m_selfOwnership = ownership;
     }
+
+    TimeLine(std::vector<ChangeNode*> TL) {
+        m_TL = new std::vector<ChangeNode*>(TL);
+        Init_TimeLineDB();
+        m_selfOwnership = true;
+    }
+
     TimeLine(const TimeLine& other)
     {
         m_selfOwnership = true; 
@@ -31,17 +38,18 @@ public:
     }
 
     TimeLine& operator=(const TimeLine&) = delete;
+    size_t Get_TimeLineLen() { if (m_TL) return m_TL->size(); else  return -1; }
+
     ~TimeLine()
     {
-        if (m_selfOwnership)
-        {
-            m_TL->clear();
+        if (m_selfOwnership && m_TL != nullptr) {
             delete m_TL;
+            m_TL = nullptr;
         }
     }
     void Set_SelfOwnership(bool selfOwner) { m_selfOwnership = selfOwner; }
 
-    std::vector<ChangeNode*>* Get_TimeLine() { return m_TL; }
+    std::vector<ChangeNode*>* Get_TimeLine() { return m_TL; } 
     DBMap* Get_DBMap() { return &m_DB_Map; }
 
 private:

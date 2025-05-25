@@ -199,6 +199,18 @@
     <Filter Include="DataStructers\TradeStructure\Src">
       <UniqueIdentifier>{a1d2f478-7942-4a10-9dd5-97c57f4e4540}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TradeTracer">
+      <UniqueIdentifier>{20445c29-c170-421a-aa78-10dff6412ba6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\TimeLine\Inc">
+      <UniqueIdentifier>{00f3ff51-a35c-4d3d-9352-52253db2f7b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\TimeLine\Src">
+      <UniqueIdentifier>{e5a1a02f-6344-4fe5-b797-ade9b2d5c3eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{951de14a-b6aa-4a17-a540-9050e98f40ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -279,9 +291,6 @@
     <ClCompile Include="JasonHandler.cpp">
       <Filter>DataStructers\JsonHandler</Filter>
     </ClCompile>
-    <ClCompile Include="TimeLine.cpp">
-      <Filter>DataStructers\TimeLine</Filter>
-    </ClCompile>
     <ClCompile Include="StatisticsDecession.cpp">
       <Filter>Strategies\PatternGod\Src</Filter>
     </ClCompile>
@@ -297,9 +306,6 @@
     <ClCompile Include="TradesManager.cpp">
       <Filter>TradesManager</Filter>
     </ClCompile>
-    <ClCompile Include="TimeLineBuilder.cpp">
-      <Filter>DataStructers\TimeLine</Filter>
-    </ClCompile>
     <ClCompile Include="DirectionStats.cpp">
       <Filter>DataStructers\DirectionStats\Src</Filter>
     </ClCompile>
@@ -314,6 +320,24 @@
     </ClCompile>
     <ClCompile Include="DirectionStatsCache.cpp">
       <Filter>DataStructers\DirectionStats\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="TradeTracer.cpp">
+      <Filter>TradeTracer</Filter>
+    </ClCompile>
+    <ClCompile Include="Static_CurrentTimeLineRep.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeLine.cpp">
+      <Filter>DataStructers\TimeLine\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeLineScored.cpp">
+      <Filter>DataStructers\TimeLine\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeLineBuilder.cpp">
+      <Filter>DataStructers\TimeLine\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Converts.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -401,9 +425,6 @@
     <ClInclude Include="JasonHandler.h">
       <Filter>DataStructers\JsonHandler</Filter>
     </ClInclude>
-    <ClInclude Include="TimeLine.h">
-      <Filter>DataStructers\TimeLine</Filter>
-    </ClInclude>
     <ClInclude Include="StatisticsDecession.h">
       <Filter>Strategies\PatternGod\Inc</Filter>
     </ClInclude>
@@ -418,9 +439,6 @@
     </ClInclude>
     <ClInclude Include="TradesManager.h">
       <Filter>TradesManager</Filter>
-    </ClInclude>
-    <ClInclude Include="TimeLineBuilder.h">
-      <Filter>DataStructers\TimeLine</Filter>
     </ClInclude>
     <ClInclude Include="DirectionStats.h">
       <Filter>DataStructers\DirectionStats\Inc</Filter>
@@ -442,6 +460,24 @@
     </ClInclude>
     <ClInclude Include="DirectionStatsCache.h">
       <Filter>DataStructers\DirectionStats\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="TradeTracer.h">
+      <Filter>TradeTracer</Filter>
+    </ClInclude>
+    <ClInclude Include="Static_CurrentTimeLineRep.h">
+      <Filter>DefinedTables</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLineBuilder.h">
+      <Filter>DataStructers\TimeLine\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLineScored.h">
+      <Filter>DataStructers\TimeLine\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLine.h">
+      <Filter>DataStructers\TimeLine\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Converts.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

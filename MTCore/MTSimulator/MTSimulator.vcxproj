@@ -42,13 +42,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -152,6 +152,7 @@
     <ClCompile Include="ChangeDataBuilder.cpp" />
     <ClCompile Include="Configrations.cpp" />
     <ClCompile Include="ConfigsTable.cpp" />
+    <ClCompile Include="Converts.cpp" />
     <ClCompile Include="CSVExportData.cpp" />
     <ClCompile Include="DataBaseConnection.cpp" />
     <ClCompile Include="DataExporter.cpp" />
@@ -175,13 +176,16 @@
     <ClCompile Include="SelectionNodes.cpp" />
     <ClCompile Include="SeqNumTable.cpp" />
     <ClCompile Include="StartPoint.cpp" />
+    <ClCompile Include="Static_CurrentTimeLineRep.cpp" />
     <ClCompile Include="Static_DBConnection.cpp" />
     <ClCompile Include="StatisticsDecession.cpp" />
     <ClCompile Include="TempCache.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="TimeLine.cpp" />
     <ClCompile Include="TimeLineBuilder.cpp" />
+    <ClCompile Include="TimeLineScored.cpp" />
     <ClCompile Include="TradesManager.cpp" />
+    <ClCompile Include="TradeTracer.cpp" />
     <ClCompile Include="XAUUSD_CurrentTable.cpp" />
     <ClCompile Include="XAUUSD_OneMinTable.cpp" />
   </ItemGroup>
@@ -195,6 +199,7 @@
     <ClInclude Include="Configrations.h" />
     <ClInclude Include="ConfigsDefs.h" />
     <ClInclude Include="ConfigsTable.h" />
+    <ClInclude Include="Converts.h" />
     <ClInclude Include="CSVExportData.h" />
     <ClInclude Include="DataBaseConnection.h" />
     <ClInclude Include="DataExporter.h" />
@@ -219,13 +224,16 @@
     <ClInclude Include="ScoreCalcs.h" />
     <ClInclude Include="SelectionNodes.h" />
     <ClInclude Include="SeqNumTable.h" />
+    <ClInclude Include="Static_CurrentTimeLineRep.h" />
     <ClInclude Include="Static_DBConnection.h" />
     <ClInclude Include="StatisticsDecession.h" />
     <ClInclude Include="TempCache.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="TimeLine.h" />
     <ClInclude Include="TimeLineBuilder.h" />
+    <ClInclude Include="TimeLineScored.h" />
     <ClInclude Include="TradesManager.h" />
+    <ClInclude Include="TradeTracer.h" />
     <ClInclude Include="XAUUSD_CurrentTable.h" />
     <ClInclude Include="XAUUSD_OneMinTable.h" />
   </ItemGroup>

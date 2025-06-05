@@ -5,6 +5,9 @@
 #define HTTP_SERVICE_MTScanner_Run		"/RunScanner"
 #define HTTP_SERVICE_MTScanner_Stop		"/StopScanner"
 
+#define HTTP_SERVICE_MTScanner_GetOrderData "/GetOrderData"
+#define HTTP_SERVICE_MTSCanner_CloseOrder		"/CloseOrder"
+
 #define HTTP_SERVICE_MTScanner_GetConfig		"/GetConfig"
 #define HTTP_SERVICE_MTScanner_GetAllConfigsNames "/GetAllConfigsNames"
 #define HTTP_SERVICE_MTScanner_SetConfigValue	"/SetConfigValue"
@@ -21,6 +24,10 @@
 #define HTTP_PARAM_TradeType "TradeType"
 #define HTTP_PARAM_Symbol "Symbol"
 #define HTTP_PARAM_STATUS "Status"
+#define HTTP_PARAM_TradeSeqNum "TradeSeqNum"
+#define HTTP_PARAM_OrderStopLoss "OrderStopLoss"
+#define HTTP_PARAM_OrderTakeProfit "OrderTakeProfit"
+#define HTTP_PARAM_OrderStatus "OrderStatus"
 
 #define HTTP_PARAM_ConfigName "ConfigName"
 #define HTTP_PARAM_ConfigValue "ConfigValue"
@@ -31,6 +38,9 @@
 // Headers Values
 #define HTTP_PARAM_VALUE_TradeType_Long "Long"
 #define HTTP_PARAM_VALUE_TradeType_Short "Short"
+
+#define HTTP_PARAM_VALUE_OrderStatus_Active "OPEN"
+#define HTTP_PARAM_VALUE_OrderStatus_Closed "CLOSED"
 
 #define HTTP_PARAM_VALUE_Status_LoadingData "Loading_Data"
 #define HTTP_PARAM_VALUE_Status_Stopped "Stopped"

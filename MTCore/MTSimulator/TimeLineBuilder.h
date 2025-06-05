@@ -59,8 +59,7 @@ public:
 					history->Get_TimeLine()->begin() + (static_cast<size_t>(indexStart) + static_cast<size_t>(futureLen)));
 
 				TimeLine tl(currTimeLine, true);
-				TimeLineScored tlScored(tl, heads->at(i).second);
-				similarPatterns.push_back(tlScored);
+				similarPatterns.emplace_back(std::move(tl), heads->at(i).second);
 			}
 
 		}

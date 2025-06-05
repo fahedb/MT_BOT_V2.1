@@ -19,11 +19,12 @@ public:
 		ClearAll();
 		index = 0;
 	}
-	XAUUSD_CurrentTable(std::string dir) : BasePricesTable(dir, DEF_TABLE_XAUUSD_CurrentPrices)
+	XAUUSD_CurrentTable(std::string& dir) : BasePricesTable(dir, DEF_TABLE_XAUUSD_CurrentPrices)
 	{
 		ClearAll();
 		index = 0;
-		Set_DATA_DB_FileName(dir + GetDB_PhysicalFileName());
+		std::string fileName = dir + GetDB_PhysicalFileName();
+		Set_DATA_DB_FileName(fileName);
 	}
 	XAUUSD_CurrentTable() : BasePricesTable(DEF_TABLE_XAUUSD_CurrentPrices)
 	{

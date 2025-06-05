@@ -36,7 +36,7 @@ private:
 	TradesManager* m_trader;
 	TimeLine* m_historyTL;
 
-	DirectionStats GetRelativeStats(OrderEntity* order, TradeTracingType forceTradeTracing = TradeTracingType::NONE);
+	DirectionStats* GetRelativeStats(OrderEntity* order, TradeTracingType forceTradeTracing = TradeTracingType::NONE);
 
 	void TraceTrades(TimeLine* historyTL)
 	{
@@ -49,13 +49,28 @@ private:
 		while (true)
 		{
 			Sleep(m_policy->TimeBetweenScans * 1000);
+			if (!m_policy->EnableTradeTracing)
+				continue;
+
 			int ordersCount = m_trader->Get_OrdersCount();
 			for (int i = 0; i < ordersCount; i++)
 			{
 				OrderEntity* order = m_trader->Get_Order_ByIdx(i);
-				DirectionStats stats = GetRelativeStats(order);
-				ActOnOrder(order, stats);
+				DirectionStats* stats = GetRelativeStats(order);
 
+				if (!stats || stats->IsActive())
+				{
+					Logger::getInstance().WriteLog("No valid stats for order " + std::to_string(order->Get_OrderSeqNum()), false, true, LogType::ERR);
+					continue; // If no stats found, skip this order
+				}
+
+				if(stats->Get_TimePoint() == order->Get_LastStatisticsCheckTimePoint())
+					continue; // If the stats are not updated, skip this order
+				order->Set_LastStatisticsCheckTimePoint(stats->Get_TimePoint());
+				ActOnOrder(order, *stats);
+				
+				if (order->Get_OrderStatus() == OrderStatus::CLOSED)
+					m_trader->Refresh_OrdersCache(); // Refresh the orders cache after closing an order)
 			}
 		}
 	}
@@ -94,8 +109,14 @@ private:
 		}
 	}
 
-	DirectionStats DynamicTradeTracing(OrderEntity* order);
-	DirectionStats ConstTradeTracing(OrderEntity* order) { return *(DirectionStatsCache::getInstance()->Get_LastStats()); }
+	DirectionStats* DynamicTradeTracing(OrderEntity* order);
+	DirectionStats* ConstTradeTracing(OrderEntity* order) 
+	{
+		DirectionStats* stats = DirectionStatsCache::getInstance()->Get_LastStats();
+		if(!stats)
+			return nullptr; // If no stats found, return empty stats
+		return stats;
+	}
 
 };
 

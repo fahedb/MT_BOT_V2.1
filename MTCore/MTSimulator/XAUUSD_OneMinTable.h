@@ -17,11 +17,12 @@ public:
 		ClearAll();
 		index = 0;
 	}
-	XAUUSD_OneMinTable(std::string dir) : BasePricesTable(dir, DEF_TABLE_XAUUSD_OneMinTimeLinePrices)
+	XAUUSD_OneMinTable(const std::string& dir) : BasePricesTable(dir, DEF_TABLE_XAUUSD_OneMinTimeLinePrices)
 	{
 		ClearAll();
 		index = 0;
-		Set_DATA_DB_FileName(dir + GetDB_PhysicalFileName());
+		std::string fileName = dir + GetDB_PhysicalFileName();
+		Set_DATA_DB_FileName(fileName);
 	}
 	_Points GetPointPlace() { return _Points::Points_XAUUSD; }
 	virtual std::string GetDB_PhysicalFileName() {return	Configrations::getInstance()->Get_ConfigValue(DBFILE_XAUUSD_M1_DATA);}

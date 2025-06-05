@@ -1,11 +1,11 @@
 #include "TradeTracer.h"
 
-DirectionStats TradeTracer::GetRelativeStats(OrderEntity* order, TradeTracingType forceTradeTracing) // Force trade tracing to be either dynamic or const
+DirectionStats* TradeTracer::GetRelativeStats(OrderEntity* order, TradeTracingType forceTradeTracing) // Force trade tracing to be either dynamic or const
 {
 	if (!order) // If no order, return empty stats
 	{
 		Logger::getInstance().WriteLog("No valid order for TradeTracing", false, true, LogType::SPECIAL_LOG);
-		return DirectionStats();
+		return nullptr;
 	}
 
 	bool dynamicTracing = forceTradeTracing == TradeTracingType::DynamicTracing && m_policy->EnableDynamicTimeLine_TradeTracing; // Only if the policy allows it
@@ -16,11 +16,11 @@ DirectionStats TradeTracer::GetRelativeStats(OrderEntity* order, TradeTracingTyp
 	else if (constTracing)
 		return ConstTradeTracing(order); // Getting the last stats for the order
 	else
-		return DirectionStats();
+		return nullptr;
 
 }
 
-DirectionStats TradeTracer::DynamicTradeTracing(OrderEntity* order)
+DirectionStats* TradeTracer::DynamicTradeTracing(OrderEntity* order)
 {
 	Logger& logger = Logger::getInstance();
 
@@ -34,7 +34,7 @@ DirectionStats TradeTracer::DynamicTradeTracing(OrderEntity* order)
 	if (timePointIdx < 0)
 	{
 		Logger::getInstance().WriteLog("Could not find ChangeNode for the TimePoint of order " + std::to_string(order->Get_OrderSeqNum()), false, true, LogType::TRADE_TRACE_LOG);
-		return DirectionStats();
+		return nullptr;
 	}
 
 	// Calc the start index of the timeline we should scan
@@ -58,12 +58,14 @@ DirectionStats TradeTracer::DynamicTradeTracing(OrderEntity* order)
 	if (futureLen <= 0)
 		futureLen = 1;
 
-	DirectionStats stats = m_statisticsEngine->DetectCommonDirection(&potentialMatches, futureLen);
+	DirectionStats* stats = new DirectionStats(std::move(m_statisticsEngine->DetectCommonDirection(&potentialMatches, futureLen)));
 
 	std::vector<TimeLineScored> scoredTimeLine = TimeLineBuilder::Build_TimeLineScored_Patterns(m_historyTL, &potentialMatches_WResults, toScanPeriod.size(), futureLen);
 	TimeLine currTL(toScanPeriod);
 
-	stats.Add_Patterns(&scoredTimeLine);
-	stats.Add_CurrPattern(currTL);
+	stats->Add_Patterns(&scoredTimeLine,true);
+	stats->Add_CurrPattern(currTL,true);
+
+	DynamicDirectionStatsCache::getInstance()->Add_NewStat(*stats, true); // Add the stats to the dynamic cache
 	return stats;
 }

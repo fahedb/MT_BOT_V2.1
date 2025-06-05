@@ -31,7 +31,11 @@ public:
 public:
 	OrderEntity* Get_Order_ByIdx(int idx) { return m_ordersCache->Get_Order_byIdx(idx);}
 	OrderEntity* Get_Order(long seq) { return m_ordersCache->Get_Order(seq); }
-	OrderEntity* Get_Order(std::string timePoint) { return m_ordersCache->Get_Order(timePoint); }
+	OrderEntity* Get_Order(std::string& timePoint) { return m_ordersCache->Get_Order(timePoint); }
+	void Refresh_OrdersCache()
+	{
+		m_ordersCache->RefreshOrders();
+	}
 	int Get_OrdersCount() { return m_ordersCache->Get_OrdersCount(); }
 	
 	OrderEntity* CheckForTrade_PatternGod(DirectionStats& stats);
@@ -51,7 +55,12 @@ public:
 			return highest;
 		return CommonDirection::BLUR;
 	}
-	
+	void Send_TraddeSignal(std::string pair, int type, int seqNum, int stopLoss, int takeProfit)
+	{
+		ExchangeData().Set_NewOrder(pair, type, seqNum, stopLoss, takeProfit);
+		m_orderCode++; Cur_Orders_InRow++;
+	}
+
 
 private: 
 
@@ -107,11 +116,6 @@ private:
 		return CommonDirection::BLUR;
 	}
 
-	void Send_TraddeSignal(std::string pair, int type)
-	{
-		ExchangeData().Set_NewOrder("XAUUSD", type);
-		m_orderCode++; Cur_Orders_InRow++;
-	}
 
 private:
     TradesManager()

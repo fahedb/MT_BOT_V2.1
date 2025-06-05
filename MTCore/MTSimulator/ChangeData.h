@@ -21,11 +21,15 @@ public:
 		m_PointPlace = _Points::_Points_DEFUALT;
 		Increase_Decrease = false;
 		activePoint = false;
+		m_openPrice = INVALID_DATA;
+		m_closePrice = INVALID_DATA;
+		m_highPrice = INVALID_DATA;
+		m_lowPrice = INVALID_DATA;
 	}
 	~ChangeNode();
 	std::string point_DateTime;
 
-	double Get_Entity(std::string key)
+	double Get_Entity(const std::string& key)
 	{
 		auto it = m_entitiesMap.find(key);
 		if (it != m_entitiesMap.end()) {

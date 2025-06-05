@@ -12,7 +12,7 @@ class CSVExportData
 	std::vector<std::string> m_dataTempContainer;
 	std::ofstream* m_file;
 public:
-	CSVExportData(std::string fileName)
+	CSVExportData(const std::string& fileName)
 	{
 		m_fileName = CONTAINER_FOLDER + fileName;
 		m_file = new std::ofstream(m_fileName, std::ios::app);
@@ -23,13 +23,13 @@ public:
 		m_file->close();
 	}
 
-	void InsertNewColumn(const std::string col)
+	void InsertNewColumn(const std::string& col)
 	{
 		m_dataTempContainer.push_back(col);
 	}
 
 
-	void InsertNewColumn(const std::vector<std::string> cols)
+	void InsertNewColumn(const std::vector<std::string>& cols)
 	{
 		for (int i = 0; i < cols.size(); i++)
 		{

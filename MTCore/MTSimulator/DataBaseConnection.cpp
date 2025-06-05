@@ -1,7 +1,7 @@
 #include "DataBaseConnection.h"
 #include "CONFIGRATIONS.H"
 
-DataBaseConnection::DataBaseConnection(std::string serverName, std::string dataBase, std::string userName, std::string pass) {
+DataBaseConnection::DataBaseConnection(const std::string& serverName,const std::string& dataBase, const std::string& userName, const std::string& pass) {
     SQLHENV henv;       // Environment handle
     SQLHDBC hdbc;       // Connection handle
     SQLHSTMT hstmt;     // Statement handle
@@ -76,7 +76,7 @@ DataBaseConnection::DataBaseConnection()
 
 }
 
-DataBaseConnection::DataBaseConnection(std::string connString)
+DataBaseConnection::DataBaseConnection(const std::string& connString)
 {
     SQLHENV henv;       // Environment handle
     SQLHDBC hdbc;       // Connection handle

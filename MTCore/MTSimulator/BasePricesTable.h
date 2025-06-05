@@ -16,17 +16,22 @@ class BasePricesTable : BTables
 private:
 	std::string m_tableName;
 protected:
-	BasePricesTable(SQLHENV& henv, SQLHDBC& hdbc, std::string tableName) : BTables(henv, hdbc) {
+	BasePricesTable(SQLHENV& henv, SQLHDBC& hdbc,const std::string& tableName) : BTables(henv, hdbc) {
 		m_tableName = tableName;
 	}
-	BasePricesTable(std::string filename, std::string tableName) : BTables(filename)
+	
+
+	BasePricesTable(const std::string& filename,const std::string& tableName) : BTables(filename)
 	{
 		m_tableName = tableName;
 	}
-	BasePricesTable(std::string tableName) : BTables() // Constuctor for Json use
+
+
+	BasePricesTable(const std::string& tableName) : BTables() // Constuctor for Json use
 	{
 		m_tableName = tableName;
 	}
+
 public: 
 	///////////////////////////////////////////////////
 	////// All functions to get selected counts////////
@@ -40,7 +45,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 public:
-	void Set_DATA_DB_FileName(std::string fileName) { Set_DBFileName(fileName); }
+	void Set_DATA_DB_FileName(const std::string& fileName) { Set_DBFileName(fileName); }
 	void Set_MultiThreadedRead() { Set_AsMultiThread_Read(); }
 
 protected:
@@ -57,8 +62,8 @@ public:
 	bool SelectDataFromFile() { return SelectFromFile(GetColsNum()); }
 	bool SelectDataFromJsonFile() { return SelectFromJsonFile(); }
 
-	virtual void FreeStyleQuery(std::string sqlCommand) { SelectFromDB(sqlCommand, tableCols()); }
-	virtual bool FreeStyleCommand(std::string sqlCommand) { return UpdateDB(sqlCommand); }
+	virtual void FreeStyleQuery(const std::string& sqlCommand) { SelectFromDB(sqlCommand, tableCols()); }
+	virtual bool FreeStyleCommand(const std::string& sqlCommand) { return UpdateDB(sqlCommand); }
 	virtual void RemoveSelect() { RemoveSelection(); }
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

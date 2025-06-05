@@ -3,7 +3,7 @@
 #include <map>
 #include <future>      // std::async, std::future
 
-bool BTables::InsertIntoDB(std::string insertSQL)
+bool BTables::InsertIntoDB(const std::string& insertSQL)
 {
 	if (!m_DBConnectionHandler || !m_DBenvHandler)
 		return false;
@@ -33,7 +33,7 @@ bool BTables::InsertIntoDB(std::string insertSQL)
 	}
 }
 
-bool BTables::SelectFromDB(std::string selectSQL,int cols,int colLen)
+bool BTables::SelectFromDB(const std::string& selectSQL,int cols,int colLen)
 {
 	if (!m_DBConnectionHandler || !m_DBenvHandler)
 		return false;
@@ -73,7 +73,7 @@ bool BTables::SelectFromDB(std::string selectSQL,int cols,int colLen)
 	return true;
 }
 
-bool BTables::UpdateDB(std::string insertSQL) {
+bool BTables::UpdateDB(const std::string& insertSQL) {
 	if (!m_DBConnectionHandler || !m_DBenvHandler)
 		return false;
 
@@ -326,7 +326,7 @@ long BTables::GetFileLinesCount(const std::string& filePath)
 }
 
 
-std::vector<JsonSelectionNode*> BTables::FileChunkRead(int startLineIdx, int endLineIdx,int threadIdx,const std::string fileName)
+std::vector<JsonSelectionNode*> BTables::FileChunkRead(int startLineIdx, int endLineIdx,int threadIdx,const std::string& fileName)
 {
 	std::this_thread::sleep_for(std::chrono::microseconds(100 * (threadIdx + 1)));
 	std::vector<JsonSelectionNode*> vector;

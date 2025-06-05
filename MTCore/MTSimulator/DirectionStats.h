@@ -138,6 +138,20 @@ private:
 	DirectionGroupStats& GetGroupStats(StatsType type);
 
 public:
+	DirectionStats(DirectionStats&& other) noexcept
+		: m_patterns_wScores(std::move(other.m_patterns_wScores)),
+		m_currPattern(other.m_currPattern ? new TimeLine(std::move(*other.m_currPattern)) : nullptr),
+		m_tradeRes(other.m_tradeRes),
+		m_active(other.m_active),
+		m_timePoint(std::move(other.m_timePoint)),
+		m_pair(other.m_pair),
+		general(std::move(other.general)),
+		first(std::move(other.first)),
+		highest(std::move(other.highest)),
+		stepsMean(std::move(other.stepsMean)) // Move constructor
+	{
+		other.m_currPattern = nullptr; // Nullify the moved pointer
+	}
 
 	DirectionStats(const DirectionStats& other)
 		: m_patterns_wScores(other.m_patterns_wScores),
@@ -145,7 +159,11 @@ public:
 		m_tradeRes(other.m_tradeRes),
 		m_active(other.m_active),
 		m_timePoint(other.m_timePoint),
-		m_pair(other.m_pair)
+		m_pair(other.m_pair),
+		general(other.general),
+		first(other.first),
+		highest(other.highest),
+		stepsMean(other.stepsMean)  // Copy constructor
 	{
 	}
 
@@ -153,7 +171,7 @@ public:
 	{
 		m_tradeRes = false;
 		m_currPattern = nullptr;
-		m_pair == CoinsPair::NONE;
+		m_pair = CoinsPair::NONE;
 		m_active = false;
 	}
 
@@ -175,8 +193,8 @@ public:
 
 	std::vector<double> GetAllMeansUpTo(int maxIndex = -1) { return stepsMean.GetAllMeansUpTo(maxIndex); }
 
-	void add(double pipChange, CommonDirection dir, int candleIdx, StatsType sType) { GetGroupStats(sType).add(pipChange, dir, candleIdx); }
-	void addStep_ForCandleIdx(double pipChange, int candleIdx) { stepsMean.addStep(pipChange, candleIdx); }
+	void add(int pipChange, CommonDirection dir, int candleIdx, StatsType sType) { GetGroupStats(sType).add(pipChange, dir, candleIdx); }
+	void addStep_ForCandleIdx(int pipChange, int candleIdx) { stepsMean.addStep(pipChange, candleIdx); }
 
 	int Get_UpCount(StatsType sType) { return GetGroupStats(sType).UpCount; }
 	int Get_DownCount(StatsType sType) { return GetGroupStats(sType).DownCount; }
@@ -196,13 +214,23 @@ public:
 	std::vector < std::pair<int, int>> Get_Indexes_and_changePips(StatsType sType) { return GetGroupStats(sType).get_Indexes_and_changePips(); }
 
 	void Add_Pattern(TimeLineScored pattern) { m_patterns_wScores.push_back(pattern); }
-	void Add_Patterns(std::vector<TimeLineScored>* patterns);
-	void Add_CurrPattern(TimeLine currPatter) { m_currPattern = new TimeLine(currPatter); }
+	void Add_Patterns(std::vector<TimeLineScored>* patterns,bool moveMemory = false);
+	void Add_CurrPattern(TimeLine&& currPatter) 
+	{ 
+		m_currPattern = new TimeLine(std::move(currPatter));
+	}
+	void Add_CurrPattern(TimeLine& currPatter,bool moveMemory = false) 
+	{
+		if (moveMemory)
+			m_currPattern = new TimeLine(std::move(currPatter));
+		else
+			m_currPattern = new TimeLine(currPatter);
+	}
 
 	void Set_PairCoint(CoinsPair pair) { m_pair = pair; }
 	CoinsPair Get_PairCoint(CoinsPair& pair) { return m_pair; }
 
-	void Set_TimePoint(std::string timePoint) { m_timePoint = timePoint; }
+	void Set_TimePoint(const std::string& timePoint) { m_timePoint = timePoint; }
 	std::string Get_TimePoint() { return m_timePoint; }
 
 	DirectionGroupStats& GetGroupStatsByName(const std::string& son);

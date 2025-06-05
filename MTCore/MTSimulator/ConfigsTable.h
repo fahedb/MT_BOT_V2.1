@@ -10,7 +10,7 @@ public:
 	{
 
 	}
-	std::vector<std::string> GetConfigRow(std::string config)
+	std::vector<std::string> GetConfigRow(const std::string& config)
 	{
 		std::string selectCmd = "select * from " + std::string(DEF_TABLE_Configs) + " where " + std::string(DEF_COLUMN_ConfigName) + "=\'" + config + "\';";
 		SelectFromDB(selectCmd,tableCols(),4000);
@@ -27,7 +27,7 @@ public:
 
 		return selected;
 	}
-	bool SetConfigValue(std::string config,std::string value)
+	bool SetConfigValue(const std::string& config,const std::string& value)
 	{
 		std::string updateCmd = "update " + std::string(DEF_TABLE_Configs) + " set " + std::string(DEF_COLUMN_ConfigValue) + " = \'" + value + "\' where "
 			+ std::string(DEF_COLUMN_ConfigName) + " = \'" + config + "\';";

@@ -18,11 +18,11 @@ private:
         m_client.set_keep_alive(true);
     }
 public:
-    httplib::Result Send_Get(std::string service,httplib::Headers headers = httplib::Headers())
+    httplib::Result Send_Get(std::string& service,httplib::Headers headers = httplib::Headers())
     {
          return m_client.Get(service,headers);
     }
-    httplib::Result Send_Post(std::string service,std::string body ="{}",std::string content_type = "application/json", httplib::Headers headers = httplib::Headers())
+    httplib::Result Send_Post(std::string& service,std::string body ="{}",std::string content_type = "application/json", httplib::Headers headers = httplib::Headers())
     {
         return  m_client.Post(service, headers, body, content_type);
     }

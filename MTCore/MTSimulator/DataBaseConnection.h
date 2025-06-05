@@ -16,12 +16,12 @@ class DataBaseConnection
 {
 
 public:
-    DataBaseConnection(std::string serverName, std::string dataBase, std::string userName, std::string pass);
+    DataBaseConnection(const std::string& serverName,const std::string& dataBase,const std::string& userName,const std::string& pass);
     SQLHENV Get_EnvHandler() { return m_envHandler; }
     SQLHDBC Get_DBConnection() { return m_DBConnectionHandler; }
 
     DataBaseConnection();
-    DataBaseConnection(std::string connString);
+    DataBaseConnection(const std::string& connString);
 
       ~DataBaseConnection()
       {

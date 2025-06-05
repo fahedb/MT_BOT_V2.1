@@ -7,10 +7,14 @@ class DBMap
 public:
 	~DBMap() { myMap.clear(); }
 	DBMap() {}
+	DBMap(const DBMap& other)
+	{
+		myMap = other.myMap; // Copy the unordered_map
+	}
 public:
 	std::unordered_map<std::string, int>* GetMap() { return &myMap; }
-	void InsetIntoMap(std::string dateTime, int idx) { myMap.insert(std::make_pair(dateTime, idx)); }
-	int GetIdx_Of_TimePoint(std::string dateTime);
+	void InsetIntoMap(const std::string& dateTime, int idx) { myMap.insert(std::make_pair(dateTime, idx)); }
+	int GetIdx_Of_TimePoint(const std::string& dateTime);
 	bool ContainsKey(const std::string& key) {return myMap.find(key) != myMap.end();}
 private:
 	std::unordered_map<std::string, int> myMap;

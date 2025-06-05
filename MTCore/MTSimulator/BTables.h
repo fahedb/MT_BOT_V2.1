@@ -38,7 +38,7 @@ public:
 		m_allSelectedFileRows.clear();
 		m_multiThreadedRead = false;
 	}
-	BTables(std::string filename)
+	BTables(const std::string& filename)
 	{
 		m_fileName = filename;
 		m_allSelectedRows.clear();
@@ -63,8 +63,8 @@ protected: // Functions to control text file
 
 protected: // Function to Control json file
 	void Set_AsMultiThread_Read() { m_multiThreadedRead = true; }
-	static std::vector<JsonSelectionNode*> FileChunkRead(int startLineIdx, int endLineIdx, int threadIdx,const std::string fileName);
-	int Get_SelectedCount_MultiThreaded(int threadIdx) { return m_allSelectedJsonRows_MultiThreaded.size() > threadIdx ? m_allSelectedJsonRows_MultiThreaded.at(threadIdx).size() : 0; }
+	static std::vector<JsonSelectionNode*> FileChunkRead(int startLineIdx, int endLineIdx, int threadIdx,const std::string& fileName);
+	int Get_SelectedCount_MultiThreaded(int threadIdx) { return m_allSelectedJsonRows_MultiThreaded.size() > static_cast<size_t>(threadIdx) ? static_cast<int>(m_allSelectedJsonRows_MultiThreaded.at(threadIdx).size()) : 0; }
 	bool SelectFromJsonFile();
 	bool SelectFromJsonFile_MultiThreaded(); // Select from a json file, with multithreading, need to call removeselection after done using 
 	JsonSelectionNode* GetNextJsonSelection(); 
@@ -73,9 +73,9 @@ protected: // Function to Control json file
 
 protected: // Function to control SQL DataBase
 
-	bool InsertIntoDB(std::string insertSQL);
-	bool SelectFromDB(std::string selectSQL,int cols,int colLen = 24);
-	bool UpdateDB(std::string insertSQL);
+	bool InsertIntoDB(const std::string& insertSQL);
+	bool SelectFromDB(const std::string& selectSQL,int cols,int colLen = 24);
+	bool UpdateDB(const std::string& insertSQL);
 
 	void Insert_NewBody_to_queue(JsonSelectionNode* node) { m_allSelectedJsonRows.push(node); }
 	void RemoveSelection();

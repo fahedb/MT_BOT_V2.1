@@ -6,12 +6,15 @@
 #include <queue>
 #include <stack>
 #include "..\MTCore\MTSimulator\Converts.h"
+#include "..\MTCore\MTSimulator\OrdersStructCache.h"
 
 struct Http_OrderStruct
 {
 	std::string symbol;
 	int long_short = 0;
 	int orderSeqNum = 0;
+	int stopLoss = 0;
+	int takeProfit = 0;
 };
 
 struct ConfigStruct
@@ -19,9 +22,9 @@ struct ConfigStruct
 	std::string label;
 	std::string value;
 	std::string explain;
-	int m_permission;
-	int m_catagory;
-	bool need_To_Update;
+	int m_permission =0 ;
+	int m_catagory = 0;
+	bool need_To_Update = false;
 };
 
 
@@ -43,7 +46,7 @@ private:
 	bool m_loadingDataStatus = true;
 public:
 
-	int Get_ConfigIdx(std::string config)
+	int Get_ConfigIdx(std::string& config)
 	{
 		for (int i = 0; i < m_confVec.size(); i++)
 		{
@@ -54,7 +57,7 @@ public:
 	}
 	std::vector<ConfigStruct> Get_AllConfigs() { return m_confVec; }
 
-	ConfigStruct Get_Config(std::string config)
+	ConfigStruct Get_Config(std::string& config)
 	{
 		int idx = Get_ConfigIdx(config);
 		if (idx < 0)
@@ -62,7 +65,7 @@ public:
 		return m_confVec.at(idx);
 	}
 
-	bool UpdateConfig(std::string config, std::string value)
+	bool UpdateConfig(std::string& config, std::string& value)
 	{
 		int idx = Get_ConfigIdx(config);
 		if (idx >= 0)
@@ -87,7 +90,7 @@ public:
 		return std::make_pair("", "");
 	}	
 
-	void PushNewConfig(std::vector<std::string> conf)
+	void PushNewConfig(std::vector<std::string>& conf)
 	{
 		if (conf.size() < 3)
 			return;
@@ -103,7 +106,7 @@ public:
 		m_confVec.push_back(configStruct);
 	}
 
-	void Handle_NewBar_M1(std::string body)
+	void Handle_NewBar_M1(const std::string& body)
 	{
 		if (!body.length())
 			return;
@@ -111,7 +114,7 @@ public:
 		m_candlesBodies.push(body);
 	}
 
-	void Handle_JSON_DB_NewBar_M1(std::string body)
+	void Handle_JSON_DB_NewBar_M1(const std::string& body)
 	{
 		if (!body.length())
 			return;
@@ -165,13 +168,61 @@ public:
 		
 		res.set_header(HTTP_PARAM_Symbol, newOrder.symbol);
 		res.set_header(HTTP_PARAM_TradeType, newOrder.long_short ? HTTP_PARAM_VALUE_TradeType_Short : HTTP_PARAM_VALUE_TradeType_Long);
+		res.set_header(HTTP_PARAM_TradeSeqNum, std::to_string(newOrder.orderSeqNum));
+		res.set_header(HTTP_PARAM_OrderStopLoss, std::to_string(newOrder.stopLoss));
+		res.set_header(HTTP_PARAM_OrderTakeProfit, std::to_string(newOrder.takeProfit));
+
 	}
-	void Set_NewOrder(std::string symbol, int long_short)
+	
+	void Handle_CloseOrder(const httplib::Request& req, httplib::Response& res)
+	{
+		int seqNum = req.get_header_value(HTTP_PARAM_TradeSeqNum).empty() ? 0 : Converts::ToInt(req.get_header_value(HTTP_PARAM_TradeSeqNum));
+
+		OrderEntity* order = OrderEntityCache::getInstance()->Get_Order(seqNum);
+		if (order)
+			order->CloseOrder();
+		res.set_header(HTTP_PARAM_OrderStatus, HTTP_PARAM_VALUE_OrderStatus_Closed);
+	}
+
+	void Handle_GetOrderData(const httplib::Request& req, httplib::Response& res)
+	{
+
+		std::string  seqNum = req.get_header_value(HTTP_PARAM_TradeSeqNum);
+		int seqnum = Converts::ToInt(seqNum);
+
+		if (seqnum <= 0)
+		{
+			Logger::getInstance().WriteLog("Error with seq num,\n recieved seqNum: " + seqNum, false, true, LogType::ERR);
+			res.set_content("Invalid Order SeqNum", "text/plain");
+			res.set_header(HTTP_PARAM_OrderStatus, HTTP_PARAM_VALUE_OrderStatus_Closed);
+			return;
+		}
+
+		OrderEntity* order = OrderEntityCache::getInstance()->Get_Order(seqnum);
+		if (order)
+		{
+			res.set_header(HTTP_PARAM_OrderStopLoss, std::to_string(order->Get_StopLoss()));
+			res.set_header(HTTP_PARAM_OrderTakeProfit, std::to_string(order->Get_TakeProfit()));
+			res.set_header(HTTP_PARAM_TradeType, order->Get_OrderType_str());
+			res.set_header(HTTP_PARAM_Symbol, order->Get_PairType_str());
+			res.set_header(HTTP_PARAM_OrderStatus, order->Get_OrderStatus_str());
+		}
+		else
+		{
+			res.set_header(HTTP_PARAM_OrderStatus, HTTP_PARAM_VALUE_OrderStatus_Closed);
+			return;
+		}
+	}
+
+	void Set_NewOrder(std::string& symbol, int long_short,int seqNum, int stopLoss=0, int takeProfit=0)
 	{
 		std::lock_guard<std::mutex> lock(m_tradeQueueMutex);
 		Http_OrderStruct newOrder;
-		newOrder.long_short = long_short;
 		newOrder.symbol = symbol;
+		newOrder.long_short = long_short;
+		newOrder.orderSeqNum = seqNum;
+		newOrder.stopLoss = stopLoss;
+		newOrder.takeProfit = takeProfit;
 		m_ordersToExecute.push(newOrder);
 	}
 };

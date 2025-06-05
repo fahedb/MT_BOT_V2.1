@@ -2,7 +2,7 @@
 #include "ConfigsTable.h"
 #include "Converts.h"
 
-std::string Configrations::DefualtConfigValues(std::string config)
+std::string Configrations::DefualtConfigValues(std::string& config)
 {
     if (config == CONFIG_DEF_FILES_DB_DIR)
         return DEFUALT_FILES_DB_DIR;
@@ -21,7 +21,7 @@ std::string Configrations::extractTextBetweenSymbols(const std::string& line) {
 
     return ""; // Return defualt connection string if not found
 }
-std::string Configrations::Get_ConfigValue_DB(std::string config,std::string defualt)
+std::string Configrations::Get_ConfigValue_DB(const std::string& config,const std::string& defualt)
 {
     ConfigsTable confTable(m_db_conn->Get_EnvHandler(), m_db_conn->Get_DBConnection());
     std::vector<std::string> row = confTable.GetConfigRow(config);
@@ -30,7 +30,7 @@ std::string Configrations::Get_ConfigValue_DB(std::string config,std::string def
     return defualt;
 }
 
-bool Configrations::UpdateConfigValue_DB(std::string conf,std::string value)
+bool Configrations::UpdateConfigValue_DB(std::string& conf,std::string& value)
 {
     ConfigsTable confTable(m_db_conn->Get_EnvHandler(), m_db_conn->Get_DBConnection());
     bool res = confTable.SetConfigValue(conf, value);
@@ -59,7 +59,7 @@ std::vector<std::vector<std::string>> Configrations::Get_AllConfigRows_DB()
 
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT));
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_PATTERN_MINIMUM_PIPS_CHANGE_TOCOUNT));
-    allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_SAVED_STATS_NUM));
+    allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_SAVED_STATS_LEN));
     
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_MAIN_ORDER_SIZE_IN_LOT));
     allConfigs.push_back(ReadConfigRow_DB(CONFIG_DEF_SUPPORT_ORDER_SIZE_IN_LOT));
@@ -102,6 +102,7 @@ std::vector<std::string> Configrations::ReadConfigRow_DB(std::string config,std:
     cacheConf[4] = "1"; // Catagory
     return cacheConf;
 }
+
 
 std::string Configrations::ReadConfigValue(std::string config)
 {
@@ -156,7 +157,7 @@ void Configrations::Init_PatternPolicy()
     m_policy.Sleep_Minuts_after_Max_Orders_InRow = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_PATTERN_SLEEP_MINUTS_AFTER_MAX_ORDERS_INROW));
 
     m_policy.Pattern_CurrentTimeLineLen = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_CURR_TIME_LINE_LEN));
-    m_policy.SavedDirectionStaticsNum = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_SAVED_STATS_NUM));
+    m_policy.SavedDirectionStaticsLen = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_SAVED_STATS_LEN));
 
     m_policy.EMA_len_for_Pattern_Export = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT));
     m_policy.RSI_Wieght =    Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_RSI_WIEGHT));

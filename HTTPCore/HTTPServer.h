@@ -14,23 +14,23 @@ private:
 	HTTPServer()
 	{
        // m_srv.set_payload_max_length(10 * 1024 * 1024);
-        m_port = 8080;
+		m_port = 8080; // TODO: Need to set it through Configrations
         m_srv.Get("/", [](const httplib::Request&, httplib::Response& res) {
             res.set_content("Welcome to MTScanner HTTP Server!\nIf You're not Authorized Kindly Report this on Whatsapp +972 522861739 <3", "text/plain"); // LOLLL !!
             });
 	}
 
-    void Get_ScanningStatus(const httplib::Request& req, httplib::Response& res) {
-        res.set_header(HTTP_PARAM_STATUS, m_requests.GetStatus_Scanning());
-    }
+    void Get_ScanningStatus(const httplib::Request& req, httplib::Response& res) { res.set_header(HTTP_PARAM_STATUS, m_requests.GetStatus_Scanning()); }
+
     void Stop_Scanning(const httplib::Request& req, httplib::Response& res) { m_requests.Set_RunningStatus(false); }
     void Run_Scanning(const httplib::Request& req, httplib::Response& res) { m_requests.Set_RunningStatus(true); }
 
     void Handle_Trade(const httplib::Request& req, httplib::Response& res) { m_requests.Handle_IsThereAnTrade(res); }
-
-    void Get_AllConfigsNames_HTTP(const httplib::Request& req, httplib::Response& res) { 
-        std::vector<ConfigStruct> confVec =  m_requests.Get_AllConfigs(); 
-        std::string body="";
+    void Get_OrderData(const httplib::Request& req, httplib::Response& res) { m_requests.Handle_GetOrderData(req, res); }
+	void CloseOrder(const httplib::Request& req, httplib::Response& res) { m_requests.Handle_CloseOrder(req, res); }
+    void Get_AllConfigsNames_HTTP(const httplib::Request& req, httplib::Response& res) {
+        std::vector<ConfigStruct> confVec = m_requests.Get_AllConfigs();
+        std::string body = "";
         for (int i = 0; i < confVec.size(); i++)
         {
             if (confVec.at(i).label.size())
@@ -38,6 +38,7 @@ private:
         }
         res.body = body;
     }
+
     void Get_Config_HTTP(const httplib::Request& req, httplib::Response& res)
     {
         std::string configName = req.get_header_value(HTTP_PARAM_ConfigName);
@@ -46,7 +47,7 @@ private:
             return;
         res.set_header(HTTP_PARAM_ConfigName, confSt.label);
         res.set_header(HTTP_PARAM_ConfigValue, confSt.value);
-        std::string explain_utf8= convert_windows1255_to_utf8(confSt.explain);
+        std::string explain_utf8 = confSt.explain;
         res.body = explain_utf8;
 
         res.set_header("Content-Type", "text/plain; charset=UTF-8");
@@ -55,21 +56,6 @@ private:
 
     }
 
-    std::string convert_windows1255_to_utf8(const std::string& input) {
-        int wide_size = MultiByteToWideChar(1255, 0, input.c_str(), -1, NULL, 0);
-        if (wide_size == 0) return "";
-
-        std::wstring wide_string(wide_size, 0);
-        MultiByteToWideChar(1255, 0, input.c_str(), -1, &wide_string[0], wide_size);
-
-        int utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string.c_str(), -1, NULL, 0, NULL, NULL);
-        if (utf8_size == 0) return "";
-
-        std::string utf8_string(utf8_size, 0);
-        WideCharToMultiByte(CP_UTF8, 0, wide_string.c_str(), -1, &utf8_string[0], utf8_size, NULL, NULL);
-
-        return utf8_string;
-    }
 
     void Set_Config_HTTP(const httplib::Request& req, httplib::Response& res)
     {
@@ -84,6 +70,7 @@ private:
         m_requests.Handle_NewBar_M1(req.body);
         res.set_header("Status", "Success");
     }
+
     void Handle_JSON_DB_NewBarM1(const httplib::Request& req, httplib::Response& res)
     {
         m_requests.Handle_JSON_DB_NewBar_M1(req.body);
@@ -91,23 +78,18 @@ private:
     }
 
 
-    void Handle_Get_CSV_OrdersSummery(const httplib::Request& req, httplib::Response& res)
-    {
-        res.set_header("OrdersSummeryPath", "C:\\MTDB\\ordersSummery.csv");
-    }
-    std::string fix_encoding(const std::string& str) {
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring wide_str = converter.from_bytes(str); // המרה ל-Wide String
-        return converter.to_bytes(wide_str); // המרה חזרה ל-UTF-8
-    }
+
+    void Handle_Get_CSV_OrdersSummery(const httplib::Request& req, httplib::Response& res) { res.set_header("OrdersSummeryPath", "C:\\MTDB\\ordersSummery.csv"); }
+
 public:
     RequestHandler* Get_RequestHandler() { return &m_requests; }
+
     void RunServer()
     {
         m_srv.Get(HTTP_SERVICE_MTScanner_GetConfig, [this](const httplib::Request& req, httplib::Response& res) {
             this->Get_Config_HTTP(req, res);
             });
-                m_srv.Get(HTTP_SERVICE_MTScanner_GetAllConfigsNames, [this](const httplib::Request& req, httplib::Response& res) {
+        m_srv.Get(HTTP_SERVICE_MTScanner_GetAllConfigsNames, [this](const httplib::Request& req, httplib::Response& res) {
             this->Get_AllConfigsNames_HTTP(req, res);
             });
 
@@ -117,7 +99,7 @@ public:
 
 
         m_srv.Get(HTTP_SERVICE_MTScanner_Status, [this](const httplib::Request& req, httplib::Response& res) {
-            this->Get_ScanningStatus(req,res);
+            this->Get_ScanningStatus(req, res);
             });
 
         m_srv.Post(HTTP_SERVICE_MTScanner_Run, [this](const httplib::Request& req, httplib::Response& res) {
@@ -134,7 +116,7 @@ public:
 
         m_srv.Post(HTTP_SERVICE_NewBar_M1, [this](const httplib::Request& req, httplib::Response& res) {
             this->Handle_NewBarM1(req, res); // Get new current time line bar
-            });   
+            });
 
         m_srv.Post(HTTP_SERVICE_NewBar_JSON_DB_M1, [this](const httplib::Request& req, httplib::Response& res) {
             this->Handle_JSON_DB_NewBarM1(req, res); // Get new history time line bar
@@ -144,8 +126,20 @@ public:
             {
                 this->Handle_Get_CSV_OrdersSummery(req, res);
             });
+
+        m_srv.Get(HTTP_SERVICE_MTScanner_GetOrderData, [this](const httplib::Request& req, httplib::Response& res)
+            {
+                this->Get_OrderData(req, res);
+            });
+        
+        m_srv.Post(HTTP_SERVICE_MTSCanner_CloseOrder, [this](const httplib::Request& req, httplib::Response& res)
+            {
+                this->CloseOrder(req, res);
+            });
+
         m_srv.listen("0.0.0.0", m_port);
     }
+
     HTTPServer(const HTTPServer&) = delete;
     HTTPServer& operator=(const HTTPServer&) = delete;
 

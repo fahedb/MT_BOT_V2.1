@@ -19,11 +19,20 @@ DirectionGroupStats& DirectionStats::GetGroupStats(StatsType type)
 	}
 }
 
-void DirectionStats::Add_Patterns(std::vector<TimeLineScored>* patterns)
+void DirectionStats::Add_Patterns(std::vector<TimeLineScored>* patterns,bool moveMemory)
 {
+	if (patterns == nullptr || patterns->empty())
+	{
+		Logger::getInstance().WriteLog("Add_Patterns: patterns is null or empty, nothing to add.", false, true, LogType::ERR);
+		return;
+	}
+
 	for (int i = 0; i < patterns->size(); i++)
 	{
-		m_patterns_wScores.push_back(patterns->at(i));
+		if (!moveMemory)
+			m_patterns_wScores.push_back(patterns->at(i));
+		else
+			m_patterns_wScores.emplace_back(std::move(patterns->at(i)));
 	}
 }
 

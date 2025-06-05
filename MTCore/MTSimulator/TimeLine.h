@@ -8,10 +8,11 @@ class TimeLine
 {
 
 public:
+
     TimeLine(TimeLine&& other) noexcept
     {
         m_TL = other.m_TL;
-        m_DB_Map = std::move(other.m_DB_Map);
+        m_DB_Map = other.m_DB_Map;
         m_selfOwnership = other.m_selfOwnership;
 
         other.m_TL = nullptr;
@@ -35,8 +36,8 @@ public:
         m_selfOwnership = true; 
         m_TL = new std::vector<ChangeNode*>(*other.m_TL);
         m_DB_Map = other.m_DB_Map;
+		Logger::getInstance().WriteLog("TimeLine copy constructor called, this is not recommended, please use move semantics instead.", false, true, LogType::ERR);
     }
-
     TimeLine& operator=(const TimeLine&) = delete;
     size_t Get_TimeLineLen() { if (m_TL) return m_TL->size(); else  return -1; }
 
@@ -68,7 +69,7 @@ private:
                 m_DB_Map.InsetIntoMap(timeKey, i);
             }
             else {
-                Logger::getInstance().WriteLog("!!!!! Duplicate point_DateTime in DB: " + timeKey + " !!!!!!", false, true, LogType::SPECIAL_LOG);
+                Logger::getInstance().WriteLog("!!!!! Duplicate point_DateTime in DB: " + timeKey + " !!!!!!", false, true, LogType::ERR);
             }
         }
     }

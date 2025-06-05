@@ -193,7 +193,7 @@ void DataExporter::Send_For_PNGExport(DirectionStats& stats)
 	std::vector<TimeLineScored>* similarPatterns = stats.Get_SimilarPatterns();
 	for (int i = 0; i < similarPatterns->size(); i++)
 	{
-		patternsVec.push_back(similarPatterns->at(i).GetTimeLine()->Get_TimeLine());
+		patternsVec.push_back(similarPatterns->at(i).Get_TimeLine().Get_TimeLine());
 	}
 	PatternExporter::Export_All_Pattens_ToPNG(currPattern->Get_TimeLine(), &patternsVec);
 }

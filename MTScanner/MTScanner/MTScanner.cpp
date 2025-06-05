@@ -25,6 +25,7 @@
 #include "TradeTracer.h"
 #include "OrdersStructCache.h"
 #include "Static_CurrentTimeLineRep.h"
+#include "ScoreResultsCache.h"
 
 void OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator,TimeLine* history);
 void DefualtProgramStart();
@@ -38,6 +39,16 @@ std::string m_lastTimePoint = "";
 
 int main(int argc, char* argv[])
 {
+	//OrderEntity* order = new OrderEntity(OrderType::LONG, "20250526164100", "20250526164100", CoinsPair::XAUUSD);
+	//order->Set_TakeProfit(1000);
+	//order->Set_StopLoss(500);
+	//OrderEntityCache* orderCache = OrderEntityCache::getInstance();
+
+	//orderCache->Add_NewOrder(order);
+	//	
+	//TradesManager::getInstance()->Send_TraddeSignal(order->Get_PairType_str(), int(order->Get_OrderType()), order->Get_OrderSeqNum(),
+	//	order->Get_StopLoss(), order->Get_TakeProfit()); // Send the trade signal to the exchange
+
 	std::thread http_thread(ExchangeData::Start_DataExchange);
 	if (IsItDataLoading(argc, argv))
 	{
@@ -117,6 +128,7 @@ void DefualtProgramStart()
 		UpdateConfigs();
 		Configrations::getInstance()->RefreshPolicy(); // Refresh all policies 
 		int timeBetweenScans = policy->TimeBetweenScans;
+		ScoreResultsCache::getInstance()->CleanOldResults(); // Clear the cache for the next scan
 		logger.WriteLog("Sleep for " + std::to_string(timeBetweenScans) + " seconds...");
 		Sleep(timeBetweenScans * 1000); // Sleep for 5 seconds before start a new scan
 	}
@@ -142,6 +154,7 @@ void UpdateCurrentTimeLine(BasePricesTable* table)
 		
 		ChangeNode* chn = table->GetNextChangeNode();
 		currTimeLineRep->Set_NewBar(chn, true);
+		body = exChData.Get_NextCandleStick_M1();
 	}
 
 	logger.WriteLog("No new Bars to recieve");
@@ -168,7 +181,7 @@ void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* stati
 	}
 	
 	logger.WriteLog("current time line size: " + std::to_string(currentTimeLine->size()));
-	if (currentTimeLine->at(0)->point_DateTime == m_lastTimePoint) // If the last time point scanned == to the current time point (start of the current vector) don't continue
+	if (currentTimeLine->at(currentTimeLine->size() - 1)->point_DateTime == m_lastTimePoint) // If the last time point scanned == to the current time point (start of the current vector) don't continue
 	{
 		std::cout << "\n\nNo new data, Last point time: " << m_lastTimePoint << std::endl;
 		return;
@@ -179,7 +192,7 @@ void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* stati
 		"Scanning period bars count: " + std::to_string(currentTimeLine->size());
 	logger.WriteLog(startScanLog, true,true);
 	
-	m_lastTimePoint = currentTimeLine->at(0)->point_DateTime;
+	m_lastTimePoint = currentTimeLine->at(currentTimeLine->size() - 1)->point_DateTime;
 	std::vector<std::pair<ChangeNode*,ScoresResult>> results; // Vector for the End of every time period
 
 	patternScan->Set_NewCurrentPeriod(currentTimeLine); // Set a new Current Period for PatternScan object for the new scan
@@ -200,18 +213,19 @@ void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* stati
 		std::vector<ChangeNode*> headsOfPotentialRes = TimeLineBuilder::SplitChangeNodeFromScores(&results);
 		DirectionStats stats = statisticsCalcucator->DetectCommonDirection(&headsOfPotentialRes);
 		
-		DirectionStatsCache::getInstance()->Add_NewStat(stats);
 
 		logger.WriteLog("Done detecting common direction.", false, false);
 
 		logger.WriteLog("Start Checking for a potentail trade...", false, false);
 		OrderEntity* tradeRes = tradeMngr->CheckForTrade_PatternGod(stats);
 		
+		
 		std::vector<TimeLineScored> similarPatterns = TimeLineBuilder::Build_TimeLineScored_Patterns(history, &results, currentTimeLine->size(), Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles);
-		stats.Add_Patterns(&similarPatterns);
+		stats.Add_Patterns(&similarPatterns,true);
 		stats.Add_CurrPattern(TimeLine(new std::vector<ChangeNode*>(*currentTimeLine), true));
 
 		DataExporter::Export_All_Statistics_Data(stats, tradeRes ? tradeRes->IsActive() : false);
+		DirectionStatsCache::getInstance()->Add_NewStat(stats,true);
 	}
 	else
 		logger.WriteLog("Didn't find any patterns with min score !!", false, true);

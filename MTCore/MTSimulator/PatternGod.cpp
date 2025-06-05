@@ -7,6 +7,7 @@
 #include "Logger.h"
 #include <mutex>
 #include <future>
+#include "ScoreResultsCache.h"
 
 #define MAX_DIFF 4
 
@@ -49,13 +50,13 @@ void PatternGod::BuildDBHistoryMap() // Function to build a map for the time poi
 			m_historyDB_Map->InsetIntoMap(timeKey, i);
 		}
 		else {
-			Logger::getInstance().WriteLog("!!!!! Duplicate point_DateTime in DB: " + timeKey + " !!!!!!", false, true,LogType::SPECIAL_LOG);
+			Logger::getInstance().WriteLog("!!!!! Duplicate point_DateTime in DB: " + timeKey + " !!!!!!", false, true,LogType::ERR);
 		}
 	}
 }
 
 
-ScoresResult PatternGod::CompareOneMinNodesPeriods(int startIdx) // compare between periods of time in the history time line and the whole current time line
+ScoresResult PatternGod::CompareOneMinNodesPeriods(int startIdx,int threadIdx) // compare between periods of time in the history time line and the whole current time line
 {
 	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
 	ScoresResult periodScore;
@@ -66,18 +67,34 @@ ScoresResult PatternGod::CompareOneMinNodesPeriods(int startIdx) // compare betw
 	int currTotalScore = 0;
 	int maxScorePossible = policy->maxScorePossibleForChangeNodes;
 	int totalMinScoretoAct = limit * policy->Score_Min_TotalScore_ToAct_PerCandle;
+	ScoreResultsCache* scoreResultsCache = ScoreResultsCache::getInstance();
+	std::vector<std::pair<std::string, ScoresResult>> scoreResults;
+	scoreResults.reserve(limit); // Reserve space for the expected number of results to avoid multiple reallocations
 
 	for (int i = 0; i < limit; ++i)
 	{
-		periodScore += ProxyScoreCalcs::CompareChangeNodes(m_currentTL->at(i), m_historyTL->at(static_cast<size_t>(startIdx) + static_cast<size_t>(i)));
-		currTotalScore += periodScore.totalScore.total;
-
+		ScoresResult* score = scoreResultsCache->GetScoreResult(m_historyTL->at(static_cast<size_t>(startIdx) + static_cast<size_t>(i))->point_DateTime, m_currentTL->at(i)->point_DateTime, threadIdx);
+		
+		if (score) // If score already calculated, use it
+		{
+			periodScore += *score;
+			currTotalScore += score->totalScore.total;
+			continue;
+		}
+		ScoresResult myScore = ProxyScoreCalcs::CompareChangeNodes(m_currentTL->at(i), m_historyTL->at(static_cast<size_t>(startIdx) + static_cast<size_t>(i)));
+		periodScore += myScore;
+		currTotalScore += myScore.totalScore.total;
+		
+		// Cache the score result for future insertion in the ScoreResultsCache singletone class
+		ScoreResultsCacheUtils::CacheScoreResult_InTempVector(scoreResults, m_historyTL->at(static_cast<size_t>(startIdx) + static_cast<size_t>(i))->point_DateTime, m_currentTL->at(i)->point_DateTime, myScore);
+		
 		int remainingCandles = limit - i;
 		int maxFutureScore = remainingCandles * maxScorePossible;
 		if (currTotalScore + maxFutureScore < totalMinScoretoAct)
 			break;
 
 	}
+	ScoreResultsCacheUtils::CacheScoreResult_ToCache(scoreResults, threadIdx);
 
 	return periodScore;
 }
@@ -93,6 +110,8 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector < std::pair< Cha
 	ScoresResult maxScore;
 
 	int threadCount = std::thread::hardware_concurrency(); // Number of threads
+	ResourceManager::getInstance()->Set_Data(THREADS_COUNT, std::to_string(threadCount)); // Set the number of threads in the ResourceManager
+
 	int historySize = static_cast<int>(m_historyTL->size());
 	int chunkSize = historySize / threadCount;
 
@@ -107,7 +126,7 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector < std::pair< Cha
 		localResults2D.reserve(estimatedItems);
 		
 		for (int i = start; i < end; i++) {
-			ScoresResult resScore = CompareOneMinNodesPeriods(i);
+			ScoresResult resScore = CompareOneMinNodesPeriods(i, threadIndex);
 			int localScoreToAct = scoreToAct;
 			if (resScore.totalScore.total > localScoreToAct) {
 				if (i + m_currentTL->size() < m_historyTL->size()) {

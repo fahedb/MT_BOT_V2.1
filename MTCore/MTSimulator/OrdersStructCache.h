@@ -35,7 +35,7 @@ public:
 		return nullptr;
 	}
 
-	OrderEntity* Get_Order(std::string timePoint)
+	OrderEntity* Get_Order(const std::string& timePoint)
 	{
 		for (int i = 0; i < m_ordersRep.size(); i++)
 			if (m_ordersRep.at(i)->Get_TimePoint() == timePoint)

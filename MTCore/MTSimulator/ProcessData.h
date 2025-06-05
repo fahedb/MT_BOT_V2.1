@@ -34,7 +34,7 @@ public:
 	static std::string GetFormattedCurrTime(char seperator = ':' /*defualt value is : */);
 
 	static std::string TrimSpaces(const std::string& input);
-	static void ConvertSQLCHARToString(const SQLCHAR* sqlCharData, std::string& outputString);
+	static void ConvertSQLCHARToString(const SQLCHAR* sqlCharData,std::string& outputString);
 	static std::string SQLWCHARToString(SQLWCHAR* sqlwcharMessage);
 	static int roundToDecimalPlaces(double value, int decimalPlaces);
 	static double convertDecimalToDouble(int value, int decimalPlaces);

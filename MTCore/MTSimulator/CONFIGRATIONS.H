@@ -36,7 +36,7 @@ struct ConfigrationsPolicy {
     double Pattern_Min_PipsChange_ToCount = 0.0;
     int Pattern_CurrentTimeLineLen = 0;
 
-    int SavedDirectionStaticsNum = 0;
+    int SavedDirectionStaticsLen = 0;
 
     int Max_Orders_InRow = 0;
     int Sleep_Minuts_after_Max_Orders_InRow = 0;
@@ -79,13 +79,15 @@ public:
 
     std::string Get_ConnectionString() { return m_connString; }
     std::string Get_DB_FileDir() { return m_filesDBDir; }
-    std::string Get_ConfigValue(std::string conf) { ReadConfigValue(conf); }
+    std::string Get_ConfigValue(std::string& conf) { ReadConfigValue(conf); }
+    std::string Get_ConfigValue(std::string& conf, std::string& defualt) { return ReadConfigValue(conf).length() ? ReadConfigValue(conf) : defualt; }
     std::string Get_ConfigValue(std::string conf, std::string defualt) { return ReadConfigValue(conf).length() ? ReadConfigValue(conf) : defualt; }
-    std::string Get_ConfigValue_DB(std::string conf, std::string defualt);
-    bool UpdateConfigValue_DB(std::string conf,std::string value);
+    std::string Get_ConfigValue_DB(const std::string& conf, const std::string& defualt);
+    bool UpdateConfigValue_DB(std::string& conf,std::string& value);
     std::vector<std::vector<std::string>> Get_AllConfigRows_DB();
+
     std::vector<std::string> ReadConfigRow_DB(std::string conf,std::string defualt);
-    
+
     ConfigrationsPolicy* Get_Policy() { return &m_policy; }
     InfraConfigrationsPolicy* Get_InfraPolicy() { return &m_infraPolicy; }
     void RefreshPolicy() { Init_PatternPolicy(); }
@@ -117,7 +119,7 @@ private:
     void Init_PatternPolicy();
     std::string ReadConfigValue(std::string config);
     std::string extractTextBetweenSymbols(const std::string& line);
-    std::string DefualtConfigValues(std::string config);
+    std::string DefualtConfigValues(std::string& config);
 
     // Members
     ConfigrationsPolicy m_policy;

@@ -211,6 +211,9 @@
     <Filter Include="Math">
       <UniqueIdentifier>{951de14a-b6aa-4a17-a540-9050e98f40ac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataStructers\ScoreResultsCache">
+      <UniqueIdentifier>{089a0092-eaea-42b8-aaae-4b5246ea8596}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -267,7 +270,7 @@
     <ClCompile Include="OrdersToExecute.cpp">
       <Filter>Tables\NewOrdersTable\Src</Filter>
     </ClCompile>
-    <ClCompile Include="TempCache.cpp">
+    <ClCompile Include="ResourceManager.cpp">
       <Filter>Cache</Filter>
     </ClCompile>
     <ClCompile Include="MyJSONHandler.cpp">
@@ -339,6 +342,9 @@
     <ClCompile Include="Converts.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="ScoreResultsCache.cpp">
+      <Filter>DataStructers\ScoreResultsCache</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BTables.h">
@@ -401,7 +407,7 @@
     <ClInclude Include="OrdersToExecute.h">
       <Filter>Tables\NewOrdersTable\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="TempCache.h">
+    <ClInclude Include="ResourceManager.h">
       <Filter>Cache</Filter>
     </ClInclude>
     <ClInclude Include="MyJSONHandler.h">
@@ -478,6 +484,9 @@
     </ClInclude>
     <ClInclude Include="Converts.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreResultsCache.h">
+      <Filter>DataStructers\ScoreResultsCache</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

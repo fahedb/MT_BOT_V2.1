@@ -6,6 +6,7 @@ void OrderEntity::ActivateOrder(OrderType long_short, std::string timePoint, std
 	m_orderType = long_short;
 	m_timePoint = timePoint;
 	m_statisticsTimePoint = statisticsTimePoint;
+	m_lastStatisticsCheckTimePoint = statisticsTimePoint; // Initialize to the same value as statisticsTimePoint on activate
 	m_pair = pair;
 	m_active = true;
 	m_status = OrderStatus::OPEN;

@@ -18,6 +18,8 @@ void Logger::WriteLog(std::string log, bool newSection,bool sendToLogServer, Log
         logToPrint += "\n";
 
     logToPrint += GetFormattedCurrTime() + log;
+    
+    std::lock_guard<std::mutex> lock(m_logMutex);
     std::cout << logToPrint;
     *(m_logFile) << logToPrint;
     m_logFile->flush();

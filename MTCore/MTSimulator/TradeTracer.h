@@ -50,7 +50,11 @@ private:
 		{
 			Sleep(m_policy->TimeBetweenScans * 1000);
 			if (!m_policy->EnableTradeTracing)
+			{
+				Logger::getInstance().WriteLog("Trade tracing is disabled, sleeping for 3 minutes", false, true, LogType::TRADE_TRACE_LOG);
+				Sleep(180 * 1000);
 				continue;
+			}
 
 			int ordersCount = m_trader->Get_OrdersCount();
 			for (int i = 0; i < ordersCount; i++)

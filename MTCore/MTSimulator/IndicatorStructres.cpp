@@ -159,44 +159,42 @@ IndicatorScore ScoresResult::combineScores() const {
 
 IndicatorMap::IndicatorMap()
 {
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::EMA, IndicatorLen::L30), nullptr));
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::EMA, IndicatorLen::L25), nullptr));
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::EMA, IndicatorLen::L20), nullptr));
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::EMA, IndicatorLen::L15), nullptr));
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::EMA, IndicatorLen::L10), nullptr));
-
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::RSI, IndicatorLen::L30), nullptr));
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::RSI, IndicatorLen::L25), nullptr));
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::RSI, IndicatorLen::L20), nullptr));
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::RSI, IndicatorLen::L15), nullptr));
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::RSI, IndicatorLen::L10), nullptr));
-
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::ZLSMA, IndicatorLen::L30), nullptr));
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::ZLSMA, IndicatorLen::L25), nullptr));
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::ZLSMA, IndicatorLen::L20), nullptr));
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::ZLSMA, IndicatorLen::L15), nullptr));
-	m_map.insert(std::make_pair(std::make_pair(IndicatorType::ZLSMA, IndicatorLen::L10), nullptr));
+	m_vec.resize(INDICATOR_TYPES_VEC_LEN); // Reserve space for 5 elements
+	
+	for (int i = 0; i < INDICATOR_TYPES_VEC_LEN; i++)
+	{
+		m_vec.at(i).resize(INDICATOR_LEN_VEC_LEN); // Reserve space for 5 elements in each vector
+		for (int j = 0; j < INDICATOR_LEN_VEC_LEN; j++)
+		{
+			m_vec.at(i).at(j) = nullptr; // Initialize each element to nullptr
+		}
+	}
 }
 
 void IndicatorMap::Set_Indicator(IndicatorType type, IndicatorLen len, IndicatorValues val,bool forceInsert /*false*/)
 {
-	std::pair<IndicatorType, IndicatorLen> pr = std::make_pair(type, len);
-	if (m_map.find(pr) != m_map.end()) {
-		if (!m_map[pr] || forceInsert)
-			m_map[pr] = Get_IndicatorObject(type, val);
+	int typeIdx = static_cast<int>(Indicators_Utils::Get_TypeIndex(type));
+	int lenIdx = static_cast<int>(Indicators_Utils::Get_LenIndex(len));
+	if (typeIdx < 0 || typeIdx >= INDICATOR_TYPES_VEC_LEN || lenIdx < 0 || lenIdx >= INDICATOR_LEN_VEC_LEN)
+	{
+		Logger::getInstance().WriteLog("IndicatorMap::Set_Indicator : Invalid IndicatorType or IndicatorLen index.", false, true, LogType::ERR);
+		return;
 	}
-	m_map.insert(std::make_pair(pr, Get_IndicatorObject(type, val)));
-
+	m_vec.at(typeIdx).at(lenIdx) = Get_IndicatorObject(type, val); // Store the indicator in the vector
 }
 
 // Function to create a new Indicator object
 
 BaseIndicator* IndicatorMap::Get_Indicator(IndicatorType type, IndicatorLen len)
 {
-	auto pr = std::make_pair(type, len);
-	auto it = m_map.find(pr);
-
-	return (it != m_map.end()) ? it->second : nullptr;
+	int typeIdx = static_cast<int>(Indicators_Utils::Get_TypeIndex(type));
+	int lenIdx = static_cast<int>(Indicators_Utils::Get_LenIndex(len));
+	if (typeIdx < 0 || typeIdx >= INDICATOR_TYPES_VEC_LEN || lenIdx < 0 || lenIdx >= INDICATOR_LEN_VEC_LEN)
+	{
+		Logger::getInstance().WriteLog("IndicatorMap::Get_Indicator : Invalid IndicatorType or IndicatorLen index.", false, true, LogType::ERR);
+		return nullptr;
+	}
+	return m_vec.at(typeIdx).at(lenIdx); // Return the indicator from the vector
 }
 
 void IndicatorMap::Set_IndValue(BaseIndicator* ind, BarPeriod barP, double val)
@@ -258,16 +256,18 @@ void IndicatorMap::Set_IndSlope(BaseIndicator* ind, BarPeriod barP, double val)
 
 void IndicatorMap::Validate_Indicator(IndicatorType type, IndicatorLen len)
 {
-	auto pr = std::make_pair(type, len);
-	auto it = m_map.find(pr);
+	int typeIdx = static_cast<int>(Indicators_Utils::Get_TypeIndex(type));
+	int lenIdx = static_cast<int>(Indicators_Utils::Get_LenIndex(len));
 
-	if (it != m_map.end()) {
-		if (!it->second) {
-			it->second = Get_IndicatorObject(type, IndicatorValues());
-		}
+	if (typeIdx < 0 || typeIdx >= INDICATOR_TYPES_VEC_LEN || lenIdx < 0 || lenIdx >= INDICATOR_LEN_VEC_LEN)
+	{
+		Logger::getInstance().WriteLog("IndicatorMap::Validate_Indicator : Invalid IndicatorType or IndicatorLen index.", false, true, LogType::ERR);
+		return;
 	}
-	else {
-		m_map.insert({ pr, Get_IndicatorObject(type, IndicatorValues()) });
+
+	if (!m_vec.at(typeIdx).at(lenIdx))
+	{
+		m_vec.at(typeIdx).at(lenIdx) = Get_IndicatorObject(type, IndicatorValues());
 	}
 }
 BaseIndicator* IndicatorMap::Get_IndicatorObject(IndicatorType type, IndicatorValues val)

@@ -47,6 +47,7 @@ DirectionStats* TradeTracer::DynamicTradeTracing(OrderEntity* order)
 	std::vector<std::pair< ChangeNode*, ScoresResult>> potentialMatches_WResults;
 	m_patternScanner->ScanForOneMinPatterns_MultiThreaded(potentialMatches_WResults);
 
+
 	std::vector<ChangeNode*> potentialMatches;
 	for (int i = 0; i < potentialMatches_WResults.size(); i++)
 		potentialMatches.push_back(potentialMatches_WResults.at(i).first);

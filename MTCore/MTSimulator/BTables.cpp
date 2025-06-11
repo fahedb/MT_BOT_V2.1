@@ -328,7 +328,7 @@ long BTables::GetFileLinesCount(const std::string& filePath)
 
 std::vector<JsonSelectionNode*> BTables::FileChunkRead(int startLineIdx, int endLineIdx,int threadIdx,const std::string& fileName)
 {
-	std::this_thread::sleep_for(std::chrono::microseconds(100 * (threadIdx + 1)));
+	std::this_thread::sleep_for(std::chrono::microseconds(15 * (threadIdx + 1)));
 	std::vector<JsonSelectionNode*> vector;
 
 	// Open the file
@@ -381,7 +381,7 @@ std::vector<JsonSelectionNode*> BTables::FileChunkRead(int startLineIdx, int end
 	// read relevant lines
 	logger.WriteLog("Trying to reserve " + std::to_string(endLineIdx - startLineIdx) + " cells for thread " + std::to_string(threadIdx) + " Starting from line: " + std::to_string(lineCount));
 	vector.reserve(endLineIdx - startLineIdx);
-
+	logger.WriteLog("Thread " + std::to_string(threadIdx) + " Started Collecting Candles...");
 	std::string currentLine;
 	currentLine.reserve(JSON_SLTRING_LEN);
 	while (startPtr < endPtr && lineCount < endLineIdx) {

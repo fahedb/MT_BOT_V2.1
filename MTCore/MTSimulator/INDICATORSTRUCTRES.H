@@ -1,4 +1,5 @@
 #pragma once
+#include "LOGGER.H"
 #include "Configrations.h"
 #include <map>
 #include <unordered_map>
@@ -149,34 +150,29 @@ public:
 	ZLSMA_Ind(IndicatorValues curr) : BaseIndicator(curr) {}
 };
 
-
-namespace std {
-	template <>
-	struct hash<std::pair<IndicatorType, IndicatorLen>> {
-		size_t operator()(const std::pair<IndicatorType, IndicatorLen>& k) const {
-			return std::hash<int>()(static_cast<int>(k.first)) ^
-				(std::hash<int>()(static_cast<int>(k.second)) << 1);
-		}
-	};
-}
+#define INDICATOR_TYPES_VEC_LEN 5
+#define INDICATOR_LEN_VEC_LEN 5
 
 class IndicatorMap
 {
 private:
-	std::unordered_map<std::pair<IndicatorType, IndicatorLen>, BaseIndicator*> m_map;
+	std::vector<std::vector< BaseIndicator*>> m_vec;
 
 	BaseIndicator* Get_IndicatorObject(IndicatorType type, IndicatorValues val); // Getting a pointer of an allocated indicator Object
 public:
 	IndicatorMap(); // Contructor
 	~IndicatorMap()
 	{
-		if (m_map.size())
+		if (m_vec.size())
 		{
-			for (auto it = m_map.begin(); it != m_map.end(); ++it) {
-				if (it->second != nullptr)
-					delete it->second;
+			for (auto& vec : m_vec)
+			{
+				for (auto& ind : vec)
+				{
+					delete ind; // Delete each BaseIndicator object
+				}
 			}
-		m_map.clear();
+			m_vec.clear();
 		}
 	}
 	void Set_Indicator(IndicatorType, IndicatorLen, IndicatorValues, bool forceInsert = false); // Function to create a new Indicator object
@@ -213,5 +209,31 @@ public:
 		if (indL == 30)	return IndicatorLen::L30;
 
 		return IndicatorLen::NONE;
+	}
+	static int Get_LenIndex(IndicatorLen len)
+	{
+		switch (len)
+		{
+		case IndicatorLen::L10: return 0;
+		case IndicatorLen::L15: return 1;
+		case IndicatorLen::L20: return 2;
+		case IndicatorLen::L25: return 3;
+		case IndicatorLen::L30: return 4;
+		case IndicatorLen::NONE: return 0; // NONE is considered as an 0 length
+		default:
+			return -1; // Invalid length
+		}
+	}
+	static int Get_TypeIndex(IndicatorType type)
+	{
+		switch (type)
+		{
+		case IndicatorType::EMA: return 0;
+		case IndicatorType::RSI: return 1;
+		case IndicatorType::ZLSMA: return 2;
+		case IndicatorType::VOLUME: return 3;
+		default:
+			return -1; // Invalid type
+		}
 	}
 };

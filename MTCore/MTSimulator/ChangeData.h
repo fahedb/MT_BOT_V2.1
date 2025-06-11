@@ -28,6 +28,7 @@ public:
 	}
 	~ChangeNode();
 	std::string point_DateTime;
+	long long point_DateTimeLong = 0; // For fast access
 
 	double Get_Entity(const std::string& key)
 	{

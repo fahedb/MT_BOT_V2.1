@@ -27,7 +27,7 @@
 #include "Static_CurrentTimeLineRep.h"
 #include "ScoreResultsCache.h"
 
-void OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator,TimeLine* history);
+bool OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator,TimeLine* history);
 void DefualtProgramStart();
 void UpdateCurrentTimeLine(BasePricesTable* table);
 void LoadJson_Data_ToDBFile();
@@ -110,7 +110,7 @@ void DefualtProgramStart()
 	
 	std::thread tracer_thread(TradeTracer::RunTracer, &historyTimeLine);
 
-
+	
 	PatternGod patternScaner(&historyTimeLine); // Init a PatternGod object for patterns Scanning
 	StatisticsDecession statisticsCalcucator(&historyTimeLine);
 
@@ -118,17 +118,31 @@ void DefualtProgramStart()
 	
 	UpdateCurrentTimeLine(&table);
 	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+	policy->ScoreResultsCacheSizePerThread = (historyTimeLine.Get_TimeLineLen() / policy->ThreadsCount) * Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLineLen(); // Set the cache size per thread based on the history time line length and the number of threads
 	UpdateConfigs();
 	Configrations::getInstance()->RefreshPolicy(); // Refresh all policies
+	int scans = 0;
 	while (true)
 	{
 		
 		UpdateCurrentTimeLine(&table);
-		OneMinutePatternGodLogic(&patternScaner,&statisticsCalcucator,&historyTimeLine); // Start scanning
+		bool isScanActivated = OneMinutePatternGodLogic(&patternScaner,&statisticsCalcucator,&historyTimeLine); // Start scanning
 		UpdateConfigs();
 		Configrations::getInstance()->RefreshPolicy(); // Refresh all policies 
 		int timeBetweenScans = policy->TimeBetweenScans;
-		ScoreResultsCache::getInstance()->CleanOldResults(); // Clear the cache for the next scan
+		
+		if (isScanActivated)
+			scans++; // Increase the scans counter if a scan was activated
+
+		ScoreResultsCache::getInstance(); // Get the instance of the ScoreResultsCache
+		if (policy->CleanEveryXScans < scans)
+		{
+			std::thread([]() {
+				ScoreResultsCache::getInstance()->CleanOldResults();
+				}).detach(); // Clean old results in a separate thread
+			scans = 0; // Reset the scans counter after cleaning
+		}
+		
 		logger.WriteLog("Sleep for " + std::to_string(timeBetweenScans) + " seconds...");
 		Sleep(timeBetweenScans * 1000); // Sleep for 5 seconds before start a new scan
 	}
@@ -147,11 +161,17 @@ void UpdateCurrentTimeLine(BasePricesTable* table)
 	while (body.length())
 	{
 		logger.WriteLog("Recieved a new bar by HTTP Client");
-
-		nlohmann::json_abi_v3_11_3::json select = nlohmann::json::parse(body);
-		JsonSelectionNode* selectionJ = new JsonSelectionNode(select);
-		table->Insert_NewCandleBody(selectionJ);
+		JsonSelectionNode* selectionJ;
 		
+		try {
+			nlohmann::json_abi_v3_11_3::json select = nlohmann::json::parse(body);
+			selectionJ = new JsonSelectionNode(select);
+		}
+		catch (const std::exception& e) {
+			logger.WriteLog("Error parsing JSON: " + std::string(e.what()), false, true, LogType::ERR);
+			return;
+		}
+		table->Insert_NewCandleBody(selectionJ);
 		ChangeNode* chn = table->GetNextChangeNode();
 		currTimeLineRep->Set_NewBar(chn, true);
 		body = exChData.Get_NextCandleStick_M1();
@@ -165,7 +185,7 @@ void UpdateCurrentTimeLine(BasePricesTable* table)
 }
 
 
-void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* statisticsCalcucator,TimeLine* history)
+bool OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* statisticsCalcucator,TimeLine* history)
 {
 	//std::vector<ChangeNode*> currentTimeLine; // Vector to store curr changeNodes
 	Logger& logger = Logger::getInstance();
@@ -176,15 +196,15 @@ void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* stati
 	{
 		logger.WriteLog("No current time line.", false, true, LogType::ERR);
 		logger.WriteLog("Sleeping for 5 minutes.", false, true, LogType::ERR);
-		Sleep(5 * 60000);
-		return;
+		Sleep(1 * 60000);
+		return false;
 	}
 	
 	logger.WriteLog("current time line size: " + std::to_string(currentTimeLine->size()));
 	if (currentTimeLine->at(currentTimeLine->size() - 1)->point_DateTime == m_lastTimePoint) // If the last time point scanned == to the current time point (start of the current vector) don't continue
 	{
 		std::cout << "\n\nNo new data, Last point time: " << m_lastTimePoint << std::endl;
-		return;
+		return false;
 	}
 
 	std::string startScanLog = std::string("!!!!!!!!!!!!		Start New Period Scan		!!!!!!!!!\n\n") +
@@ -204,7 +224,7 @@ void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* stati
 	if (!exh.IsScanningAllowed())
 	{
 		logger.WriteLog("Scanning Stopped by user, skipping scanning...", false, true);
-		return;
+		return false;
 	}
 	if (patternScan->ScanForOneMinPatterns_MultiThreaded(results)) // Scan for patterns
 	{
@@ -231,6 +251,7 @@ void OneMinutePatternGodLogic(PatternGod* patternScan,StatisticsDecession* stati
 		logger.WriteLog("Didn't find any patterns with min score !!", false, true);
 
 	logger.WriteLog("Done scanning and exporting data.");
+	return true;
 
 }
 std::vector<ChangeNode*> LoadHistoryToVector_MultiThreaded(XAUUSD_OneMinTable* tb) // Need to change name
@@ -260,23 +281,17 @@ std::vector<ChangeNode*> LoadHistoryToVector_MultiThreaded(XAUUSD_OneMinTable* t
 	int chunkSize = tb->GetSelected_Count_MultiThreaded(0);
 	logger.WriteLog("Every thread should build " + std::to_string(chunkSize) + " CHange nodes.", false, true);
 
-	std::mutex loggerMutex, resultMutex;
+	std::mutex resultMutex;
 	std::vector< std::vector<ChangeNode*>> reads2D(threadCount);
 
 	// Function to process a chunk of the loop
 	auto processChunk = [&](int threadIndex, XAUUSD_OneMinTable* tableObj) {
 
-		{
-			std::lock_guard<std::mutex> lock(loggerMutex);
-			logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Started Building ChangeNodes...");
-		}
+		logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Started Building ChangeNodes...");
 
 		reads2D[threadIndex] = std::move(LoadChangeNodesForThread(threadIndex, tableObj)); // קריאה מקובץ
 
-		{
-			std::lock_guard<std::mutex> lock(loggerMutex);
-			logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Done Building " + std::to_string(reads2D[threadIndex].size()) + " ChangeNodes.");
-		}
+		logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Done Building " + std::to_string(reads2D[threadIndex].size()) + " ChangeNodes.");
 
 	};
 

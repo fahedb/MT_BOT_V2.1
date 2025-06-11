@@ -33,6 +33,7 @@ private:
     std::string GetFormattedCurrTime();
     std::ofstream* m_logFile;
     HTTP_Logger* m_httpLogger;
+	std::mutex m_logMutex; // Mutex for thread-safe logging
     Logger()
     {
         std::string fileName = Configrations::getInstance()->Get_ConfigValue(CONFIG_DEF_LOG_FILE_NAME);

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include "DataBaseConnection.h"
+#include <thread>
 
 struct EMA_Check_Details;
 
@@ -62,6 +63,12 @@ struct ConfigrationsPolicy {
     bool EnableDynamicTimeLine_TradeTracing = false;
 
     int TraceCurrTimeLineLen = 0;
+
+    bool EnableScoreCaching = true;
+	long ScoreResultsCacheSizePerThread = 100000; // Default size for each thread's cache
+	int ThreadsCount = std::thread::hardware_concurrency() - 1; // Default to number of hardware threads minus one
+	int CleanEveryXScans = 5; // Default to clean cache every 10 scans
+
 };
 
 class Configrations // SingleTon class for all configrations of the program

@@ -53,6 +53,7 @@ public:
 				if (!timePointSwitch)
 				{
 					chN->point_DateTime = CurrKey.at(0);
+					chN->point_DateTimeLong = Converts::ToLongLong(chN->point_DateTime);
 					timePointSwitch = true;
 				}
 			}

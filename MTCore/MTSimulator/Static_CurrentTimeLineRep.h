@@ -22,6 +22,10 @@ public:
 
     void Set_NewBar(ChangeNode* changeNode, bool updateCurrTimeLine = false)
     {
+		if (!changeNode) {
+			Logger::getInstance().WriteLog("ChangeNode is null, cannot set new bar.", false, true, LogType::ERR);
+			return;
+		}
         Set_Inner_NewBar(m_TraceTimeLine, changeNode, m_policy->TraceCurrTimeLineLen,true); // Update the trace time line, need to delete the memory of the oldest ChangeNode
 
         if (updateCurrTimeLine) Set_Inner_NewBar(m_currTimeLine, changeNode, m_policy->Pattern_CurrentTimeLineLen, false); // Update the current scan time line
@@ -48,6 +52,7 @@ private:
     ConfigrationsPolicy* m_policy;
     void Set_Inner_NewBar(TimeLine* tl, ChangeNode* changeNode, size_t maxLen, bool deleteOldestBarMemory = false)
     {
+
         if (tl->Get_TimeLineLen() >= maxLen)
         {
             while (tl->Get_TimeLineLen() >= maxLen)

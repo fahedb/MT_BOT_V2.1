@@ -29,7 +29,7 @@ void StrategiesRunner::Run_PatternGod(TimeLine& historyTimeLine)
 
 bool StrategiesRunner::OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator, TimeLine* history)
 {
-	if (ScanPreCondition())
+	if (!ScanPreCondition())
 		return false;
 
 	std::vector<std::pair<ChangeNode*, ScoresResult>> results; // Vector for the End of every time period

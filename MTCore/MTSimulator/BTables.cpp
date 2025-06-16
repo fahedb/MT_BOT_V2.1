@@ -128,16 +128,30 @@ void BTables::RemoveSelection()
 		m_allSelectedJsonRows.pop();
 	}
 
-	for (int i = 0; i < m_allSelectedJsonRows_MultiThreaded.size(); i++)
-	{
-		for (int t = 0; t < m_allSelectedJsonRows_MultiThreaded.at(i).size(); t++)
-		{
-			JsonSelectionNode* j = m_allSelectedJsonRows_MultiThreaded.at(i).at(t);
-			delete j;
-		}
-		m_allSelectedJsonRows_MultiThreaded.at(i).clear();
+	std::vector<std::future<void>> futures; // Vector of cleaning tasks per thread
+
+	for (int i = 0; i < m_allSelectedJsonRows_MultiThreaded.size(); i++) {
+		futures.emplace_back(std::async(std::launch::async, [this, i]() {
+			RemoveSelectionPerThread(i);
+			}));
 	}
+	Logger::getInstance().WriteLog("Cleaning Json selection Started", false, true, LogType::LOG);
+	for (auto& f : futures) f.get(); // Wait till all tasks finish
+	Logger::getInstance().WriteLog("Cleaning Json selection Finished", false, true, LogType::LOG);
 	m_allSelectedJsonRows_MultiThreaded.clear();
+}
+
+void BTables::RemoveSelectionPerThread(int threadIdx)
+{
+	std::vector<JsonSelectionNode*>& jsonRows = m_allSelectedJsonRows_MultiThreaded.at(threadIdx);
+	int mySize = static_cast<int>(jsonRows.size());
+
+	for (int t = 0; t < mySize; t++)
+	{
+		JsonSelectionNode* j = jsonRows[t];
+		delete j;
+	}
+	jsonRows.clear();
 }
 
 bool BTables::SelectFromFile(int cols)

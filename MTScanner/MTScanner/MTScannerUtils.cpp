@@ -12,7 +12,6 @@ void MTScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scan
 	if (isScanActivated)
 		scansNum++; // Increase the scans counter if a scan was activated
 
-	ScoreResultsCache::getInstance(); // Get the instance of the ScoreResultsCache
 	if (Configrations::getInstance()->Get_Policy()->CleanEveryXScans < scansNum)
 	{
 		ScoreResultsCache::getInstance()->CleanOldResults();

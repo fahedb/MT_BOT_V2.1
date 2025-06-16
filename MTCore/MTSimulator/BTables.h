@@ -79,6 +79,8 @@ protected: // Function to control SQL DataBase
 
 	void Insert_NewBody_to_queue(JsonSelectionNode* node) { m_allSelectedJsonRows.push(node); }
 	void RemoveSelection();
+private:
+	void RemoveSelectionPerThread(int threadIdx);
 };
 
 #endif

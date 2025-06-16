@@ -16,9 +16,7 @@ public:
 	{
 		XAUUSD_OneMinTable tb(Configrations::getInstance()->Get_DB_FileDir());
 		LoadHistoryToVector_MultiThreaded(&tb);
-		std::future<void> cleanupTask = std::async(std::launch::async, [&tb]() {
-			tb.RemoveSelect();
-			});
+		tb.RemoveSelect();
 	}
 
 private:

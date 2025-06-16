@@ -67,7 +67,7 @@ struct ConfigrationsPolicy {
     bool EnableScoreCaching = true;
 	long ScoreResultsCacheSizePerThread = 100000; // Default size for each thread's cache
 	int ThreadsCount = std::thread::hardware_concurrency() - 1; // Default to number of hardware threads minus one
-	int CleanEveryXScans = 5; // Default to clean cache every 10 scans
+	int CleanEveryXScans = 10; // Default to clean cache every 10 scans
 
 };
 

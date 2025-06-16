@@ -4,7 +4,6 @@
 #include <map>
 #include <unordered_map>
 #include <array>
-#define GRAVITY_MIN_STRONG_LEVEL 70.0
 
 enum struct _Points {
 	_Points_DEFUALT = 0,

@@ -6,9 +6,9 @@
 class JasonHandler
 {
 public:
-	static nlohmann::json_abi_v3_11_3::json Build_Json_ForStats(DirectionStats& stats)
+	static nlohmann::json Build_Json_ForStats(DirectionStats& stats)
 	{
-		nlohmann::json_abi_v3_11_3::json j;
+		nlohmann::json j;
 		j[stats.Get_TimePoint()] =
 		{
 			{JSON_BODY_MEMBER_PATTERNS_COUNT,std::to_string(stats.Get_TotalCount(StatsType::General))}
@@ -25,9 +25,9 @@ public:
 	}
 
 
-	static nlohmann::json_abi_v3_11_3::json Build_Json_ForCandle(std::string timePoint,CandleData candle)
+	static nlohmann::json Build_Json_ForCandle(std::string timePoint,CandleData candle)
 	{
-		nlohmann::json_abi_v3_11_3::json j;
+		nlohmann::json j;
 		j[timePoint] =
 		{
 			 {HTTP_BODY_MEMBER_OpenPrice, std::string(candle.openPrice ,7)}
@@ -46,7 +46,7 @@ public:
 	}
 private:
 
-	static void Add_Calcs_toJson_Stats(nlohmann::json_abi_v3_11_3::json* j,std::string son,DirectionStats& stats)
+	static void Add_Calcs_toJson_Stats(nlohmann::json* j,std::string son,DirectionStats& stats)
 	{
 		DirectionGroupStats grpStats = stats.GetGroupStatsByName(son);
 		(*j)[stats.Get_TimePoint()][son] =
@@ -70,6 +70,6 @@ private:
 	}
 
 	static std::string GetLenString(int len) { return "L" + std::to_string(len); }
-	static void Add_Indicator_ToJson(nlohmann::json_abi_v3_11_3::json* j, std::string timePoint, std::string indT, IndicatorNode indNode);
+	static void Add_Indicator_ToJson(nlohmann::json* j, std::string timePoint, std::string indT, IndicatorNode indNode);
 };
 

@@ -35,5 +35,8 @@
     <ClCompile Include="OldFuncs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DLL_OrderStruct.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

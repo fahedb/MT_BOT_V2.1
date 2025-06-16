@@ -7,7 +7,6 @@
 #include <vector>
 #include "ExtentionF.h"
 #include "DataBaseConnection.h"
-#include "SynchronizeCurrentDBBase.h"
 #include "OrdersToExecute.h"
 #include "CandleData.h"
 #include "XAUUSD_CurrentTable.h"
@@ -15,48 +14,31 @@
 #include "Logger.h"
 #include "JasonHandler.h"
 #include "HTTPClient.h"
+#include "DLL_OrderStruct.h"
 
 std::string GetTableName(std::string symbol);
 
 // MTSimulator Logics
-extern "C" __declspec(dllimport) int CheckForNewOrders_DB();
-extern "C" __declspec(dllimport) int CheckForNewOrders_HTTP();
-extern "C" __declspec(dllimport) bool SendNewBarDetailsToFileExtended(char* timePoint, char* symbol, CandleStruct data);
+extern "C" __declspec(dllimport) int CheckForNewOrders_HTTP(DLL_OrderStruct_P order);
+extern "C" __declspec(dllimport) int GetOrderDataBySeqNum(int seqNum, DLL_OrderStruct_P order);
+
 extern "C" __declspec(dllimport) bool TruncCurrTableForFreshStart(char* symbol);
-extern "C" __declspec(dllimport) bool InsertNewPriceRecord(char* timePoint, char* symbol, CandleStruct data);
 extern "C" __declspec(dllimport) bool InsertNewBar_HTTP_M1(char* timePoint, char* symbol, CandleStruct data);
 extern "C" __declspec(dllimport) bool InsertNewBar_HTTP_M1_JSON_DB(char* timePoint, char* symbol, CandleStruct data);
 extern "C" __declspec(dllimport) bool InsertNewBar_M1_JSON_DB(char* timePoint, char* symbol, CandleStruct data);
 extern "C" __declspec(dllimport) double Get_MainTrade_Size();
 extern "C" __declspec(dllimport) double Get_SupportTrade_Size();
 extern "C" __declspec(dllimport) int GetFutureVision();
+extern "C" __declspec(dllimport) void CloseOrder(int seqNum);
 
 extern "C" __declspec(dllimport) int Get_TP_Diff();
 extern "C" __declspec(dllimport) int Get_SL_Diff();
 extern "C" __declspec(dllimport) int Get_TP_Start();
 extern "C" __declspec(dllimport) int Get_SL_Start();
+extern "C" __declspec(dllimport) int IsOrderClosed(int seqNum);
 
 
 /// Start of MTSimulator Functions
-
-bool InsertNewPriceRecord(char* timePoint, char* symbol, CandleStruct data)
-{
-    // TODO: insert new fresh record to current table
-    DataBaseConnection db;
-    XAUUSD_CurrentTable table(db.Get_EnvHandler(), db.Get_DBConnection());
-
-    SyncJobStructure job;
-    job.data = CandleData(*data);
-    job.priceDateTime = timePoint;
-    job.symbol = symbol;
-    job.tableName = table.Get_TableName();
-    SynchronizeCurrentDBBase syncer(db.Get_EnvHandler(), db.Get_DBConnection());
-    bool res = syncer.InsertionIntoTables(&table, &job);
-    db.CloseConnection();
-    return res;
-}
-
-
 bool TruncCurrTableForFreshStart(char* symbol)
 {
     //TODO: Function to truncate current tables 
@@ -64,44 +46,91 @@ bool TruncCurrTableForFreshStart(char* symbol)
     XAUUSD_CurrentTable table(db.Get_EnvHandler(), db.Get_DBConnection());
     std::string command = "truncate table " + table.Get_TableName();
     return table.FreeStyleCommand(command);
+
 }
 
-int CheckForNewOrders_DB()
+void CloseOrder(int seqNum)
 {
-    DataBaseConnection db_Work;
-    OrdersToExecute ods(db_Work.Get_EnvHandler(), db_Work.Get_DBConnection());
-    NewOrderStructure noData = ods.GetNextOrder();
-    db_Work.CloseConnection();
-    
-    if (!noData.priceDateTime.length())
-        return -1;
-    return noData.Long_Short;
+    httplib::Headers header;
+    header.insert(std::make_pair(HTTP_PARAM_TradeSeqNum, std::to_string(seqNum)));
+    httplib::Result res = HTTPClient::getInstance().Send_Post(HTTP_SERVICE_MTSCanner_CloseOrder, "", "application/json", header);
 }
 
+int IsOrderClosed(int seqNum)
+{
+    httplib::Result res = HTTPClient::getInstance().Send_Get(HTTP_SERVICE_MTScanner_GetOrderData);
+    if (!res)
+    {
+       Logger::getInstance().WriteLog("DLL Error while trying to send an HTTP request to server", false, true, LogType::SPECIAL_LOG);
+       return 0;
+    }
+    OrderStatus status = OrderStatusUtils::Get_OrderStatus_FromString(res->get_header_value(HTTP_PARAM_STATUS));
 
-int CheckForNewOrders_HTTP()
+    if (status == OrderStatus::CLOSED)
+        return 1;
+    else
+        return 0;
+
+}
+
+int GetOrderDataBySeqNum(int seqNum,DLL_OrderStruct_P order)
+{
+    httplib::Result res = HTTPClient::getInstance().Send_Get(HTTP_SERVICE_MTScanner_GetOrderData);
+
+    if(!res)
+    { 
+       Logger::getInstance().WriteLog("DLL Error while trying to send an HTTP request to server", false, true, LogType::SPECIAL_LOG);
+       return 0;
+    }
+    std::string symbol = res->get_header_value(HTTP_PARAM_Symbol);
+    std::string type = res->get_header_value(HTTP_PARAM_TradeType);
+    std::string seqNumStr = res->get_header_value(HTTP_PARAM_TradeSeqNum);
+    std::string status = res->get_header_value(HTTP_PARAM_STATUS);
+
+    std::string stopLoss = res->get_header_value(HTTP_PARAM_OrderStopLoss);
+    std::string takeProfit = res->get_header_value(HTTP_PARAM_OrderTakeProfit);
+
+    order->pair = DLL_CoinsPairUtils::Get_CoinsPair_FromString(symbol);
+    order->type = DLL_OrderTypeUtils::Get_OrderType_FromString(type);
+    order->status = DLL_OrderStatusUtils::Get_OrderStatus_FromString(status);
+    order->seqNum = Converts::ToInt(seqNumStr);
+    order->stopLoss = Converts::ToInt(stopLoss);
+    order->stopLoss = Converts::ToInt(takeProfit);
+
+    return 1;
+}
+
+int CheckForNewOrders_HTTP(DLL_OrderStruct_P order)
 {
     httplib::Result res = HTTPClient::getInstance().Send_Get(HTTP_SERVICE_IsThereAnTrade);
     if (!res)
     {
         Logger::getInstance().WriteLog("DLL Error while trying to send an HTTP request to server" ,false,true,LogType::SPECIAL_LOG);
-        return -1;
+        return 0;
     }
     std::string symbol = res->get_header_value(HTTP_PARAM_Symbol);
     std::string type = res->get_header_value(HTTP_PARAM_TradeType);
-    
-    if (!symbol.length())
-        return -1;
-    if (type == HTTP_PARAM_VALUE_TradeType_Long)
+    std::string seqNum = res->get_header_value(HTTP_PARAM_TradeSeqNum);
+    std::string status = res->get_header_value(HTTP_PARAM_STATUS);
+
+    std::string stopLoss = res->get_header_value(HTTP_PARAM_OrderStopLoss);
+    std::string takeProfit = res->get_header_value(HTTP_PARAM_OrderTakeProfit);
+
+    order->pair = DLL_CoinsPairUtils::Get_CoinsPair_FromString(symbol);
+    order->type = DLL_OrderTypeUtils::Get_OrderType_FromString(type);
+    order->seqNum = Converts::ToInt(seqNum);
+    order->status = DLL_OrderStatusUtils::Get_OrderStatus_FromString(status);
+
+    order->stopLoss = Converts::ToInt(stopLoss);
+    order->stopLoss = Converts::ToInt(takeProfit);
+    if (order->status == DLL_OrderStatus::DLL_ORDER_STATUS_NONE)
         return 0;
-    if (type == HTTP_PARAM_VALUE_TradeType_Short)
-        return 1;
-    return -1;
+    return 1;
 }
 bool InsertNewBar_HTTP_M1(char* timePoint, char* symbol, CandleStruct data)
 {
     // TODO: insert new fresh record to current table
-    nlohmann::json_abi_v3_11_3::json j = JasonHandler::Build_Json_ForCandle(std::string(timePoint), *data);
+    nlohmann::json j = JasonHandler::Build_Json_ForCandle(std::string(timePoint), *data);
     std::string body = j.dump();
     httplib::Result res = HTTPClient::getInstance().Send_Post(HTTP_SERVICE_NewBar_M1, body);
     
@@ -119,7 +148,7 @@ bool InsertNewBar_HTTP_M1(char* timePoint, char* symbol, CandleStruct data)
 bool InsertNewBar_HTTP_M1_JSON_DB(char* timePoint, char* symbol, CandleStruct data)
 {
     // TODO: insert new fresh record to current table
-    nlohmann::json_abi_v3_11_3::json j = JasonHandler::Build_Json_ForCandle(std::string(timePoint), *data);
+    nlohmann::json j = JasonHandler::Build_Json_ForCandle(std::string(timePoint), *data);
     std::string body = j.dump();
 
     httplib::Result res = HTTPClient::getInstance().Send_Post(HTTP_SERVICE_NewBar_JSON_DB_M1, body);
@@ -137,7 +166,7 @@ bool InsertNewBar_M1_JSON_DB(char* timePoint, char* symbol, CandleStruct data)
 {
     std::ofstream file("C:\\MTDB\\JsonBackUp_XAUUSD.json", std::ios::app);
     // TODO: insert new fresh record to current table
-    nlohmann::json_abi_v3_11_3::json j = JasonHandler::Build_Json_ForCandle(std::string(timePoint), *data);
+    nlohmann::json j = JasonHandler::Build_Json_ForCandle(std::string(timePoint), *data);
     std::string body = j.dump();
     file << body << "\n";
     file.close();
@@ -243,3 +272,5 @@ int Get_TP_Diff()
     }
     return 200;
 }
+
+

@@ -166,11 +166,11 @@ public:
 			m_ordersToExecute.pop();
 		
 		
-		res.set_header(HTTP_PARAM_Symbol, newOrder.symbol);
-		res.set_header(HTTP_PARAM_TradeType, newOrder.long_short ? HTTP_PARAM_VALUE_TradeType_Short : HTTP_PARAM_VALUE_TradeType_Long);
-		res.set_header(HTTP_PARAM_TradeSeqNum, std::to_string(newOrder.orderSeqNum));
-		res.set_header(HTTP_PARAM_OrderStopLoss, std::to_string(newOrder.stopLoss));
-		res.set_header(HTTP_PARAM_OrderTakeProfit, std::to_string(newOrder.takeProfit));
+		res.set_header(HTTP_PARAM_Symbol,			newOrder.symbol);
+		res.set_header(HTTP_PARAM_TradeType,		newOrder.long_short ? HTTP_PARAM_VALUE_TradeType_Short : HTTP_PARAM_VALUE_TradeType_Long);
+		res.set_header(HTTP_PARAM_TradeSeqNum,		std::to_string(newOrder.orderSeqNum));
+		res.set_header(HTTP_PARAM_OrderStopLoss,	std::to_string(newOrder.stopLoss));
+		res.set_header(HTTP_PARAM_OrderTakeProfit,	std::to_string(newOrder.takeProfit));
 
 	}
 	
@@ -206,10 +206,12 @@ public:
 			res.set_header(HTTP_PARAM_TradeType, order->Get_OrderType_str());
 			res.set_header(HTTP_PARAM_Symbol, order->Get_PairType_str());
 			res.set_header(HTTP_PARAM_OrderStatus, order->Get_OrderStatus_str());
+			res.set_header(HTTP_PARAM_TradeSeqNum, seqNum);
 		}
 		else
 		{
 			res.set_header(HTTP_PARAM_OrderStatus, HTTP_PARAM_VALUE_OrderStatus_Closed);
+			res.set_header(HTTP_PARAM_TradeSeqNum, seqNum);
 			return;
 		}
 	}

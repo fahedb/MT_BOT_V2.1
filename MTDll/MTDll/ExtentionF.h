@@ -4,8 +4,8 @@
 #include <string>
 #include <codecvt>
 #include <vector>
-#include "SyncJobs_Table.h"
 #include <sstream>
+#include "DefinedTables.h"
 
 std::string GetTableName(std::string symbol);
 //

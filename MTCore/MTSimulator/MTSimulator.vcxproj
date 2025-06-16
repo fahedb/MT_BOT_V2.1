@@ -171,6 +171,7 @@
     <ClCompile Include="OrderStruct.cpp" />
     <ClCompile Include="PatternExporter.cpp" />
     <ClCompile Include="PatternGod.cpp" />
+    <ClCompile Include="ProccessFlags.cpp" />
     <ClCompile Include="ProcessData.cpp" />
     <ClCompile Include="ScoreCalcs.cpp" />
     <ClCompile Include="ScoreResultsCache.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="OrderType.h" />
     <ClInclude Include="PatternExporter.h" />
     <ClInclude Include="PatternGod.h" />
+    <ClInclude Include="ProccessFlags.h" />
     <ClInclude Include="ProcessData.h" />
     <ClInclude Include="ScoreCalcs.h" />
     <ClInclude Include="ScoreResultsCache.h" />

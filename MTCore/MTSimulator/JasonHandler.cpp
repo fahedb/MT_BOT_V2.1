@@ -1,6 +1,6 @@
 #include "JasonHandler.h"
 
-void JasonHandler::Add_Indicator_ToJson(nlohmann::json_abi_v3_11_3::json* j, std::string timePoint, std::string indT, IndicatorNode indNode)
+void JasonHandler::Add_Indicator_ToJson(nlohmann::json* j, std::string timePoint, std::string indT, IndicatorNode indNode)
 {
 	(*j)[timePoint][HTTP_BODY_MEMBER_IND_FATHER][indT][GetLenString(indNode.len)][HTTP_BODY_MEMBER_IND_VALUES] =
 	{

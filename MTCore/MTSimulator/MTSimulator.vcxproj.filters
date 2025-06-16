@@ -345,6 +345,9 @@
     <ClCompile Include="ScoreResultsCache.cpp">
       <Filter>DataStructers\ScoreResultsCache</Filter>
     </ClCompile>
+    <ClCompile Include="ProccessFlags.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BTables.h">
@@ -487,6 +490,9 @@
     </ClInclude>
     <ClInclude Include="ScoreResultsCache.h">
       <Filter>DataStructers\ScoreResultsCache</Filter>
+    </ClInclude>
+    <ClInclude Include="ProccessFlags.h">
+      <Filter>DefinedTables</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

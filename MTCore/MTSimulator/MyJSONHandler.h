@@ -3,7 +3,7 @@
 //#include <iostream>
 //#include <fstream>
 //
-//class MyJSONHandler : public nlohmann::json::json_sax_t
+//class MyJSONHandler : public nlohmann::json_sax_t
 //{
 //public:
 //    // מטפלים במפתחות

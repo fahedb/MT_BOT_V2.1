@@ -14,16 +14,16 @@
 
 class JsonSelectionNode
 {
-	nlohmann::json_abi_v3_11_3::json m_selection;
+	nlohmann::json m_selection;
 public:
 	bool m_valid = false;
 	JsonSelectionNode() { m_valid = false; }
-	JsonSelectionNode(nlohmann::json_abi_v3_11_3::json j)
+	JsonSelectionNode(nlohmann::json j)
 	{
 		m_selection = j;
 		m_valid = true;
 	}
-	nlohmann::json_abi_v3_11_3::json* Get_Json() { return &m_selection; }
+	nlohmann::json* Get_Json() { return &m_selection; }
 };
 
 class SQLSelectionNode

@@ -28,7 +28,7 @@ public:
 private:
 	std::vector<ChangeNode*>& m_hitoryTimeLine;
 	BasePricesTable* m_table = nullptr; // Pointer to the table, can be used for other purposes if needed
-	std::vector<ChangeNode*> LoadChangeNodesForThread(int threadIdx, BasePricesTable* tb)
+	static std::vector<ChangeNode*> LoadChangeNodesForThread(int threadIdx, BasePricesTable* tb)
 	{
 		std::vector<ChangeNode*> localHistoryTimeLine;
 		localHistoryTimeLine.reserve(tb->GetSelected_Count_MultiThreaded(0));
@@ -69,7 +69,7 @@ private:
 
 	}
 
-	void ChangeNodeLoader(std::vector< std::vector<ChangeNode*>>& reads2D,std::vector<ChangeNode*>& hitoryTimeLine, BasePricesTable* tb)
+	void ChangeNodeLoader(std::vector< std::vector<ChangeNode*>>* reads2D, BasePricesTable* tb)
 	{
 		Logger& logger = Logger::getInstance();
 		int threadCount = static_cast<int>(LOAD_CHANGE_NODES_THREAD_NUM);
@@ -79,40 +79,35 @@ private:
 		logger.WriteLog("Every thread should build " + std::to_string(chunkSize) + " CHange nodes.", false, true);
 
 
-		std::mutex resultMutex;
-
-		// Function to process a chunk of the loop
-
-
 		std::vector<std::future<void>> futures;
 
 		for (int t = 0; t < threadCount; ++t) {
-			std::promise<void> prom;
-			futures.push_back(prom.get_future());
+			auto prom = std::make_shared<std::promise<void>>();
+			futures.push_back(prom->get_future());
 
 			ThreadPool::getInstance()->enqueueTask(
-				[t, tb, prom = std::move(prom)]() mutable {
-					processChunk(t, tb);     // הפונקציה שלך
-					prom.set_value();        // סימון שהסתיים
+				[t, tb, reads2D, prom]() {
+					processChunk(t, tb, reads2D);
+					prom->set_value();
 				},
 				TaskPriority::High
 			);
 		}
 
 		for (auto& f : futures)
-			f.get(); // חכה לסיום של כל אחת מהמשימות
+			f.get(); // Wait till the end
 	}
-	void processChunk (int threadIndex, XAUUSD_OneMinTable* tableObj,std::vector<std::vector<ChangeNode*>>& reads2D) {
+	static void processChunk(int threadIndex, BasePricesTable* tableObj, std::vector< std::vector<ChangeNode*>>* reads2D) {
 
-		Logger& logger =Logger::getInstance();
+		Logger& logger = Logger::getInstance();
 
 		logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Started Building ChangeNodes...");
 
-		reads2D[threadIndex] = std::move(LoadChangeNodesForThread(threadIndex, tableObj)); // קריאה מקובץ
+		(*reads2D)[threadIndex] = std::move(HistoryTimeLineLoader::LoadChangeNodesForThread(threadIndex, tableObj)); // קריאה מקובץ
 
 		logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Done Building " + std::to_string(reads2D[threadIndex].size()) + " ChangeNodes.");
 
-		};
+	}
 	void ChangeNodeThreadsLoadsMerger(std::vector< std::vector<ChangeNode*>>& reads2D, std::vector<ChangeNode*>& hitoryTimeLine)
 	{
 		int threadCount = static_cast<int>(LOAD_CHANGE_NODES_THREAD_NUM);
@@ -137,7 +132,7 @@ private:
 
 		std::vector< std::vector<ChangeNode*>> reads2D(static_cast<size_t>(LOAD_CHANGE_NODES_THREAD_NUM));
 
-		ChangeNodeLoader(reads2D,m_hitoryTimeLine, tb);
+		ChangeNodeLoader(&reads2D, tb);
 		ChangeNodeThreadsLoadsMerger(reads2D, m_hitoryTimeLine);
 
 		ExchangeData exh;

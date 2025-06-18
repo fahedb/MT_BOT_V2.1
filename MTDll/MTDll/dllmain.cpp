@@ -254,7 +254,7 @@ int Get_SL_Diff()
     if (res && res->status == 200)
     {
         std::string value = res->get_header_value(HTTP_PARAM_ConfigValue);
-        return std::stoi(value);
+        return Converts::ToInt(value);
     }
     return 200;
 }
@@ -268,7 +268,7 @@ int Get_TP_Diff()
     if (res && res->status == 200)
     {
         std::string value = res->get_header_value(HTTP_PARAM_ConfigValue);
-        return std::stoi(value);
+        return Converts::ToInt(value);
     }
     return 200;
 }

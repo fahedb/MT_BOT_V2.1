@@ -9,21 +9,34 @@
 
 #pragma once
 
+enum class TaskPriority {
+	High,
+	Low
+};
 
 // **מחלקת Thread Pool מותאמת ל-C++11**
 class ThreadPool {
-public:
-    ThreadPool(size_t numThreads);
-    ~ThreadPool();
-
-    void enqueueTask(std::function<void()> task);
 
 private:
     std::vector<std::thread> workers;
-    std::queue<std::function<void()>> tasks;
+    std::queue<std::function<void()>> highPriorityTasks;
+    std::queue<std::function<void()>> lowPriorityTasks;
     std::mutex queueMutex;
     std::condition_variable condition;
     bool stop;
 
     void workerThread();
+
+    ThreadPool(const ThreadPool&) = delete;
+    ThreadPool& operator=(const ThreadPool&) = delete;
+
+    ThreadPool();
+    ~ThreadPool();
+public:
+	void enqueueTask(std::function<void()> task, TaskPriority priority = TaskPriority::Low); // Add a task to the queue with specified priority
+    // Static method to get the instance of the Singleton
+    static ThreadPool* getInstance() {
+        static ThreadPool instance; // Guaranteed to be destroyed and instantiated on first use
+        return &instance;
+    }
 };

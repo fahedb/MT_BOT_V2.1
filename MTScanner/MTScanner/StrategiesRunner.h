@@ -23,8 +23,10 @@ public:
 		HttpServerSyncer::LoadAllConfigsToHttpCore();
 
 		std::vector<ChangeNode*> history;
-		HistoryTimeLineLoader historyLoader(history);
+		XAUUSD_OneMinTable table(Configrations::getInstance()->Get_DB_FileDir());
+		HistoryTimeLineLoader historyLoader(history, &table);
 		historyLoader.Run();
+		
 		TimeLine historyTimeLine(&history);
 		Run_PatternGod(historyTimeLine);
 

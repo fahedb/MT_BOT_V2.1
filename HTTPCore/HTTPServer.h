@@ -70,7 +70,7 @@ private:
         m_requests.Handle_NewBar_M1(req.body);
         res.set_header("Status", "Success");
     }
-
+    
     void Handle_JSON_DB_NewBarM1(const httplib::Request& req, httplib::Response& res)
     {
         m_requests.Handle_JSON_DB_NewBar_M1(req.body);

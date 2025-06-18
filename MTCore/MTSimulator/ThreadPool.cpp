@@ -1,7 +1,8 @@
 #include "ThreadPool.h"
 
 // Constructor
-ThreadPool::ThreadPool(size_t numThreads) : stop(false) {
+ThreadPool::ThreadPool() : stop(false) {
+    size_t numThreads = std::thread::hardware_concurrency() - 1; // Get the number of hardware threads
     for (size_t i = 0; i < numThreads; ++i) {
         workers.emplace_back([this] { workerThread(); });
     }
@@ -20,10 +21,16 @@ ThreadPool::~ThreadPool() {
 }
 
 // Add a task to the queue
-void ThreadPool::enqueueTask(std::function<void()> task) {
+void ThreadPool::enqueueTask(std::function<void()> task,TaskPriority priority) {
     {
         std::unique_lock<std::mutex> lock(queueMutex);
-        tasks.push(std::move(task));
+
+        if (priority == TaskPriority::High) {
+            highPriorityTasks.push(std::move(task));
+		}
+        else {
+            lowPriorityTasks.push(std::move(task));
+        }
     }
     condition.notify_one();
 }
@@ -34,11 +41,30 @@ void ThreadPool::workerThread() {
         std::function<void()> task;
         {
             std::unique_lock<std::mutex> lock(queueMutex);
-            condition.wait(lock, [this] { return stop || !tasks.empty(); });
-            if (stop && tasks.empty()) return;
-            task = std::move(tasks.front());
-            tasks.pop();
+            condition.wait(lock, [this] {
+                return stop || !highPriorityTasks.empty() || !lowPriorityTasks.empty();
+                });
+
+            if (!highPriorityTasks.empty()) {
+                task = std::move(highPriorityTasks.front());
+                highPriorityTasks.pop();
+            }
+            else if (!lowPriorityTasks.empty()) {
+                task = std::move(lowPriorityTasks.front());
+                lowPriorityTasks.pop();
+            }
+			else if (stop) {
+				return; // Exit if stop is true and no tasks are available
+			}
         }
-        task();
+        try {
+            task();
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Task threw exception: " << e.what() << std::endl;
+        }
+        catch (...) {
+            std::cerr << "Task threw unknown exception." << std::endl;
+        }
     }
 }

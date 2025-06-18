@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <map>
 #include <future>      // std::async, std::future
-
+#include "ThreadPool.h"
 bool BTables::InsertIntoDB(const std::string& insertSQL)
 {
 	if (!m_DBConnectionHandler || !m_DBenvHandler)
@@ -127,31 +127,32 @@ void BTables::RemoveSelection()
 		j = nullptr;
 		m_allSelectedJsonRows.pop();
 	}
-
-	std::vector<std::future<void>> futures; // Vector of cleaning tasks per thread
-
-	for (int i = 0; i < m_allSelectedJsonRows_MultiThreaded.size(); i++) {
-		futures.emplace_back(std::async(std::launch::async, [this, i]() {
-			RemoveSelectionPerThread(i);
-			}));
+	for (int t = 0; t < m_allSelectedJsonRows_MultiThreaded.size(); ++t) {
+		RemoveSelectionPerThread(t);
 	}
-	Logger::getInstance().WriteLog("Cleaning Json selection Started", false, true, LogType::LOG);
-	for (auto& f : futures) f.get(); // Wait till all tasks finish
-	Logger::getInstance().WriteLog("Cleaning Json selection Finished", false, true, LogType::LOG);
-	m_allSelectedJsonRows_MultiThreaded.clear();
 }
 
 void BTables::RemoveSelectionPerThread(int threadIdx)
 {
 	std::vector<JsonSelectionNode*>& jsonRows = m_allSelectedJsonRows_MultiThreaded.at(threadIdx);
+	Logger::getInstance().WriteLog("Thread [" + std::to_string(threadIdx) + "] Start Cleaning " + std::to_string(jsonRows.size()) + " Objects", false, false, LogType::LOG);
 	int mySize = static_cast<int>(jsonRows.size());
 
 	for (int t = 0; t < mySize; t++)
 	{
-		JsonSelectionNode* j = jsonRows[t];
-		delete j;
+
+		if (!(t % 5001))
+		{
+			jsonRows.erase(jsonRows.begin(), jsonRows.begin() + t);
+			ThreadPool::getInstance()->enqueueTask([threadIdx,this]() {
+				this->RemoveSelectionPerThread(threadIdx);
+				}, TaskPriority::Low);
+			return; // Return to allow other threads to process
+		}
+		delete jsonRows[t];
 	}
 	jsonRows.clear();
+	Logger::getInstance().WriteLog("Thread [" + std::to_string(threadIdx) + "] Done Cleaning.", false, false, LogType::LOG);
 }
 
 bool BTables::SelectFromFile(int cols)
@@ -209,41 +210,35 @@ bool BTables::SelectFromJsonFile_MultiThreaded()
 	int chunkSize = (linesCount + threadCount - 1) / threadCount; // חלוקה מדויקת יותר
 	logger.WriteLog("Every thread should load " + std::to_string(chunkSize) + " candles.",false,true);
 
-	std::mutex loggerMutex, resultMutex;
 	std::vector< std::vector<JsonSelectionNode*>> reads2D(threadCount);
 
 	// Function to process a chunk of the loop
 	auto processChunk = [&](int start, int end, int threadIndex) {
 
-		{
-			std::lock_guard<std::mutex> lock(loggerMutex);
-			logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Started Pulling data...");
-		}
-
+		logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Started Pulling data...");
+		
 		reads2D[threadIndex] = std::move(FileChunkRead(start, end, threadIndex, m_fileName)); // קריאה מקובץ
 
-		{
-			std::lock_guard<std::mutex> lock(loggerMutex);
-			logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Done Pulling " + std::to_string(reads2D[threadIndex].size()) + " Candles." );
-		}
-
+		logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Done Pulling " + std::to_string(reads2D[threadIndex].size()) + " Candles.");
 	};
 
-	// שימוש ב-std::async לניהול תהליכונים אוטומטי
-	std::vector<std::future<void>> futures;
+	std::vector<std::thread> threads;
 	for (int t = 0; t < threadCount; ++t) {
 		int start = t * chunkSize;
 		int end = (t == threadCount - 1) ? linesCount : (t + 1) * chunkSize;
 		logger.WriteLog("Init new Thread for reading history, start:" + std::to_string(start) + " end: " + std::to_string(end));
-		futures.emplace_back(std::async(std::launch::async, processChunk, start, end, t));
+		threads.emplace_back(processChunk, start, end, t);
+		
 	}
 
-	// שימוש ב-get() במקום join()
-	for (auto& f : futures) {
-		f.get(); // מחכה לסיום כל המשימות
+	// Join threads
+	Logger::getInstance().WriteLog("Pulling Data Started", false, true, LogType::LOG);
+	for (auto& th : threads) {
+		th.join();
 	}
 
-	// מיזוג הנתונים
+	Logger::getInstance().WriteLog("Start Merging Data", false, false, LogType::LOG);
+	// Merge Data
 	for (int i = 0; i < threadCount; i++)
 	{
 		std::vector<JsonSelectionNode*> vec = reads2D.at(i);

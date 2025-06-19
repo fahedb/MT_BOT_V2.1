@@ -1,4 +1,5 @@
 #include "ScoreResultsCache.h"
+#include "ThreadPool.h"
 
 ScoreResultsCache::ScoreResultsCache()
 {
@@ -64,15 +65,25 @@ void ScoreResultsCache::CleanOldResults() // Do not use This function in a seper
 	//Getting the older TimePoint
 	long long oldestTP = Converts::ToLongLong(Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine()->at(0)->point_DateTime);
 
-	std::vector<std::future<void>> futures; // Vector of cleaning tasks per thread
+
+	std::vector<std::future<void>> futures;
 
 	for (int i = 0; i < m_scoreResultsCache.size(); i++) {
-		futures.emplace_back(std::async(std::launch::async, [this, i, oldestTP]() {
-			CleanOldResultsForThread(i, m_lastCleanedTime);
-			}));
+		auto prom = std::make_shared<std::promise<void>>();
+		futures.push_back(prom->get_future());
+
+		ThreadPool::getInstance()->enqueueTask(
+			[this, i, oldestTP, prom]() {
+				this->CleanOldResultsForThread(i, m_lastCleanedTime);
+				prom->set_value();
+			},
+			TaskPriority::High
+		);
 	}
+
 	Logger::getInstance().WriteLog("Cleaning Results Cache Started", false, true, LogType::LOG);
-	for (auto& f : futures) f.get(); // Wait till all tasks finish
+	for (auto& f : futures)
+		f.get(); // Wait till the end
 	Logger::getInstance().WriteLog("Cleaning Results Cache Finished", false, true, LogType::LOG);
 
 	m_cleaningInProgress.store(false); // Reset the flag 

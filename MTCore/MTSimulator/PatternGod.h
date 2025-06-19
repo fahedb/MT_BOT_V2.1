@@ -56,7 +56,11 @@ private:
 	std::string GetFormattedCurrentTime();
 	void BuildDBHistoryMap();
 	bool Time_Check(TimeWindow);
-	
+
+	void ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct,
+		std::mutex* maxResultLock,
+		ScoresResult* maxScore,std::vector<std::pair< ChangeNode*, ScoresResult>>* resultNodes2D);
+
 	DataBaseConnection m_Db_Work;
 	DBMap* m_historyDB_Map;
 

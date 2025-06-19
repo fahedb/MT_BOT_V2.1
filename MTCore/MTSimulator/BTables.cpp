@@ -141,7 +141,7 @@ void BTables::RemoveSelectionPerThread(int threadIdx)
 	for (int t = 0; t < mySize; t++)
 	{
 
-		if (!(t % 5001))
+		if (!(t % 3000) && t)
 		{
 			jsonRows.erase(jsonRows.begin(), jsonRows.begin() + t);
 			ThreadPool::getInstance()->enqueueTask([threadIdx,this]() {

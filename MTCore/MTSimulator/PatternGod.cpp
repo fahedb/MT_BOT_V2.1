@@ -8,6 +8,8 @@
 #include <mutex>
 #include <future>
 #include "ScoreResultsCache.h"
+#include "ThreadPool.h"
+#include "MTSimulatorUtils.h"
 
 #define MAX_DIFF 4
 
@@ -140,7 +142,7 @@ ScoresResult PatternGod::CompareOneMinNodesPeriods(int startIdx,int threadIdx) /
 int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector < std::pair< ChangeNode*, ScoresResult>>& resultNodes2D) // Compare every X candles of the history to the current timeLine
 {
 		// Mutex for thread-safe access to shared resources
-	std::mutex loggerMutex, resultMutex, local2DResult;
+	std::mutex resultMutex, local2DResultMutex;
 
 	Logger& logger = Logger::getInstance();
 	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
@@ -155,56 +157,32 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector < std::pair< Cha
 
 	logger.WriteLog("Score to Act: " + std::to_string(scoreToAct), false, true);
 
-	// Function to process a chunk of the loop
-	auto processChunk = [&](int start, int end, int threadIndex) {
-		int estimatedItems = 20;
-		ScoresResult localMaxScore;
+	std::vector<std::vector < std::pair< ChangeNode*, ScoresResult>>> resultNodesPerThread(threadCount);
 
-		std::vector<std::pair< ChangeNode*, ScoresResult>> localResults2D;
-		localResults2D.reserve(estimatedItems);
-		int localScoreToAct = scoreToAct;
-
-		for (int i = start; i < end; i++) {
-			ScoresResult resScore = CompareOneMinNodesPeriods(i, threadIndex);
-			if (resScore.totalScore.total > localScoreToAct) {
-				if (i + m_currentTL->size() < m_historyTL->size()) {
-					localResults2D.push_back(std::pair<ChangeNode*, ScoresResult>(m_historyTL->at(i + m_currentTL->size() - 1), ScoresResult(resScore)));
-				}
-			}
-			else
-			{
-				i += 10;
-			}
-			if (localMaxScore.totalScore.total < resScore.totalScore.total)
-				localMaxScore = resScore;
-		}
-
-		logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Done Processing...");
-
-		{
-			std::lock_guard<std::mutex> lock(resultMutex);
-			if (maxScore.totalScore.total < localMaxScore.totalScore.total)
-				maxScore = localMaxScore;
-		}
-
-		{
-			std::lock_guard<std::mutex> lock(local2DResult);
-			resultNodes2D.insert(resultNodes2D.end(), localResults2D.begin(), localResults2D.end());
-		}
-	};
-
-	// Launch threads
-	std::vector<std::thread> threads;
+	std::vector<std::future<void>> futures;
 	for (int t = 0; t < threadCount; ++t) {
+
 		int start = t * chunkSize;
 		int end = (t == threadCount - 1) ? historySize : (t + 1) * chunkSize;
-		threads.emplace_back(processChunk, start, end, t); // Pass thread index as `t`
+
+		auto prom = std::make_shared<std::promise<void>>();
+		futures.push_back(prom->get_future());
+		std::vector<std::pair<ChangeNode*, ScoresResult>>* localResultsNodes = &resultNodesPerThread[t];
+		ThreadPool::getInstance()->enqueueTask(
+			[this,t, start,end,scoreToAct ,&resultMutex, &local2DResultMutex,&maxScore,&resultNodes2D, localResultsNodes, prom]() {
+				this->ProccessScanChunk(start, end, t, scoreToAct, &resultMutex, &maxScore, localResultsNodes);
+				prom->set_value();
+			},
+			TaskPriority::High
+		);
 	}
 
-	// Join threads
-	for (auto& th : threads) {
-		th.join();
-	}
+	Logger::getInstance().WriteLog("Scan Started", false, true, LogType::LOG);
+	for (auto& f : futures)
+		f.get(); // Wait till the end
+	Logger::getInstance().WriteLog("Scan Ended", false, true, LogType::LOG);
+	MTSimulatorUtils::MergeResultsNodes(&resultNodes2D, &resultNodesPerThread);
+
 	SortScores(resultNodes2D);
 	FilterDuplicatesTimeLines(resultNodes2D);
 	filterByHighScores(resultNodes2D);
@@ -231,6 +209,42 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector < std::pair< Cha
 	return static_cast<int>(resultNodes2D.size());
 
 }
+
+// Function to process a chunk of the loop
+void PatternGod::ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct,
+	std::mutex* maxResultLock,
+	ScoresResult* maxScore,std::vector<std::pair< ChangeNode*, ScoresResult>>* resultNodesPerThread) {
+
+	int estimatedItems = 20;
+	Logger& logger = Logger::getInstance();
+	resultNodesPerThread->reserve(estimatedItems);
+	int localScoreToAct = scoreToAct;
+	ScoresResult maxLocalScore;
+	const int currTlSize = m_currentTL->size(), histTlSize = m_historyTL->size();
+	for (int i = startIdx; i < endIdx; i++) {
+		ScoresResult resScore = CompareOneMinNodesPeriods(i, threadIndex);
+
+		if (resScore.totalScore.total > localScoreToAct) {
+			if (i + currTlSize < histTlSize) {
+				resultNodesPerThread->emplace_back(m_historyTL->at(i + currTlSize - 1), resScore);
+			}
+		}
+		else
+		{
+			i += 10;
+		}
+		if (maxLocalScore.totalScore.total < resScore.totalScore.total)
+			maxLocalScore = resScore;
+
+	}
+
+	{
+		std::lock_guard<std::mutex> lock(*maxResultLock);
+		if (maxScore->totalScore.total < maxLocalScore.totalScore.total)
+			*maxScore = maxLocalScore;
+	}
+}
+
 
 void PatternGod::filterByHighScores(std::vector<std::pair< ChangeNode*, ScoresResult>>& nodesResults2D)
 {

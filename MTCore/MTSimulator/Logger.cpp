@@ -1,4 +1,5 @@
 #include "Logger.h"
+#include "ThreadPool.h"
 
 /// <Logger>
 /// Logger class function, For logging data
@@ -9,7 +10,9 @@ void Logger::WriteLog(std::string log, bool newSection,bool sendToLogServer, Log
 {
     if (sendToLogServer)
     {
-        std::thread(&Logger::Http_Send_Log, this, log, logType).detach();
+        ThreadPool::getInstance()->enqueueTask([log, logType,this]() {
+            this->Http_Send_Log(log, logType);
+            }, TaskPriority::Low);
     }
     std::string logToPrint = "";
     if (newSection)

@@ -137,14 +137,14 @@ void BTables::RemoveSelectionPerThread(int threadIdx)
 	std::vector<JsonSelectionNode*>& jsonRows = m_allSelectedJsonRows_MultiThreaded.at(threadIdx);
 	Logger::getInstance().WriteLog("Thread [" + std::to_string(threadIdx) + "] Start Cleaning " + std::to_string(jsonRows.size()) + " Objects", false, false, LogType::LOG);
 	int mySize = static_cast<int>(jsonRows.size());
-
+	ThreadPool* tPool = ThreadPool::getInstance();
 	for (int t = 0; t < mySize; t++)
 	{
 
-		if (!(t % 3000) && t)
+		if ((!(t % 2000) && t) || tPool->IsLowPriorityPaused())
 		{
 			jsonRows.erase(jsonRows.begin(), jsonRows.begin() + t);
-			ThreadPool::getInstance()->enqueueTask([threadIdx,this]() {
+			tPool->enqueueTask([threadIdx,this]() {
 				this->RemoveSelectionPerThread(threadIdx);
 				}, TaskPriority::Low);
 			return; // Return to allow other threads to process
@@ -204,38 +204,31 @@ bool BTables::SelectFromJsonFile_MultiThreaded()
 
 	if (linesCount == 0) return false;
 
-	int threadCount = std::thread::hardware_concurrency() - 1; // מספר תהליכונים
+	int threadCount = ThreadPool::getInstance()->Get_ThreadsNum(); // Get threads availbe
 	logger.WriteLog("Threads Available for parallel read: " + std::to_string(threadCount),false,true);
 
-	int chunkSize = (linesCount + threadCount - 1) / threadCount; // חלוקה מדויקת יותר
+	int chunkSize = (linesCount + threadCount - 1) / threadCount; // Chunk size per thread
 	logger.WriteLog("Every thread should load " + std::to_string(chunkSize) + " candles.",false,true);
 
 	std::vector< std::vector<JsonSelectionNode*>> reads2D(threadCount);
 
-	// Function to process a chunk of the loop
-	auto processChunk = [&](int start, int end, int threadIndex) {
-
-		logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Started Pulling data...");
-		
-		reads2D[threadIndex] = std::move(FileChunkRead(start, end, threadIndex, m_fileName)); // קריאה מקובץ
-
-		logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Done Pulling " + std::to_string(reads2D[threadIndex].size()) + " Candles.");
-	};
-
-	std::vector<std::thread> threads;
+	std::vector<std::future<void>> futures;
 	for (int t = 0; t < threadCount; ++t) {
-		int start = t * chunkSize;
-		int end = (t == threadCount - 1) ? linesCount : (t + 1) * chunkSize;
-		logger.WriteLog("Init new Thread for reading history, start:" + std::to_string(start) + " end: " + std::to_string(end));
-		threads.emplace_back(processChunk, start, end, t);
-		
-	}
+		auto prom = std::make_shared<std::promise<void>>();
+		futures.push_back(prom->get_future());
+		int startIdx = t * chunkSize;
+		int endIdx = (t == threadCount - 1) ? linesCount : (t + 1) * chunkSize;
 
-	// Join threads
-	Logger::getInstance().WriteLog("Pulling Data Started", false, true, LogType::LOG);
-	for (auto& th : threads) {
-		th.join();
+		ThreadPool::getInstance()->enqueueTask(
+			[this, startIdx, endIdx, t, &reads2D, prom]() {
+				this->ProcessFileChunk(startIdx, endIdx, t, &reads2D);
+				prom->set_value();
+			},
+			TaskPriority::High
+		);
 	}
+	for (auto& f : futures)
+		f.get(); // Wait till the end
 
 	Logger::getInstance().WriteLog("Start Merging Data", false, false, LogType::LOG);
 	// Merge Data
@@ -255,6 +248,17 @@ bool BTables::SelectFromJsonFile_MultiThreaded()
 	reads2D.clear();
 	return true;
 }
+// Function to process a chunk of the loop
+void BTables::ProcessFileChunk(int start, int end, int threadIndex, std::vector< std::vector<JsonSelectionNode*>>* reads2D) {
+	
+	Logger& logger = Logger::getInstance();
+
+	logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Started Pulling data...");
+
+	(*reads2D)[threadIndex] = std::move(FileChunkRead(start, end, threadIndex, m_fileName));
+
+	logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Done Pulling " + std::to_string(reads2D[threadIndex].size()) + " Candles.");
+	};
 
 JsonSelectionNode* BTables::GetNextJsonSelection()
 {

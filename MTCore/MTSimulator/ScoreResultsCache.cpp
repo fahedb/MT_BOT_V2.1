@@ -5,7 +5,7 @@ ScoreResultsCache::ScoreResultsCache()
 {
 	int threadsCount = Converts::ToInt(ResourceManager::getInstance()->Get_Data(THREADS_COUNT)); // Get the number of threads from the resource manager
 	if (threadsCount <= 0) {
-		threadsCount = std::thread::hardware_concurrency(); // Default to 1 thread if the count is invalid
+		threadsCount = ThreadPool::getInstance()->Get_ThreadsNum(); // Default to 1 thread if the count is invalid
 	}
 	m_scoreResultsCache.resize(threadsCount); // Resize the cache to hold scores for each thread
 
@@ -18,18 +18,19 @@ ScoreResultsCache::ScoreResultsCache()
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------
 
-void ScoreResultsCache::CleanOldResultsForThread(int threadIdx, long long oldestTP)
+void ScoreResultsCache::CleanOldResultsForThread(int threadIdx, long long oldestTP, robin_hood::unordered_map<std::pair<long long, long long>, ScoresResult>* relevantMap)
 {
-	auto& relevantMap = m_scoreResultsCache.at(threadIdx);
-	for (auto it = relevantMap.begin(); it != relevantMap.end(); ) {
+	Logger::getInstance().WriteLog("Thread [" + std::to_string(threadIdx) + "] Started cleaning cache...");
+	for (auto it = relevantMap->begin(); it != relevantMap->end(); ) {
 		long long timePoint2Long = it->first.second; // Extract the second part of the key (timePoint2) - The current timeline TimePoint
 
 		if (timePoint2Long < oldestTP) {
-			it = relevantMap.erase(it); // Remove the element and get the next iterator
+			it = relevantMap->erase(it); // Remove the element and get the next iterator
 		}
 		else
 			++it; // Move to the next element
 	}
+	Logger::getInstance().WriteLog("Thread [" + std::to_string(threadIdx) + "] end cleaning cache");
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -65,27 +66,25 @@ void ScoreResultsCache::CleanOldResults() // Do not use This function in a seper
 	//Getting the older TimePoint
 	long long oldestTP = Converts::ToLongLong(Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine()->at(0)->point_DateTime);
 
-
+	ThreadPool::getInstance()->Set_PauseLowPriorityTasks(true);
 	std::vector<std::future<void>> futures;
-
 	for (int i = 0; i < m_scoreResultsCache.size(); i++) {
 		auto prom = std::make_shared<std::promise<void>>();
 		futures.push_back(prom->get_future());
-
+		auto* relevantMap = &m_scoreResultsCache.at(i);
 		ThreadPool::getInstance()->enqueueTask(
-			[this, i, oldestTP, prom]() {
-				this->CleanOldResultsForThread(i, m_lastCleanedTime);
+			[this, i, oldestTP, prom, relevantMap]() {
+				ScoreResultsCache::CleanOldResultsForThread(i, oldestTP,relevantMap);
 				prom->set_value();
 			},
 			TaskPriority::High
 		);
 	}
-
 	Logger::getInstance().WriteLog("Cleaning Results Cache Started", false, true, LogType::LOG);
 	for (auto& f : futures)
 		f.get(); // Wait till the end
 	Logger::getInstance().WriteLog("Cleaning Results Cache Finished", false, true, LogType::LOG);
-
+	ThreadPool::getInstance()->Set_PauseLowPriorityTasks(false);
 	m_cleaningInProgress.store(false); // Reset the flag 
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -96,7 +95,11 @@ bool ScoreResultsCache::CleanPreCondition()
 		Logger::getInstance().WriteLog("Cleaning is already in progress, skipping this call.", false, false, LogType::ERR);
 		return false; // Prevent multiple cleaning operations at the same time
 	}
-
+	if (!m_scoreResultsCache.at(0).size())
+	{
+		Logger::getInstance().WriteLog("Nothing to clean.", false, false, LogType::ERR);
+		return false;
+	}
 	ChangeNode* oldestChN = Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine()->at(0); // Get the oldest ChangeNode from the current timeline
 
 	if (!oldestChN) {

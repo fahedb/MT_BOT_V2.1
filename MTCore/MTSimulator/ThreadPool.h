@@ -18,12 +18,14 @@ enum class TaskPriority {
 class ThreadPool {
 
 private:
-    std::vector<std::thread> workers;
-    std::queue<std::function<void()>> highPriorityTasks;
-    std::queue<std::function<void()>> lowPriorityTasks;
-    std::mutex queueMutex;
+    std::vector<std::thread> m_workers;
+    std::queue<std::function<void()>> m_highPriorityTasks;
+    std::queue<std::function<void()>> m_lowPriorityTasks;
+    std::mutex m_queueMutex;
     std::condition_variable condition;
-    bool stop;
+    size_t m_workersNum;
+    bool m_stop;
+    bool m_pauseLowTasks;
 
     void workerThread();
 
@@ -34,6 +36,9 @@ private:
     ~ThreadPool();
 public:
 	void enqueueTask(std::function<void()> task, TaskPriority priority = TaskPriority::Low); // Add a task to the queue with specified priority
+    size_t Get_ThreadsNum() { return m_workersNum; }
+    void Set_PauseLowPriorityTasks(bool pause) { m_pauseLowTasks = pause; }
+    bool IsLowPriorityPaused() { return m_pauseLowTasks; }
     // Static method to get the instance of the Singleton
     static ThreadPool* getInstance() {
         static ThreadPool instance; // Guaranteed to be destroyed and instantiated on first use

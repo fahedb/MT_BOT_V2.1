@@ -348,6 +348,9 @@
     <ClCompile Include="ProccessFlags.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MTSimulatorUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BTables.h">
@@ -492,6 +495,9 @@
       <Filter>DataStructers\ScoreResultsCache</Filter>
     </ClInclude>
     <ClInclude Include="ProccessFlags.h">
+      <Filter>DefinedTables</Filter>
+    </ClInclude>
+    <ClInclude Include="MTSimulatorUtils.h">
       <Filter>DefinedTables</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,21 +1,21 @@
 #include "ThreadPool.h"
 
 // Constructor
-ThreadPool::ThreadPool() : stop(false) {
-    size_t numThreads = std::thread::hardware_concurrency() - 1; // Get the number of hardware threads
-    for (size_t i = 0; i < numThreads; ++i) {
-        workers.emplace_back([this] { workerThread(); });
+ThreadPool::ThreadPool() : m_stop(false), m_pauseLowTasks(false) {
+    m_workersNum = std::thread::hardware_concurrency() - 1; // Get the number of hardware threads
+    for (size_t i = 0; i < m_workersNum; ++i) {
+        m_workers.emplace_back([this] { workerThread(); });
     }
 }
 
 // Close all threads
 ThreadPool::~ThreadPool() {
     {
-        std::unique_lock<std::mutex> lock(queueMutex);
-        stop = true;
+        std::unique_lock<std::mutex> lock(m_queueMutex);
+        m_stop = true;
     }
     condition.notify_all();
-    for (auto& worker : workers) {
+    for (auto& worker : m_workers) {
         worker.join();
     }
 }
@@ -23,13 +23,13 @@ ThreadPool::~ThreadPool() {
 // Add a task to the queue
 void ThreadPool::enqueueTask(std::function<void()> task,TaskPriority priority) {
     {
-        std::unique_lock<std::mutex> lock(queueMutex);
+        std::unique_lock<std::mutex> lock(m_queueMutex);
 
         if (priority == TaskPriority::High) {
-            highPriorityTasks.push(std::move(task));
+            m_highPriorityTasks.push(std::move(task));
 		}
         else {
-            lowPriorityTasks.push(std::move(task));
+            m_lowPriorityTasks.push(std::move(task));
         }
     }
     condition.notify_one();
@@ -40,23 +40,29 @@ void ThreadPool::workerThread() {
     while (true) {
         std::function<void()> task;
         {
-            std::unique_lock<std::mutex> lock(queueMutex);
+            std::unique_lock<std::mutex> lock(m_queueMutex);
             condition.wait(lock, [this] {
-                return stop || !highPriorityTasks.empty() || !lowPriorityTasks.empty();
+                // Wait till relevant task
+                return m_stop ||
+                    !m_highPriorityTasks.empty() ||
+                    (!m_lowPriorityTasks.empty() && !m_pauseLowTasks);
                 });
 
-            if (!highPriorityTasks.empty()) {
-                task = std::move(highPriorityTasks.front());
-                highPriorityTasks.pop();
+            if (m_stop) return;
+
+            if (!m_highPriorityTasks.empty()) {
+                task = std::move(m_highPriorityTasks.front());
+                m_highPriorityTasks.pop();
             }
-            else if (!lowPriorityTasks.empty()) {
-                task = std::move(lowPriorityTasks.front());
-                lowPriorityTasks.pop();
+            else if (!m_lowPriorityTasks.empty() && !m_pauseLowTasks) {
+                task = std::move(m_lowPriorityTasks.front());
+                m_lowPriorityTasks.pop();
             }
-			else if (stop) {
-				return; // Exit if stop is true and no tasks are available
-			}
+            else {
+                continue; // Nothing valid to do yet
+            }
         }
+
         try {
             task();
         }

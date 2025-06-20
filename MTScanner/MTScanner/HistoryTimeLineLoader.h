@@ -7,7 +7,6 @@
 #include <future>
 
 #pragma once
-#define LOAD_CHANGE_NODES_THREAD_NUM std::thread::hardware_concurrency() - 1
 class HistoryTimeLineLoader
 {
 public:
@@ -60,7 +59,7 @@ private:
 		logger.WriteLog("Done pulling from DB.", false, true);
 
 		logger.WriteLog("Start Loading data into RAM...", false, true);
-		int threadCount = static_cast<int>(LOAD_CHANGE_NODES_THREAD_NUM);
+		int threadCount = static_cast<int>(ThreadPool::getInstance()->Get_ThreadsNum());
 
 		logger.WriteLog("Trying to reserve " + std::to_string(tb->GetSelected_Count_MultiThreaded(0) * threadCount) + " Data cells...");
 
@@ -72,7 +71,7 @@ private:
 	void ChangeNodeLoader(std::vector< std::vector<ChangeNode*>>* reads2D, BasePricesTable* tb)
 	{
 		Logger& logger = Logger::getInstance();
-		int threadCount = static_cast<int>(LOAD_CHANGE_NODES_THREAD_NUM);
+		int threadCount = static_cast<int>(ThreadPool::getInstance()->Get_ThreadsNum());
 
 		logger.WriteLog("Threads Available for parallel Build: " + std::to_string(threadCount), false, true);
 		int chunkSize = tb->GetSelected_Count_MultiThreaded(0);
@@ -105,12 +104,12 @@ private:
 
 		(*reads2D)[threadIndex] = std::move(HistoryTimeLineLoader::LoadChangeNodesForThread(threadIndex, tableObj)); // קריאה מקובץ
 
-		logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Done Building " + std::to_string(reads2D[threadIndex].size()) + " ChangeNodes.");
+		logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Done Building " + std::to_string(reads2D->at(threadIndex).size()) + " ChangeNodes.");
 
 	}
 	void ChangeNodeThreadsLoadsMerger(std::vector< std::vector<ChangeNode*>>& reads2D, std::vector<ChangeNode*>& hitoryTimeLine)
 	{
-		int threadCount = static_cast<int>(LOAD_CHANGE_NODES_THREAD_NUM);
+		int threadCount = static_cast<int>(ThreadPool::getInstance()->Get_ThreadsNum());
 		// Merge results
 		for (int i = 0; i < threadCount; i++)
 		{
@@ -130,7 +129,7 @@ private:
 
 		LoadDataIntoRAM(m_hitoryTimeLine, tb);
 
-		std::vector< std::vector<ChangeNode*>> reads2D(static_cast<size_t>(LOAD_CHANGE_NODES_THREAD_NUM));
+		std::vector< std::vector<ChangeNode*>> reads2D(static_cast<size_t>(ThreadPool::getInstance()->Get_ThreadsNum()));
 
 		ChangeNodeLoader(&reads2D, tb);
 		ChangeNodeThreadsLoadsMerger(reads2D, m_hitoryTimeLine);

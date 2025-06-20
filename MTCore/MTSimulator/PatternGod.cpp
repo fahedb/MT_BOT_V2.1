@@ -149,7 +149,7 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector < std::pair< Cha
 	int scoreToAct = static_cast<int> (m_currentTL->size()) * static_cast<double> (policy->Score_Min_TotalScore_ToAct_PerCandle);
 	ScoresResult maxScore;
 
-	int threadCount = std::thread::hardware_concurrency(); // Number of threads
+	int threadCount = ThreadPool::getInstance()->Get_ThreadsNum()	; // Number of threads
 	ResourceManager::getInstance()->Set_Data(THREADS_COUNT, std::to_string(threadCount)); // Set the number of threads in the ResourceManager
 
 	int historySize = static_cast<int>(m_historyTL->size());
@@ -158,7 +158,11 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector < std::pair< Cha
 	logger.WriteLog("Score to Act: " + std::to_string(scoreToAct), false, true);
 
 	std::vector<std::vector < std::pair< ChangeNode*, ScoresResult>>> resultNodesPerThread(threadCount);
+	ThreadPool* tPool = ThreadPool::getInstance();
 
+	Logger::getInstance().WriteLog("Scan Started", false, true, LogType::LOG); // Log before stop low priority tasks
+
+	tPool->Set_PauseLowPriorityTasks(true);
 	std::vector<std::future<void>> futures;
 	for (int t = 0; t < threadCount; ++t) {
 
@@ -168,8 +172,8 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector < std::pair< Cha
 		auto prom = std::make_shared<std::promise<void>>();
 		futures.push_back(prom->get_future());
 		std::vector<std::pair<ChangeNode*, ScoresResult>>* localResultsNodes = &resultNodesPerThread[t];
-		ThreadPool::getInstance()->enqueueTask(
-			[this,t, start,end,scoreToAct ,&resultMutex, &local2DResultMutex,&maxScore,&resultNodes2D, localResultsNodes, prom]() {
+		tPool->enqueueTask(
+			[this, t, start, end, scoreToAct, &resultMutex, &local2DResultMutex, &maxScore, &resultNodes2D, localResultsNodes, prom]() {
 				this->ProccessScanChunk(start, end, t, scoreToAct, &resultMutex, &maxScore, localResultsNodes);
 				prom->set_value();
 			},
@@ -177,10 +181,10 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector < std::pair< Cha
 		);
 	}
 
-	Logger::getInstance().WriteLog("Scan Started", false, true, LogType::LOG);
 	for (auto& f : futures)
 		f.get(); // Wait till the end
 	Logger::getInstance().WriteLog("Scan Ended", false, true, LogType::LOG);
+	tPool->Set_PauseLowPriorityTasks(false);
 	MTSimulatorUtils::MergeResultsNodes(&resultNodes2D, &resultNodesPerThread);
 
 	SortScores(resultNodes2D);

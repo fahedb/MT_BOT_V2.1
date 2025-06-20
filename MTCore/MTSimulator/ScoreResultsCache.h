@@ -58,7 +58,7 @@ public:
 
 	bool CleanPreCondition(); // Function to check if cleaning is allowed
 	void CleanOldResults(); // Do not use This function in a seperated thread - Use it only in the main thread of scanning, need to freez the main thread to prevent scanning while cleaning
-	void CleanOldResultsForThread(int threadIdx, long long oldestTP); // Function to clean cache per thread
+	static void CleanOldResultsForThread(int threadIdx, long long oldestTP, robin_hood::unordered_map<std::pair<long long, long long>, ScoresResult>* relevantMap); // Function to clean cache per thread
 
 public:
 	ScoreResultsCache(const ScoreResultsCache&) = delete;

@@ -65,6 +65,7 @@ protected: // Functions to control text file
 protected: // Function to Control json file
 	void Set_AsMultiThread_Read() { m_multiThreadedRead = true; }
 	static std::vector<JsonSelectionNode*> FileChunkRead(int startLineIdx, int endLineIdx, int threadIdx,const std::string& fileName);
+	void ProcessFileChunk(int start, int end, int threadIndex, std::vector< std::vector<JsonSelectionNode*>>* reads2D);
 	int Get_SelectedCount_MultiThreaded(int threadIdx) { return m_allSelectedJsonRows_MultiThreaded.size() > static_cast<size_t>(threadIdx) ? static_cast<int>(m_allSelectedJsonRows_MultiThreaded.at(threadIdx).size()) : 0; }
 	bool SelectFromJsonFile();
 	bool SelectFromJsonFile_MultiThreaded(); // Select from a json file, with multithreading, need to call removeselection after done using 

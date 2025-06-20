@@ -8,7 +8,7 @@
 #include "TradeTracer.h"
 #include "DataExporter.h"
 #include "HttpServerSyncer.h"
-
+#include "LOGGER.H"
 #include <future>
 
 
@@ -27,6 +27,7 @@ public:
 		HistoryTimeLineLoader historyLoader(history, &table);
 		historyLoader.Run();
 		
+		Logger::getInstance().WriteLog("About to run PatternGod !!", true, true, LogType::SPECIAL_LOG);
 		TimeLine historyTimeLine(&history);
 		Run_PatternGod(historyTimeLine);
 

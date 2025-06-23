@@ -62,7 +62,7 @@ private:
 				OrderEntity* order = m_trader->Get_Order_ByIdx(i);
 				DirectionStats* stats = GetRelativeStats(order);
 
-				if (!stats || stats->IsActive())
+				if (!stats || !stats->IsActive())
 				{
 					Logger::getInstance().WriteLog("No valid stats for order " + std::to_string(order->Get_OrderSeqNum()), false, true, LogType::ERR);
 					continue; // If no stats found, skip this order

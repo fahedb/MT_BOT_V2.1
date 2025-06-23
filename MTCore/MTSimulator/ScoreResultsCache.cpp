@@ -97,6 +97,7 @@ bool ScoreResultsCache::CleanPreCondition()
 	}
 	if (!m_scoreResultsCache.at(0).size())
 	{
+		m_cleaningInProgress.store(false); // Reset the flag if no cleaning is needed
 		Logger::getInstance().WriteLog("Nothing to clean.", false, false, LogType::ERR);
 		return false;
 	}

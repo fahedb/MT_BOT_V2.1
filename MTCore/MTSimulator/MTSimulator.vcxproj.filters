@@ -351,6 +351,9 @@
     <ClCompile Include="MTSimulatorUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MemoryUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BTables.h">
@@ -498,6 +501,9 @@
       <Filter>DefinedTables</Filter>
     </ClInclude>
     <ClInclude Include="MTSimulatorUtils.h">
+      <Filter>DefinedTables</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryUtils.h">
       <Filter>DefinedTables</Filter>
     </ClInclude>
   </ItemGroup>

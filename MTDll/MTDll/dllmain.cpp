@@ -108,23 +108,23 @@ int CheckForNewOrders_HTTP(DLL_OrderStruct_P order)
         Logger::getInstance().WriteLog("DLL Error while trying to send an HTTP request to server" ,false,true,LogType::SPECIAL_LOG);
         return 0;
     }
+    std::string status = res->get_header_value(HTTP_PARAM_STATUS);
+    order->status = DLL_OrderStatusUtils::Get_OrderStatus_FromString(status);
+    if (order->status == DLL_OrderStatus::DLL_ORDER_STATUS_NONE)
+        return 0;
+
     std::string symbol = res->get_header_value(HTTP_PARAM_Symbol);
     std::string type = res->get_header_value(HTTP_PARAM_TradeType);
     std::string seqNum = res->get_header_value(HTTP_PARAM_TradeSeqNum);
-    std::string status = res->get_header_value(HTTP_PARAM_STATUS);
-
     std::string stopLoss = res->get_header_value(HTTP_PARAM_OrderStopLoss);
     std::string takeProfit = res->get_header_value(HTTP_PARAM_OrderTakeProfit);
 
     order->pair = DLL_CoinsPairUtils::Get_CoinsPair_FromString(symbol);
     order->type = DLL_OrderTypeUtils::Get_OrderType_FromString(type);
     order->seqNum = Converts::ToInt(seqNum);
-    order->status = DLL_OrderStatusUtils::Get_OrderStatus_FromString(status);
 
     order->stopLoss = Converts::ToInt(stopLoss);
     order->stopLoss = Converts::ToInt(takeProfit);
-    if (order->status == DLL_OrderStatus::DLL_ORDER_STATUS_NONE)
-        return 0;
     return 1;
 }
 bool InsertNewBar_HTTP_M1(char* timePoint, char* symbol, CandleStruct data)

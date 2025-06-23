@@ -47,13 +47,16 @@ FileSelectionNode* BasePricesTable::GetNextFileEnt()
 
 ChangeNode* BasePricesTable::GetNextChangeNode_MultiThreaded(int threadIdx)
 {
-	JsonSelectionNode* j = GetNextJsonEntity_MultiThreaded(threadIdx);
+	JsonSelectionNode* j = GetNextSelection_newLogic(threadIdx);
 	if (j)
 	{
-		return ChangeDataBuilder::BuildChangeNode(j);
+		ChangeNode* node = ChangeDataBuilder::BuildChangeNode(j);
+		delete j;
+		return node;
 	}
 	return nullptr;
 }
+
 
 ChangeNode* BasePricesTable::GetNextChangeNode()
 {

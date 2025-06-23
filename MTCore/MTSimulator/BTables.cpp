@@ -3,6 +3,8 @@
 #include <map>
 #include <future>      // std::async, std::future
 #include "ThreadPool.h"
+#include "MemoryUtils.h"
+
 bool BTables::InsertIntoDB(const std::string& insertSQL)
 {
 	if (!m_DBConnectionHandler || !m_DBenvHandler)
@@ -127,237 +129,27 @@ void BTables::RemoveSelection()
 		j = nullptr;
 		m_allSelectedJsonRows.pop();
 	}
-	for (int t = 0; t < m_allSelectedJsonRows_MultiThreaded.size(); ++t) {
-		RemoveSelectionPerThread(t);
-	}
+	UnloadFileMapping();
 }
 
-void BTables::RemoveSelectionPerThread(int threadIdx)
-{
-	std::vector<JsonSelectionNode*>& jsonRows = m_allSelectedJsonRows_MultiThreaded.at(threadIdx);
-	Logger::getInstance().WriteLog("Thread [" + std::to_string(threadIdx) + "] Start Cleaning " + std::to_string(jsonRows.size()) + " Objects", false, false, LogType::LOG);
-	int mySize = static_cast<int>(jsonRows.size());
-	ThreadPool* tPool = ThreadPool::getInstance();
-	for (int t = 0; t < mySize; t++)
-	{
 
-		if ((!(t % 2000) && t) || tPool->IsLowPriorityPaused())
-		{
-			jsonRows.erase(jsonRows.begin(), jsonRows.begin() + t);
-			tPool->enqueueTask([threadIdx,this]() {
-				this->RemoveSelectionPerThread(threadIdx);
-				}, TaskPriority::Low);
-			return; // Return to allow other threads to process
-		}
-		delete jsonRows[t];
-	}
-	jsonRows.clear();
-	Logger::getInstance().WriteLog("Thread [" + std::to_string(threadIdx) + "] Done Cleaning.", false, false, LogType::LOG);
-}
 
-bool BTables::SelectFromFile(int cols)
-{
-	std::ifstream file(m_fileName);
-
-	if (!file.is_open()) {
-		std::cerr << "Error opening file: " << m_fileName << std::endl;
-		return false; // Return empty vector on error
-	}
-
-	std::string line;
-	while (std::getline(file, line)) {
-		std::vector<std::string> row;
-		row = ProcessData::splitString(line, ",");
-		if (row.size())
-			m_allSelectedFileRows.push_back(new FileSelectionNode(row));
-	}
-
-	file.close();
-	return true;
-}
-bool BTables::SelectFromJsonFile()
-{
-	if (m_multiThreadedRead)
-		return SelectFromJsonFile_MultiThreaded();
-	std::ifstream file(m_fileName);
-	if (!file.is_open()) {
-		std::cerr << "Error opening file: " << m_fileName << std::endl;
-		return false; // Return empty vector on error
-	}
-	std::string line;
-	while (std::getline(file, line)) {
-		if (line.length() < 3)
-			continue;
-		m_allSelectedJsonRows.push(new JsonSelectionNode(nlohmann::json::parse(line)));
-	}
-	file.close();
-	return true;
-}
-
-bool BTables::SelectFromJsonFile_MultiThreaded()
-{
-	Logger& logger = Logger::getInstance();
-	
-	logger.WriteLog("Counting Rows in DB Json file...", false, true);
-	long linesCount = GetFileLinesCount(m_fileName);
-	logger.WriteLog("Candles Found in Json DB file: " + std::to_string(linesCount),false,true);
-
-	if (linesCount == 0) return false;
-
-	int threadCount = ThreadPool::getInstance()->Get_ThreadsNum(); // Get threads availbe
-	logger.WriteLog("Threads Available for parallel read: " + std::to_string(threadCount),false,true);
-
-	int chunkSize = (linesCount + threadCount - 1) / threadCount; // Chunk size per thread
-	logger.WriteLog("Every thread should load " + std::to_string(chunkSize) + " candles.",false,true);
-
-	std::vector< std::vector<JsonSelectionNode*>> reads2D(threadCount);
-
-	std::vector<std::future<void>> futures;
-	for (int t = 0; t < threadCount; ++t) {
-		auto prom = std::make_shared<std::promise<void>>();
-		futures.push_back(prom->get_future());
-		int startIdx = t * chunkSize;
-		int endIdx = (t == threadCount - 1) ? linesCount : (t + 1) * chunkSize;
-
-		ThreadPool::getInstance()->enqueueTask(
-			[this, startIdx, endIdx, t, &reads2D, prom]() {
-				this->ProcessFileChunk(startIdx, endIdx, t, &reads2D);
-				prom->set_value();
-			},
-			TaskPriority::High
-		);
-	}
-	for (auto& f : futures)
-		f.get(); // Wait till the end
-
-	Logger::getInstance().WriteLog("Start Merging Data", false, false, LogType::LOG);
-	// Merge Data
-	for (int i = 0; i < threadCount; i++)
-	{
-		std::vector<JsonSelectionNode*> vec = reads2D.at(i);
-		std::vector<JsonSelectionNode*> localVec;
-		for (int t = 0; t < vec.size(); t++)
-		{
-			//m_allSelectedJsonRows.push(vec.at(t));
-			localVec.push_back(vec.at(t));
-		}
-		m_allSelectedJsonRows_MultiThreaded.push_back(localVec);
-		m_jsonsThreadIdxsPlaces.push_back(0);
-		reads2D.at(i).clear();
-	}
-	reads2D.clear();
-	return true;
-}
-// Function to process a chunk of the loop
-void BTables::ProcessFileChunk(int start, int end, int threadIndex, std::vector< std::vector<JsonSelectionNode*>>* reads2D) {
-	
-	Logger& logger = Logger::getInstance();
-
-	logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Started Pulling data...");
-
-	(*reads2D)[threadIndex] = std::move(FileChunkRead(start, end, threadIndex, m_fileName));
-
-	logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] Done Pulling " + std::to_string(reads2D[threadIndex].size()) + " Candles.");
-	};
-
-JsonSelectionNode* BTables::GetNextJsonSelection()
-{
-	if (!m_allSelectedJsonRows.size())
-		return nullptr;
-	JsonSelectionNode* j = m_allSelectedJsonRows.front();
-	m_allSelectedJsonRows.pop();
-	return j;
-}
-
-JsonSelectionNode* BTables::GetNextJsonSelection_MultiThreaded(int threadIdx)
-{
-	if (threadIdx >= m_allSelectedJsonRows_MultiThreaded.size())
-		return nullptr;
-
-	size_t currIdx = m_jsonsThreadIdxsPlaces[threadIdx];
-	auto& jsonRows = m_allSelectedJsonRows_MultiThreaded[threadIdx];
-
-	if (currIdx >= jsonRows.size())
-		return nullptr;
-
-	JsonSelectionNode* j = jsonRows[currIdx];
-	m_jsonsThreadIdxsPlaces[threadIdx] = currIdx + 1;
-	return j;
-
-}
-
-long BTables::GetFileLinesCount(const std::string& filePath)
+bool BTables::InitFileMap()
 {
 	// Open the file
-	HANDLE hFile = CreateFileA(filePath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFileA(m_fileName.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
-		std::cerr << "Error opening file: " << filePath << std::endl;
-		return 0;
-	}
-
-	// Get file size (supporting files > 4GB)
-	LARGE_INTEGER fileSize;
-	if (!GetFileSizeEx(hFile, &fileSize)) {
-		std::cerr << "Error getting file size" << std::endl;
+		Logger::getInstance().WriteLog("Error opening file: " + m_fileName, false, true, LogType::ERR);
 		CloseHandle(hFile);
-		return 0;
-	}
-
-	// Create file mapping
-	HANDLE hMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
-	if (!hMapping) {
-		std::cerr << "Error creating file mapping" << std::endl;
-		CloseHandle(hFile);
-		return 0;
-	}
-
-	// Map file to memory
-	char* fileData = static_cast<char*>(MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0));
-	if (!fileData) {
-		std::cerr << "Error mapping file" << std::endl;
-		CloseHandle(hMapping);
-		CloseHandle(hFile);
-		return 0;
-	}
-
-	// Count lines by iterating through file data
-	long lineCount = 0;
-	char* startPtr = fileData;
-	char* endPtr = fileData + fileSize.QuadPart;
-
-	while (startPtr < endPtr) {
-		if (*startPtr == '\n') lineCount++;
-		startPtr++;
-	}
-
-	// Clean up
-	UnmapViewOfFile(fileData);
-	CloseHandle(hMapping);
-	CloseHandle(hFile);
-
-	return lineCount;
-}
-
-
-std::vector<JsonSelectionNode*> BTables::FileChunkRead(int startLineIdx, int endLineIdx,int threadIdx,const std::string& fileName)
-{
-	std::this_thread::sleep_for(std::chrono::microseconds(15 * (threadIdx + 1)));
-	std::vector<JsonSelectionNode*> vector;
-
-	// Open the file
-	HANDLE hFile = CreateFileA(fileName.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hFile == INVALID_HANDLE_VALUE) {
-		std::cerr << "Error opening file: " << fileName << std::endl;
-		CloseHandle(hFile);
-		return vector;
+		return false;
 	}
 
 	// Create file Mapping
 	HANDLE hMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
 	if (!hMapping) {
 		CloseHandle(hFile);
-		std::cerr << "Error creating file mapping" << std::endl;
-		return vector;
+		Logger::getInstance().WriteLog("Error opening file: " + m_fileName, false, true, LogType::ERR);
+		return false;
 	}
 
 	// Map to memory
@@ -366,7 +158,7 @@ std::vector<JsonSelectionNode*> BTables::FileChunkRead(int startLineIdx, int end
 		CloseHandle(hMapping);
 		CloseHandle(hFile);
 		std::cerr << "Error mapping file" << std::endl;
-		return vector;
+		return false;
 	}
 
 	// Size of file
@@ -377,43 +169,43 @@ std::vector<JsonSelectionNode*> BTables::FileChunkRead(int startLineIdx, int end
 		CloseHandle(hMapping);
 		CloseHandle(hFile);
 		std::cerr << "Error getting file size" << std::endl;
-		return vector;
+		return false;
 	}
 
-	char* startPtr = fileData;
-	char* endPtr = fileData + fileSize.QuadPart;
+	m_hFile = hFile;
+	m_hMapping = hMapping;
+	m_startCharPtr = fileData;
+	m_endCharPtr = fileData + fileSize.QuadPart;
+	int threadsNum = ThreadPool::getInstance()->Get_ThreadsNum();
+	for (int i = 0; i < threadsNum; i++)
+	{
+		m_currFileIdxPlaces.push_back(std::make_pair(fileData, fileData));
+	}
+}
 
-	// Look for the relevant line
-	int lineCount = 0;
-	while (startPtr < endPtr && lineCount < startLineIdx) {
+long BTables::GetFileLinesCount()
+{
+	// Count lines by iterating through file data
+	long lineCount = 0;
+	char* startPtr = m_startCharPtr;
+	char* endPtr = m_endCharPtr;
+	if (startPtr == nullptr)
+		return 0;
+
+	while (startPtr < endPtr) {
 		if (*startPtr == '\n') lineCount++;
 		startPtr++;
 	}
 
-	Logger& logger = Logger::getInstance();
-	// read relevant lines
-	logger.WriteLog("Trying to reserve " + std::to_string(endLineIdx - startLineIdx) + " cells for thread " + std::to_string(threadIdx) + " Starting from line: " + std::to_string(lineCount));
-	vector.reserve(endLineIdx - startLineIdx);
-	logger.WriteLog("Thread " + std::to_string(threadIdx) + " Started Collecting Candles...");
-	std::string currentLine;
-	currentLine.reserve(JSON_SLTRING_LEN);
-	while (startPtr < endPtr && lineCount < endLineIdx) {
-		if (*startPtr == '\n') {
-			vector.push_back(new JsonSelectionNode(nlohmann::json::parse(currentLine)));
-			currentLine.clear();
-			lineCount++;
-		}
-		else {
-			currentLine += *startPtr;
-		}
-		startPtr++;
-	}
-	logger.WriteLog("Thread " + std::to_string(threadIdx) + " Collected " + std::to_string(vector.size()) + " Candles.");
+	return lineCount;
+}
 
-	// πιχει δ-File Mapping
-	UnmapViewOfFile(fileData);
-	CloseHandle(hMapping);
-	CloseHandle(hFile);
 
-	return vector;
+JsonSelectionNode* BTables::GetNextJsonSelection()
+{
+	if (!m_allSelectedJsonRows.size())
+		return nullptr;
+	JsonSelectionNode* j = m_allSelectedJsonRows.front();
+	m_allSelectedJsonRows.pop();
+	return j;
 }

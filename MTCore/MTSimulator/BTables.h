@@ -28,6 +28,13 @@ private:
 
 	std::mutex queueMutex;
 	std::string m_fileName;
+
+	HANDLE m_hFile = nullptr;
+	HANDLE m_hMapping = nullptr;
+	char* m_startCharPtr = nullptr;
+	char* m_endCharPtr = nullptr;
+	std::vector<std::pair<char*, char*>> m_currFileIdxPlaces;
+	std::vector<int> m_currLineIdx;
 public: 
 	BTables(SQLHENV& henv, SQLHDBC& hdbc)
 	{
@@ -54,8 +61,7 @@ public:
 
 protected: // Functions to control text file
 
-	long GetFileLinesCount(const std::string& filePath);
-	bool SelectFromFile(int cols);
+	long GetFileLinesCount();
 	std::vector<SQLSelectionNode*>* GetSelectedRows() { return &m_allSelectedRows; }
 	std::vector<FileSelectionNode*>* GetSelectedRowsFromFile() { return &m_allSelectedFileRows; }
 	virtual std::string GetDB_PhysicalFileName() { return Configrations::getInstance()->Get_ConfigValue(DBFILE_DEFUALT_DB_FILE); }
@@ -64,14 +70,61 @@ protected: // Functions to control text file
 
 protected: // Function to Control json file
 	void Set_AsMultiThread_Read() { m_multiThreadedRead = true; }
-	static std::vector<JsonSelectionNode*> FileChunkRead(int startLineIdx, int endLineIdx, int threadIdx,const std::string& fileName);
-	void ProcessFileChunk(int start, int end, int threadIndex, std::vector< std::vector<JsonSelectionNode*>>* reads2D);
-	int Get_SelectedCount_MultiThreaded(int threadIdx) { return m_allSelectedJsonRows_MultiThreaded.size() > static_cast<size_t>(threadIdx) ? static_cast<int>(m_allSelectedJsonRows_MultiThreaded.at(threadIdx).size()) : 0; }
-	bool SelectFromJsonFile();
-	bool SelectFromJsonFile_MultiThreaded(); // Select from a json file, with multithreading, need to call removeselection after done using 
-	JsonSelectionNode* GetNextJsonSelection(); 
-	JsonSelectionNode* GetNextJsonSelection_MultiThreaded(int threadIdx);
+	void UnloadFileMapping()
+	{
+		UnmapViewOfFile(m_startCharPtr);
+		CloseHandle(m_hFile);
+		CloseHandle(m_hMapping);
 
+		m_startCharPtr = nullptr;
+		m_hFile = nullptr;
+		m_hMapping = nullptr;
+	}
+	bool InitFileMap();
+	JsonSelectionNode* GetNextJsonSelection();
+	void InitLineIdx(int startLineIdx, int endLineIdx, int threadIdx)
+	{
+		// Look for the relevant line
+		int lineCount = startLineIdx;
+
+		char* currPtr = threadIdx > 0 ? m_currFileIdxPlaces.at(threadIdx - 1).second : m_startCharPtr;
+		char* endPtr = m_endCharPtr;
+		m_currFileIdxPlaces.at(threadIdx).first = currPtr; // Init the start ptr
+
+		if (*currPtr == '\n') currPtr++;
+
+		while (currPtr < endPtr && lineCount < endLineIdx) {
+			if (*currPtr == '\n') lineCount++;
+			currPtr++;
+		}
+		m_currFileIdxPlaces.at(threadIdx).second = currPtr; // Init the start ptr
+
+	}
+
+	JsonSelectionNode* GetNextSelection_newLogic(int threadIdx)
+	{
+		char* startPtr = m_currFileIdxPlaces.at(threadIdx).first;
+		char* endPtr = m_currFileIdxPlaces.size() - 1 > threadIdx ? m_currFileIdxPlaces.at(threadIdx).second : m_endCharPtr;
+		//JsonSelectionNode* j = nullptr;
+		std::string currentLine;
+		currentLine.reserve(JSON_SLTRING_LEN);
+		if (*startPtr == '\n')
+			startPtr++;
+		while (startPtr < endPtr)
+		{
+			if (*startPtr == '\n') {
+				startPtr++; // To skip the new line in the next run
+				m_currFileIdxPlaces.at(threadIdx).first = startPtr;
+				return new JsonSelectionNode(nlohmann::json::parse(currentLine));
+
+			}
+			else {
+				currentLine += *startPtr;
+			}
+			startPtr++;
+		}
+		return nullptr;
+	}
 
 protected: // Function to control SQL DataBase
 
@@ -82,7 +135,7 @@ protected: // Function to control SQL DataBase
 	void Insert_NewBody_to_queue(JsonSelectionNode* node) { m_allSelectedJsonRows.push(node); }
 	void RemoveSelection();
 private:
-	void RemoveSelectionPerThread(int threadIdx);
+	// Remove json allocations per thread, this function will work in chunks, after finishing the chunk it will enqueue new task
 };
 
 #endif

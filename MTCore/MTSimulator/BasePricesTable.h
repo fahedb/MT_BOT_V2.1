@@ -39,15 +39,26 @@ public:
 
 	std::vector<SQLSelectionNode*>* GetSelected() { return GetSelectedRows(); }
 	std::vector<FileSelectionNode*>* GetSelectedFromFile() { return GetSelectedRowsFromFile(); }
-	JsonSelectionNode* GetNextJsonEntity_MultiThreaded(int threadIdx) { return GetNextJsonSelection_MultiThreaded(threadIdx); }
-	virtual int GetSelected_Count_MultiThreaded(int threadIdx) { return BTables::Get_SelectedCount_MultiThreaded(threadIdx); }
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 public:
 	void Set_DATA_DB_FileName(const std::string& fileName) { Set_DBFileName(fileName); }
 	void Set_MultiThreadedRead() { Set_AsMultiThread_Read(); }
+	int InitFileMapForRead() { // Init indexes and maps, and return chunk size
+		InitFileMap();
+		long linesCount = GetFileLinesCount();
+		int threadsNum = ThreadPool::getInstance()->Get_ThreadsNum();
+		int chunkSize =  static_cast<long>(linesCount) / threadsNum;
 
+		for (int t = 0; t < threadsNum; t++)
+		{
+			int startIdx = t * chunkSize;
+			int endIdx = (t == threadsNum - 1) ? linesCount : (t + 1) * chunkSize;
+			InitLineIdx(startIdx, endIdx, t);
+		}
+		return chunkSize;
+	}
 protected:
 
 	void ClearAll();
@@ -58,9 +69,6 @@ public:
 	///////////////////////////////////////////////////
 	////// All functions to select from DB ////////////
 	///////////////////////////////////////////////////
-
-	bool SelectDataFromFile() { return SelectFromFile(GetColsNum()); }
-	bool SelectDataFromJsonFile() { return SelectFromJsonFile(); }
 
 	virtual void FreeStyleQuery(const std::string& sqlCommand) { SelectFromDB(sqlCommand, tableCols()); }
 	virtual bool FreeStyleCommand(const std::string& sqlCommand) { return UpdateDB(sqlCommand); }

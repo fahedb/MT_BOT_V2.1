@@ -164,6 +164,7 @@
     <ClCompile Include="IndicatorStructres.cpp" />
     <ClCompile Include="JasonHandler.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="MemoryUtils.cpp" />
     <ClCompile Include="MTChart.cpp" />
     <ClCompile Include="MTSimulatorUtils.cpp" />
     <ClCompile Include="MyJSONHandler.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="IndicatorStructres.h" />
     <ClInclude Include="JasonHandler.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="MemoryUtils.h" />
     <ClInclude Include="MTChart.h" />
     <ClInclude Include="MTSimulatorUtils.h" />
     <ClInclude Include="MyJSONHandler.h" />

@@ -24,7 +24,7 @@ public:
 		selected.push_back(GetSelectedRows()->at(0)->GetColumn(3)); //explain 
 		selected.push_back(GetSelectedRows()->at(0)->GetColumn(4)); //permission
 		selected.push_back(GetSelectedRows()->at(0)->GetColumn(5)); //catagory
-
+		RemoveSelection();
 		return selected;
 	}
 	bool SetConfigValue(const std::string& config,const std::string& value)

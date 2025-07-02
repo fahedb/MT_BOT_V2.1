@@ -14,6 +14,21 @@
 class ChangeNode
 {
 public:
+	double m_openPrice;
+	double m_closePrice;
+	double m_highPrice;
+	double m_lowPrice;
+
+	long long point_DateTimeLong = 0; // For fast access
+	int	Pip_Change=0;
+	_Points m_PointPlace;
+
+	bool Increase_Decrease = false;
+	bool activePoint=false;
+
+	std::unordered_map<std::string, double> m_entitiesMap;
+	std::string symbol;
+
 	ChangeNode()
 	{
 		point_DateTime = "";
@@ -28,7 +43,6 @@ public:
 	}
 	~ChangeNode();
 	std::string point_DateTime;
-	long long point_DateTimeLong = 0; // For fast access
 
 	double Get_Entity(const std::string& key)
 	{
@@ -40,19 +54,6 @@ public:
 	}
 	void Set_Entity(const std::string& key, double val) { m_entitiesMap[key] = val; }
 
-	std::unordered_map<std::string, double> m_entitiesMap;
-
-	std::string symbol;
-	bool Increase_Decrease = false;
-	int	Pip_Change=0;
-
-	bool activePoint=false;
-	_Points m_PointPlace;
-
-	double m_openPrice;
-	double m_closePrice;
-	double m_highPrice;
-	double m_lowPrice;
 
 public:
 	void SetPoints(_Points points) { m_PointPlace = points; }

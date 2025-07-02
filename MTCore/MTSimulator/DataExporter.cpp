@@ -113,19 +113,36 @@ std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
 	first_summeryLog += std::string("\n\n") + indexesSummery_first;
 	highest_summeryLog += std::string("\n\n") + indexesSummery_highest;
 
-	std::string stepsMeansLog = "Steps Means details:\n\n";
-	auto stepMeans_vec = stats.GetAllMeansUpTo();
-	for (int i = 0; i < stepMeans_vec.size(); i++)
+	std::string generalStepsMeansLog = "*General* Steps Means details:\n\n";
+	auto generalStepMeans_vec = stats.GetAllMeansUpTo(CommonDirection::NONE);
+	for (int i = 0; i < generalStepMeans_vec.size(); i++)
 	{
-		stepsMeansLog += "Index " + std::to_string(i + 1) + " : " + std::to_string(stepMeans_vec.at(i)) + "\n";
+		generalStepsMeansLog += "Index " + std::to_string(i + 1) + " : " + std::to_string(generalStepMeans_vec.at(i)) + "\n";
 	}
 
+
+	std::string positiveStepsMeansLog = "*Positive* Steps Means details:\n\n";
+	auto positiveStepMeans_vec = stats.GetAllMeansUpTo(CommonDirection::UP);
+	for (int i = 0; i < positiveStepMeans_vec.size(); i++)
+	{
+		positiveStepsMeansLog += "Index " + std::to_string(i + 1) + " : " + std::to_string(positiveStepMeans_vec.at(i)) + "\n";
+	}
+
+
+	std::string negativeStepsMeansLog = "*Negative* Steps Means details:\n\n";
+	auto negativeStepMeans_vec = stats.GetAllMeansUpTo(CommonDirection::DOWN);
+	for (int i = 0; i < negativeStepMeans_vec.size(); i++)
+	{
+		negativeStepsMeansLog += "Index " + std::to_string(i + 1) + " : " + std::to_string(negativeStepMeans_vec.at(i)) + "\n";
+	}
 
 	std::vector<std::string> summery_logs;
 	summery_logs.push_back(general_summeryLog);
 	summery_logs.push_back(first_summeryLog);
 	summery_logs.push_back(highest_summeryLog);
-	summery_logs.push_back(stepsMeansLog);
+	summery_logs.push_back(generalStepsMeansLog);
+	summery_logs.push_back(positiveStepsMeansLog);
+	summery_logs.push_back(negativeStepsMeansLog);
 	return summery_logs;
 }
 

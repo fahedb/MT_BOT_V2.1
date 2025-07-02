@@ -214,6 +214,9 @@
     <Filter Include="DataStructers\ScoreResultsCache">
       <UniqueIdentifier>{089a0092-eaea-42b8-aaae-4b5246ea8596}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataStructers\GraphStruct">
+      <UniqueIdentifier>{9a275826-6b1c-4a7d-a3dd-a204f6b58b8b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -353,6 +356,15 @@
     </ClCompile>
     <ClCompile Include="MemoryUtils.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GaphUtils.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphStructres.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomBuilder.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -505,6 +517,18 @@
     </ClInclude>
     <ClInclude Include="MemoryUtils.h">
       <Filter>DefinedTables</Filter>
+    </ClInclude>
+    <ClInclude Include="GaphUtils.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphStructres.h">
+      <Filter>DefinedTables</Filter>
+    </ClInclude>
+    <ClInclude Include="BarPeriods.h">
+      <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomBuilder.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

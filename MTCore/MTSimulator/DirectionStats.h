@@ -10,8 +10,34 @@ enum class CommonDirection
 {
 	UP = 0,
 	DOWN = 1,
-	BLUR = 3
+	BLUR = 3,
+	NONE = 4 // Added NONE to handle cases where direction is not defined
 };
+
+class CommonDirection_Utils
+{
+public:
+	static std::string GetCommonDirectionStr(CommonDirection dir)
+	{
+		switch (dir)
+		{
+		case CommonDirection::UP:
+			return "UP";
+		case CommonDirection::DOWN:
+			return "DOWN";
+		case CommonDirection::BLUR:
+			return "BLUR";
+		case CommonDirection::NONE:
+			return "NONE";
+
+		default:
+			return "NONE";
+		}
+
+		return "NONE";
+	}
+};
+
 enum class StatsType
 {
 	General = 0,
@@ -45,7 +71,7 @@ struct StepsMean
 		if (maxIndex < 0 || maxIndex >= stepsSum.size())
 			maxIndex = stepsSum.size() - 1;
 
-		result.reserve(static_cast<size_t>(maxIndex) + static_cast<size_t>(1));
+		result.reserve(static_cast<size_t>(maxIndex + 1));
 		
 		for (int i = 0; i <= maxIndex; ++i)
 			result.push_back(GetMeanForCandleIdx(i));
@@ -126,7 +152,9 @@ private:
 	DirectionGroupStats general;
 	DirectionGroupStats first;
 	DirectionGroupStats highest;
-	StepsMean stepsMean;
+	StepsMean stepsMean_General;
+	StepsMean stepsMean_PurePositive;
+	StepsMean stepsMean_PureNegative;
 	std::vector<TimeLineScored> m_patterns_wScores;
 	TimeLine* m_currPattern;
 	bool m_tradeRes;
@@ -148,7 +176,9 @@ public:
 		general(std::move(other.general)),
 		first(std::move(other.first)),
 		highest(std::move(other.highest)),
-		stepsMean(std::move(other.stepsMean)) // Move constructor
+		stepsMean_General(std::move(other.stepsMean_General)), // Move constructor
+		stepsMean_PurePositive(std::move(other.stepsMean_PurePositive)), // Move constructor
+		stepsMean_PureNegative(std::move(other.stepsMean_PureNegative)) // Move constructor
 	{
 		other.m_currPattern = nullptr; // Nullify the moved pointer
 	}
@@ -163,7 +193,9 @@ public:
 		general(other.general),
 		first(other.first),
 		highest(other.highest),
-		stepsMean(other.stepsMean)  // Copy constructor
+		stepsMean_General(other.stepsMean_General),  // Copy constructor
+		stepsMean_PurePositive(other.stepsMean_PurePositive), // Copy constructor
+		stepsMean_PureNegative(other.stepsMean_PureNegative)  // Copy constructor
 	{
 	}
 
@@ -191,10 +223,22 @@ public:
 	void Set_TradeRes(bool tradeRes) { m_tradeRes = tradeRes; }
 	bool Get_TradeRes() { return m_tradeRes; };
 
-	std::vector<double> GetAllMeansUpTo(int maxIndex = -1) { return stepsMean.GetAllMeansUpTo(maxIndex); }
+	std::vector<double> GetAllMeansUpTo(CommonDirection dir, int maxIndex = -1) { return GetStepMeans(dir).GetAllMeansUpTo(maxIndex); }// Ensure the means are calculated for the specified direction
 
+	
 	void add(int pipChange, CommonDirection dir, int candleIdx, StatsType sType) { GetGroupStats(sType).add(pipChange, dir, candleIdx); }
-	void addStep_ForCandleIdx(int pipChange, int candleIdx) { stepsMean.addStep(pipChange, candleIdx); }
+	
+	void addStep_ForCandleIdx(int pipChange, int candleIdx) {
+		stepsMean_General.addStep(pipChange, candleIdx);
+
+		if (pipChange > 0) {
+			stepsMean_PurePositive.addStep(pipChange, candleIdx);
+		}
+		else if (pipChange < 0) {
+			stepsMean_PureNegative.addStep(pipChange, candleIdx);
+
+		}
+	}
 
 	int Get_UpCount(StatsType sType) { return GetGroupStats(sType).UpCount; }
 	int Get_DownCount(StatsType sType) { return GetGroupStats(sType).DownCount; }
@@ -210,7 +254,7 @@ public:
 	double mean(StatsType sType) { return GetGroupStats(sType).mean(); }
 	double meanIndexes(StatsType sType) { return GetGroupStats(sType).meanIndexes(); }
 	
-	double Get_Mean_For_CandleIdx(int candleIdx) { return stepsMean.GetMeanForCandleIdx(candleIdx); }
+	double Get_Mean_For_CandleIdx(int candleIdx) { return stepsMean_General.GetMeanForCandleIdx(candleIdx); }
 	std::vector < std::pair<int, int>> Get_Indexes_and_changePips(StatsType sType) { return GetGroupStats(sType).get_Indexes_and_changePips(); }
 
 	void Add_Pattern(TimeLineScored pattern) { m_patterns_wScores.push_back(pattern); }
@@ -234,4 +278,10 @@ public:
 	std::string Get_TimePoint() { return m_timePoint; }
 
 	DirectionGroupStats& GetGroupStatsByName(const std::string& son);
+	StepsMean& GetStepMeans(CommonDirection dir) 
+	{
+		if (dir == CommonDirection::UP) return stepsMean_PurePositive;
+		if (dir == CommonDirection::DOWN) return stepsMean_PureNegative;
+		return stepsMean_General; // Default to General if not UP or DOWN
+	}
 };

@@ -11,6 +11,16 @@ enum struct _Points {
 	Points_XAUUSD = 2
 };
 
+enum class BarPeriod {
+	M1 = 1,
+	M5 = 5,
+	M15 = 15,
+	M30 = 30,
+	H1 = 60,
+	H4 = 240,
+	NONE = -1
+};
+
 struct IndicatorScore {
 	int M1=0;
 	int M5=0;
@@ -54,15 +64,6 @@ enum struct IndicatorType
 	NONE = -1
 };
 
-enum class BarPeriod {
-	M1 = 1,
-	M5 = 5,
-	M15 = 15,
-	M30 = 30,
-	H1 = 60,
-	H4 = 240,
-	NONE = -1
-};
 enum struct IndicatorValueType
 {
 	Value = 0,
@@ -175,19 +176,9 @@ public:
 		}
 	}
 	void Set_Indicator(IndicatorType, IndicatorLen, IndicatorValues, bool forceInsert = false); // Function to create a new Indicator object
-	void Set_Ind_SingleValue(IndicatorType type, IndicatorLen len,BarPeriod barP,double val)
-	{
-		Validate_Indicator(type, len);
-		BaseIndicator* ind = Get_Indicator(type, len);
-		Set_IndValue(ind, barP, val);
-	}
-	void Set_Ind_SingleSlope(IndicatorType type, IndicatorLen len, BarPeriod barP, double val)
-	{
-		Validate_Indicator(type, len);
-		BaseIndicator* ind = Get_Indicator(type, len);
-		Set_IndSlope(ind, barP, val);
-	}
-	BaseIndicator* Get_Indicator(IndicatorType type, IndicatorLen len);
+	void Set_Ind_SingleValue(IndicatorType type, IndicatorLen len,BarPeriod barP,double val); // To Set indicator single value - by type, len and baePeriod
+	void Set_Ind_SingleSlope(IndicatorType type, IndicatorLen len, BarPeriod barP, double val); // To Set indicator single slope - by type, len and barPeriod
+	BaseIndicator* Get_Indicator(IndicatorType type, IndicatorLen len); // Get Indicator ptr
 private:
 	void Set_IndValue(BaseIndicator*, BarPeriod, double);
 	void Set_IndSlope(BaseIndicator*, BarPeriod, double);

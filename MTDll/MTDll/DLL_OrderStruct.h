@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include <string>
-
+#include "ServicesDef.h"
 
 
 // CPP enum def side
@@ -27,9 +27,9 @@ class DLL_OrderTypeUtils
 public:
 	static DLL_OrderType Get_OrderType_FromString(const std::string& type)
 	{
-		if (type == "LONG")
+		if (type == HTTP_PARAM_VALUE_TradeType_Long)
 			return DLL_OrderType::DLL_ORDER_TYPE_LONG;
-		else if (type == "SHORT")
+		else if (type == HTTP_PARAM_VALUE_TradeType_Short)
 			return DLL_OrderType::DLL_ORDER_TYPE_SHORT;
 		else
 			return DLL_OrderType::DLL_ORDER_TYPE_NONE;
@@ -39,9 +39,9 @@ public:
 		switch (type)
 		{
 		case DLL_OrderType::DLL_ORDER_TYPE_LONG:
-			return "LONG";
+			return HTTP_PARAM_VALUE_TradeType_Long;
 		case DLL_OrderType::DLL_ORDER_TYPE_SHORT:
-			return "SHORT";
+			return HTTP_PARAM_VALUE_TradeType_Short;
 		default:
 			return "NONE";
 		}

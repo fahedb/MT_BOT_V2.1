@@ -6,6 +6,8 @@
 #include "PROCESSDATA.H"
 #include "Configrations.h"
 #include "Logger.h"
+#include "GraphStructres.h"
+
 #define PNG_FOLDER_NAME "PatternsPNG\\"
 
 

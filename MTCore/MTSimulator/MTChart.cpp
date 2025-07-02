@@ -1,4 +1,5 @@
 #include "MTChart.h"
+#include "GraphStructres.h"
 
 /// <MTChart>
 /// MTChart class function, for drawing charts using x,y points

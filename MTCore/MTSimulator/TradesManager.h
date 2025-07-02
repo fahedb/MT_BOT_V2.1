@@ -32,10 +32,7 @@ public:
 	OrderEntity* Get_Order_ByIdx(int idx) { return m_ordersCache->Get_Order_byIdx(idx);}
 	OrderEntity* Get_Order(long seq) { return m_ordersCache->Get_Order(seq); }
 	OrderEntity* Get_Order(std::string& timePoint) { return m_ordersCache->Get_Order(timePoint); }
-	void Refresh_OrdersCache()
-	{
-		m_ordersCache->RefreshOrders();
-	}
+	void Refresh_OrdersCache() { m_ordersCache->RefreshOrders(); }
 	int Get_OrdersCount() { return m_ordersCache->Get_OrdersCount(); }
 	
 	OrderEntity* CheckForTrade_PatternGod(DirectionStats& stats);
@@ -55,6 +52,26 @@ public:
 			return highest;
 		return CommonDirection::BLUR;
 	}
+
+	CommonDirection CalcCommonDirection_Pure(DirectionStats& stats)
+	{
+		if (!stats.IsActive())
+			return CommonDirection::BLUR;
+
+		CommonDirection general = CheckDirection_Pure(stats, StatsType::General);
+		CommonDirection first = CheckDirection_Pure(stats, StatsType::First);
+		CommonDirection highest = CheckDirection_Pure(stats, StatsType::Highest);
+
+		if (highest == first)
+			return highest;
+		if (general == highest)
+			return highest;
+		return CommonDirection::BLUR;
+	}
+
+
+
+
 	void Send_TraddeSignal(std::string pair, int type, int seqNum, int stopLoss, int takeProfit)
 	{
 		ExchangeData().Set_NewOrder(pair, type, seqNum, stopLoss, takeProfit);
@@ -115,6 +132,54 @@ private:
 
 		return CommonDirection::BLUR;
 	}
+
+
+	CommonDirection CheckDirection_Pure(DirectionStats& stats, StatsType stype)
+	{
+		ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+
+		int generalCount = stats.Get_TotalCount(stype);
+		double upPercent = (double(stats.Get_UpCount(stype)) / generalCount) * 100.0;
+		double downPercent = (double(stats.Get_DownCount(stype)) / generalCount) * 100.0;
+		double blurPercent = (double(stats.Get_BlurCount(stype)) / generalCount) * 100.0;
+
+		double meanPips = stats.mean(StatsType::General);
+
+		bool isUp = upPercent > policy->Pattern_Min_Percent_To_ExecuteOrder;
+		bool isDown = downPercent > policy->Pattern_Min_Percent_To_ExecuteOrder;
+
+		if (isUp)
+		{
+			return CommonDirection::UP;
+		}
+		else if (isDown)
+		{
+			return CommonDirection::DOWN;
+		}
+		else if (policy->Pattern_Activate_Alternative_ExecuteOrder)
+		{
+			bool isAlternativeAllowed = blurPercent <= policy->Pattern_Max_Noise_To_ExecuteOrder_Alternative
+				&& std::fabs(downPercent - upPercent) >= policy->Pattern_Diff_Percent_To_ExecuteOrder_Alternative;
+
+			if (isAlternativeAllowed)
+			{
+				bool isAlternativeUp = upPercent > downPercent;
+				bool isAlternativeDown = downPercent > upPercent;
+
+				if (isAlternativeUp)
+				{
+					return CommonDirection::UP;
+				}
+				else if (isAlternativeDown)
+				{
+					return CommonDirection::DOWN;
+				}
+			}
+		}
+		return CommonDirection::BLUR;
+	}
+
+	
 
 
 private:

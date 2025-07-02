@@ -1,6 +1,6 @@
 #include "ProcessData.h"
 
-void ProcessData::OpenA_Folder(std::string folderName)
+void ProcessData::OpenA_Folder(const std::string& folderName)
 {
 	// Convert std::string to std::wstring because Windows API functions often use wide characters
 	std::wstring wideFolderName(folderName.begin(), folderName.end());

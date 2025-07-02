@@ -95,7 +95,7 @@ private:
 			return;
 		}
 
-		CommonDirection newDirection = m_trader->CalcCommonDirection(stats);
+		CommonDirection newDirection = m_trader->CalcCommonDirection_Pure(stats);
 		CommonDirection desiredDirection = order->Get_OrderType() == OrderType::LONG ? CommonDirection::UP : CommonDirection::DOWN;
 
 		if (desiredDirection == newDirection)
@@ -104,8 +104,8 @@ private:
 		}
 		else
 		{
-			std::string desiredDirStr = desiredDirection == CommonDirection::UP ? "UP" : "DOWN";
-			std::string newDirStr = newDirection == CommonDirection::UP ? "UP" : "DOWN";
+			std::string desiredDirStr = CommonDirection_Utils::GetCommonDirectionStr(desiredDirection);
+			std::string newDirStr = CommonDirection_Utils::GetCommonDirectionStr(newDirection);
 			Logger::getInstance().WriteLog("Order " + std::to_string(order->Get_OrderSeqNum()) + " is in the wrong direction, Closing it\n"
 				+ "Desired direction: " + desiredDirStr + "\nDirection found: " + newDirStr, false, true, LogType::TRADE_TRACE_LOG);
 

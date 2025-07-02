@@ -29,7 +29,7 @@ enum TimeUnits
 class ProcessData
 {
 public:
-	static void OpenA_Folder(std::string folderName);
+	static void OpenA_Folder(const std::string& folderName);
 	static std::string GetFormattedCurrentDate(char seperator = '-' /*Defualt value is - */);
 	static std::string GetFormattedCurrTime(char seperator = ':' /*defualt value is : */);
 

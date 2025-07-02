@@ -14,37 +14,20 @@ BaseIndicator::BaseIndicator(IndicatorValues curr) {
 	m_curr_BarValues = curr;
 }
 
-
 ////////////////////////////////////////////////////
 /////////// END OF Base Indicator class Functions////
 ////////////////////////////////////////////////////
 
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
 
-
-////////////////////////////////////////////////////
-// Gravity Values Structer class Functions//////////
-///			Author: Fahed.b				  //////////
-////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////
-/////////// END OF Gravity Values Structer class Functions////
-////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////
-// Gravity Indricator class Functions	  //////////
-///			Author: Fahed.b				  //////////
-////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////
-/////////// END OF Gravity Indricator class Functions////
-////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////
 // IndicatorScore Struct Functions		  //////////
 ///			Author: Fahed.b				  //////////
 ////////////////////////////////////////////////////
 
+// Just a constructor :)
 IndicatorScore::IndicatorScore() {
 	M1 = 0;
 	M5 = 0;
@@ -55,11 +38,15 @@ IndicatorScore::IndicatorScore() {
 	total = 0;
 }
 
-// Calculate the total score
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
 
-void IndicatorScore::calcTotal() {
+void IndicatorScore::calcTotal() { // Calculate the total score
 	total = M1 + M5 + M15 + M30 + H1 + H4;
 }
+
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
 
 IndicatorScore IndicatorScore::operator+(const IndicatorScore& other) const {
 	IndicatorScore result;
@@ -79,7 +66,7 @@ IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
 	M30 += other.M30;
 	H1 += other.H1;
 	H4 += other.H4;
-	calcTotal();
+	calcTotal(); // Recalculate the total
 	return *this;
 }
 
@@ -88,17 +75,24 @@ IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
 /////////// END OF IndicatorScore Struct class Functions////
 ////////////////////////////////////////////////////
 
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
+
+
 
 ////////////////////////////////////////////////////
 // ScoreResult Struct Functions		  //////////
 ///			Author: Fahed.b				  //////////
 ////////////////////////////////////////////////////
 
-inline ScoresResult::ScoresResult()
+ScoresResult::ScoresResult() // Just a constructor :)
 {
 }
 
-void ScoresResult::calcTotalResult() {
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
+
+void ScoresResult::calcTotalResult() { // Calc total score of every object
 	rsiScore.calcTotal();
 	emaScore.calcTotal();
 	zlsmaScore.calcTotal();
@@ -106,6 +100,9 @@ void ScoresResult::calcTotalResult() {
 	totalScore = combineScores();
 	totalScore.calcTotal();
 }
+
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
 
 ScoresResult& ScoresResult::operator+=(const ScoresResult& other) {
 
@@ -118,6 +115,9 @@ ScoresResult& ScoresResult::operator+=(const ScoresResult& other) {
 
 	return *this;
 }
+
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
 
 ScoresResult ScoresResult::operator+(const ScoresResult& other) const {
 	ScoresResult result;
@@ -133,9 +133,10 @@ ScoresResult ScoresResult::operator+(const ScoresResult& other) const {
 	return result;
 }
 
-// Helper function to combine scores into totalScore
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
 
-IndicatorScore ScoresResult::combineScores() const {
+IndicatorScore ScoresResult::combineScores() const { // function to combine scores into totalScore
 	IndicatorScore combined;
 	combined.M1 =	rsiScore.M1		+ emaScore.M1	+ zlsmaScore.M1		+ volumeScore.M1;
 	combined.M5 =	rsiScore.M5		+ emaScore.M5	+ zlsmaScore.M5		+ volumeScore.M5;
@@ -147,9 +148,13 @@ IndicatorScore ScoresResult::combineScores() const {
 	return combined;
 }
 
-////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 /////////// END OF ScoreResult Struct class Functions////
-////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
+
 
 ////////////////////////////////////////////////////
 // IndicatorMap Class Functions		  //////////
@@ -157,7 +162,7 @@ IndicatorScore ScoresResult::combineScores() const {
 ////////////////////////////////////////////////////
 
 
-IndicatorMap::IndicatorMap()
+IndicatorMap::IndicatorMap() 
 {
 	m_vec.resize(INDICATOR_TYPES_VEC_LEN); // Reserve space for 5 elements
 	
@@ -171,6 +176,9 @@ IndicatorMap::IndicatorMap()
 	}
 }
 
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
+
 void IndicatorMap::Set_Indicator(IndicatorType type, IndicatorLen len, IndicatorValues val,bool forceInsert /*false*/)
 {
 	int typeIdx = static_cast<int>(Indicators_Utils::Get_TypeIndex(type));
@@ -183,9 +191,32 @@ void IndicatorMap::Set_Indicator(IndicatorType type, IndicatorLen len, Indicator
 	m_vec.at(typeIdx).at(lenIdx) = Get_IndicatorObject(type, val); // Store the indicator in the vector
 }
 
-// Function to create a new Indicator object
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
 
-BaseIndicator* IndicatorMap::Get_Indicator(IndicatorType type, IndicatorLen len)
+// To Set indicator single value - by type, len and baePeriod
+void IndicatorMap::Set_Ind_SingleValue(IndicatorType type, IndicatorLen len, BarPeriod barP, double val)
+{
+	Validate_Indicator(type, len); // Create the Indicator obj if it's missing - by type and len
+	BaseIndicator* ind = Get_Indicator(type, len); // Getting the indicator ptr - by type and len
+	Set_IndValue(ind, barP, val); // Set a single indicator value - by barPeriod
+}
+
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
+
+// To Set indicator single value - by type, len and baePeriod
+void IndicatorMap::Set_Ind_SingleSlope(IndicatorType type, IndicatorLen len, BarPeriod barP, double val) // To Set indicator single slope - by type, len and baePeriod
+{
+	Validate_Indicator(type, len); // Create the Indicator obj if it's missing - by type and len
+	BaseIndicator* ind = Get_Indicator(type, len); // Getting the indicator ptr - by type and len
+	Set_IndSlope(ind, barP, val); // Set a single indicator value - by barPeriod
+}
+
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
+
+BaseIndicator* IndicatorMap::Get_Indicator(IndicatorType type, IndicatorLen len) // Function to Get Indicaor ptr
 {
 	int typeIdx = static_cast<int>(Indicators_Utils::Get_TypeIndex(type));
 	int lenIdx = static_cast<int>(Indicators_Utils::Get_LenIndex(len));
@@ -197,7 +228,10 @@ BaseIndicator* IndicatorMap::Get_Indicator(IndicatorType type, IndicatorLen len)
 	return m_vec.at(typeIdx).at(lenIdx); // Return the indicator from the vector
 }
 
-void IndicatorMap::Set_IndValue(BaseIndicator* ind, BarPeriod barP, double val)
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
+
+void IndicatorMap::Set_IndValue(BaseIndicator* ind, BarPeriod barP, double val) // Function to create a new Indicator object
 {
 	switch (barP)
 	{

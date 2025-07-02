@@ -160,6 +160,8 @@
     <ClCompile Include="DirectionStats.cpp" />
     <ClCompile Include="DirectionStatsCache.cpp" />
     <ClCompile Include="EURUSD_CurrentTable.cpp" />
+    <ClCompile Include="GaphUtils.cpp" />
+    <ClCompile Include="GraphStructres.cpp" />
     <ClCompile Include="HTTP_Lgger.cpp" />
     <ClCompile Include="IndicatorStructres.cpp" />
     <ClCompile Include="JasonHandler.cpp" />
@@ -173,6 +175,7 @@
     <ClCompile Include="OrderStruct.cpp" />
     <ClCompile Include="PatternExporter.cpp" />
     <ClCompile Include="PatternGod.cpp" />
+    <ClCompile Include="PolynomBuilder.cpp" />
     <ClCompile Include="ProccessFlags.cpp" />
     <ClCompile Include="ProcessData.cpp" />
     <ClCompile Include="ScoreCalcs.cpp" />
@@ -194,6 +197,7 @@
     <ClCompile Include="XAUUSD_OneMinTable.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BarPeriods.h" />
     <ClInclude Include="BasePricesTable.h" />
     <ClInclude Include="BTables.h" />
     <ClInclude Include="CandleData.h" />
@@ -212,6 +216,8 @@
     <ClInclude Include="DirectionStats.h" />
     <ClInclude Include="DirectionStatsCache.h" />
     <ClInclude Include="EURUSD_CurrentTable.h" />
+    <ClInclude Include="GaphUtils.h" />
+    <ClInclude Include="GraphStructres.h" />
     <ClInclude Include="HTTP_Lgger.h" />
     <ClInclude Include="IndicatorStructres.h" />
     <ClInclude Include="JasonHandler.h" />
@@ -226,6 +232,7 @@
     <ClInclude Include="OrderType.h" />
     <ClInclude Include="PatternExporter.h" />
     <ClInclude Include="PatternGod.h" />
+    <ClInclude Include="PolynomBuilder.h" />
     <ClInclude Include="ProccessFlags.h" />
     <ClInclude Include="ProcessData.h" />
     <ClInclude Include="ScoreCalcs.h" />

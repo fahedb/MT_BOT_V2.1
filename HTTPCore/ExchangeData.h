@@ -13,7 +13,7 @@ public:
 		m_httpsrv = HTTPServer::getInstance();
 	}
 
-	void Set_NewOrder(std::string& symbol, int long_short,int seqNum, int stopLoss, int takeProfit) { m_httpsrv->Get_RequestHandler()->Set_NewOrder(symbol, long_short,seqNum,stopLoss,takeProfit); }
+	void Set_NewOrder(const std::string& symbol, int long_short,int seqNum, int stopLoss, int takeProfit) { m_httpsrv->Get_RequestHandler()->Set_NewOrder(symbol, long_short,seqNum,stopLoss,takeProfit); }
 	std::string Get_NextCandleStick_M1() { return m_httpsrv->Get_RequestHandler()->Get_NextCandle(); }
 	std::string Get_NextCandleStick_M1_JSON_DB() { return m_httpsrv->Get_RequestHandler()->Get_Next_DBCandle_M1(); }
 

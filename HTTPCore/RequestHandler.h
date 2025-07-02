@@ -216,7 +216,7 @@ public:
 		}
 	}
 
-	void Set_NewOrder(std::string& symbol, int long_short,int seqNum, int stopLoss=0, int takeProfit=0)
+	void Set_NewOrder(const std::string& symbol, int long_short,int seqNum, int stopLoss=0, int takeProfit=0)
 	{
 		std::lock_guard<std::mutex> lock(m_tradeQueueMutex);
 		Http_OrderStruct newOrder;

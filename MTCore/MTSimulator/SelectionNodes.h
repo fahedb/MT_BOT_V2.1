@@ -33,6 +33,14 @@ class SQLSelectionNode
 
 public:
 	SQLSelectionNode(const std::vector<std::vector<SQLCHAR>>& row) : m_row(row) {}
+	~SQLSelectionNode() {
+		for (int i = 0; i < m_row.size(); i++)
+		{
+			auto& aWord = m_row.at(i);
+			aWord.clear();
+		}
+		m_row.clear();
+	}
 	const std::vector<std::vector<SQLCHAR>>* GetRow()	const { return &m_row; }
 	std::string GetColumn(int i) {
 		//static void ConvertSQLCHARToString(const SQLCHAR * sqlCharData, std::string & outputString) {

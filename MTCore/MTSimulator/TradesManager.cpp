@@ -20,11 +20,11 @@ OrderEntity* TradesManager::CheckForTrade_PatternGod(DirectionStats& stats) // F
 	else
 		ordType = OrderType::NONE;
 
-	double mean = stats.mean(StatsType::Highest);
+	double mean = abs(stats.mean(StatsType::Highest));
 
 	double stopLoss = 0;
 	if (ordType != OrderType::NONE)
-		stopLoss = stats.Get_PureMean(StatsType::Highest, highestDir == CommonDirection::UP ? CommonDirection::DOWN : CommonDirection::UP);
+		stopLoss = abs(stats.Get_PureMean(StatsType::Highest, highestDir == CommonDirection::UP ? CommonDirection::DOWN : CommonDirection::UP));
 
 	
 	

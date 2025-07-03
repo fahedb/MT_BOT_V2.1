@@ -1,4 +1,4 @@
-#include "GraphStructres.h"
+#include "GraphStructure.h"
 #include <string>
 
 #pragma once

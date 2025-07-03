@@ -1,5 +1,5 @@
 #include <string>
-#include "GraphStructres.h"
+#include "GraphStructure.h"
 #include "GraphTypeEnum.h"
 #include "FilterTypeEnum.h"
 #include "TimeLineTypeEnum.h"

@@ -1,5 +1,5 @@
 #include <string>
-#include "GraphStructres.h"
+#include "GraphStructure.h"
 
 #pragma once
 class GraphDrawer

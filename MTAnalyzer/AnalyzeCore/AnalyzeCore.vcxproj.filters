@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="PatternCompareEnums">
+      <UniqueIdentifier>{663e8654-3164-451a-b390-9fc99c95db39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic">
+      <UniqueIdentifier>{156fb3cc-c22a-48b1-b62c-f48ab01c40cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphConfig">
+      <UniqueIdentifier>{6e526fee-dc95-4dff-bacb-d4f84a7e9667}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphDraw">
+      <UniqueIdentifier>{e0a5a623-708f-4e1e-bee2-5c8b093b318c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphDraw\GeneralDrawer">
+      <UniqueIdentifier>{0f5d1c27-498a-4c72-8ed8-47ee97a18b58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphDraw\GeneralDrawer\Src">
+      <UniqueIdentifier>{ea6f76b2-4801-4e3a-954e-5f483f93a864}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphDraw\GeneralDrawer\Inc">
+      <UniqueIdentifier>{fc547307-56bc-483c-81d7-f9c810007154}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphDraw\LinearDrawer">
+      <UniqueIdentifier>{0d856736-bd84-4a6a-b583-3647702becca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphDraw\LinearDrawer\Inc">
+      <UniqueIdentifier>{d17c639f-5bac-4f56-a3d2-931bf75597d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphDraw\LinearDrawer\Src">
+      <UniqueIdentifier>{ca7fd8be-14a1-4827-90b2-eb941c732a76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphDraw\BarsDrawer">
+      <UniqueIdentifier>{6dd1ffda-f1f4-41bc-99ee-848990bbc4ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphDraw\BarsDrawer\Inc">
+      <UniqueIdentifier>{68c40b0b-e961-4fdc-a0b3-1e0df0e58e2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphDraw\BarsDrawer\Src">
+      <UniqueIdentifier>{32291bf0-0518-4d6a-a40a-ba7573ba48b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphContainer">
+      <UniqueIdentifier>{27bb8c5e-1090-41ad-bba4-703fba5cdee5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphContainer\Inc">
+      <UniqueIdentifier>{d67a5d85-943f-40c7-a579-22ca5a7c2090}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphContainer\Src">
+      <UniqueIdentifier>{b7e5b194-f7ca-48ac-962a-2a9108267bfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphContainersCache">
+      <UniqueIdentifier>{a70da80c-5648-411b-aaa8-cf416026cb9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphContainersCache\Inc">
+      <UniqueIdentifier>{ce71400e-2ece-4c44-af74-528e5730cfec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphLogic\GraphContainersCache\Src">
+      <UniqueIdentifier>{3962b2c4-70ea-4370-9191-7e202bec3bd3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterTypeEnum.h">
+      <Filter>PatternCompareEnums</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphTypeEnum.h">
+      <Filter>PatternCompareEnums</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphSettings.h">
+      <Filter>GraphLogic\GraphConfig</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphDrawer.h">
+      <Filter>GraphLogic\GraphDraw\GeneralDrawer\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphLinearDrawer.h">
+      <Filter>GraphLogic\GraphDraw\LinearDrawer\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphBarsDrawer.h">
+      <Filter>GraphLogic\GraphDraw\BarsDrawer\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphContainer.h">
+      <Filter>GraphLogic\GraphContainer\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLineTypeEnum.h">
+      <Filter>PatternCompareEnums</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphContainerCache.h">
+      <Filter>GraphLogic\GraphContainersCache\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AnalyzeCore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphSettings.cpp">
+      <Filter>GraphLogic\GraphConfig</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphDrawer.cpp">
+      <Filter>GraphLogic\GraphDraw\GeneralDrawer\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphLinearDrawer.cpp">
+      <Filter>GraphLogic\GraphDraw\LinearDrawer\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphBarsDrawer.cpp">
+      <Filter>GraphLogic\GraphDraw\BarsDrawer\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphContainer.cpp">
+      <Filter>GraphLogic\GraphContainer\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphContainerCache.cpp">
+      <Filter>GraphLogic\GraphContainersCache\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

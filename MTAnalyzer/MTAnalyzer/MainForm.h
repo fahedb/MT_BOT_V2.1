@@ -1,4 +1,5 @@
 #include "Settings.h"
+//#include "GraphContainerCache.h"
 
 #pragma once
 
@@ -318,7 +319,7 @@ namespace MTAnalyzer {
 		}
 #pragma endregion
 private:
-
+	//GraphContainerCache* m_graphsCache;
 private:
 	System::Void AllSelectionRadioButton_CheckedChanged(System::Object^ sender, System::EventArgs^ e) { if (om_AllSelectionRadioButton->Checked == true) { InitRadioFilterSelection(PatternsCompare_FilterType::ALL); } }
 	System::Void TradesOnlyRadioButton_CheckedChanged(System::Object^ sender, System::EventArgs^ e) { if (om_TradesOnlyRadioButton->Checked == true) InitRadioFilterSelection(PatternsCompare_FilterType::TradesOnly); }

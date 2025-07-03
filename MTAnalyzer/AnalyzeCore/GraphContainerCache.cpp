@@ -35,7 +35,7 @@ void GraphContainerCache::Set_GraphStruct(GraphContainerKey key, GraphStructure&
     }
 }
 
-std::pair<std::vector<GraphContainer>, std::vector<GraphContainer>> GraphContainerCache::Get_AllContainers(PatternsCompare_FilterType fType)
+std::pair<GraphContainerVec, GraphContainerVec> GraphContainerCache::Get_AllContainers(PatternsCompare_FilterType fType)
 {
     std::pair<std::vector<GraphContainer>, std::vector<GraphContainer>> resPairVec;
     if (fType != PatternsCompare_FilterType::NONE)

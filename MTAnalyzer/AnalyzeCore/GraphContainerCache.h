@@ -17,6 +17,7 @@ struct PairHash {
 
 typedef robin_hood::unordered_map<std::pair<PatternsCompare_FilterType, long>, GraphContainer, PairHash> GraphContainerMap;
 typedef std::pair<PatternsCompare_FilterType, long> GraphContainerKey;
+typedef std::vector<GraphContainer> GraphContainerVec;
 
 /// <summary>
 /// Singleton Class to manage GraphContainers
@@ -37,7 +38,7 @@ public:
     void Set_PngPath(GraphContainerKey key,const std::string& path,PatternCompare_GraphType gType,PatternsCompare_TimeLineType tlT);
     void Set_GraphStruct(GraphContainerKey key, GraphStructure& gSt, PatternCompare_GraphType gType, PatternsCompare_TimeLineType tlT);
     
-    std::pair<std::vector<GraphContainer>, std::vector<GraphContainer>> Get_AllContainers(PatternsCompare_FilterType fType);
+    std::pair<GraphContainerVec, GraphContainerVec> Get_AllContainers(PatternsCompare_FilterType fType);
 
 private:
     GraphContainerMap* Get_Map(PatternsCompare_TimeLineType tlT) { if (tlT == PatternsCompare_TimeLineType::History) return &m_historyGraphsContainers; else return &m_currentGraphsContainers; }

@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnalyzeCore", "AnalyzeCore\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPCore", "..\HTTPCore\HTTPCore.vcxproj", "{795C2DF4-EE54-4683-A658-EC0881EEC905}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MTSimulator", "..\MTCore\MTSimulator\MTSimulator.vcxproj", "{26CB6981-5CC5-4DED-8470-7E6B8DB5C4E1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -43,14 +41,6 @@ Global
 		{795C2DF4-EE54-4683-A658-EC0881EEC905}.Release|x64.Build.0 = Release|x64
 		{795C2DF4-EE54-4683-A658-EC0881EEC905}.Release|x86.ActiveCfg = Release|Win32
 		{795C2DF4-EE54-4683-A658-EC0881EEC905}.Release|x86.Build.0 = Release|Win32
-		{26CB6981-5CC5-4DED-8470-7E6B8DB5C4E1}.Debug|x64.ActiveCfg = Debug|x64
-		{26CB6981-5CC5-4DED-8470-7E6B8DB5C4E1}.Debug|x64.Build.0 = Debug|x64
-		{26CB6981-5CC5-4DED-8470-7E6B8DB5C4E1}.Debug|x86.ActiveCfg = Debug|Win32
-		{26CB6981-5CC5-4DED-8470-7E6B8DB5C4E1}.Debug|x86.Build.0 = Debug|Win32
-		{26CB6981-5CC5-4DED-8470-7E6B8DB5C4E1}.Release|x64.ActiveCfg = Release|x64
-		{26CB6981-5CC5-4DED-8470-7E6B8DB5C4E1}.Release|x64.Build.0 = Release|x64
-		{26CB6981-5CC5-4DED-8470-7E6B8DB5C4E1}.Release|x86.ActiveCfg = Release|Win32
-		{26CB6981-5CC5-4DED-8470-7E6B8DB5C4E1}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

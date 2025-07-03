@@ -112,7 +112,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -149,6 +149,7 @@
     <ClInclude Include="GraphDrawer.h" />
     <ClInclude Include="GraphLinearDrawer.h" />
     <ClInclude Include="GraphSettings.h" />
+    <ClInclude Include="GraphStructure.h" />
     <ClInclude Include="GraphTypeEnum.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="TimeLineTypeEnum.h" />

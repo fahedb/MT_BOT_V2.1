@@ -70,6 +70,9 @@
     <Filter Include="GraphLogic\GraphContainersCache\Src">
       <UniqueIdentifier>{3962b2c4-70ea-4370-9191-7e202bec3bd3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Convertors">
+      <UniqueIdentifier>{e04bf2ff-d923-4059-ba4b-e556b0877c2a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -106,6 +109,9 @@
       <Filter>GraphLogic\GraphContainersCache\Inc</Filter>
     </ClInclude>
     <ClInclude Include="Test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphStructure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

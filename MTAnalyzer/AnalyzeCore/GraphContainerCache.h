@@ -1,23 +1,12 @@
 #include "GraphContainer.h"
 #include "robin_hood.h"
 #include "Converts.h"
+#include <mutex>
 
 #pragma once
-struct PairHash {
-    std::size_t operator()(const std::pair<PatternsCompare_FilterType, long>& p) const {
-        std::size_t h1 = std::hash<PatternsCompare_FilterType>{}(p.first);
-        std::size_t h2 = std::hash<long>{}(p.second);
-        return h1 ^ (h2 << 1);
-    }
-    std::size_t operator()(const PatternsCompare_FilterType& val) const {
-        return std::hash<std::underlying_type_t<PatternsCompare_FilterType>>{}(static_cast<std::underlying_type_t<PatternsCompare_FilterType>>(val));
-    }
-};
 
-
-typedef robin_hood::unordered_map<std::pair<PatternsCompare_FilterType, long>, GraphContainer, PairHash> GraphContainerMap;
-typedef std::pair<PatternsCompare_FilterType, long> GraphContainerKey;
-typedef std::vector<GraphContainer> GraphContainerVec;
+typedef robin_hood::unordered_map<long long, GraphContainer> GraphContainerMap; // Map to store GraphContainers with long long Ids (son Ids)
+typedef std::pair<GraphContainer, GraphContainerMap> GraphPack; // Every GraphPack contains a parent GraphContainer(Main Id) and a map of son GraphContainers (History Ids)
 
 /// <summary>
 /// Singleton Class to manage GraphContainers
@@ -34,20 +23,24 @@ public:
         return &instance;
     }
 
-    void Set_NewContainer(GraphContainer& container);
-    void Set_PngPath(GraphContainerKey key,const std::string& path,PatternCompare_GraphType gType,PatternsCompare_TimeLineType tlT);
-    void Set_GraphStruct(GraphContainerKey key, GraphStructure& gSt, PatternCompare_GraphType gType, PatternsCompare_TimeLineType tlT);
+    void Set_NewContainer(GraphContainer& container, const std::string& parentId);
+    void Set_PngPath(const std::string& paterntId, const std::string& sonId, const std::string& path, PatternsCompare_FilterType fType, PatternCompare_GraphType gType);
+    void Set_GraphStruct(const std::string& paterntId, const std::string& sonId, GraphStructure& gSt, PatternsCompare_FilterType fType, PatternCompare_GraphType gType);
     
-    std::pair<GraphContainerVec, GraphContainerVec> Get_AllContainers(PatternsCompare_FilterType fType);
-
+    std::vector<GraphContainer> Get_AllContainers_ForCurrentPoint(const std::string& id ,PatternsCompare_FilterType fType);
+    GraphContainer * Get_Container(std::string parentId,std::string sonId, PatternsCompare_TimeLineType tlT);
+	GraphContainer* Get_SonContainer(const std::string& parentId, const std::string& sonId); // Get the son container for a specific parentId (Main Id) and sonId (History Id)
+	GraphContainer* Get_ParentContainer(const std::string& parentId, PatternsCompare_FilterType fType); // Get the parent container for a specific parentId (Main Id)
+	std::vector<GraphPack>* Get_GraphPacks(PatternsCompare_FilterType fType); // Get the GraphPacks for a specific filter type (ALL or TradesOnly)
+	GraphPack* Get_GraphPack(PatternsCompare_FilterType fType, const std::string& parentId); // Get the GraphPack for a specific parentId (Main Id)
 private:
-    GraphContainerMap* Get_Map(PatternsCompare_TimeLineType tlT) { if (tlT == PatternsCompare_TimeLineType::History) return &m_historyGraphsContainers; else return &m_currentGraphsContainers; }
-    GraphContainerMap m_currentGraphsContainers;
-    GraphContainerMap m_historyGraphsContainers;
-
+    std::vector<GraphPack> m_scansGraphPacks;
+    std::vector<GraphPack> m_tradesGraphPacks;
+	std::mutex m_mutex; // Mutex for thread safety
 
     // Private constructor to prevent instantiation
     GraphContainerCache() {
+
     }
     ~GraphContainerCache()
     {
@@ -59,26 +52,13 @@ class GraphContainerCacheUtils
 public:
     static void CompleteMissingData(GraphContainerMap* myMap, GraphContainer& container)
     {
-        auto pr = std::make_pair(container.Get_FilterType(), Converts::ToLong(container.Get_Id()));
-        auto val = myMap->find(pr);
+        auto val = myMap->find(Converts::ToLongLong(container.Get_Id()));
         if (val != myMap->end()) {
             GraphContainerCacheUtils::CompleteMissingPaths(val->second, container);
             GraphContainerCacheUtils::CompleteMissingStructures(val->second, container);
         }
     }
 
-    static std::vector<GraphContainer> Get_Containers(GraphContainerMap* myMap,PatternsCompare_FilterType fType)
-    {
-        std::vector<GraphContainer> resVec;
-        for (auto it = myMap->begin(); it != myMap->end(); ) {
-            if (it->first.first == fType)
-            {
-                resVec.push_back(it->second);
-            }
-            ++it; // Move to the next element
-        }
-        return resVec;
-    }
 
 private:
     static void CompleteMissingPaths(GraphContainer& dest, GraphContainer& src)

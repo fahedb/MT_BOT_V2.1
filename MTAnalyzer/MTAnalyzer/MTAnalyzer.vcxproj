@@ -30,7 +30,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CLRSupport>true</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -125,16 +125,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DataProxyClass.cpp" />
+    <ClCompile Include="GraphsManager.cpp" />
     <ClCompile Include="MainForm.cpp" />
+    <ClCompile Include="ManagedToNativeConverter.cpp" />
+    <ClCompile Include="NativeToManagedConverter.cpp" />
+    <ClCompile Include="ProxyGraphStruct.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DataProxyClass.h" />
+    <ClInclude Include="GraphsManager.h" />
     <ClInclude Include="MainForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="ManagedToNativeConverter.h" />
+    <ClInclude Include="NativeToManagedConverter.h" />
+    <ClInclude Include="ProxyGraphStruct.h" />
     <ClInclude Include="Settings.h" />
   </ItemGroup>
   <ItemGroup>

@@ -60,8 +60,13 @@ private:
 			for (int i = 0; i < ordersCount; i++)
 			{
 				OrderEntity* order = m_trader->Get_Order_ByIdx(i);
-				DirectionStats* stats = GetRelativeStats(order);
+				if(!order || order->Get_OrderStatus() == OrderStatus::CLOSED)
+				{
+					Logger::getInstance().WriteLog("Invalid order found in TradeTracing, skipping", false, true, LogType::ERR);
+					continue; // Skip invalid orders
+				}
 
+				DirectionStats* stats = GetRelativeStats(order);
 				if (!stats || !stats->IsActive())
 				{
 					Logger::getInstance().WriteLog("No valid stats for order " + std::to_string(order->Get_OrderSeqNum()), false, true, LogType::ERR);

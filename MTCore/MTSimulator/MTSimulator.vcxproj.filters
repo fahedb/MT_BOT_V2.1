@@ -217,6 +217,33 @@
     <Filter Include="DataStructers\GraphStruct">
       <UniqueIdentifier>{9a275826-6b1c-4a7d-a3dd-a204f6b58b8b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataStructers\JsonHandler\GraphContainersJsonHandler">
+      <UniqueIdentifier>{f715a403-9831-4890-9c2e-194d70cf17dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\GraphStruct\AnalyzePackage">
+      <UniqueIdentifier>{638dde87-15cb-4697-86b6-557f8cab95cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cache\CurrentTimeLineCache">
+      <UniqueIdentifier>{d2b62fef-49eb-4f7a-93f6-d00a111af051}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ApplicationFlags">
+      <UniqueIdentifier>{9cea1775-2c5f-4dd7-8bd2-5f790b5bb959}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryUtils">
+      <UniqueIdentifier>{d4858981-9dd8-42b1-a495-d1d5fdfa1b68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Utils">
+      <UniqueIdentifier>{6684f42b-04d4-4198-9484-11c29b52e2df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataExport\CSVExporter">
+      <UniqueIdentifier>{78646767-ebb5-4b87-81e6-5440918ecc14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\JsonHandler\GraphContainersJsonHandler\Inc">
+      <UniqueIdentifier>{3e4f00bc-6298-4467-93fa-38685759e938}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\JsonHandler\GraphContainersJsonHandler\Src">
+      <UniqueIdentifier>{bc67b9a7-0ef7-440d-b0d8-daea0fc4e83f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -276,9 +303,6 @@
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Cache</Filter>
     </ClCompile>
-    <ClCompile Include="MyJSONHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ThreadPool.cpp">
       <Filter>MultiThreading</Filter>
     </ClCompile>
@@ -288,9 +312,6 @@
     <ClCompile Include="HTTP_Lgger.cpp">
       <Filter>LogsLogic\Src</Filter>
     </ClCompile>
-    <ClCompile Include="CSVExportData.cpp">
-      <Filter>DataExport</Filter>
-    </ClCompile>
     <ClCompile Include="SeqNumTable.cpp">
       <Filter>Tables\SeqTable</Filter>
     </ClCompile>
@@ -299,9 +320,6 @@
     </ClCompile>
     <ClCompile Include="StatisticsDecession.cpp">
       <Filter>Strategies\PatternGod\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="DataExporter.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ChangeDataBuilder.cpp">
       <Filter>DataStructers\ChangeStructure\Src</Filter>
@@ -330,9 +348,6 @@
     <ClCompile Include="TradeTracer.cpp">
       <Filter>TradeTracer</Filter>
     </ClCompile>
-    <ClCompile Include="Static_CurrentTimeLineRep.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TimeLine.cpp">
       <Filter>DataStructers\TimeLine\Src</Filter>
     </ClCompile>
@@ -348,23 +363,38 @@
     <ClCompile Include="ScoreResultsCache.cpp">
       <Filter>DataStructers\ScoreResultsCache</Filter>
     </ClCompile>
-    <ClCompile Include="ProccessFlags.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MTSimulatorUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GaphUtils.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="GraphStructres.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PolynomBuilder.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphStructres.cpp">
+      <Filter>DataStructers\GraphStruct</Filter>
+    </ClCompile>
+    <ClCompile Include="AnalyzerGraphsPackage.cpp">
+      <Filter>DataStructers\GraphStruct\AnalyzePackage</Filter>
+    </ClCompile>
+    <ClCompile Include="DataExporter.cpp">
+      <Filter>DataExport</Filter>
+    </ClCompile>
+    <ClCompile Include="Static_CurrentTimeLineRep.cpp">
+      <Filter>Cache\CurrentTimeLineCache</Filter>
+    </ClCompile>
+    <ClCompile Include="ProccessFlags.cpp">
+      <Filter>ApplicationFlags</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryUtils.cpp">
+      <Filter>MemoryUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="MTSimulatorUtils.cpp">
+      <Filter>Strategies\PatternGod\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CSVExportData.cpp">
+      <Filter>DataExport\CSVExporter</Filter>
+    </ClCompile>
+    <ClCompile Include="JsonHandler_GraphContainer.cpp">
+      <Filter>DataStructers\JsonHandler\GraphContainersJsonHandler\Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -431,9 +461,6 @@
     <ClInclude Include="ResourceManager.h">
       <Filter>Cache</Filter>
     </ClInclude>
-    <ClInclude Include="MyJSONHandler.h">
-      <Filter>DefinedTables</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadPool.h">
       <Filter>MultiThreading</Filter>
     </ClInclude>
@@ -443,9 +470,6 @@
     <ClInclude Include="HTTP_Lgger.h">
       <Filter>LogsLogic\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="CSVExportData.h">
-      <Filter>DataExport</Filter>
-    </ClInclude>
     <ClInclude Include="SeqNumTable.h">
       <Filter>Tables\SeqTable</Filter>
     </ClInclude>
@@ -454,9 +478,6 @@
     </ClInclude>
     <ClInclude Include="StatisticsDecession.h">
       <Filter>Strategies\PatternGod\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="DataExporter.h">
-      <Filter>DefinedTables</Filter>
     </ClInclude>
     <ClInclude Include="ChangeDataBuilder.h">
       <Filter>DataStructers\ChangeStructure\Inc</Filter>
@@ -491,9 +512,6 @@
     <ClInclude Include="TradeTracer.h">
       <Filter>TradeTracer</Filter>
     </ClInclude>
-    <ClInclude Include="Static_CurrentTimeLineRep.h">
-      <Filter>DefinedTables</Filter>
-    </ClInclude>
     <ClInclude Include="TimeLineBuilder.h">
       <Filter>DataStructers\TimeLine\Inc</Filter>
     </ClInclude>
@@ -509,26 +527,44 @@
     <ClInclude Include="ScoreResultsCache.h">
       <Filter>DataStructers\ScoreResultsCache</Filter>
     </ClInclude>
-    <ClInclude Include="ProccessFlags.h">
-      <Filter>DefinedTables</Filter>
-    </ClInclude>
-    <ClInclude Include="MTSimulatorUtils.h">
-      <Filter>DefinedTables</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryUtils.h">
-      <Filter>DefinedTables</Filter>
-    </ClInclude>
     <ClInclude Include="GaphUtils.h">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphStructres.h">
-      <Filter>DefinedTables</Filter>
     </ClInclude>
     <ClInclude Include="BarPeriods.h">
       <Filter>DataStructers\ChangeStructure\Inc</Filter>
     </ClInclude>
     <ClInclude Include="PolynomBuilder.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="AnalyzerGraphsPackage.h">
+      <Filter>DataStructers\GraphStruct\AnalyzePackage</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphStructres.h">
+      <Filter>DataStructers\GraphStruct</Filter>
+    </ClInclude>
+    <ClInclude Include="Static_CurrentTimeLineRep.h">
+      <Filter>Cache\CurrentTimeLineCache</Filter>
+    </ClInclude>
+    <ClInclude Include="ProccessFlags.h">
+      <Filter>ApplicationFlags</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryUtils.h">
+      <Filter>MemoryUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="MTSimulatorUtils.h">
+      <Filter>Strategies\PatternGod\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CSVExportData.h">
+      <Filter>DataExport\CSVExporter</Filter>
+    </ClInclude>
+    <ClInclude Include="DataExporter.h">
+      <Filter>DataExport</Filter>
+    </ClInclude>
+    <ClInclude Include="JsonHandler_GraphContainer.h">
+      <Filter>DataStructers\JsonHandler\GraphContainersJsonHandler\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="JsonDefs_GraphContainer.h">
+      <Filter>DataStructers\JsonHandler\GraphContainersJsonHandler\Inc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

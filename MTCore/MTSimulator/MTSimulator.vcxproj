@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AnalyzerGraphsPackage.cpp" />
     <ClCompile Include="BasePricesTable.cpp" />
     <ClCompile Include="BTables.cpp" />
     <ClCompile Include="ChangeData.cpp" />
@@ -165,11 +166,11 @@
     <ClCompile Include="HTTP_Lgger.cpp" />
     <ClCompile Include="IndicatorStructres.cpp" />
     <ClCompile Include="JasonHandler.cpp" />
+    <ClCompile Include="JsonHandler_GraphContainer.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="MemoryUtils.cpp" />
     <ClCompile Include="MTChart.cpp" />
     <ClCompile Include="MTSimulatorUtils.cpp" />
-    <ClCompile Include="MyJSONHandler.cpp" />
     <ClCompile Include="OrdersStructCache.cpp" />
     <ClCompile Include="OrdersToExecute.cpp" />
     <ClCompile Include="OrderStruct.cpp" />
@@ -197,6 +198,7 @@
     <ClCompile Include="XAUUSD_OneMinTable.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnalyzerGraphsPackage.h" />
     <ClInclude Include="BarPeriods.h" />
     <ClInclude Include="BasePricesTable.h" />
     <ClInclude Include="BTables.h" />
@@ -221,11 +223,12 @@
     <ClInclude Include="HTTP_Lgger.h" />
     <ClInclude Include="IndicatorStructres.h" />
     <ClInclude Include="JasonHandler.h" />
+    <ClInclude Include="JsonDefs_GraphContainer.h" />
+    <ClInclude Include="JsonHandler_GraphContainer.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MemoryUtils.h" />
     <ClInclude Include="MTChart.h" />
     <ClInclude Include="MTSimulatorUtils.h" />
-    <ClInclude Include="MyJSONHandler.h" />
     <ClInclude Include="OrdersStructCache.h" />
     <ClInclude Include="OrdersToExecute.h" />
     <ClInclude Include="OrderStruct.h" />

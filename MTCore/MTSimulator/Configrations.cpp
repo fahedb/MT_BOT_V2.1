@@ -178,4 +178,11 @@ void Configrations::Init_PatternPolicy()
     m_policy.TraceCurrTimeLineLen = Converts::ToInt(Get_ConfigValue_DB(CONFG_DEF_TRACE_CURR_TIMELINE_LEN));
     m_policy.EnableTradeTracing =   Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_ENABLE_TRADE_TRACING)) > 0 ? true : false;
     m_policy.EnableDynamicTimeLine_TradeTracing = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_ENABLE_DYNAMIC_TIMELINE_TRADE_TRACING)) > 0 ? true : false;
+
+    m_policy.EnableScoreCaching= Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_ENABLE_DYNAMIC_TIMELINE_TRADE_TRACING)) > 0 ? true : false;
+
+
+	// Configs to control polynom scan
+	m_policy.EnablePolynomScan = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_ENABLE_POLYNOM_SCAN)) > 0 ? true : false;
+	m_policy.PolynomLen_ForScan = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_POLYNOM_LEN_FOR_SCAN));
 }

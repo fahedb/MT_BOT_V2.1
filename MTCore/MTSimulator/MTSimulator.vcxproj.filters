@@ -211,9 +211,6 @@
     <Filter Include="Math">
       <UniqueIdentifier>{951de14a-b6aa-4a17-a540-9050e98f40ac}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DataStructers\ScoreResultsCache">
-      <UniqueIdentifier>{089a0092-eaea-42b8-aaae-4b5246ea8596}</UniqueIdentifier>
-    </Filter>
     <Filter Include="DataStructers\GraphStruct">
       <UniqueIdentifier>{9a275826-6b1c-4a7d-a3dd-a204f6b58b8b}</UniqueIdentifier>
     </Filter>
@@ -243,6 +240,42 @@
     </Filter>
     <Filter Include="DataStructers\JsonHandler\GraphContainersJsonHandler\Src">
       <UniqueIdentifier>{bc67b9a7-0ef7-440d-b0d8-daea0fc4e83f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\DataStructures">
+      <UniqueIdentifier>{10b856d1-ed5f-4a42-b138-114be456ed70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\MathFuncs">
+      <UniqueIdentifier>{f3439fda-2919-4bc4-a3a7-8b6456137ad1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cache\PolynomCache">
+      <UniqueIdentifier>{7368a161-42aa-47ea-8f00-a16d2a747a8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\MathFuncs\Inc">
+      <UniqueIdentifier>{21104887-9c08-4374-855a-473f59379a1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\MathFuncs\Src">
+      <UniqueIdentifier>{8bade003-a4e3-41a6-acd6-dea07c34b940}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\DataStructures\Plynom">
+      <UniqueIdentifier>{482b80c6-0296-4b45-adbb-100a5fefde2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\DataStructures\Plynom\Struct">
+      <UniqueIdentifier>{fbb44e2e-6c80-4d63-b956-1107f949c5f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\DataStructures\Plynom\Builder">
+      <UniqueIdentifier>{244d7396-dbf6-4a07-bc27-5003a526b3d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cache\ScoreResultsCache">
+      <UniqueIdentifier>{089a0092-eaea-42b8-aaae-4b5246ea8596}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cache\Resources">
+      <UniqueIdentifier>{378a5976-4854-40b1-a78b-171a2395ceef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Normalizer">
+      <UniqueIdentifier>{4992186a-2fd9-4516-bfb0-7979358bb2c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\Keys">
+      <UniqueIdentifier>{c499ba8c-ec04-41bb-926c-62204479e353}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -300,9 +333,6 @@
     <ClCompile Include="OrdersToExecute.cpp">
       <Filter>Tables\NewOrdersTable\Src</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>Cache</Filter>
-    </ClCompile>
     <ClCompile Include="ThreadPool.cpp">
       <Filter>MultiThreading</Filter>
     </ClCompile>
@@ -357,17 +387,8 @@
     <ClCompile Include="TimeLineBuilder.cpp">
       <Filter>DataStructers\TimeLine\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Converts.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="ScoreResultsCache.cpp">
-      <Filter>DataStructers\ScoreResultsCache</Filter>
-    </ClCompile>
-    <ClCompile Include="GaphUtils.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="PolynomBuilder.cpp">
-      <Filter>Math</Filter>
+      <Filter>Cache\ScoreResultsCache</Filter>
     </ClCompile>
     <ClCompile Include="GraphStructres.cpp">
       <Filter>DataStructers\GraphStruct</Filter>
@@ -395,6 +416,39 @@
     </ClCompile>
     <ClCompile Include="JsonHandler_GraphContainer.cpp">
       <Filter>DataStructers\JsonHandler\GraphContainersJsonHandler\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphUtils.cpp">
+      <Filter>Math\MathFuncs\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Converts.cpp">
+      <Filter>Math\MathFuncs\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Polynom.h">
+      <Filter>Math\DataStructures\Plynom\Struct</Filter>
+    </ClCompile>
+    <ClCompile Include="Polynom.cpp">
+      <Filter>Math\DataStructures\Plynom\Struct</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomBuilder.cpp">
+      <Filter>Math\DataStructures\Plynom\Builder</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomCache.cpp">
+      <Filter>Cache\PolynomCache</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Cache\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomScoreCalcs.cpp">
+      <Filter>CalcScoreLogic\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomChangeNodePackage.cpp">
+      <Filter>DataStructers\ChangeStructure\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomChangeNodePackageBuilder.cpp">
+      <Filter>DataStructers\ChangeStructure\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomKey.cpp">
+      <Filter>DataStructers\Keys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -458,9 +512,6 @@
     <ClInclude Include="OrdersToExecute.h">
       <Filter>Tables\NewOrdersTable\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceManager.h">
-      <Filter>Cache</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadPool.h">
       <Filter>MultiThreading</Filter>
     </ClInclude>
@@ -521,20 +572,11 @@
     <ClInclude Include="TimeLine.h">
       <Filter>DataStructers\TimeLine\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="Converts.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="ScoreResultsCache.h">
-      <Filter>DataStructers\ScoreResultsCache</Filter>
-    </ClInclude>
-    <ClInclude Include="GaphUtils.h">
-      <Filter>Math</Filter>
+      <Filter>Cache\ScoreResultsCache</Filter>
     </ClInclude>
     <ClInclude Include="BarPeriods.h">
       <Filter>DataStructers\ChangeStructure\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="PolynomBuilder.h">
-      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="AnalyzerGraphsPackage.h">
       <Filter>DataStructers\GraphStruct\AnalyzePackage</Filter>
@@ -565,6 +607,33 @@
     </ClInclude>
     <ClInclude Include="JsonDefs_GraphContainer.h">
       <Filter>DataStructers\JsonHandler\GraphContainersJsonHandler\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphUtils.h">
+      <Filter>Math\MathFuncs\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Converts.h">
+      <Filter>Math\MathFuncs\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomBuilder.h">
+      <Filter>Math\DataStructures\Plynom\Builder</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomCache.h">
+      <Filter>Cache\PolynomCache</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Cache\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomScoreCalcs.h">
+      <Filter>CalcScoreLogic\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomChangeNodePackage.h">
+      <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomChangeNodePackageBuilder.h">
+      <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomKey.h">
+      <Filter>DataStructers\Keys</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

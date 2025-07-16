@@ -3,8 +3,15 @@
 #include "XAUUSD_OneMinTable.h"
 #include "ExchangeData.h"
 #include "ThreadPool.h"
-
 #include <future>
+
+// <summary>
+/// HistoryTimeLineLoader class for loading
+/// historical data into a vector of ChangeNode objects.
+/// It uses multi-threading to efficiently load data from a database table.
+/// </summary>
+/// Author: Fahed Elbatash
+/// Date: 2025-07-12
 
 #pragma once
 class HistoryTimeLineLoader

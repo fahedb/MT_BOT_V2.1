@@ -11,6 +11,17 @@
 #include "LOGGER.H"
 #include <future>
 
+/// <summary>	
+/// StrategiesRunner class for running
+/// trading strategies on historical data.
+/// It loads configurations, retrieves historical data,
+/// and executes the PatternGod strategy on the data.
+/// </summary>
+/// Author: Fahed Elbatash
+/// Date: 2025-07-12
+/// /// This class is responsible for initializing the trading environment,
+/// loading historical data, and executing the PatternGod strategy.
+
 
 #pragma once
 class StrategiesRunner

@@ -44,18 +44,9 @@ class ScoreResultsCache
 private:
 	long long m_lastCleanedTime = 0; // Timestamp of the last cleaning operation
 	std::atomic<bool> m_cleaningInProgress = false; // Flag to indicate if cleaning is in progress
-	std::vector<robin_hood::unordered_map<std::pair<long long, long long>, ScoresResult>> m_scoreResultsCache; // Cache to store scores by time point
+	std::vector<robin_hood::unordered_map<long long, ScoresResult>> m_scoreResultsCache; // Cache to store scores by time point
 public:
-	void StoreNewScoreResult(const std::string& timePoint1,const std::string& timePoint2,const ScoresResult& score, int threadIdx)
-	{
-		m_scoreResultsCache[threadIdx].try_emplace(std::make_pair(Converts::ToLongLong(timePoint1), Converts::ToLongLong(timePoint2)), score);
-	}
-
-	void StoreNewScoreResult(const std::pair<long long, long long>& timePointCombo, const ScoresResult& score, int threadIdx) { m_scoreResultsCache[threadIdx].try_emplace(timePointCombo, score); }
 	
-	ScoresResult* GetScoreResult(const std::string& timePoint1, const std::string& timePoint2, int threadIdx);
-	ScoresResult* GetScoreResult(long long timePoint1, long long timePoint2, int threadIdx);
-
 	bool CleanPreCondition(); // Function to check if cleaning is allowed
 	void CleanOldResults(); // Do not use This function in a seperated thread - Use it only in the main thread of scanning, need to freez the main thread to prevent scanning while cleaning
 	static void CleanOldResultsForThread(int threadIdx, long long oldestTP, robin_hood::unordered_map<std::pair<long long, long long>, ScoresResult>* relevantMap); // Function to clean cache per thread

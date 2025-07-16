@@ -4,11 +4,11 @@
 #include "MathExtentions.h"
 
 #pragma once
-class GaphUtils
+class GraphUtils
 {
 private:
 	static GraphStructure Build_Points(const std::vector<double>& points, int splitter = -1); // Function to add X values to Y values into vector - for private usage
-	static std::vector<double> GetNormalizedValues(std::vector<ChangeNode*>& vec, IndicatorType indType = IndicatorType::NONE, IndicatorLen indLen = IndicatorLen::NONE, BarPeriod barP = BarPeriod::NONE);
+	static std::vector<double> GetNormalizedValues(std::vector<ChangeNode*>& vec, IndicatorType indType = IndicatorType::NONE, IndicatorLen indLen = IndicatorLen::NONE, BarPeriod barP = BarPeriod::NONE, IndicatorValueType indVT = IndicatorValueType::Value);
 
 	// TODO - Need to use tamplate here
 	static void NormalizeVectorValues(std::vector<double>& vec)
@@ -20,10 +20,10 @@ private:
 	}
 
 public:
-	static GraphStructure Build_NormalizedGraph(std::vector<ChangeNode*> vec,IndicatorType indType = IndicatorType::NONE, IndicatorLen indLen = IndicatorLen::NONE, BarPeriod barP = BarPeriod::NONE)
+	static GraphStructure Build_NormalizedGraph(std::vector<ChangeNode*> vec,IndicatorType indType = IndicatorType::NONE, IndicatorLen indLen = IndicatorLen::NONE, BarPeriod barP = BarPeriod::NONE,IndicatorValueType indVT = IndicatorValueType::Value)
 	{
 		GraphStructure graph;
-		std::vector<double> yValues = GaphUtils::GetNormalizedValues(vec,indType,indLen,barP);
+		std::vector<double> yValues = GraphUtils::GetNormalizedValues(vec,indType,indLen,barP,indVT);
 		graph.points.reserve(yValues.size());
 
 		for (int i = 0; i < yValues.size(); i++)

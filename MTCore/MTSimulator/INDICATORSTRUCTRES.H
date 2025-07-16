@@ -179,6 +179,7 @@ public:
 	void Set_Ind_SingleValue(IndicatorType type, IndicatorLen len,BarPeriod barP,double val); // To Set indicator single value - by type, len and baePeriod
 	void Set_Ind_SingleSlope(IndicatorType type, IndicatorLen len, BarPeriod barP, double val); // To Set indicator single slope - by type, len and barPeriod
 	BaseIndicator* Get_Indicator(IndicatorType type, IndicatorLen len); // Get Indicator ptr
+	std::vector<std::vector< BaseIndicator*>>* Get_Indicators_Vec() { return &m_vec; } // Get the vector of indicators
 private:
 	void Set_IndValue(BaseIndicator*, BarPeriod, double);
 	void Set_IndSlope(BaseIndicator*, BarPeriod, double);
@@ -224,6 +225,27 @@ public:
 		case IndicatorType::VOLUME: return 3;
 		default:
 			return -1; // Invalid type
+		}
+	}
+
+	static double Get_IndicatorValue(const IndicatorValues& indValues, BarPeriod barP, IndicatorValueType valueType)
+	{
+		switch (barP)
+		{
+		case BarPeriod::M1:
+			return valueType == IndicatorValueType::Value ? indValues.M1 : indValues.m_Slope_M1;
+		case BarPeriod::M5:
+			return valueType == IndicatorValueType::Value ? indValues.M5 : indValues.m_Slope_M5;
+		case BarPeriod::M15:
+			return valueType == IndicatorValueType::Value ? indValues.M15 : indValues.m_Slope_M15;
+		case BarPeriod::M30:
+			return valueType == IndicatorValueType::Value ? indValues.M30 : indValues.m_Slope_M30;
+		case BarPeriod::H1:
+			return valueType == IndicatorValueType::Value ? indValues.H1 : indValues.m_Slope_H1;
+		case BarPeriod::H4:
+			return valueType == IndicatorValueType::Value ? indValues.H4 : indValues.m_Slope_H4;
+		default:
+			return 0.0; // Invalid bar period
 		}
 	}
 };

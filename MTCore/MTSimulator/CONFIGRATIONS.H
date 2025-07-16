@@ -70,6 +70,9 @@ struct ConfigrationsPolicy {
 	int ThreadsCount = ThreadPool::getInstance()->Get_ThreadsNum(); // Default to number of hardware threads minus one
 	int CleanEveryXScans = 10; // Default to clean cache every 10 scans
 
+	bool EnablePolynomScan = 0;
+	int PolynomLen_ForScan = 0;
+
 };
 
 class Configrations // SingleTon class for all configrations of the program

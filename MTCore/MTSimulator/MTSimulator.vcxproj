@@ -161,7 +161,7 @@
     <ClCompile Include="DirectionStats.cpp" />
     <ClCompile Include="DirectionStatsCache.cpp" />
     <ClCompile Include="EURUSD_CurrentTable.cpp" />
-    <ClCompile Include="GaphUtils.cpp" />
+    <ClCompile Include="GraphUtils.cpp" />
     <ClCompile Include="GraphStructres.cpp" />
     <ClCompile Include="HTTP_Lgger.cpp" />
     <ClCompile Include="IndicatorStructres.cpp" />
@@ -176,7 +176,14 @@
     <ClCompile Include="OrderStruct.cpp" />
     <ClCompile Include="PatternExporter.cpp" />
     <ClCompile Include="PatternGod.cpp" />
+    <ClCompile Include="Polynom.cpp" />
     <ClCompile Include="PolynomBuilder.cpp" />
+    <ClCompile Include="Polynom.h" />
+    <ClCompile Include="PolynomCache.cpp" />
+    <ClCompile Include="PolynomChangeNodePackage.cpp" />
+    <ClCompile Include="PolynomChangeNodePackageBuilder.cpp" />
+    <ClCompile Include="PolynomKey.cpp" />
+    <ClCompile Include="PolynomScoreCalcs.cpp" />
     <ClCompile Include="ProccessFlags.cpp" />
     <ClCompile Include="ProcessData.cpp" />
     <ClCompile Include="ScoreCalcs.cpp" />
@@ -218,7 +225,7 @@
     <ClInclude Include="DirectionStats.h" />
     <ClInclude Include="DirectionStatsCache.h" />
     <ClInclude Include="EURUSD_CurrentTable.h" />
-    <ClInclude Include="GaphUtils.h" />
+    <ClInclude Include="GraphUtils.h" />
     <ClInclude Include="GraphStructres.h" />
     <ClInclude Include="HTTP_Lgger.h" />
     <ClInclude Include="IndicatorStructres.h" />
@@ -236,6 +243,11 @@
     <ClInclude Include="PatternExporter.h" />
     <ClInclude Include="PatternGod.h" />
     <ClInclude Include="PolynomBuilder.h" />
+    <ClInclude Include="PolynomCache.h" />
+    <ClInclude Include="PolynomChangeNodePackage.h" />
+    <ClInclude Include="PolynomChangeNodePackageBuilder.h" />
+    <ClInclude Include="PolynomKey.h" />
+    <ClInclude Include="PolynomScoreCalcs.h" />
     <ClInclude Include="ProccessFlags.h" />
     <ClInclude Include="ProcessData.h" />
     <ClInclude Include="ScoreCalcs.h" />

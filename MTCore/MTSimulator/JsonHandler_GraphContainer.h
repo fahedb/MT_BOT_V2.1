@@ -29,22 +29,22 @@ class JsonHandler_GraphContainer
 	//}
 
 
-	static nlohmann::json Build_GraphsPackageJson(const AnalyzerGraphsPackage& package)
-	{
-		nlohmann::json j;
-		j[stats.Get_TimePoint()] =
-		{
-			{JSON_BODY_MEMBER_PATTERNS_COUNT,std::to_string(stats.Get_TotalCount(StatsType::General))}
-		};
+	//static nlohmann::json Build_GraphsPackageJson(const AnalyzerGraphsPackage& package)
+	//{
+	//	nlohmann::json j;
+	//	j[stats.Get_TimePoint()] =
+	//	{
+	//		{JSON_BODY_MEMBER_PATTERNS_COUNT,std::to_string(stats.Get_TotalCount(StatsType::General))}
+	//	};
 
-		auto allmeans_perIndex = stats.GetAllMeansUpTo(CommonDirection::NONE);
-		for (int i = 0; i < allmeans_perIndex.size(); i++)
-			j[stats.Get_TimePoint()]["StepsMeans"].push_back(std::make_pair(std::to_string(i + 1), allmeans_perIndex.at(i)));
+	//	auto allmeans_perIndex = stats.GetAllMeansUpTo(CommonDirection::NONE);
+	//	for (int i = 0; i < allmeans_perIndex.size(); i++)
+	//		j[stats.Get_TimePoint()]["StepsMeans"].push_back(std::make_pair(std::to_string(i + 1), allmeans_perIndex.at(i)));
 
-		Add_Calcs_toJson_Stats(&j, "First", stats);
-		Add_Calcs_toJson_Stats(&j, "General", stats);
-		Add_Calcs_toJson_Stats(&j, "Highest", stats);
-		return j;
-	}
+	//	Add_Calcs_toJson_Stats(&j, "First", stats);
+	//	Add_Calcs_toJson_Stats(&j, "General", stats);
+	//	Add_Calcs_toJson_Stats(&j, "Highest", stats);
+	//	return j;
+	//}
 };
 

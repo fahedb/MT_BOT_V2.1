@@ -2,6 +2,8 @@
 #include "ChangeData.h"
 #include "PolynomChangeNodePackageBuilder.h"
 #include "CONFIGRATIONS.H"
+#include "PolynomKey.h"
+
 
 #pragma once
 class PolynomChangeNodePackage
@@ -9,19 +11,10 @@ class PolynomChangeNodePackage
 public:
 	PolynomChangeNodePackage(std::vector<ChangeNode*>& nodes)
 	{
-		
-
+		m_map = PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(nodes);
 	}
-
+	PolynomMap m_map;
 private:
-	std::vector<Polynom> m_pols; // Map to store polynomials by symbol
-
-	void BuildPolynomForChangeNodes(std::vector<ChangeNode*> chNs)
-	{
-		int polynomLen = Configrations::getInstance()->Get_Policy()->PolynomLen_ForScan;
-
-		for()
-	}
-
+	
 };
 

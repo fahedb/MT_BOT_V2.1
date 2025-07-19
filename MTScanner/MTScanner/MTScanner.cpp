@@ -22,11 +22,11 @@ int main(int argc, char* argv[])
 void DefualtProgramStart()
 {
 
-	OrderEntity* order = new OrderEntity(OrderType::SHORT, "2025062519350000", "2025062519350000", CoinsPair::XAUUSD);
-	order->Set_TakeProfit(static_cast<int>(-244));
-	order->Set_StopLoss(static_cast<int>(234));
+	//OrderEntity* order = new OrderEntity(OrderType::SHORT, "2025062519350000", "2025062519350000", CoinsPair::XAUUSD);
+	//order->Set_TakeProfit(static_cast<int>(-244));
+	//order->Set_StopLoss(static_cast<int>(234));
 
-	ExchangeData().Set_NewOrder("XAUUSD", 1, order->Get_OrderSeqNum(), order->Get_StopLoss(), order->Get_TakeProfit());
+	//ExchangeData().Set_NewOrder("XAUUSD", 1, order->Get_OrderSeqNum(), order->Get_StopLoss(), order->Get_TakeProfit());
 
 	StrategiesRunner runner;
 	runner.Run();

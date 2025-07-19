@@ -11,6 +11,8 @@
 #include "LOGGER.H"
 #include <future>
 
+#include "PolynomChangeNodePackageBuilder.h"
+
 /// <summary>	
 /// StrategiesRunner class for running
 /// trading strategies on historical data.
@@ -38,6 +40,12 @@ public:
 		HistoryTimeLineLoader historyLoader(history, &table);
 		historyLoader.Run();
 		
+		// Test logic:
+		auto m = PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vector<ChangeNode*>(history.begin(), history.begin() + 5));
+
+		//////////////////////////
+
+
 		Logger::getInstance().WriteLog("About to run PatternGod !!", true, true, LogType::SPECIAL_LOG);
 		TimeLine historyTimeLine(&history);
 		Run_PatternGod(historyTimeLine);

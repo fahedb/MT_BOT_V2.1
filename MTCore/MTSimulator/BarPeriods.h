@@ -7,6 +7,9 @@ class BarPeriod_Utils
 public:
 	static double Extract_Value(BaseIndicator* ind, BarPeriod barP,IndicatorValueType indVT = IndicatorValueType::Value)
 	{
+		if (!ind || !(ind->Get_IndicatorValues_Pointer()))
+			return 0;
+
 		switch (barP)
 		{
 		case BarPeriod::M1:

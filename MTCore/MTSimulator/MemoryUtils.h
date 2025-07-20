@@ -1,6 +1,13 @@
 #include "SelectionNodes.h"
 #include "LOGGER.H"
 
+enum class MemoryActionType
+{
+    DEEP_COPY,
+	MOVE,
+    NONE
+};
+
 #pragma once
 class MemoryUtils
 {

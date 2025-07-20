@@ -1,17 +1,13 @@
 #include "Polynom.h"
 
-void Polynom::SetPolynom(const std::vector<double>& polynom)
-{
-	m_polynom = polynom;
-	size = static_cast<int>(polynom.size());
-}
 
 void Polynom::AddMemeber(double front, int upper)
 {
-	if (upper > m_polynom.size())
+	if (upper > m_polynom.size() - 1)
 	{
-		for (int i = m_polynom.size(); i < upper; i++)
+		for (int i = m_polynom.size() - 1; i < upper; i++)
 			m_polynom.push_back(0);
 	}
 	m_polynom[upper] = front;
+	size = static_cast<int>(m_polynom.size());
 }

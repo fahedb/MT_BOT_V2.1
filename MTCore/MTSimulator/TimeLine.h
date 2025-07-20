@@ -4,6 +4,8 @@
 #include "ChangeData.h"
 #include "LOGGER.H"
 
+typedef std::pair<long long, long long> TimeLineSegment;
+
 class TimeLine
 {
 
@@ -18,6 +20,14 @@ public:
         other.m_TL = nullptr;
         other.m_selfOwnership = false;
     }
+    TimeLine(TimeLine* other) noexcept
+    {
+        m_TL = other->m_TL;
+        m_DB_Map = other->m_DB_Map;
+        m_selfOwnership = other->m_selfOwnership;
+        other->m_TL = nullptr;
+        other->m_selfOwnership = false;
+	}
 
     TimeLine(std::vector<ChangeNode*>* TL,bool ownership = false) {
         m_TL = TL;

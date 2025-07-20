@@ -12,7 +12,7 @@ public:
 
 		double minValue = vec.at(0);
 
-		for (int i = 0; i < vec.at(i); i++)	if (minValue > vec.at(i)) minValue = vec.at(i);
+		for (int i = 0; i < vec.size(); i++)	if (minValue > vec.at(i)) minValue = vec.at(i);
 
 		return minValue;
 

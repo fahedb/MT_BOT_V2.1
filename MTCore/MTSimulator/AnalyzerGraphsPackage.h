@@ -1,5 +1,6 @@
 #include "GraphStructres.h"
 #include <string>
+#include <stdexcept>
 
 #pragma once
 

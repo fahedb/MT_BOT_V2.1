@@ -42,7 +42,7 @@ public:
 		
 		// Test logic:
 		auto m = PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vector<ChangeNode*>(history.begin(), history.begin() + 5));
-
+		size_t size = m.size();
 		//////////////////////////
 
 

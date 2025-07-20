@@ -10,7 +10,7 @@ class PolynomChangeNodePackage
 {
 public:
 	// Default constructor
-	PolynomChangeNodePackage(std::vector<ChangeNode*>& nodes)
+	PolynomChangeNodePackage(const std::vector<ChangeNode*>& nodes)
 	{
 		m_map = PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(nodes);
 	}

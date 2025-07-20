@@ -184,6 +184,7 @@
     <ClCompile Include="PolynomChangeNodePackageBuilder.cpp" />
     <ClCompile Include="PolynomKey.cpp" />
     <ClCompile Include="PolynomScoreCalcs.cpp" />
+    <ClCompile Include="PolynomTimeLine.cpp" />
     <ClCompile Include="ProccessFlags.cpp" />
     <ClCompile Include="ProcessData.cpp" />
     <ClCompile Include="ScoreCalcs.cpp" />
@@ -248,6 +249,7 @@
     <ClInclude Include="PolynomChangeNodePackageBuilder.h" />
     <ClInclude Include="PolynomKey.h" />
     <ClInclude Include="PolynomScoreCalcs.h" />
+    <ClInclude Include="PolynomTimeLine.h" />
     <ClInclude Include="ProccessFlags.h" />
     <ClInclude Include="ProcessData.h" />
     <ClInclude Include="ScoreCalcs.h" />

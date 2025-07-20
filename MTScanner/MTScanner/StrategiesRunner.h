@@ -12,6 +12,7 @@
 #include <future>
 
 #include "PolynomChangeNodePackageBuilder.h"
+#include "PolynomTimeLine.h"
 
 /// <summary>	
 /// StrategiesRunner class for running
@@ -41,8 +42,9 @@ public:
 		historyLoader.Run();
 		
 		// Test logic:
-		auto m = PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vector<ChangeNode*>(history.begin(), history.begin() + 5));
-		size_t size = m.size();
+		//auto m = PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vector<ChangeNode*>(history.begin(), history.begin() + 5));
+		PolynomTimeLine tl(std::vector<ChangeNode*>(history.begin(), history.begin() + 5));
+		size_t size = sizeof(tl);
 		//////////////////////////
 
 

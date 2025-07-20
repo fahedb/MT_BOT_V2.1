@@ -450,6 +450,9 @@
     <ClCompile Include="PolynomKey.cpp">
       <Filter>DataStructers\Keys</Filter>
     </ClCompile>
+    <ClCompile Include="PolynomTimeLine.cpp">
+      <Filter>DataStructers\ChangeStructure\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BTables.h">
@@ -634,6 +637,9 @@
     </ClInclude>
     <ClInclude Include="PolynomKey.h">
       <Filter>DataStructers\Keys</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomTimeLine.h">
+      <Filter>DataStructers\ChangeStructure\Inc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

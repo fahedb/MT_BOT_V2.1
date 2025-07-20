@@ -7,6 +7,14 @@
 class PolynomTimeLine
 {
 public:
+	// defult constructor
+	PolynomTimeLine(const std::vector<ChangeNode*>& nodes)
+	{
+		m_segment = std::make_pair(nodes.at(0)->point_DateTimeLong, nodes.at(nodes.size() - 1)->point_DateTimeLong);
+		m_timeLine = new TimeLine(nodes); // Create a new TimeLine with the nodes
+		m_polynomPackage = new PolynomChangeNodePackage(nodes); // Create a new PolynomChangeNodePackage with the nodes
+	}
+
 	// Constructor for PolynomTimeLine with ownership of PolynomChangeNodePackage and TimeLine
 	PolynomTimeLine(TimeLineSegment segment, PolynomChangeNodePackage* polynomPackage, TimeLine* timeLine, MemoryActionType mAT,bool selfOwnerShip = true)
 	{

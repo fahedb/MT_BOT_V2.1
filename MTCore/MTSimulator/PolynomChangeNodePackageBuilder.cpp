@@ -1,4 +1,5 @@
 #include "PolynomChangeNodePackageBuilder.h"
+#include "PolynomTimeLine.h"
 
 PolynomMap PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vector<ChangeNode*> nodes)
 {
@@ -52,5 +53,6 @@ PolynomMap PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vect
 	polynomMap[PolynomKey(IndicatorType::VOLUME, IndicatorLen::NONE, IndicatorValueType::Value)] = BuildPolynomForIndicator(nodes, IndicatorType::VOLUME, IndicatorLen::L10, IndicatorValueType::Value);
 	// VOLUME Indicators: Slopes
 	polynomMap[PolynomKey(IndicatorType::VOLUME, IndicatorLen::NONE, IndicatorValueType::Slope)] = BuildPolynomForIndicator(nodes, IndicatorType::VOLUME, IndicatorLen::L10, IndicatorValueType::Slope);
+
 	return polynomMap;
 }

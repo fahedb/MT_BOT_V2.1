@@ -179,7 +179,7 @@
     <ClCompile Include="Polynom.cpp" />
     <ClCompile Include="PolynomBuilder.cpp" />
     <ClCompile Include="Polynom.h" />
-    <ClCompile Include="PolynomCache.cpp" />
+    <ClCompile Include="PolynomTimeLineCache.cpp" />
     <ClCompile Include="PolynomChangeNodePackage.cpp" />
     <ClCompile Include="PolynomChangeNodePackageBuilder.cpp" />
     <ClCompile Include="PolynomKey.cpp" />
@@ -244,7 +244,7 @@
     <ClInclude Include="PatternExporter.h" />
     <ClInclude Include="PatternGod.h" />
     <ClInclude Include="PolynomBuilder.h" />
-    <ClInclude Include="PolynomCache.h" />
+    <ClInclude Include="PolynomTimeLineCache.h" />
     <ClInclude Include="PolynomChangeNodePackage.h" />
     <ClInclude Include="PolynomChangeNodePackageBuilder.h" />
     <ClInclude Include="PolynomKey.h" />

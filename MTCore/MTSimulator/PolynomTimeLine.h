@@ -1,90 +1,44 @@
 #include "TimeLine.h"
 #include "PolynomChangeNodePackage.h"
 #include "MemoryUtils.h"
+#include <memory>
 
 #pragma once
 
 class PolynomTimeLine
 {
 public:
-	// defult constructor
-	PolynomTimeLine(const std::vector<ChangeNode*>& nodes)
-	{
-		m_segment = std::make_pair(nodes.at(0)->point_DateTimeLong, nodes.at(nodes.size() - 1)->point_DateTimeLong);
-		m_timeLine = new TimeLine(nodes); // Create a new TimeLine with the nodes
-		m_polynomPackage = new PolynomChangeNodePackage(nodes); // Create a new PolynomChangeNodePackage with the nodes
-	}
+    // Default constructor
+    PolynomTimeLine(const std::vector<ChangeNode*>& nodes)
+        : m_segment(nodes.at(0)->point_DateTimeLong, nodes.at(nodes.size() - 1)->point_DateTimeLong),
+          m_timeLine(std::make_unique<TimeLine>(nodes)),
+          m_polynomPackage(std::make_unique<PolynomChangeNodePackage>(nodes))
+    {}
 
-	// Constructor for PolynomTimeLine with ownership of PolynomChangeNodePackage and TimeLine
-	PolynomTimeLine(TimeLineSegment segment, PolynomChangeNodePackage* polynomPackage, TimeLine* timeLine, MemoryActionType mAT,bool selfOwnerShip = true)
-	{
-		m_segment = segment;
-		m_MemoryActionType = mAT; // If true, this class owns the memory of the PolynomChangeNodePackage and TimeLine, otherwise they are managed externally
-		m_selfOwnership = selfOwnerShip; // If true, this class will take ownership of the memory, otherwise it will not
+    // Constructor for PolynomTimeLine with ownership transfer
+    PolynomTimeLine(TimeLineSegment segment, std::unique_ptr<PolynomChangeNodePackage> polynomPackage, std::unique_ptr<TimeLine> timeLine)
+        : m_segment(segment),
+          m_polynomPackage(std::move(polynomPackage)),
+          m_timeLine(std::move(timeLine))
+    {}
 
-		if(m_MemoryActionType == MemoryActionType::MOVE)
-		{
-			if (polynomPackage) // Move poylnomPackage
-				m_polynomPackage = new PolynomChangeNodePackage(polynomPackage); // Move the PolynomChangeNodePackage
-			if (timeLine) // Move timeLine
-				m_timeLine = new TimeLine(timeLine); // Move the TimeLine
-		}
-		else if (m_MemoryActionType == MemoryActionType::DEEP_COPY)
-		{
-			m_selfOwnership = true; // This class will take ownership of the memory
-			if (polynomPackage) // Deep copy PolynomChangeNodePackage
-				m_polynomPackage = new PolynomChangeNodePackage(*polynomPackage);
-			if (timeLine) // Deep copy TimeLine
-				m_timeLine = new TimeLine(*timeLine);
-		}
-		else
-		{
-			m_polynomPackage = polynomPackage; // Copying the pointer, not the object
-			m_timeLine = timeLine; // Copying the pointer, not the object
-			Logger::getInstance().WriteLog("PolynomTimeLine constructor called with MemoryActionType::NONE, this is not recommended, please use move semantics instead.", false, true, LogType::ERR);
-		}
-	}
+    // Move constructor
+    PolynomTimeLine(PolynomTimeLine&& other) noexcept = default;
+    // Move assignment
+    PolynomTimeLine& operator=(PolynomTimeLine&& other) noexcept = default;
 
-	// Move constructor
-	PolynomTimeLine(PolynomTimeLine&& other) noexcept
-	{
-		m_segment = other.m_segment;
-		m_polynomPackage = other.m_polynomPackage;
-		m_timeLine = other.m_timeLine;
-		m_selfOwnership = other.m_selfOwnership;
-		other.m_polynomPackage = nullptr; // Transfer ownership
-		other.m_timeLine = nullptr; // Transfer ownership
-	}
-	// Copy constructor (not recommended, use move semantics instead)
-	PolynomTimeLine(const PolynomTimeLine& other)
-	{
-		m_segment = other.m_segment;
-		m_polynomPackage = other.m_polynomPackage; // Copying the pointer, not the object
-		m_timeLine = other.m_timeLine; // Copying the pointer, not the object
-		m_selfOwnership = false; // This class does not own the memory of the PolynomChangeNodePackage and TimeLine
-		Logger::getInstance().WriteLog("PolynomTimeLine copy constructor called, this is not recommended, please use move semantics instead.", false, true, LogType::ERR);
-	}
+    // Delete copy constructor and copy assignment to enforce unique ownership
+    PolynomTimeLine(const PolynomTimeLine&) = delete;
+    PolynomTimeLine& operator=(const PolynomTimeLine&) = delete;
 
-	~PolynomTimeLine()
-	{
-		if (m_selfOwnership)
-		{
-			if (m_polynomPackage) // Check if the PolynomChangeNodePackage is not null
-				delete m_polynomPackage; // Delete the PolynomChangeNodePackage if this class owns it
-			m_polynomPackage = nullptr;
-			if (m_timeLine) // Check if the TimeLine is not null
-				delete m_timeLine; // Delete the TimeLine if this class owns it
-			m_timeLine = nullptr;
-		}
-	}
-	TimeLine* Get_TimeLine() { return m_timeLine; }
-	PolynomChangeNodePackage* Get_PolynomPackage() { return m_polynomPackage; }
-	TimeLineSegment Get_Segment() { return m_segment; }
+    // No need for a custom destructor; unique_ptr handles cleanup
+
+    TimeLine* Get_TimeLine() const { return m_timeLine.get(); }
+    PolynomChangeNodePackage* Get_PolynomPackage() const { return m_polynomPackage.get(); }
+    TimeLineSegment Get_Segment() const { return m_segment; }
 private:
-	TimeLineSegment m_segment;
-	PolynomChangeNodePackage* m_polynomPackage = nullptr; // Polynom package for this segment
-	TimeLine* m_timeLine = nullptr; // TimeLine for this segment
-	MemoryActionType m_MemoryActionType = MemoryActionType::NONE; 
-	bool m_selfOwnership = false; // If true, this class owns the memory of the PolynomChangeNodePackage and TimeLine
+    TimeLineSegment m_segment;
+    std::unique_ptr<PolynomChangeNodePackage> m_polynomPackage;
+    std::unique_ptr<TimeLine> m_timeLine;
 };
 

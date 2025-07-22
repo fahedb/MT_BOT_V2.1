@@ -432,7 +432,7 @@
     <ClCompile Include="PolynomBuilder.cpp">
       <Filter>Math\DataStructures\Plynom\Builder</Filter>
     </ClCompile>
-    <ClCompile Include="PolynomCache.cpp">
+    <ClCompile Include="PolynomTimeLineCache.cpp">
       <Filter>Cache\PolynomCache</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
@@ -620,7 +620,7 @@
     <ClInclude Include="PolynomBuilder.h">
       <Filter>Math\DataStructures\Plynom\Builder</Filter>
     </ClInclude>
-    <ClInclude Include="PolynomCache.h">
+    <ClInclude Include="PolynomTimeLineCache.h">
       <Filter>Cache\PolynomCache</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManager.h">

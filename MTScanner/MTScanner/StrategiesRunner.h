@@ -11,8 +11,8 @@
 #include "LOGGER.H"
 #include <future>
 
-#include "PolynomChangeNodePackageBuilder.h"
 #include "PolynomTimeLine.h"
+#include "PolynomTimeLineCache.h"
 
 /// <summary>	
 /// StrategiesRunner class for running
@@ -43,11 +43,19 @@ public:
 		
 		// Test logic:
 		//auto m = PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vector<ChangeNode*>(history.begin(), history.begin() + 5));
-		PolynomTimeLine tl(std::vector<ChangeNode*>(history.begin(), history.begin() + 5));
-		size_t size = sizeof(tl);
-		//////////////////////////
+		{
+			std::unique_ptr<PolynomTimeLine> tl = std::make_unique<PolynomTimeLine>(std::vector<ChangeNode*>(history.begin(), history.begin() + 5));
 
+			size_t size = sizeof(tl);
+			//////////////////////////
+			Polynom* a = tl->Get_PolynomPackage()->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L15, IndicatorValueType::Value));
+			Polynom* b = tl->Get_PolynomPackage()->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L15, IndicatorValueType::Slope));
 
+			PolynomTimeLineCache::getInstance()->InsertPolynomTimeLine(std::move(tl));
+		}
+		PolynomTimeLine* tl2 = PolynomTimeLineCache::getInstance()->GetPolynomTimeLine(PolynomTimeLineKey(history.at(0)->point_DateTimeLong, history.at(4)->point_DateTimeLong));
+		Polynom* a = tl2->Get_PolynomPackage()->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L15, IndicatorValueType::Value));
+		Polynom* b = tl2->Get_PolynomPackage()->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L15, IndicatorValueType::Slope));
 		Logger::getInstance().WriteLog("About to run PatternGod !!", true, true, LogType::SPECIAL_LOG);
 		TimeLine historyTimeLine(&history);
 		Run_PatternGod(historyTimeLine);

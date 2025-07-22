@@ -41,6 +41,11 @@ namespace robin_hood {
         }
     };
 }
+enum class PolynomTimeLineCacheType
+{
+    HISTORICAL, // Historical polynomial timelines
+    CURRENT // Current polynomial timelines
+};
 
 // <summary>
 /// This class is a Singleton that manages a cache of polynomial timelines.
@@ -63,28 +68,42 @@ public:
     }
 
     // Insert with a key and a unique_ptr to PolynomTimeLine
-    void InsertPolynomTimeLine(const PolynomTimeLineKey& key, std::unique_ptr<PolynomTimeLine> polynomTl) {
-        m_polynomTimeLineCache.try_emplace(key, std::move(polynomTl));
+    void InsertPolynomTimeLine(const PolynomTimeLineKey& key, std::unique_ptr<PolynomTimeLine> polynomTl, PolynomTimeLineCacheType cachT) {
+        auto cache = GetPolynomTimeLineCache(cachT);
+        cache->try_emplace(key, std::move(polynomTl));
     }
 
     // Insert using the segment as the key
-    void InsertPolynomTimeLine(std::unique_ptr<PolynomTimeLine> polynomTl) {
+    void InsertPolynomTimeLine(std::unique_ptr<PolynomTimeLine> polynomTl, PolynomTimeLineCacheType cachT) {
+        auto cache = GetPolynomTimeLineCache(cachT);
+        
         PolynomTimeLineKey key;
         key.startTimePoint = polynomTl->Get_Segment().first;
         key.endTimePoint = polynomTl->Get_Segment().second;
-        m_polynomTimeLineCache.try_emplace(key, std::move(polynomTl));
+        cache->try_emplace(key, std::move(polynomTl));
     }
 
-    PolynomTimeLine* GetPolynomTimeLine(const PolynomTimeLineKey& key) {
-        auto it = m_polynomTimeLineCache.find(key);
-        if (it != m_polynomTimeLineCache.end()) {
+    PolynomTimeLine* GetPolynomTimeLine(const PolynomTimeLineKey& key, PolynomTimeLineCacheType cachT)  {
+		auto cache = GetPolynomTimeLineCache(cachT);
+
+        auto it = cache->find(key);
+        if (it != cache->end()) {
             return it->second.get();
         }
         return nullptr;
     }
 
+
 private:
-    robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>> m_polynomTimeLineCache;
+    robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>* GetPolynomTimeLineCache(PolynomTimeLineCacheType type) {
+        if (type == PolynomTimeLineCacheType::HISTORICAL) {
+            return &m_hist_polynomTimeLineCache;
+        } else {
+            return &m_curr_polynomTimeLineCache;
+        }
+	}
+    robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>> m_hist_polynomTimeLineCache;
+    robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>> m_curr_polynomTimeLineCache;
 };
 
 
@@ -97,8 +116,23 @@ private:
 /// Date: 2025-07-22
 class PolynomTimeLineCacheManager
 {
+private:
+    static bool PreConditionBuild()
+    {
+        // Check if the cache is enabled and if the polynom length is set
+        Configrations* config = Configrations::getInstance();
+        if (!config->Get_Policy()->EnablePolynomScan || config->Get_Policy()->PolynomLen_ForScan <= 0) {
+            Logger::getInstance().WriteLog("Polynom scan is not enabled or polynom length is not set.", true, true, LogType::ERR);
+            return false; // Precondition failed
+        }
+		return true; // Precondition passed
+    }
 public:
-    static int Build_PoylnomTimeLines(const std::vector<ChangeNode*>& nodes) {
+    static int Build_PoylnomTimeLines(const std::vector<ChangeNode*>& nodes, PolynomTimeLineCacheType cachT) {
+        
+        if(!PreConditionBuild()) {
+            return 0; // Precondition failed, no polynom timelines built
+		}
 
         // Create a PolynomTimeLine from the nodes
 		PolynomTimeLineCache* cache = PolynomTimeLineCache::getInstance();
@@ -106,14 +140,20 @@ public:
         int polyLen = config->Get_Policy()->PolynomLen_ForScan;
 
 		int buildCount = 0;
-
+        int nodesSize = nodes.size();
 		// Build each polyLen changeNodes into a PolynomTimeLine
-        for (size_t i = 0; i <= nodes.size() - polyLen; i += polyLen) {
+        for (size_t i = 0; i <= nodesSize - polyLen - 1; i++) {
             std::vector<ChangeNode*> segmentNodes(nodes.begin() + i, nodes.begin() + i + polyLen);
             if (segmentNodes.size() < polyLen) continue; // Skip if not enough nodes
+
+			// Check if the PolynomTimeLine already exists in the cache
+			PolynomTimeLineKey key(segmentNodes.front()->point_DateTimeLong, segmentNodes.back()->point_DateTimeLong);
+            if (cache->GetPolynomTimeLine(key,cachT) != nullptr) {
+                continue; // Skip if already exists
+			}
+
             auto polynomTimeLine = std::make_unique<PolynomTimeLine>(segmentNodes);
-            PolynomTimeLineKey key(segmentNodes.front()->point_DateTimeLong, segmentNodes.back()->point_DateTimeLong);
-            cache->InsertPolynomTimeLine(key, std::move(polynomTimeLine));
+            cache->InsertPolynomTimeLine(key, std::move(polynomTimeLine), cachT);
             buildCount++;
         }
 		return buildCount;

@@ -1,59 +1,51 @@
 #include "PolynomScoreCalcs.h"
 
-inline PolynomScore PolynomScoreCalcs::CalcScore(PolynomChangeNodePackage* hist, PolynomChangeNodePackage* curr)
+double CalcSinglePolynomScore(Polynom* hist, Polynom* curr, PolynomPolicy* policy, const int weight = 10) {
+	if (!hist || !curr)
+		return 0.0;
+
+	double wEval = policy->weight_eval;
+	double wRMSE = policy->weight_rmse;
+	double wCoeff = policy->weight_coeff;
+
+
+	double scoreEval = PolynomComparer::Compare_ByEval(*hist, *curr);
+	double scoreRMSE = PolynomComparer::Compare_ByRMSE(*hist, *curr);
+	double scoreCoeff = PolynomComparer::Compare_ByWeightedCoefficients(*hist, *curr);
+	double score = wEval * scoreEval + wRMSE * scoreRMSE + wCoeff * scoreCoeff;
+	return score * weight;
+
+}
+
+TimeLinePolynomScore PolynomScoreCalcs::CalcScore(PolynomChangeNodePackage* hist, PolynomChangeNodePackage* curr)
 {
-	PolynomScore score;
+	TimeLinePolynomScore score;
+
 	if (hist == nullptr || curr == nullptr) {
 		return score; // Return empty score if either package is null
 	}
 	// Calculate EMA scores for each polynomial
-	score.L10 = CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L10, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L10, IndicatorValueType::Value)));
-	score.L15 = CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L15, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L15, IndicatorValueType::Value)));
-	score.L20 = CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L20, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L20, IndicatorValueType::Value)));
-	score.L25 = CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L25, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L25, IndicatorValueType::Value)));
-	score.L30 = CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L30, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L30, IndicatorValueType::Value)));
 
-	// Calculate EMA slopes for each polynomial
-	score.L10_slope = CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L10, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L10, IndicatorValueType::Slope)));
-	score.L15_slope = CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L15, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L15, IndicatorValueType::Slope)));
-	score.L20_slope = CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L20, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L20, IndicatorValueType::Slope)));
-	score.L25_slope = CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L25, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L25, IndicatorValueType::Slope)));
-	score.L30_slope = CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L30, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::EMA, IndicatorLen::L30, IndicatorValueType::Slope)));
+	IndicatorTypeList indTypes;
+	IndicatorLenList indLengths;
+	IndicatorValueTypeList indValueTypes;
 
-	// calculate ZLSMA scores for each polynomial
-	score.L10 += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L10, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L10, IndicatorValueType::Value)));
-	score.L15 += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L15, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L15, IndicatorValueType::Value)));
-	score.L20 += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L20, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L20, IndicatorValueType::Value)));
-	score.L25 += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L25, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L25, IndicatorValueType::Value)));
-	score.L30 += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L30, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L30, IndicatorValueType::Value)));
+	PolynomPolicy* policy = Configrations::getInstance()->Get_PolynomPolicy();
 
-	// Calculate ZLSMA slopes for each polynomial
-	score.L10_slope += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L10, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L10, IndicatorValueType::Slope)));
-	score.L15_slope += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L15, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L15, IndicatorValueType::Slope)));
-	score.L20_slope += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L20, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L20, IndicatorValueType::Slope)));
-	score.L25_slope += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L25, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L25, IndicatorValueType::Slope)));
-	score.L30_slope += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L30, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::ZLSMA, IndicatorLen::L30, IndicatorValueType::Slope)));
-
-	// calculate RSI scores for each polynomial
-	score.L10 += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L10, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L10, IndicatorValueType::Value)));
-	score.L15 += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L15, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L15, IndicatorValueType::Value)));
-	score.L20 += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L20, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L20, IndicatorValueType::Value)));
-	score.L25 += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L25, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L25, IndicatorValueType::Value)));
-	score.L30 += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L30, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L30, IndicatorValueType::Value)));
-
-	// Calculate RSI slopes for each polynomial
-	score.L10_slope += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L10, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L10, IndicatorValueType::Slope)));
-	score.L15_slope += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L15, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L15, IndicatorValueType::Slope)));
-	score.L20_slope += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L20, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L20, IndicatorValueType::Slope)));
-	score.L25_slope += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L25, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L25, IndicatorValueType::Slope)));
-	score.L30_slope += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L30, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::RSI, IndicatorLen::L30, IndicatorValueType::Slope)));
-
-	// calculate the Volume scores for each polynomial
-	score.L10 += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::VOLUME, IndicatorLen::NONE, IndicatorValueType::Value)), curr->GetPolynom(PolynomKey(IndicatorType::VOLUME, IndicatorLen::NONE, IndicatorValueType::Value)));
-	//calculate the Volume slopes for each polynomial
-	score.L10_slope += CalcSinglePolynomScore(hist->GetPolynom(PolynomKey(IndicatorType::VOLUME, IndicatorLen::NONE, IndicatorValueType::Slope)), curr->GetPolynom(PolynomKey(IndicatorType::VOLUME, IndicatorLen::NONE, IndicatorValueType::Slope)));
+	for(int i =0 ; i < indTypes.types.size(); i++)
+	{
+		for(int j = 0; j < indLengths.lengths.size(); j++)
+		{
+			for(int k = 0; k < indValueTypes.valueTypes.size(); k++)
+			{
+				auto polynomKey = PolynomKey(indTypes.types[i], indLengths.lengths[j], indValueTypes.valueTypes[k]);
+				score.GetScoreContainer(indValueTypes.valueTypes[k])->AddScore(indLengths.lengths[j], CalcSinglePolynomScore(hist->GetPolynom(polynomKey), curr->GetPolynom(polynomKey), policy));
+			}
+		}
+	}
 
 	// Calculate the total score
-	score.CalculateTotalScore();
+	score.GetScoreContainer(IndicatorValueType::Value)->CalculateTotalScore();
+	score.GetScoreContainer(IndicatorValueType::Slope)->CalculateTotalScore();
 	return score;
 }

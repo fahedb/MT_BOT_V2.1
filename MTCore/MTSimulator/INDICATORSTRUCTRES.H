@@ -60,8 +60,12 @@ enum struct IndicatorType
 	EMA = 0,
 	RSI = 1,
 	ZLSMA = 2,
-	VOLUME = 3,
+	VOLUME = 3, // currently not used
 	NONE = -1
+};
+struct IndicatorTypeList
+{
+	std::array<IndicatorType, 4> types = { IndicatorType::EMA, IndicatorType::RSI, IndicatorType::ZLSMA };
 };
 
 enum struct IndicatorValueType
@@ -70,6 +74,16 @@ enum struct IndicatorValueType
 	Slope = 1,
 	NONE = -1
 };
+struct IndicatorValueTypeList
+{
+	std::array<IndicatorValueType, 2> valueTypes = { IndicatorValueType::Value, IndicatorValueType::Slope };
+};
+
+struct BarPeriodList
+{
+	std::array<BarPeriod, 6> periods = { BarPeriod::M1, BarPeriod::M5, BarPeriod::M15, BarPeriod::M30, BarPeriod::H1, BarPeriod::H4 };
+};
+
 enum struct IndicatorLen
 {
 	L10 = 10,
@@ -79,6 +93,13 @@ enum struct IndicatorLen
 	L30=30,
 	NONE = -1
 };
+
+struct IndicatorLenList
+{
+	std::array<IndicatorLen, 5> lengths = { IndicatorLen::L10, IndicatorLen::L15, IndicatorLen::L20, IndicatorLen::L25, IndicatorLen::L30 };
+};
+
+
 
 enum GravityType
 {

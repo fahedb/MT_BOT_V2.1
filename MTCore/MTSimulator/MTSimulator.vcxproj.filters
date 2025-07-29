@@ -277,6 +277,9 @@
     <Filter Include="DataStructers\Keys">
       <UniqueIdentifier>{c499ba8c-ec04-41bb-926c-62204479e353}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math\DataStructures\Plynom\Comparer">
+      <UniqueIdentifier>{9aaf1d48-ef9c-4c38-a3c9-2e0d6fce59fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -452,6 +455,15 @@
     </ClCompile>
     <ClCompile Include="PolynomTimeLine.cpp">
       <Filter>DataStructers\ChangeStructure\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomScore.cpp">
+      <Filter>DataStructers\ChangeStructure\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomComparer.cpp">
+      <Filter>Math\DataStructures\Plynom\Comparer</Filter>
+    </ClCompile>
+    <ClCompile Include="Policies.h">
+      <Filter>Configs\Inc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -640,6 +652,12 @@
     </ClInclude>
     <ClInclude Include="PolynomTimeLine.h">
       <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomScore.h">
+      <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomComparer.h">
+      <Filter>Math\DataStructures\Plynom\Comparer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

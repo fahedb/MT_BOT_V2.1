@@ -1,4 +1,5 @@
 #include "HttpServerSyncer.h"
+#include "PolynomTimeLineCache.h"
 
 void HttpServerSyncer::UpdateCurrentTimeLine(BasePricesTable* table)
 {
@@ -8,9 +9,10 @@ void HttpServerSyncer::UpdateCurrentTimeLine(BasePricesTable* table)
 	std::string body = exChData.Get_NextCandleStick_M1();
 	Logger& logger = Logger::getInstance();
 	Static_CurrentTimeLineRep* currTimeLineRep = Static_CurrentTimeLineRep::getInstance();
-
+	bool newBar = false;
 	while (body.length())
 	{
+		newBar = true;
 		logger.WriteLog("Recieved a new bar by HTTP Client");
 		JsonSelectionNode* selectionJ;
 
@@ -28,6 +30,11 @@ void HttpServerSyncer::UpdateCurrentTimeLine(BasePricesTable* table)
 		body = exChData.Get_NextCandleStick_M1();
 	}
 
+	if (newBar) // If we have a new bar, we need to update the current timeline polynom cache
+	{
+		int polysBuilt = PolynomTimeLineCacheManager::Build_PoylnomTimeLines(*currTimeLineRep->Get_CurrTimeLine()->Get_TimeLine(), PolynomTimeLineCacheType::CURRENT);
+		logger.WriteLog("Built " + std::to_string(polysBuilt) + " polynomial timelines from the current timeline.", true, true, LogType::LOG);
+	}
 	logger.WriteLog("No new Bars to recieve");
 }
 

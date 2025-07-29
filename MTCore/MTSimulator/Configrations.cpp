@@ -184,5 +184,8 @@ void Configrations::Init_PatternPolicy()
 
 	// Configs to control polynom scan
 	m_policy.EnablePolynomScan = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_ENABLE_POLYNOM_SCAN)) > 0 ? true : false;
-	m_policy.PolynomLen_ForScan = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_POLYNOM_LEN_FOR_SCAN));
+
+
+
+	//m_policy.PolynomLen_ForScan = Converts::ToInt(Get_ConfigValue_DB(CONFIG_DEF_POLYNOM_LEN_FOR_SCAN)); // NOTE: Moved to PolynomPolicy
 }

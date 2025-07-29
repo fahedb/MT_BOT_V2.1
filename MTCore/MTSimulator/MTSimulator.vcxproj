@@ -176,9 +176,12 @@
     <ClCompile Include="OrderStruct.cpp" />
     <ClCompile Include="PatternExporter.cpp" />
     <ClCompile Include="PatternGod.cpp" />
+    <ClCompile Include="Policies.h" />
     <ClCompile Include="Polynom.cpp" />
     <ClCompile Include="PolynomBuilder.cpp" />
     <ClCompile Include="Polynom.h" />
+    <ClCompile Include="PolynomComparer.cpp" />
+    <ClCompile Include="PolynomScore.cpp" />
     <ClCompile Include="PolynomTimeLineCache.cpp" />
     <ClCompile Include="PolynomChangeNodePackage.cpp" />
     <ClCompile Include="PolynomChangeNodePackageBuilder.cpp" />
@@ -244,6 +247,8 @@
     <ClInclude Include="PatternExporter.h" />
     <ClInclude Include="PatternGod.h" />
     <ClInclude Include="PolynomBuilder.h" />
+    <ClInclude Include="PolynomComparer.h" />
+    <ClInclude Include="PolynomScore.h" />
     <ClInclude Include="PolynomTimeLineCache.h" />
     <ClInclude Include="PolynomChangeNodePackage.h" />
     <ClInclude Include="PolynomChangeNodePackageBuilder.h" />

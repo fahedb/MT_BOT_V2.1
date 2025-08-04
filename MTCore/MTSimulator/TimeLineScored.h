@@ -1,5 +1,4 @@
 #include "TimeLine.h"
-
 #pragma once
 
 class TimeLineScored {

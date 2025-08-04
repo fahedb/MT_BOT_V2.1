@@ -57,19 +57,15 @@ public:
 		const IndicatorValues& hist = ChNHistory->Get_Indicator_Pointer(IndicatorType::RSI, len)->Get_IndicatorValues();
 		const IndicatorValues& curr = ChNcurr->Get_Indicator_Pointer(IndicatorType::RSI, len)->Get_IndicatorValues();
 
-		score.M1 = ((RelativeScoreCalcs::CalcScore(hist.m_Slope_M1, curr.m_Slope_M1, weight)));
-		score.M5 = ((RelativeScoreCalcs::CalcScore(hist.m_Slope_M5, curr.m_Slope_M5, weight)));
-		score.M15 = ((RelativeScoreCalcs::CalcScore(hist.m_Slope_M15, curr.m_Slope_M15, weight))); 
-		score.M30 = ((RelativeScoreCalcs::CalcScore(hist.m_Slope_M30, curr.m_Slope_M30, weight))); 
-		score.H4 = ((RelativeScoreCalcs::CalcScore(hist.m_Slope_H4, curr.m_Slope_H4, weight)));	
-		score.H1 = ((RelativeScoreCalcs::CalcScore(hist.m_Slope_H1, curr.m_Slope_H1, weight)));	
+		BarPeriodList barPeriods;
+		for( auto& period : barPeriods.periods) { // Iterate through all BarPeriods
+			if (period == BarPeriod::NONE) continue; // Skip NONE period
+			double localScore = 0;
 
-		score.M1 += (RelativeScoreCalcs::CalcScore(hist.M1, curr.M1, weight));
-		score.M5 += (RelativeScoreCalcs::CalcScore(hist.M5, curr.M5, weight));
-		score.M15 +=(RelativeScoreCalcs::CalcScore(hist.M15, curr.M15, weight));
-		score.M30 +=(RelativeScoreCalcs::CalcScore(hist.M30, curr.M30, weight));
-		score.H1 += (RelativeScoreCalcs::CalcScore(hist.H1, curr.H1, weight));
-		score.H4 += (RelativeScoreCalcs::CalcScore(hist.H4, curr.H4, weight));
+			localScore = RelativeScoreCalcs::CalcScore(hist.Get_Value(IndicatorValueType::Slope, period), curr.Get_Value(IndicatorValueType::Slope, period), weight); // Calculate the score for each BarPeriod
+			localScore += RelativeScoreCalcs::CalcScore(hist.Get_Value(IndicatorValueType::Value, period), curr.Get_Value(IndicatorValueType::Value, period), weight); // Add the value score for each BarPeriod
+			score.scores.at(period) = localScore; // Store the score for the BarPeriod
+		}
 
 		score.calcTotal();
 		return score;
@@ -88,45 +84,26 @@ public:
 		const IndicatorValues& hist = histIndPointer->Get_IndicatorValues();
 		const IndicatorValues& curr = currIndPointer->Get_IndicatorValues();
 
-		/// Slope of ema score
-		score.M1 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M1, curr.m_Slope_M1, weight);
-		score.M5 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M5, curr.m_Slope_M5, weight);
-		score.M15 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M15, curr.m_Slope_M15, weight);
-		score.M30 = RelativeScoreCalcs::CalcScore(hist.m_Slope_M30, curr.m_Slope_M30, weight);
-		score.H1 = RelativeScoreCalcs::CalcScore(hist.m_Slope_H1, curr.m_Slope_H1, weight);
-		score.H4 = RelativeScoreCalcs::CalcScore(hist.m_Slope_H4, curr.m_Slope_H4, weight);
-
+		BarPeriodList barPeriods;
+		
+		for (auto& period : barPeriods.periods) { // Iterate through all BarPeriods for slopes
+			if (period == BarPeriod::NONE) continue; // Skip NONE period
+			score.scores.at(period) = RelativeScoreCalcs::CalcScore(hist.Get_Value(IndicatorValueType::Slope, period), curr.Get_Value(IndicatorValueType::Slope, period), weight); // Calculate the score for each BarPeriod
+		}
 
 		double histRange = histHigh - histLow;
 		double currRange = currHigh - currLow;
 
-
 		double normHist =0;
 		double normCurr =0;
 
-		normHist = (hist.M1 - histLow) / histRange;
-		normCurr = (curr.M1 - currLow) / currRange;
-		score.M1 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
+		for (auto& period : barPeriods.periods) { // Iterate through all BarPeriods for values
+			if (period == BarPeriod::NONE) continue; // Skip NONE period
+			normHist = (hist.Get_Value(IndicatorValueType::Value, period) - histLow) / histRange;
+			normCurr = (curr.Get_Value(IndicatorValueType::Value, period) - currLow) / currRange;
+			score.scores.at(period) += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
+		}
 
-		normHist = (hist.M5 - histLow) / histRange;
-		normCurr = (curr.M5 - currLow) / currRange;
-		score.M5 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-
-		normHist = (hist.M15 - histLow) / histRange;
-		normCurr = (curr.M15 - currLow) / currRange;
-		score.M15 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-
-		normHist = (hist.M30 - histLow) / histRange;
-		normCurr = (curr.M30 - currLow) / currRange;
-		score.M30 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-
-		normHist = (hist.H1 - histLow) / histRange;
-		normCurr = (curr.H1 - currLow) / currRange;
-		score.H1 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
-
-		normHist = (hist.H4 - histLow) / histRange;
-		normCurr = (curr.H4 - currLow) / currRange;
-		score.H4 += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
 		score.calcTotal();
 
 		return score;
@@ -182,19 +159,15 @@ public:
 		IndicatorValues histindV = histIndPointer->Get_IndicatorValues();
 		IndicatorValues currindV = currIndPointer->Get_IndicatorValues();
 
-		score.M1 =	RelativeScoreCalcs::CalcScore(histindV.M1, currindV.M1, weight);
-		score.M5 =	RelativeScoreCalcs::CalcScore(histindV.M5, currindV.M5, weight);
-		score.M15 = RelativeScoreCalcs::CalcScore(histindV.M15, currindV.M15, weight);
-		score.M30 = RelativeScoreCalcs::CalcScore(histindV.M30, currindV.M30, weight);
-		score.H1 =	RelativeScoreCalcs::CalcScore(histindV.H1, currindV.H1, weight);
-		score.H4 =	RelativeScoreCalcs::CalcScore(histindV.H4, currindV.H4, weight);
+		BarPeriodList barPeriods;
+		for (auto& period : barPeriods.periods) { // Iterate through all BarPeriods
+			if (period == BarPeriod::NONE) continue; // Skip NONE period
+			double localScore = 0;
 
-		score.M1  += RelativeScoreCalcs::CalcScore(histindV.m_Slope_M1,  currindV.m_Slope_M1, weight);
-		score.M5  += RelativeScoreCalcs::CalcScore(histindV.m_Slope_M5,  currindV.m_Slope_M5, weight);
-		score.M15 += RelativeScoreCalcs::CalcScore(histindV.m_Slope_M15, currindV.m_Slope_M15, weight);
-		score.M30 += RelativeScoreCalcs::CalcScore(histindV.m_Slope_M30, currindV.m_Slope_M30, weight);
-		score.H1  += RelativeScoreCalcs::CalcScore(histindV.m_Slope_H1,  currindV.m_Slope_H1, weight);
-		score.H4  += RelativeScoreCalcs::CalcScore(histindV.m_Slope_H4,  currindV.m_Slope_H4, weight);
+			localScore = RelativeScoreCalcs::CalcScore(histindV.Get_Value(IndicatorValueType::Slope, period), currindV.Get_Value(IndicatorValueType::Slope, period), weight); // Calculate the score for each BarPeriod
+			localScore += RelativeScoreCalcs::CalcScore(histindV.Get_Value(IndicatorValueType::Value, period), currindV.Get_Value(IndicatorValueType::Value, period), weight); // Add the value score for each BarPeriod
+			score.scores.at(period) = localScore; // Store the score for the BarPeriod
+		}
 
 		return score;
 	}
@@ -216,13 +189,14 @@ public:
 
 		double currLow = ChNcurr->m_lowPrice;
 		double currHigh = ChNcurr->m_highPrice;
+		IndicatorScore score;
+		score.Reset();
 
-		IndicatorScore score = General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, IndicatorLen::L10, weight);
-		score += General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, IndicatorLen::L15, weight);
-		score += General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, IndicatorLen::L20, weight);
-		score += General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, IndicatorLen::L25, weight);
-		score += General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, IndicatorLen::L30, weight);
-
+		IndicatorLenList indLengths;
+		for (const auto& len : indLengths.lengths) {
+			if (len == IndicatorLen::NONE) continue; // Skip NONE length
+			score += General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, len, weight);
+		}
 		return score;
 	}
 };
@@ -237,11 +211,14 @@ public:
 	static inline ScoresResult CompareChangeNodes(ChangeNode* historyNode, ChangeNode* currentNode)
 	{
 		ScoresResult score;
+		score.Reset();
+
 		// Calc all the scores
-		score.rsiScore = RsiScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
-		score.emaScore = EmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
-		score.zlsmaScore = ZlsmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
-		score.volumeScore = VolumeScoreCalcs::CalcScore(historyNode, currentNode);
+		score.indicatorScores.at(IndicatorType::RSI) = RsiScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
+		score.indicatorScores.at(IndicatorType::EMA) = EmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
+		score.indicatorScores.at(IndicatorType::ZLSMA) = ZlsmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
+
+		//score.volumeScore = VolumeScoreCalcs::CalcScore(historyNode, currentNode);
 		// Sum all the scores into one Object
 		score.calcTotalResult();
 		return score;
@@ -250,45 +227,20 @@ public:
 	static ScoresResult CalcAverageScore(ScoresResult score, int timeLineLen)
 	{
 		ScoresResult average;
-		average.emaScore.M1 = score.emaScore.M1 / timeLineLen;
-		average.emaScore.M5 = score.emaScore.M5 / timeLineLen;
-		average.emaScore.M15 = score.emaScore.M15 / timeLineLen;
-		average.emaScore.M30 = score.emaScore.M30 / timeLineLen;
-		average.emaScore.H1 = score.emaScore.H1 / timeLineLen;
-		average.emaScore.H4 = score.emaScore.H4 / timeLineLen;
-		average.emaScore.total = score.emaScore.total / timeLineLen;
+		average.totalScore.Reset();
 
-		average.zlsmaScore.M1 = score.zlsmaScore.M1 / timeLineLen;
-		average.zlsmaScore.M5 = score.zlsmaScore.M5 / timeLineLen;
-		average.zlsmaScore.M15 = score.zlsmaScore.M15 / timeLineLen;
-		average.zlsmaScore.M30 = score.zlsmaScore.M30 / timeLineLen;
-		average.zlsmaScore.H1 = score.zlsmaScore.H1 / timeLineLen;
-		average.zlsmaScore.H4 = score.zlsmaScore.H4 / timeLineLen;
-		average.zlsmaScore.total = score.zlsmaScore.total / timeLineLen;
+		IndicatorTypeList indTypes;
+		IndicatorLenList indLengths;
+		BarPeriodList barPeriods;
 
-		average.rsiScore.M1 = score.rsiScore.M1 / timeLineLen;
-		average.rsiScore.M5 = score.rsiScore.M5 / timeLineLen;
-		average.rsiScore.M15 = score.rsiScore.M15 / timeLineLen;
-		average.rsiScore.M30 = score.rsiScore.M30 / timeLineLen;
-		average.rsiScore.H1 = score.rsiScore.H1 / timeLineLen;
-		average.rsiScore.H4 = score.rsiScore.H4 / timeLineLen;
-		average.rsiScore.total = score.rsiScore.total / timeLineLen;
+		for (const auto& type : indTypes.types) {
+			for (const auto& period : barPeriods.periods) {
+				if (period == BarPeriod::NONE) continue; // Skip NONE period
+//				auto& scoreContainer = average.indicatorScores[type].scores[period];
+				average.indicatorScores[type].scores[period] = score.indicatorScores[type].scores[period] / timeLineLen; // Calculate the average score for each BarPeriod
+			}
 
-		average.volumeScore.M1 = score.volumeScore.M1 / timeLineLen;
-		average.volumeScore.M5 = score.volumeScore.M5 / timeLineLen;
-		average.volumeScore.M15 = score.volumeScore.M15 / timeLineLen;
-		average.volumeScore.M30 = score.volumeScore.M30 / timeLineLen;
-		average.volumeScore.H1 = score.volumeScore.H1 / timeLineLen;
-		average.volumeScore.H4 = score.volumeScore.H4 / timeLineLen;
-		average.volumeScore.total = score.volumeScore.total / timeLineLen;
-
-		average.totalScore.M1 = score.totalScore.M1 / timeLineLen;
-		average.totalScore.M5 = score.totalScore.M5 / timeLineLen;
-		average.totalScore.M15 = score.totalScore.M15 / timeLineLen;
-		average.totalScore.M30 = score.totalScore.M30 / timeLineLen;
-		average.totalScore.H1 = score.totalScore.H1 / timeLineLen;
-		average.totalScore.H4 = score.totalScore.H4 / timeLineLen;
-		average.totalScore.total = score.totalScore.total / timeLineLen;
+		}
 
 		return average;
 	}

@@ -1,5 +1,4 @@
 #include "GraphUtils.h"
-#include "BarPeriods.h"
 
 GraphStructure GraphUtils::Build_Points(const std::vector<double>& points, int splitter) // Function to add X values to Y values into vector
 {
@@ -24,7 +23,7 @@ GraphStructure GraphUtils::Build_Points(const std::vector<double>& points, int s
 	for (int i = 0; i < vec.size(); i++)
 	{
 		if (changePipGraph) normalizedValue.push_back(static_cast<double>(vec.at(i)->Pip_Change));
-		else normalizedValue.push_back(BarPeriod_Utils::Extract_Value(vec.at(i)->Get_Indicator_Pointer(indType, indLen), barP, indVT));
+		else normalizedValue.push_back(vec.at(i)->Get_Indicator_Pointer(indType, indLen)->Get_IndicatorValues_Pointer()->Get_Value(indVT, barP));
 	}
 
 	GraphUtils::NormalizeVectorValues(normalizedValue);

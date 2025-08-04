@@ -176,6 +176,11 @@
     <ClCompile Include="OrderStruct.cpp" />
     <ClCompile Include="PatternExporter.cpp" />
     <ClCompile Include="PatternGod.cpp" />
+    <ClCompile Include="PatternGodUtils.cpp" />
+    <ClCompile Include="PatternGod_BaseComparer.cpp" />
+    <ClCompile Include="PatternGod_PolynomComparer.cpp" />
+    <ClCompile Include="PatternGod_ResultFusionEngine.cpp" />
+    <ClCompile Include="PatternGod_ScoreComparer.cpp" />
     <ClCompile Include="Policies.h" />
     <ClCompile Include="Polynom.cpp" />
     <ClCompile Include="PolynomBuilder.cpp" />
@@ -192,6 +197,7 @@
     <ClCompile Include="ProcessData.cpp" />
     <ClCompile Include="ScoreCalcs.cpp" />
     <ClCompile Include="ScoreResultsCache.cpp" />
+    <ClCompile Include="ScoreResultsCachePolynom.cpp" />
     <ClCompile Include="SelectionNodes.cpp" />
     <ClCompile Include="SeqNumTable.cpp" />
     <ClCompile Include="StartPoint.cpp" />
@@ -210,7 +216,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnalyzerGraphsPackage.h" />
-    <ClInclude Include="BarPeriods.h" />
     <ClInclude Include="BasePricesTable.h" />
     <ClInclude Include="BTables.h" />
     <ClInclude Include="CandleData.h" />
@@ -231,7 +236,9 @@
     <ClInclude Include="EURUSD_CurrentTable.h" />
     <ClInclude Include="GraphUtils.h" />
     <ClInclude Include="GraphStructres.h" />
+    <ClInclude Include="HashingStructs.h" />
     <ClInclude Include="HTTP_Lgger.h" />
+    <ClInclude Include="IndicatorEnums.h" />
     <ClInclude Include="IndicatorStructres.h" />
     <ClInclude Include="JasonHandler.h" />
     <ClInclude Include="JsonDefs_GraphContainer.h" />
@@ -246,6 +253,11 @@
     <ClInclude Include="OrderType.h" />
     <ClInclude Include="PatternExporter.h" />
     <ClInclude Include="PatternGod.h" />
+    <ClInclude Include="PatternGodUtils.h" />
+    <ClInclude Include="PatternGod_BaseComparer.h" />
+    <ClInclude Include="PatternGod_PolynomComparer.h" />
+    <ClInclude Include="PatternGod_ResultFusionEngine.h" />
+    <ClInclude Include="PatternGod_ScoreComparer.h" />
     <ClInclude Include="PolynomBuilder.h" />
     <ClInclude Include="PolynomComparer.h" />
     <ClInclude Include="PolynomScore.h" />
@@ -259,6 +271,7 @@
     <ClInclude Include="ProcessData.h" />
     <ClInclude Include="ScoreCalcs.h" />
     <ClInclude Include="ScoreResultsCache.h" />
+    <ClInclude Include="ScoreResultsCachePolynom.h" />
     <ClInclude Include="SelectionNodes.h" />
     <ClInclude Include="SeqNumTable.h" />
     <ClInclude Include="Static_CurrentTimeLineRep.h" />

@@ -229,7 +229,7 @@ void PatternExporter::Build_SinglePattern_PointsVector(std::vector<ChangeNode*>*
 		{
 			pointsVec.splitter = counter;
 		}
-		double pointOnGraph = ProcessData::roundToDecimalPlaces(GetValueByMode(nodes->at(i), mode, indT, indL), (int)_Points::Points_XAUUSD);
+		double pointOnGraph = ProcessData::roundToDecimalPlaces(nodes->at(i)->Get_Indicator_Pointer(indT, indL)->Get_IndicatorValues_Pointer()->Get_Value(IndicatorValueType::Value, mode), (int)_Points::Points_XAUUSD);
 		pointOnGraph -= minPoint;
 		if (last_pointOnGraph == pointOnGraph)
 		{
@@ -241,31 +241,6 @@ void PatternExporter::Build_SinglePattern_PointsVector(std::vector<ChangeNode*>*
 	}
 }
 
-double PatternExporter::GetValueByMode(ChangeNode* chN, BarPeriod mode, IndicatorType indT,IndicatorLen indL)
-{
-	if (!chN)
-		return INVALID_DATA;
-	IndicatorValues values;
-	values = chN->Get_Indicator_Pointer(indT,indL)->Get_IndicatorValues();
-
-	switch (mode)
-	{
-	case BarPeriod::M1:
-		return values.M1;
-	case BarPeriod::M5:
-		return values.M5;
-	case BarPeriod::M15:
-		return values.M15;
-	case BarPeriod::M30:
-		return values.M30;
-	case BarPeriod::H1:
-		return values.H1;
-	case BarPeriod::H4:
-		return values.H4;
-	default:
-		return INVALID_DATA
-	}
-}
 
 std::pair<double, double> PatternExporter::Find_Max_Min_Values(std::vector<ChangeNode*>* nodes, BarPeriod mode, IndicatorType indT,IndicatorLen indL)
 {
@@ -275,7 +250,7 @@ std::pair<double, double> PatternExporter::Find_Max_Min_Values(std::vector<Chang
 
 	for (int i = 0; i < nodesCount; i++) // loop to find min\max values for cleaner chart /// TODO: Need to move to a new method
 	{
-		double pointOnGraph = ProcessData::roundToDecimalPlaces(GetValueByMode(nodes->at(i), mode, indT,indL), (int)_Points::Points_XAUUSD);
+		double pointOnGraph = ProcessData::roundToDecimalPlaces(nodes->at(i)->Get_Indicator_Pointer(indT, indL)->Get_IndicatorValues_Pointer()->Get_Value(IndicatorValueType::Value, mode), (int)_Points::Points_XAUUSD);
 		if (maxPoint < static_cast<int>(pointOnGraph))
 			maxPoint = static_cast<int>(pointOnGraph);
 		if (minPoint > static_cast<int>(pointOnGraph))

@@ -1,0 +1,14 @@
+#include "TimeLine.h"
+//#include <string>
+
+#pragma once
+class PatternGodUtils
+{
+public:
+	static void SortScores(std::vector<std::pair< ChangeNode*, ScoresResult>>& nodesResults2D);
+	static void FilterDuplicatesTimeLines(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D, DBMap* historyDB_Map);
+	static void filterByHighScores(std::vector<std::pair< ChangeNode*, ScoresResult>>& nodesResults2D);
+	static std::string BuildScanResultLog(const std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);
+
+};
+

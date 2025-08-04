@@ -29,12 +29,10 @@ BaseIndicator::BaseIndicator(IndicatorValues curr) {
 
 // Just a constructor :)
 IndicatorScore::IndicatorScore() {
-	M1 = 0;
-	M5 = 0;
-	M15 = 0;
-	M30 = 0;
-	H1 = 0;
-	H4 = 0;
+	BarPeriodList barPeriods;
+	for(const auto& period : barPeriods.periods) {
+		scores.at(period) = 0.0; // Initialize each BarPeriod with a score of 0
+	}
 	total = 0;
 }
 
@@ -42,7 +40,10 @@ IndicatorScore::IndicatorScore() {
 // ------------------------------------------------------------------------------------------------------------
 
 void IndicatorScore::calcTotal() { // Calculate the total score
-	total = M1 + M5 + M15 + M30 + H1 + H4;
+	total = 0; // Reset total before calculation
+	for (const auto& pair : scores) {
+		total += pair.second; // Sum up all the scores
+	}
 }
 
 // ------------------------------------------------------------------------------------------------------------
@@ -50,22 +51,19 @@ void IndicatorScore::calcTotal() { // Calculate the total score
 
 IndicatorScore IndicatorScore::operator+(const IndicatorScore& other) const {
 	IndicatorScore result;
-	result.M1 = M1 + other.M1;
-	result.M5 = M5 + other.M5;
-	result.M15 = M15 + other.M15;
-	result.M30 = M30 + other.M30;
-	result.H1 = H1 + other.H1;
-	result.H4 = H4 + other.H4;
+
+	for(const auto& pair : scores) {
+		BarPeriod period = pair.first;
+		result.scores.at(period) = pair.second + other.scores.at(period); // Sum scores for each BarPeriod
+	}
 	result.calcTotal(); // Recalculate the total
 	return result;
 }
 IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
-	M1 += other.M1;
-	M5 += other.M5;
-	M15 += other.M15;
-	M30 += other.M30;
-	H1 += other.H1;
-	H4 += other.H4;
+	for(const auto& pair : scores) {
+		BarPeriod period = pair.first;
+		scores.at(period) += other.scores.at(period); // Add scores for each BarPeriod
+	}
 	calcTotal(); // Recalculate the total
 	return *this;
 }
@@ -87,18 +85,29 @@ IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
 
 ScoresResult::ScoresResult() // Just a constructor :)
 {
+	IndicatorTypeList indTypes;
+	for (const auto& type : indTypes.types) {
+		indicatorScores.at(type) = IndicatorScore(); // Initialize each IndicatorType with an empty IndicatorScore
+	}
 }
 
 // ------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------
 
 void ScoresResult::calcTotalResult() { // Calc total score of every object
-	rsiScore.calcTotal();
-	emaScore.calcTotal();
-	zlsmaScore.calcTotal();
-	volumeScore.calcTotal();
+	for(auto& pair : indicatorScores) {
+		pair.second.calcTotal(); // Calculate total for each IndicatorScore
+	}
+
 	totalScore = combineScores();
 	totalScore.calcTotal();
+}
+
+inline void ScoresResult::Reset() { // Clear the scores and total
+	for (auto& pair : indicatorScores) {
+		pair.second.Reset(); // Reset each IndicatorScore
+	}
+	totalScore.Reset(); // Reset the total score
 }
 
 // ------------------------------------------------------------------------------------------------------------
@@ -106,10 +115,11 @@ void ScoresResult::calcTotalResult() { // Calc total score of every object
 
 ScoresResult& ScoresResult::operator+=(const ScoresResult& other) {
 
-	rsiScore += other.rsiScore;
-	emaScore += other.emaScore;
-	zlsmaScore += other.zlsmaScore;
-	volumeScore += other.volumeScore;
+	IndicatorTypeList indTypes;
+	for (const auto& type : indTypes.types) {
+		indicatorScores.at(type) += other.indicatorScores.at(type); // Add scores for each IndicatorType
+	}
+
 	totalScore = combineScores();
 	totalScore.calcTotal();
 
@@ -120,15 +130,14 @@ ScoresResult& ScoresResult::operator+=(const ScoresResult& other) {
 // ------------------------------------------------------------------------------------------------------------
 
 ScoresResult ScoresResult::operator+(const ScoresResult& other) const {
+	
 	ScoresResult result;
+	IndicatorTypeList indList;
 
-	// Add IndicatorScore fields
-	result.rsiScore = rsiScore + other.rsiScore;
-	result.emaScore = emaScore + other.emaScore;
-	result.zlsmaScore = zlsmaScore + other.zlsmaScore;
-	result.volumeScore = volumeScore + other.volumeScore;
-	// Combine total scores (no need to recalculate; just sum them)
-	result.calcTotalResult();
+	for(const auto& type : indList.types) { // Iterate through all IndicatorTypes
+		result.indicatorScores.at(type) = indicatorScores.at(type) + other.indicatorScores.at(type); // Combine scores for each IndicatorType
+	}
+	result.calcTotalResult(); // Combine total scores (no need to recalculate; just sum them)
 
 	return result;
 }
@@ -137,14 +146,19 @@ ScoresResult ScoresResult::operator+(const ScoresResult& other) const {
 // ------------------------------------------------------------------------------------------------------------
 
 IndicatorScore ScoresResult::combineScores() const { // function to combine scores into totalScore
-	IndicatorScore combined;
-	combined.M1 =	rsiScore.M1		+ emaScore.M1	+ zlsmaScore.M1		+ volumeScore.M1;
-	combined.M5 =	rsiScore.M5		+ emaScore.M5	+ zlsmaScore.M5		+ volumeScore.M5;
-	combined.M15 =	rsiScore.M15	+ emaScore.M15	+ zlsmaScore.M15	+ volumeScore.M15;
-	combined.M30 =	rsiScore.M30	+ emaScore.M30	+ zlsmaScore.M30	+ volumeScore.M30;
-	combined.H1 =	rsiScore.H1		+ emaScore.H1	+ zlsmaScore.H1		+ volumeScore.H1;
-	combined.H4 =	rsiScore.H4		+ emaScore.H4	+ zlsmaScore.H4		+ volumeScore.H4;
 
+	IndicatorScore combined;
+	combined.Reset(); // Reset combined scores
+
+	BarPeriodList barPeriods;
+
+	for(const auto& period : barPeriods.periods) { // Iterate through all BarPeriods
+		if (period == BarPeriod::NONE) continue; // Skip NONE period
+		IndicatorTypeList indTypes;
+		for(auto& type : indTypes.types) { // Iterate through all IndicatorTypes
+			combined.scores.at(period) += indicatorScores.at(type).scores.at(period); // Sum scores for each BarPeriod and IndicatorType
+		}
+	}
 	return combined;
 }
 
@@ -233,59 +247,20 @@ BaseIndicator* IndicatorMap::Get_Indicator(IndicatorType type, IndicatorLen len)
 
 void IndicatorMap::Set_IndValue(BaseIndicator* ind, BarPeriod barP, double val) // Function to create a new Indicator object
 {
-	switch (barP)
-	{
-	case BarPeriod::M1:
-		ind->Get_IndicatorValues_Pointer()->M1 = val;
-		break;
-	case BarPeriod::M5:
-		ind->Get_IndicatorValues_Pointer()->M5 = val;
-		break;
-	case BarPeriod::M15:
-		ind->Get_IndicatorValues_Pointer()->M15 = val;
-		break;
-	case BarPeriod::M30:
-		ind->Get_IndicatorValues_Pointer()->M30 = val;
-		break;
-	case BarPeriod::H1:
-		ind->Get_IndicatorValues_Pointer()->H1 = val;
-		break;
-	case BarPeriod::H4:
-		ind->Get_IndicatorValues_Pointer()->H4 = val;
-		break;
-	case BarPeriod::NONE:
-		break;
-	default:
-		break;
+	if (!ind) {
+		Logger::getInstance().WriteLog("IndicatorMap::Set_IndValue : BaseIndicator pointer is null.", false, true, LogType::ERR);
+		return;
 	}
+	ind->Get_IndicatorValues_Pointer()->Set_SingleValue(barP, val); // Set the slope value for the specific BarPeriod
 }
 
 void IndicatorMap::Set_IndSlope(BaseIndicator* ind, BarPeriod barP, double val)
 {
-	auto* values = ind->Get_IndicatorValues_Pointer();
-	switch (barP)
-	{
-	case BarPeriod::M1:
-		values->m_Slope_M1 = val;
-		break;
-	case BarPeriod::M5:
-		values->m_Slope_M5 = val;
-		break;
-	case BarPeriod::M15:
-		values->m_Slope_M15 = val;
-		break;
-	case BarPeriod::M30:
-		values->m_Slope_M30 = val;
-		break;
-	case BarPeriod::H1:
-		values->m_Slope_H1 = val;
-		break;
-	case BarPeriod::H4:
-		values->m_Slope_H4 = val;
-		break;
-	default:
-		break;
+	if (!ind) {
+		Logger::getInstance().WriteLog("IndicatorMap::Set_IndValue : BaseIndicator pointer is null.", false, true, LogType::ERR);
+		return;
 	}
+	ind->Get_IndicatorValues_Pointer()->Set_Value(IndicatorValueType::Slope, barP, val); // Set the slope value for the specific BarPeriod
 }
 
 void IndicatorMap::Validate_Indicator(IndicatorType type, IndicatorLen len)
@@ -329,60 +304,3 @@ BaseIndicator* IndicatorMap::Get_IndicatorObject(IndicatorType type, IndicatorVa
 // IndicatorValues Struct Functions		  //////////
 ///			Author: Fahed.b				  //////////
 ////////////////////////////////////////////////////
-
-void IndicatorValues::Set_SingleSlope(BarPeriod barP, double slope)
-{
-	switch (barP)
-	{
-	case BarPeriod::M1:
-		m_Slope_M1 = slope;
-		break;
-	case BarPeriod::M5:
-		m_Slope_M5 = slope;
-		break;
-	case BarPeriod::M15:
-		m_Slope_M15 = slope;
-		break;
-	case BarPeriod::M30:
-		m_Slope_M30 = slope;
-		break;
-	case BarPeriod::H1:
-		m_Slope_H1 = slope;
-		break;
-	case BarPeriod::H4:
-		m_Slope_H4 = slope;
-		break;
-	case BarPeriod::NONE:
-		break;
-	default:
-		break;
-	}
-}
-void IndicatorValues::Set_SingleValue(BarPeriod barP, double val)
-{
-	switch (barP)
-	{
-	case BarPeriod::M1:
-		M1 = val;
-		break;
-	case BarPeriod::M5:
-		M5 = val;
-		break;
-	case BarPeriod::M15:
-		M15 = val;
-		break;
-	case BarPeriod::M30:
-		M30 = val;
-		break;
-	case BarPeriod::H1:
-		H1 = val;
-		break;
-	case BarPeriod::H4:
-		H4 = val;
-		break;
-	case BarPeriod::NONE:
-		break;
-	default:
-		break;
-	}
-}

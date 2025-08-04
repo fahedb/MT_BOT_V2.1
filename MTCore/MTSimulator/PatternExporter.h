@@ -38,7 +38,6 @@ private:
 	static std::vector<GraphStructure> Build_Points(std::vector<std::vector<ChangeNode*>*>* patternsNodes, BarPeriod mode, IndicatorType indT);
 
 	static void Build_SinglePattern_PointsVector(std::vector<ChangeNode*>* nodes, BarPeriod mode, IndicatorType indT, GraphStructure& pointsVec);
-	static double GetValueByMode(ChangeNode* chN, BarPeriod mode, IndicatorType indT,IndicatorLen indL);
 	static std::pair<double, double> Find_Max_Min_Values(std::vector<ChangeNode*>* nodes, BarPeriod mode, IndicatorType indT,IndicatorLen indL);
 };
 

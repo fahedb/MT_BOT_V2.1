@@ -79,6 +79,19 @@ public:
 		return IndicatorType::NONE;
 	}
 
+	static std::string Get_String_IndicatorType(IndicatorType type)
+	{
+		switch (type)
+		{
+		case IndicatorType::EMA: return HTTP_BODY_MEMBER_IND_EMA;
+		case IndicatorType::RSI: return HTTP_BODY_MEMBER_IND_RSI;
+		case IndicatorType::ZLSMA: return HTTP_BODY_MEMBER_IND_ZLSMA;
+		case IndicatorType::VOLUME: return HTTP_BODY_MEMBER_IND_VOLUME;
+		default:
+			return "NONE"; // NONE is considered as an 0 length
+		}
+	}
+
 	static IndicatorLen Get_Enum_IdicatorLen(const std::string& len)
 	{
 		if (len == HTTP_BODY_MEMBER_IND_LEN_10) return IndicatorLen::L10;

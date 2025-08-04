@@ -40,6 +40,17 @@ namespace robin_hood {
             return h1 ^ (h2 << 1);
         }
     };
+
+    // Hash function for pair of PolynomTimeLineKeys
+    template <>
+    struct hash<std::pair<PolynomTimeLineKey, PolynomTimeLineKey>> {
+        size_t operator()(const std::pair<PolynomTimeLineKey, PolynomTimeLineKey>& p) const {
+            size_t h1 = robin_hood::hash<PolynomTimeLineKey>{}(p.first);
+            size_t h2 = robin_hood::hash<PolynomTimeLineKey>{}(p.second);
+            // Combine hashes
+            return h1 ^ (h2 << 1);
+        }
+    };
 }
 enum class PolynomTimeLineCacheType
 {

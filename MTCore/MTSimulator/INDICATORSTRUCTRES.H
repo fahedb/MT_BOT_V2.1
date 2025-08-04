@@ -1,102 +1,46 @@
 #pragma once
+#include "IndicatorEnums.h"
 #include "LOGGER.H"
 #include "Configrations.h"
 #include <map>
 #include <unordered_map>
-#include <array>
-
-enum struct _Points {
-	_Points_DEFUALT = 0,
-	Points_EURUSD = 4,
-	Points_XAUUSD = 2
-};
-
-enum class BarPeriod {
-	M1 = 1,
-	M5 = 5,
-	M15 = 15,
-	M30 = 30,
-	H1 = 60,
-	H4 = 240,
-	NONE = -1
-};
+#include "robin_hood.h"
 
 struct IndicatorScore {
-	int M1=0;
-	int M5=0;
-	int M15=0;
-	int M30=0;
-	int H1=0;
-	int H4=0;
+
+	robin_hood::unordered_map<BarPeriod, double> scores; // Scores for each length
 	int total=0;
+
 	IndicatorScore();
 	// Calculate the total score
 	void calcTotal();
-
+	void Reset() { // Clear the scores and total
+		for(auto& pair : scores) {
+			pair.second = 0.0; // Reset each BarPeriod score to 0
+		}
+		total = 0;
+	}
 	// Overload the + operator for IndicatorScore
 	IndicatorScore operator+(const IndicatorScore& other) const;
 	IndicatorScore& operator+=(const IndicatorScore& other);
 };
 
 struct ScoresResult {
-	IndicatorScore rsiScore;
-	IndicatorScore zlsmaScore;
-	IndicatorScore emaScore;
-	IndicatorScore volumeScore;
+
+	robin_hood::unordered_map<IndicatorType, IndicatorScore> indicatorScores;
 	IndicatorScore totalScore;
+
 	ScoresResult();
 	// Calculates and updates the total score based on other scores
 	void calcTotalResult();
+	void Reset();
+
 	// Overload the + operator for ScoresResult
 	ScoresResult operator+(const ScoresResult& other) const;
 	ScoresResult& operator+=(const ScoresResult& other);
 private:
 	// Helper function to combine scores into totalScore
 	IndicatorScore combineScores() const;
-};
-
-enum struct IndicatorType
-{
-	EMA = 0,
-	RSI = 1,
-	ZLSMA = 2,
-	VOLUME = 3, // currently not used
-	NONE = -1
-};
-struct IndicatorTypeList
-{
-	std::array<IndicatorType, 4> types = { IndicatorType::EMA, IndicatorType::RSI, IndicatorType::ZLSMA };
-};
-
-enum struct IndicatorValueType
-{
-	Value = 0,
-	Slope = 1,
-	NONE = -1
-};
-struct IndicatorValueTypeList
-{
-	std::array<IndicatorValueType, 2> valueTypes = { IndicatorValueType::Value, IndicatorValueType::Slope };
-};
-
-struct BarPeriodList
-{
-	std::array<BarPeriod, 6> periods = { BarPeriod::M1, BarPeriod::M5, BarPeriod::M15, BarPeriod::M30, BarPeriod::H1, BarPeriod::H4 };
-};
-
-enum struct IndicatorLen
-{
-	L10 = 10,
-	L15 = 15,
-	L20 = 20,
-	L25=25,
-	L30=30,
-	NONE = -1
-};
-
-struct IndicatorLenList
-{
-	std::array<IndicatorLen, 5> lengths = { IndicatorLen::L10, IndicatorLen::L15, IndicatorLen::L20, IndicatorLen::L25, IndicatorLen::L30 };
 };
 
 
@@ -113,23 +57,34 @@ enum GravityType
 };
 
 struct IndicatorValues {
-	void Set_SingleSlope(BarPeriod barP, double slope);
-	void Set_SingleValue(BarPeriod barP, double val);
-	// Indicator Values
-	double M1;
-	double M5;
-	double M15;
-	double M30;
-	double H1;
-	double H4;
+	void Set_SingleSlope(BarPeriod barP, double slope) { slopes[barP] = slope; } // Set the slope for the specified BarPeriod
+	void Set_SingleValue(BarPeriod barP, double val) { values[barP] = val; }// Set the value for the specified BarPeriod
+	
+	void Set_Value(IndicatorValueType valueType, BarPeriod barP, double val) // General function to set value or slope based on IndicatorValueType
+	{
+		if (valueType == IndicatorValueType::Value)
+			Set_SingleValue(barP, val);
+		else if (valueType == IndicatorValueType::Slope)
+			Set_SingleSlope(barP, val);
+		else
+			Logger::getInstance().WriteLog("IndicatorValues::Set_Value : Invalid IndicatorValueType.", false, true, LogType::ERR);
+	}
+	
+	double Get_SingleValue(BarPeriod barP) const { return values.at(barP); } // Get the value for the specified BarPeriod
+	double Get_SingleSlope(BarPeriod barP) const { return slopes.at(barP); } // Get the slope for the specified BarPeriod
 
-	// Slopes
-	double m_Slope_M1;
-	double m_Slope_M5;
-	double m_Slope_M15;
-	double m_Slope_M30;
-	double m_Slope_H1;
-	double m_Slope_H4;
+	double Get_Value(IndicatorValueType valueType, BarPeriod barP) const // General function to get value or slope based on IndicatorValueType
+	{
+		if (valueType == IndicatorValueType::Value)
+			return Get_SingleValue(barP);
+		else if (valueType == IndicatorValueType::Slope)
+			return Get_SingleSlope(barP);
+		return 0.0; // Default case, should not happen
+	}
+	// Indicator Values
+	robin_hood::unordered_map<BarPeriod, double> values; // Values for each length
+	robin_hood::unordered_map<BarPeriod, double> slopes; // Slopes for each length
+
 };
 
 
@@ -251,22 +206,7 @@ public:
 
 	static double Get_IndicatorValue(const IndicatorValues& indValues, BarPeriod barP, IndicatorValueType valueType)
 	{
-		switch (barP)
-		{
-		case BarPeriod::M1:
-			return valueType == IndicatorValueType::Value ? indValues.M1 : indValues.m_Slope_M1;
-		case BarPeriod::M5:
-			return valueType == IndicatorValueType::Value ? indValues.M5 : indValues.m_Slope_M5;
-		case BarPeriod::M15:
-			return valueType == IndicatorValueType::Value ? indValues.M15 : indValues.m_Slope_M15;
-		case BarPeriod::M30:
-			return valueType == IndicatorValueType::Value ? indValues.M30 : indValues.m_Slope_M30;
-		case BarPeriod::H1:
-			return valueType == IndicatorValueType::Value ? indValues.H1 : indValues.m_Slope_H1;
-		case BarPeriod::H4:
-			return valueType == IndicatorValueType::Value ? indValues.H4 : indValues.m_Slope_H4;
-		default:
-			return 0.0; // Invalid bar period
-		}
+		if (barP == BarPeriod::NONE) return 0.0; // Handle NONE period case
+		return indValues.Get_Value(valueType, barP); // Get the value or slope based on the valueType
 	}
 };

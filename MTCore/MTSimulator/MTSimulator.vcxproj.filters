@@ -105,12 +105,6 @@
     <Filter Include="LogsLogic\Src">
       <UniqueIdentifier>{ed41a6cd-4d26-4fcd-bbbb-721647bcf855}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Strategies\PatternGod\Inc">
-      <UniqueIdentifier>{68e523ae-99eb-4bac-8591-976818de4c32}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Strategies\PatternGod\Src">
-      <UniqueIdentifier>{7d06b0a5-496d-425a-a2a8-280f8b99395a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Tables\PricesTables">
       <UniqueIdentifier>{2e26a098-9515-4c68-803c-a33c7bbd5bd4}</UniqueIdentifier>
     </Filter>
@@ -280,6 +274,51 @@
     <Filter Include="Math\DataStructures\Plynom\Comparer">
       <UniqueIdentifier>{9aaf1d48-ef9c-4c38-a3c9-2e0d6fce59fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cache\PolynomCache\Inc">
+      <UniqueIdentifier>{1327bb1e-ea85-4851-b739-5b43733225c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cache\PolynomCache\Src">
+      <UniqueIdentifier>{e8effb11-5797-438a-adf2-a5feb075d56b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Comparers">
+      <UniqueIdentifier>{31aa580c-5bbf-426f-9e29-78e7e030700b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Statistics">
+      <UniqueIdentifier>{bedeb277-4650-4f19-8971-645c0b9833ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\PatternGod_Main">
+      <UniqueIdentifier>{fd5eb46e-1372-41af-86d6-63a07a56c1ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\PatternGod_Main\Inc">
+      <UniqueIdentifier>{68e523ae-99eb-4bac-8591-976818de4c32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\PatternGod_Main\Src">
+      <UniqueIdentifier>{7d06b0a5-496d-425a-a2a8-280f8b99395a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Comparers\PolynomComparer">
+      <UniqueIdentifier>{9c5b0a44-bae6-42ad-8577-f998393b20cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Comparers\PolynomComparer\Inc">
+      <UniqueIdentifier>{940a2fc6-24af-49d1-adea-f22a0123c7dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Comparers\PolynomComparer\Src">
+      <UniqueIdentifier>{43d29eaa-ba9e-4422-a625-53565ec808af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Comparers\ScoreComparer">
+      <UniqueIdentifier>{69065f78-4e52-4a0a-88ed-82963ad04be3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Comparers\ScoreComparer\Inc">
+      <UniqueIdentifier>{5daef6f5-3114-4d2c-9a20-c88180413223}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Comparers\ScoreComparer\Src">
+      <UniqueIdentifier>{5398b1d6-94e4-41e6-982b-383fe3590c45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Comparers\BaseComparer">
+      <UniqueIdentifier>{705a7afc-92be-4787-afc5-2bfca351c4a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\ResultFusionEngine">
+      <UniqueIdentifier>{20e9d7b6-7138-4391-927f-464c115b5846}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -324,9 +363,6 @@
     <ClCompile Include="Logger.cpp">
       <Filter>LogsLogic\Src</Filter>
     </ClCompile>
-    <ClCompile Include="PatternGod.cpp">
-      <Filter>Strategies\PatternGod\Src</Filter>
-    </ClCompile>
     <ClCompile Include="XAUUSD_CurrentTable.cpp">
       <Filter>Tables\PricesTables\XAUUSD_Tables\Src</Filter>
     </ClCompile>
@@ -350,9 +386,6 @@
     </ClCompile>
     <ClCompile Include="JasonHandler.cpp">
       <Filter>DataStructers\JsonHandler</Filter>
-    </ClCompile>
-    <ClCompile Include="StatisticsDecession.cpp">
-      <Filter>Strategies\PatternGod\Src</Filter>
     </ClCompile>
     <ClCompile Include="ChangeDataBuilder.cpp">
       <Filter>DataStructers\ChangeStructure\Src</Filter>
@@ -435,9 +468,6 @@
     <ClCompile Include="PolynomBuilder.cpp">
       <Filter>Math\DataStructures\Plynom\Builder</Filter>
     </ClCompile>
-    <ClCompile Include="PolynomTimeLineCache.cpp">
-      <Filter>Cache\PolynomCache</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Cache\Resources</Filter>
     </ClCompile>
@@ -464,6 +494,33 @@
     </ClCompile>
     <ClCompile Include="Policies.h">
       <Filter>Configs\Inc</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternGodUtils.cpp">
+      <Filter>Strategies\PatternGod\PatternGod_Main\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreResultsCachePolynom.cpp">
+      <Filter>Cache\PolynomCache\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomTimeLineCache.cpp">
+      <Filter>Cache\PolynomCache\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternGod_PolynomComparer.cpp">
+      <Filter>Strategies\PatternGod\Comparers\PolynomComparer\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="StatisticsDecession.cpp">
+      <Filter>Strategies\PatternGod\Statistics</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternGod.cpp">
+      <Filter>Strategies\PatternGod\PatternGod_Main\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternGod_ScoreComparer.cpp">
+      <Filter>Strategies\PatternGod\Comparers\ScoreComparer\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternGod_BaseComparer.cpp">
+      <Filter>Strategies\PatternGod\Comparers\BaseComparer</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternGod_ResultFusionEngine.cpp">
+      <Filter>Strategies\PatternGod\ResultFusionEngine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -515,9 +572,6 @@
     <ClInclude Include="Logger.h">
       <Filter>LogsLogic\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="PatternGod.h">
-      <Filter>Strategies\PatternGod\Inc</Filter>
-    </ClInclude>
     <ClInclude Include="XAUUSD_CurrentTable.h">
       <Filter>Tables\PricesTables\XAUUSD_Tables\Inc</Filter>
     </ClInclude>
@@ -541,9 +595,6 @@
     </ClInclude>
     <ClInclude Include="JasonHandler.h">
       <Filter>DataStructers\JsonHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="StatisticsDecession.h">
-      <Filter>Strategies\PatternGod\Inc</Filter>
     </ClInclude>
     <ClInclude Include="ChangeDataBuilder.h">
       <Filter>DataStructers\ChangeStructure\Inc</Filter>
@@ -590,9 +641,6 @@
     <ClInclude Include="ScoreResultsCache.h">
       <Filter>Cache\ScoreResultsCache</Filter>
     </ClInclude>
-    <ClInclude Include="BarPeriods.h">
-      <Filter>DataStructers\ChangeStructure\Inc</Filter>
-    </ClInclude>
     <ClInclude Include="AnalyzerGraphsPackage.h">
       <Filter>DataStructers\GraphStruct\AnalyzePackage</Filter>
     </ClInclude>
@@ -632,9 +680,6 @@
     <ClInclude Include="PolynomBuilder.h">
       <Filter>Math\DataStructures\Plynom\Builder</Filter>
     </ClInclude>
-    <ClInclude Include="PolynomTimeLineCache.h">
-      <Filter>Cache\PolynomCache</Filter>
-    </ClInclude>
     <ClInclude Include="ResourceManager.h">
       <Filter>Cache\Resources</Filter>
     </ClInclude>
@@ -658,6 +703,39 @@
     </ClInclude>
     <ClInclude Include="PolynomComparer.h">
       <Filter>Math\DataStructures\Plynom\Comparer</Filter>
+    </ClInclude>
+    <ClInclude Include="IndicatorEnums.h">
+      <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternGodUtils.h">
+      <Filter>Strategies\PatternGod\PatternGod_Main\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomTimeLineCache.h">
+      <Filter>Cache\PolynomCache\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreResultsCachePolynom.h">
+      <Filter>Cache\PolynomCache\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="HashingStructs.h">
+      <Filter>Cache\PolynomCache\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternGod_PolynomComparer.h">
+      <Filter>Strategies\PatternGod\Comparers\PolynomComparer\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="StatisticsDecession.h">
+      <Filter>Strategies\PatternGod\Statistics</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternGod.h">
+      <Filter>Strategies\PatternGod\PatternGod_Main\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternGod_ScoreComparer.h">
+      <Filter>Strategies\PatternGod\Comparers\ScoreComparer\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternGod_BaseComparer.h">
+      <Filter>Strategies\PatternGod\Comparers\BaseComparer</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternGod_ResultFusionEngine.h">
+      <Filter>Strategies\PatternGod\ResultFusionEngine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

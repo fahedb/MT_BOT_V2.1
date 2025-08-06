@@ -16,7 +16,13 @@ enum class PatternGodComparerType
 	// Add more comparer types as needed
 };
 struct PatternGodComparerTypeList { std::vector<PatternGodComparerType> types = { PatternGodComparerType::PolynomComparer , PatternGodComparerType::ScoreComparer }; };
-
+struct PatternGodComparerTypeWeights 
+{
+	robin_hood::unordered_map<PatternGodComparerType, double> weights = { // TODO : Make this configurable
+		{ PatternGodComparerType::PolynomComparer, 0.6 },
+		{ PatternGodComparerType::ScoreComparer, 0.4 }
+	};
+};
 
 class PatternGod_BaseComparer
 {

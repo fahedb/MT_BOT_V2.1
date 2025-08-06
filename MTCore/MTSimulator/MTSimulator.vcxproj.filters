@@ -522,6 +522,12 @@
     <ClCompile Include="PatternGod_ResultFusionEngine.cpp">
       <Filter>Strategies\PatternGod\ResultFusionEngine</Filter>
     </ClCompile>
+    <ClCompile Include="ConfigsTableStaticProxy.cpp">
+      <Filter>Configs\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Policies.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BTables.h">
@@ -736,6 +742,9 @@
     </ClInclude>
     <ClInclude Include="PatternGod_ResultFusionEngine.h">
       <Filter>Strategies\PatternGod\ResultFusionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigsTableStaticProxy.h">
+      <Filter>Configs\Inc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

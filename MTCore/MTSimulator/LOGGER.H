@@ -36,7 +36,7 @@ private:
 	std::mutex m_logMutex; // Mutex for thread-safe logging
     Logger()
     {
-        std::string fileName = Configrations::getInstance()->Get_ConfigValue(CONFIG_DEF_LOG_FILE_NAME);
+        std::string fileName = Configrations::getInstance()->Get_Config_Main(CONFIG_DEF_LOG_FILE_NAME);
         m_logFile = new std::ofstream(fileName, std::ios::app);
         m_httpLogger = HTTP_Logger::getInstance();
     }

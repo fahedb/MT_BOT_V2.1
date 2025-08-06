@@ -24,6 +24,8 @@ struct IndicatorScore {
 	IndicatorScore operator+(const IndicatorScore& other) const;
 	IndicatorScore& operator+=(const IndicatorScore& other);
 };
+IndicatorScore operator*(const IndicatorScore& score, double factor); // External Multiply operator
+IndicatorScore operator*(double factor, const IndicatorScore& score); // External Multiply operator
 
 struct ScoresResult {
 
@@ -38,10 +40,14 @@ struct ScoresResult {
 	// Overload the + operator for ScoresResult
 	ScoresResult operator+(const ScoresResult& other) const;
 	ScoresResult& operator+=(const ScoresResult& other);
+
+
 private:
 	// Helper function to combine scores into totalScore
 	IndicatorScore combineScores() const;
 };
+ScoresResult operator*(const ScoresResult& score, double factor); // External Multiply ScoresResult by a factor
+ScoresResult operator*(double factor, const ScoresResult& score); // External Multiply ScoresResult by a factor
 
 
 

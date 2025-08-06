@@ -1,5 +1,11 @@
 #include "PatternGod_PolynomComparer.h"
 
+void PatternGod_PolynomComparer::InitComaprer()
+{
+	m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
+	Set_ComparerType(); // Initialize the comparer type
+}
+
 ScoresResult PatternGod_PolynomComparer::CompareOneMinNodesPeriods(int startIdx, int threadIdx)
 {
 	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();

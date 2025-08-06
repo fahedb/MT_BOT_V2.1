@@ -64,8 +64,8 @@ protected: // Functions to control text file
 	long GetFileLinesCount();
 	std::vector<SQLSelectionNode*>* GetSelectedRows() { return &m_allSelectedRows; }
 	std::vector<FileSelectionNode*>* GetSelectedRowsFromFile() { return &m_allSelectedFileRows; }
-	virtual std::string GetDB_PhysicalFileName() { return Configrations::getInstance()->Get_ConfigValue(DBFILE_DEFUALT_DB_FILE); }
-	virtual std::string GetDB_PhysicalFileName_Json() { return Configrations::getInstance()->Get_ConfigValue(DBFILE_DEFUALT_DB_FILE_JSON); }
+	virtual std::string GetDB_PhysicalFileName() { return Configrations::getInstance()->Get_Config_Main(DBFILE_DEFUALT_DB_FILE); }
+	virtual std::string GetDB_PhysicalFileName_Json() { return Configrations::getInstance()->Get_Config_Main(DBFILE_DEFUALT_DB_FILE_JSON); }
 	void Set_DBFileName(std::string fileName) { m_fileName = fileName; }
 
 protected: // Function to Control json file

@@ -49,7 +49,7 @@ void IndicatorScore::calcTotal() { // Calculate the total score
 // ------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------
 
-IndicatorScore IndicatorScore::operator+(const IndicatorScore& other) const {
+IndicatorScore IndicatorScore::operator+(const IndicatorScore& other) const { 
 	IndicatorScore result;
 
 	for(const auto& pair : scores) {
@@ -68,6 +68,26 @@ IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
 	return *this;
 }
 
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
+
+IndicatorScore operator*(const IndicatorScore& score, double factor) // External function to multiply IndicatorScore by a factor
+{
+	IndicatorScore result;
+
+	for (auto it = score.scores.begin(); it != score.scores.end(); ++it)
+	{
+		result.scores[it->first] = it->second * factor; // Scale each score (double) by the factor
+	}
+	result.calcTotal(); // Recalculate the total score after scaling
+
+	return result;
+}
+
+IndicatorScore operator*(double factor, const IndicatorScore& score) // External function to multiply IndicatorScore by a factor
+{
+	return score * factor; // Just call the other operator
+}
 
 ////////////////////////////////////////////////////
 /////////// END OF IndicatorScore Struct class Functions////
@@ -162,6 +182,27 @@ IndicatorScore ScoresResult::combineScores() const { // function to combine scor
 	return combined;
 }
 
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
+
+ScoresResult operator*(const ScoresResult& score, double factor) // External function to multiply ScoresResult by a factor
+{
+	ScoresResult result;
+
+	for (auto it = score.indicatorScores.begin(); it != score.indicatorScores.end(); ++it)
+	{
+		IndicatorScore scaledScore = it->second * factor; // ãåøù ùâí ìÎIndicatorScore éäéä operator*
+		result.indicatorScores[it->first] = scaledScore;
+	}
+	result.calcTotalResult(); // Recalculate the total score after scaling
+	return result;
+}
+
+ScoresResult operator*(double factor, const ScoresResult& score) // External function to multiply ScoresResult by a factor
+{
+	return score * factor;
+}
+
 /////////////////////////////////////////////////////////
 /////////// END OF ScoreResult Struct class Functions////
 /////////////////////////////////////////////////////////
@@ -254,6 +295,9 @@ void IndicatorMap::Set_IndValue(BaseIndicator* ind, BarPeriod barP, double val) 
 	ind->Get_IndicatorValues_Pointer()->Set_SingleValue(barP, val); // Set the slope value for the specific BarPeriod
 }
 
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
+
 void IndicatorMap::Set_IndSlope(BaseIndicator* ind, BarPeriod barP, double val)
 {
 	if (!ind) {
@@ -262,6 +306,9 @@ void IndicatorMap::Set_IndSlope(BaseIndicator* ind, BarPeriod barP, double val)
 	}
 	ind->Get_IndicatorValues_Pointer()->Set_Value(IndicatorValueType::Slope, barP, val); // Set the slope value for the specific BarPeriod
 }
+
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
 
 void IndicatorMap::Validate_Indicator(IndicatorType type, IndicatorLen len)
 {
@@ -279,6 +326,10 @@ void IndicatorMap::Validate_Indicator(IndicatorType type, IndicatorLen len)
 		m_vec.at(typeIdx).at(lenIdx) = Get_IndicatorObject(type, IndicatorValues());
 	}
 }
+
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
+
 BaseIndicator* IndicatorMap::Get_IndicatorObject(IndicatorType type, IndicatorValues val)
 {
 	switch (type)
@@ -296,6 +347,9 @@ BaseIndicator* IndicatorMap::Get_IndicatorObject(IndicatorType type, IndicatorVa
 	}
 }
 
+// ------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------
+
 ////////////////////////////////////////////////////
 /////////// END OF IndicatorMap class Functions////
 ////////////////////////////////////////////////////
@@ -304,3 +358,5 @@ BaseIndicator* IndicatorMap::Get_IndicatorObject(IndicatorType type, IndicatorVa
 // IndicatorValues Struct Functions		  //////////
 ///			Author: Fahed.b				  //////////
 ////////////////////////////////////////////////////
+
+

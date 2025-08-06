@@ -153,6 +153,7 @@
     <ClCompile Include="ChangeDataBuilder.cpp" />
     <ClCompile Include="Configrations.cpp" />
     <ClCompile Include="ConfigsTable.cpp" />
+    <ClCompile Include="ConfigsTableStaticProxy.cpp" />
     <ClCompile Include="Converts.cpp" />
     <ClCompile Include="CSVExportData.cpp" />
     <ClCompile Include="DataBaseConnection.cpp" />
@@ -181,6 +182,7 @@
     <ClCompile Include="PatternGod_PolynomComparer.cpp" />
     <ClCompile Include="PatternGod_ResultFusionEngine.cpp" />
     <ClCompile Include="PatternGod_ScoreComparer.cpp" />
+    <ClCompile Include="Policies.cpp" />
     <ClCompile Include="Policies.h" />
     <ClCompile Include="Polynom.cpp" />
     <ClCompile Include="PolynomBuilder.cpp" />
@@ -225,6 +227,7 @@
     <ClInclude Include="Configrations.h" />
     <ClInclude Include="ConfigsDefs.h" />
     <ClInclude Include="ConfigsTable.h" />
+    <ClInclude Include="ConfigsTableStaticProxy.h" />
     <ClInclude Include="Converts.h" />
     <ClInclude Include="CSVExportData.h" />
     <ClInclude Include="DataBaseConnection.h" />

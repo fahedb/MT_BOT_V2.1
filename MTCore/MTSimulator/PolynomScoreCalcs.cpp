@@ -2,7 +2,7 @@
 #include "PolynomTimeLineCache.h"
 #include "ScoreResultsCachePolynom.h"
 
-double CalcSinglePolynomScore(Polynom* hist, Polynom* curr, PolynomPolicy* policy, const int weight = 10) {
+double CalcSinglePolynomScore(Polynom* hist, Polynom* curr, PolynomComparerPolicy* policy, const int weight = 10) {
 	if (!hist || !curr)
 		return 0.0;
 
@@ -84,7 +84,7 @@ TimeLinePolynomScore PolynomScoreCalcs::CalcScore(PolynomChangeNodePackage* hist
 
 	IndicatorTypeList indTypes;
 
-	PolynomPolicy* policy = Configrations::getInstance()->Get_PolynomPolicy();
+	PolynomComparerPolicy* policy = Configrations::getInstance()->Get_PolynomPolicy();
 
 	for(const auto& indType : indTypes.types)
 	{

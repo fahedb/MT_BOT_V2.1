@@ -20,11 +20,11 @@ void PatternExporter::Export_All_Pattens_ToPNG(std::vector<ChangeNode*>* currPat
 	Export_RelationalPatterns_EMA5_ToPNG(currPattern, similarPatterns, containerFolder);
 	Export_RelationalPatterns_EMA1_ToPNG(currPattern, similarPatterns, containerFolder);
 
-	if (Configrations::getInstance()->Get_Policy()->Export_Patterns_PNG_To_Telegram)
+	if (Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy)->Export_Patterns_PNG_To_Telegram)
 	{
-		Logger::getInstance().LogPatternPngs(m_m15_patternsPaths, "M15", "L" + std::to_string(Configrations::getInstance()->Get_Policy()->EMA_len_for_Pattern_Export));
-		Logger::getInstance().LogPatternPngs(m_m5_patternsPaths, "M5", "L" + std::to_string(Configrations::getInstance()->Get_Policy()->EMA_len_for_Pattern_Export));
-		Logger::getInstance().LogPatternPngs(m_m1_patternsPaths, "M1", "L" + std::to_string(Configrations::getInstance()->Get_Policy()->EMA_len_for_Pattern_Export));
+		Logger::getInstance().LogPatternPngs(m_m15_patternsPaths, "M15", "L" + std::to_string(Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy)->EMA_len_for_Pattern_Export));
+		Logger::getInstance().LogPatternPngs(m_m5_patternsPaths, "M5", "L" + std::to_string(Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy)->EMA_len_for_Pattern_Export));
+		Logger::getInstance().LogPatternPngs(m_m1_patternsPaths, "M1", "L" + std::to_string(Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy)->EMA_len_for_Pattern_Export));
 	}
 	m_m15_patternsPaths.clear();
 	m_m5_patternsPaths.clear();
@@ -34,7 +34,6 @@ void PatternExporter::Export_All_Pattens_ToPNG(std::vector<ChangeNode*>* currPat
 
 void PatternExporter::Export_RelationalPatterns_EMA1_ToPNG(std::vector<ChangeNode*>* currPattern, std::vector<std::vector<ChangeNode*>*>* similarPatterns, std::string containerFolder)
 {
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
 	if (!currPattern || !similarPatterns)
 	{
 		Logger::getInstance().WriteLog("Error: No Current&Similar TimeLines!!\nExport To PNG canceled");
@@ -66,7 +65,6 @@ void PatternExporter::Export_RelationalPatterns_EMA1_ToPNG(std::vector<ChangeNod
 }
 void PatternExporter::Export_RelationalPatterns_EMA15_ToPNG(std::vector<ChangeNode*>* currPattern, std::vector<std::vector<ChangeNode*>*>* similarPatterns, std::string containerFolder)
 {
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
 	if (!currPattern || !similarPatterns)
 	{
 		Logger::getInstance().WriteLog("Error: No Current&Similar TimeLines!!\nExport To PNG canceled");
@@ -210,9 +208,10 @@ GraphStructure PatternExporter::Build_Points(std::vector<ChangeNode*>* nodes, Ba
 void PatternExporter::Build_SinglePattern_PointsVector(std::vector<ChangeNode*>* nodes, BarPeriod mode, IndicatorType indT ,GraphStructure& pointsVec)
 {
 	// Need a config for indicatorLen
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+	PatternGodStatisticsPolicy* statisticsPolicy = Configrations::getInstance()->Get_Policy<PatternGodStatisticsPolicy>(PolicyType::PatternGodStatisticsPolicy);
+	ConfigrationsPolicy* confPolicy = Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
 
-	IndicatorLen indL = Indicators_Utils::Get_IndicatorLenEnum(policy->EMA_len_for_Pattern_Export);
+	IndicatorLen indL = Indicators_Utils::Get_IndicatorLenEnum(confPolicy->EMA_len_for_Pattern_Export);
 	if (indL == IndicatorLen::NONE)
 		indL = IndicatorLen::L20;
 
@@ -225,7 +224,7 @@ void PatternExporter::Build_SinglePattern_PointsVector(std::vector<ChangeNode*>*
 	pointsVec.points.push_back(mxmn);
 	for (int i = 0; i < nodesCount; i++)
 	{
-		if (i == static_cast<int>(nodes->size()) - policy->Score_Future_Vision_Candles && policy->Pattern_CurrentTimeLineLen < nodes->size())
+		if (i == static_cast<int>(nodes->size()) - statisticsPolicy->Score_Future_Vision_Candles && confPolicy->Pattern_CurrentTimeLineLen < nodes->size())
 		{
 			pointsVec.splitter = counter;
 		}

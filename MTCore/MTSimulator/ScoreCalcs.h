@@ -39,7 +39,7 @@ public:
 
 	static inline IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr)
 	{
-		double weight = Configrations::getInstance()->Get_Policy()->RSI_Wieght;
+		double weight = Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->RSI_Wieght;
 		IndicatorScore score;
 		score += RsiScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L10, weight);
 		score += RsiScoreCalcs::CalcScore(ChNHistory, ChNcurr, IndicatorLen::L15, weight);
@@ -122,7 +122,7 @@ public:
 
 	static inline IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr)
 	{
-		double weight = Configrations::getInstance()->Get_Policy()->EMA_Wieght;
+		double weight = Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->EMA_Wieght;
 		double histLow = ChNHistory->m_lowPrice;
 		double histHigh = ChNHistory->m_highPrice;
 
@@ -154,7 +154,7 @@ public:
 		if (!histIndPointer || !currIndPointer)
 			return score;
 
-		int weight = Configrations::getInstance()->Get_Policy()->VOLUME_Wieght;
+		int weight = Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->VOLUME_Wieght;
 
 		IndicatorValues histindV = histIndPointer->Get_IndicatorValues();
 		IndicatorValues currindV = currIndPointer->Get_IndicatorValues();
@@ -182,7 +182,7 @@ public:
 
 	static inline IndicatorScore Calc_AllLensScore(ChangeNode* ChNHistory, ChangeNode* ChNcurr)
 	{
-		double weight = Configrations::getInstance()->Get_Policy()->ZLSMA_Wieght;
+		double weight = Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->ZLSMA_Wieght;
 
 		double histLow =  ChNHistory->m_lowPrice ;
 		double histHigh = ChNHistory->m_highPrice;

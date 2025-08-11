@@ -5,24 +5,10 @@
 #include "ScoreResultsCachePolynom.h"
 #include "PolynomScoreCalcs.h"
 #include "TimeLineBuilder.h"
+#include "ComparersEnums.h"
 
 #pragma once
 
-enum class PatternGodComparerType
-{
-	PolynomComparer,
-	ScoreComparer,
-	NONE
-	// Add more comparer types as needed
-};
-struct PatternGodComparerTypeList { std::vector<PatternGodComparerType> types = { PatternGodComparerType::PolynomComparer , PatternGodComparerType::ScoreComparer }; };
-struct PatternGodComparerTypeWeights 
-{
-	robin_hood::unordered_map<PatternGodComparerType, double> weights = { // TODO : Make this configurable
-		{ PatternGodComparerType::PolynomComparer, 0.6 },
-		{ PatternGodComparerType::ScoreComparer, 0.4 }
-	};
-};
 
 class PatternGod_BaseComparer
 {
@@ -51,20 +37,10 @@ protected:
 		TimeLineBuilder::Build_TimeLineDB(history, m_historyDB_Map);
 		TimeLineBuilder::Build_TimeLineDB(curr, m_currDB_Map);
 	}
-	~PatternGod_BaseComparer()
-	{
-		if (m_historyDB_Map != nullptr) {
-			delete m_historyDB_Map; // Free the history DB map
-			m_historyDB_Map = nullptr;
-		}
-		if (m_currDB_Map != nullptr) {
-			delete m_currDB_Map; // Free the current DB map
-			m_currDB_Map = nullptr;
-		}
-	}
-
 
 public:
+	~PatternGod_BaseComparer(); 
+
 	PatternGodComparerType Get_ComparerType() const { return m_comparerType; } // Get the comparer type
 	virtual int ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);
 

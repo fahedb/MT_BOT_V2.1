@@ -3,7 +3,7 @@
 TimeLine TimeLineBuilder::Build_TimeLine_Pattern(TimeLine* history, ChangeNode* head, int patternLen, int futureLen)
 {
 	int timeLineLen = patternLen;
-	int indexStart = history->Get_DBMap()->GetIdx_Of_TimePoint(head->point_DateTime);
+	int indexStart = history->Get_DBMap()->GetIdx_Of_TimePoint(head->point_DateTimeLong);
 	std::vector<ChangeNode*>* vec = new std::vector<ChangeNode*>(history->Get_TimeLine()->begin() + (static_cast<size_t>(indexStart) - static_cast<size_t>(timeLineLen)), history->Get_TimeLine()->begin() + (static_cast<size_t>(indexStart) + static_cast<size_t>(futureLen)));
 	TimeLine similarPattern(vec, true);
 	return similarPattern;
@@ -15,7 +15,7 @@ std::vector<TimeLine> TimeLineBuilder::Build_TimeLine_Patterns(TimeLine* history
 	int timeLineLen = patternLen;
 	for (int i = 0; i < heads->size(); i++)
 	{
-		int indexStart = history->Get_DBMap()->GetIdx_Of_TimePoint(heads->at(i)->point_DateTime);
+		int indexStart = history->Get_DBMap()->GetIdx_Of_TimePoint(heads->at(i)->point_DateTimeLong);
 
 		size_t histSize = history->Get_TimeLine()->size();
 		if (indexStart >= timeLineLen && static_cast<size_t>(indexStart) + static_cast<size_t>(futureLen) <= histSize) {
@@ -37,7 +37,7 @@ std::vector<TimeLineScored> TimeLineBuilder::Build_TimeLineScored_Patterns(TimeL
 	int timeLineLen = patternLen;
 	for (int i = 0; i < heads->size(); i++)
 	{
-		int indexStart = history->Get_DBMap()->GetIdx_Of_TimePoint(heads->at(i).first->point_DateTime);
+		int indexStart = history->Get_DBMap()->GetIdx_Of_TimePoint(heads->at(i).first->point_DateTimeLong);
 
 		size_t histSize = history->Get_TimeLine()->size();
 		if (indexStart >= timeLineLen && static_cast<size_t>(indexStart) + static_cast<size_t>(futureLen) <= histSize) {
@@ -71,12 +71,12 @@ void TimeLineBuilder::Build_TimeLineDB(std::vector<ChangeNode*>* tl, DBMap* dbMa
 
 	for (int i = 0; i < tl->size(); i++)
 	{
-		const std::string& timeKey = tl->at(i)->point_DateTime;
+		long long timeKey = tl->at(i)->point_DateTimeLong;
 		if (!dbMap->ContainsKey(timeKey)) {
 			dbMap->InsetIntoMap(timeKey, i);
 		}
 		else {
-			Logger::getInstance().WriteLog("!!!!! Duplicate point_DateTime in DB: " + timeKey + " !!!!!!", false, true, LogType::ERR);
+			Logger::getInstance().WriteLog("!!!!! Duplicate point_DateTime in DB: " + std::to_string(timeKey) + " !!!!!!", false, true, LogType::ERR);
 		}
 	}
 }

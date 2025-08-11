@@ -32,7 +32,7 @@ public:
 		index = 0;
 	}
 	_Points GetPointPlace() { return _Points::Points_XAUUSD; }
-	virtual std::string GetDB_PhysicalFileName() override { return	Configrations::getInstance()->Get_ConfigValue(DBFILE_XAUUSD_CURR_DATA); }
+	virtual std::string GetDB_PhysicalFileName() override { return	Configrations::getInstance()->Get_Config_DB(DBFILE_XAUUSD_CURR_DATA); }
 	virtual int tableCols() {
 		return XAUUSDCurrPricesTablesCols;
 	}

@@ -15,7 +15,8 @@ public:
 
     Static_CurrentTimeLineRep()
     {
-        m_policy = Configrations::getInstance()->Get_Policy();
+        m_confPolicy = Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
+        m_tracePolicy = Configrations::getInstance()->Get_Policy<OrderTracerPolicy>(PolicyType::OrderTracerPolicy);
         m_TraceTimeLine = new TimeLine(new std::vector<ChangeNode*>, true);
         m_currTimeLine = new TimeLine(new std::vector<ChangeNode*>, true);
     }
@@ -26,13 +27,13 @@ public:
 			Logger::getInstance().WriteLog("ChangeNode is null, cannot set new bar.", false, true, LogType::ERR);
 			return;
 		}
-        Set_Inner_NewBar(m_TraceTimeLine, changeNode, m_policy->TraceCurrTimeLineLen,true); // Update the trace time line, need to delete the memory of the oldest ChangeNode
+        Set_Inner_NewBar(m_TraceTimeLine, changeNode, m_tracePolicy->TraceCurrTimeLineLen,true); // Update the trace time line, need to delete the memory of the oldest ChangeNode
 
-        if (updateCurrTimeLine) Set_Inner_NewBar(m_currTimeLine, changeNode, m_policy->Pattern_CurrentTimeLineLen, false); // Update the current scan time line
+        if (updateCurrTimeLine) Set_Inner_NewBar(m_currTimeLine, changeNode, m_confPolicy->Pattern_CurrentTimeLineLen, false); // Update the current scan time line
     }
 
-    void Set_NewBar_CurrTimeLine(ChangeNode* changeNode, bool deleteOldestBarMemory = false) { Set_Inner_NewBar(m_currTimeLine, changeNode, m_policy->Pattern_CurrentTimeLineLen); }
-    void Set_NewBar_TraceTimeLine(ChangeNode* changeNode, bool deleteOldestBarMemory = false) { Set_Inner_NewBar(m_TraceTimeLine, changeNode, m_policy->TraceCurrTimeLineLen); }
+    void Set_NewBar_CurrTimeLine(ChangeNode* changeNode, bool deleteOldestBarMemory = false) { Set_Inner_NewBar(m_currTimeLine, changeNode, m_confPolicy->Pattern_CurrentTimeLineLen); }
+    void Set_NewBar_TraceTimeLine(ChangeNode* changeNode, bool deleteOldestBarMemory = false) { Set_Inner_NewBar(m_TraceTimeLine, changeNode, m_tracePolicy->TraceCurrTimeLineLen); }
 
     TimeLine* Get_CurrTimeLine() { return m_currTimeLine; }
     TimeLine* Get_TraceTimeLine() { return m_TraceTimeLine; }
@@ -49,7 +50,8 @@ public:
 private:
     TimeLine* m_currTimeLine;
     TimeLine* m_TraceTimeLine;
-    ConfigrationsPolicy* m_policy;
+    ConfigrationsPolicy* m_confPolicy;
+    OrderTracerPolicy* m_tracePolicy;
     void Set_Inner_NewBar(TimeLine* tl, ChangeNode* changeNode, size_t maxLen, bool deleteOldestBarMemory = false)
     {
 

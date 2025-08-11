@@ -6,7 +6,7 @@ std::mutex DataExporter::m_csvFileLocker;
 
 void DataExporter::Export_All_Statistics_Data(DirectionStats& stats, bool tradeDecRes)
 {
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
 	Logger& logger = Logger::getInstance();
 	std::vector<std::string> summery_logs = PrepareSummeryLogs(stats); // Prepare all summery logs in vector
 

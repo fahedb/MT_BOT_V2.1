@@ -172,6 +172,7 @@
     <ClCompile Include="MemoryUtils.cpp" />
     <ClCompile Include="MTChart.cpp" />
     <ClCompile Include="MTSimulatorUtils.cpp" />
+    <ClCompile Include="Normalizer.cpp" />
     <ClCompile Include="OrdersStructCache.cpp" />
     <ClCompile Include="OrdersToExecute.cpp" />
     <ClCompile Include="OrderStruct.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="ChangeData.h" />
     <ClInclude Include="ChangeDataBuilder.h" />
     <ClInclude Include="CoinsPair.h" />
+    <ClInclude Include="ComparersEnums.h" />
     <ClInclude Include="Configrations.h" />
     <ClInclude Include="ConfigsDefs.h" />
     <ClInclude Include="ConfigsTable.h" />
@@ -250,6 +252,7 @@
     <ClInclude Include="MemoryUtils.h" />
     <ClInclude Include="MTChart.h" />
     <ClInclude Include="MTSimulatorUtils.h" />
+    <ClInclude Include="Normalizer.h" />
     <ClInclude Include="OrdersStructCache.h" />
     <ClInclude Include="OrdersToExecute.h" />
     <ClInclude Include="OrderStruct.h" />

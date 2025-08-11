@@ -19,13 +19,25 @@ std::vector<std::vector<std::string>> BasePolicy::Get_AllConfigs(std::vector<std
 // ------------------------------------------------------------------------------------------------------------------
 
 
+inline std::vector<std::vector<std::string>> ConfigrationsPolicy::Get_All()
+{
+    std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
+        std::make_pair(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT),
+        std::make_pair(CONFIG_DEF_CURR_TIME_LINE_LEN),
+        std::make_pair(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT),
+        std::make_pair(CONFIG_DEF_TIME_BETWEEN_SCANS),
+        std::make_pair(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM),
+        std::make_pair(CONFG_DEF_ENABLE_PATTERNS_PNG_EXPORT),
+    };
+    return Get_AllConfigs(allConfigs);
+}
+
 void ConfigrationsPolicy::InitPolicy()
 {
     Score_Min_TotalScore_ToAct_PerCandle =
         Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT));
 
     Pattern_CurrentTimeLineLen = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_CURR_TIME_LINE_LEN));
-    SavedDirectionStaticsLen = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_SAVED_STATS_LEN));
 
     EMA_len_for_Pattern_Export = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT));
 
@@ -38,11 +50,29 @@ void ConfigrationsPolicy::InitPolicy()
 // ------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------
 
+inline std::vector<std::vector<std::string>> TradeManagerPolicy::Get_All()
+{
+    std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
+        std::make_pair(CONFIG_DEF_PATTERN_MINIMUM_PATTERNS_TO_TAKE_ACTION),
+        std::make_pair(CONFG_DEF_PATTERN_MAX_PATTERNS_TO_FIND),
+        std::make_pair(CONFIG_DEF_PATTERN_THRESHOLD_RATIO_TOP_SCORES),
+        std::make_pair(CONFIG_DEF_PATTERN_MINIMUM_PERCENT_TO_EXECUTE_ORDER),
+        std::make_pair(CONFIG_DEF_PATTERN_DIFF_PERCENT_TO_EXECUTE_ORDER_ALTERNATIVE),
+        std::make_pair(CONFIG_DEF_PATTERN_MAX_NOISE_PERCENT_TO_EXECUTE_ORDER_ALTERNATIVE),
+        std::make_pair(CONFIG_DEF_PATTERN_ACTIVATE_ALTERNATIVE_EXECUTE_ORDER),
+        std::make_pair(CONFIG_DEF_PATTERN_MINIMUM_PIPS_CHANGE_TOCOUNT),
+        std::make_pair(CONFIG_DEF_PATTERN_MIN_MEAN_PIPS_TO_EXECUTE_ORDER)
+
+
+    };
+    return Get_AllConfigs(allConfigs);
+}
+
 void TradeManagerPolicy::InitPolicy()
 {
-    Patter_Min_Patterns_ToTake_Action =
+    Pattern_Min_Patterns_ToTake_Action =
         Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MINIMUM_PATTERNS_TO_TAKE_ACTION));
-    Patter_Max_Patterns_To_Find =
+    Pattern_Max_Patterns_To_Find =
         Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFG_DEF_PATTERN_MAX_PATTERNS_TO_FIND));
     Pattern_Min_Percent_To_ExecuteOrder =
         Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MINIMUM_PERCENT_TO_EXECUTE_ORDER));
@@ -56,20 +86,50 @@ void TradeManagerPolicy::InitPolicy()
     Pattern_Activate_Alternative_ExecuteOrder =
         Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_ACTIVATE_ALTERNATIVE_EXECUTE_ORDER));
 
+    Pattern_Min_PipsChange_ToCount =
+        Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MINIMUM_PIPS_CHANGE_TOCOUNT)); // Need to implement a logic
+
+    Min_MeanPips_ToExecute_Order = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_MEAN_PIPS_TO_EXECUTE_ORDER));
+
 }
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
+inline std::vector<std::vector<std::string>> ScoreCachingPolicy::Get_All()
+{
+    std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
+        std::make_pair(CONFIG_DEF_ENABLE_SCORE_CACHEING),
+        std::make_pair(CONFIG_DEF_PATTERN_MAX_ORDERS_INROW),
+        std::make_pair(CONFIG_DEF_PATTERN_SLEEP_MINUTS_AFTER_MAX_ORDERS_INROW)
+
+    };
+
+    return Get_AllConfigs(allConfigs);
+}
+
 void ScoreCachingPolicy::InitPolicy()
 {
-    EnableScoreCaching = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_ENABLE_DYNAMIC_TIMELINE_TRADE_TRACING)) > 0 ? true : false;
+    EnableScoreCaching = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_ENABLE_SCORE_CACHEING)) > 0 ? true : false;
     Max_Orders_InRow = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MAX_ORDERS_INROW));
     Sleep_Minuts_after_Max_Orders_InRow = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_SLEEP_MINUTS_AFTER_MAX_ORDERS_INROW));
 }
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
+
+inline std::vector<std::vector<std::string>> OrdersPolicy::Get_All()
+{
+    std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
+        std::make_pair(CONFIG_DEF_STOP_LOSS_START),
+        std::make_pair(CONFIG_DEF_TAKE_PROFIT_START),
+        std::make_pair(CONFIG_DEF_STOP_LOSS_DIFF),
+        std::make_pair(CONFIG_DEF_TAKE_PROFIT_DIFF),
+        std::make_pair(CONFiG_DEF_ENABLE_DYNAMIC_TP_SL)
+    };
+
+    return Get_AllConfigs(allConfigs);
+}
 
 void OrdersPolicy::InitPolicy()
 {
@@ -79,14 +139,24 @@ void OrdersPolicy::InitPolicy()
     SL_start = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_STOP_LOSS_START));
     TP_start = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_TAKE_PROFIT_START));
 
-    Pattern_Min_PipsChange_ToCount =
-        Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MINIMUM_PIPS_CHANGE_TOCOUNT)); // Need to implement a logic
+    Dynamic_SL_TP = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFiG_DEF_ENABLE_DYNAMIC_TP_SL)) != 0 ? true : false;
 
-    Min_MeanPips_ToExecute_Order = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_MEAN_PIPS_TO_EXECUTE_ORDER));
+
 }
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
+
+inline std::vector<std::vector<std::string>> OrderTracerPolicy::Get_All()
+{
+    std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
+        std::make_pair(CONFIG_DEF_ENABLE_TRADE_TRACING),
+        std::make_pair(CONFIG_DEF_ENABLE_DYNAMIC_TIMELINE_TRADE_TRACING),
+        std::make_pair(CONFIG_DEF_ENABLE_TRADE_TRACING)
+    };
+
+    return Get_AllConfigs(allConfigs);
+}
 
 void OrderTracerPolicy::InitPolicy()
 {
@@ -97,6 +167,19 @@ void OrderTracerPolicy::InitPolicy()
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
+
+inline std::vector<std::vector<std::string>> PolynomComparerPolicy::Get_All()
+{
+    std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
+        std::make_pair(CONFIGS_POLYNOM_EVAL_WEIGHT),
+        std::make_pair(CONFIGS_POLYNOM_RMSE_WEIGHT),
+        std::make_pair(CONFIGS_POLYNOM_COEFF_WEIGHT),
+        std::make_pair(CONFIG_DEF_ENABLE_POLYNOM_SCAN),
+        std::make_pair(CONFIGS_POLYNOM_LEN_FOR_SCAN)
+    };
+
+    return Get_AllConfigs(allConfigs);
+}
 
 void PolynomComparerPolicy::InitPolicy()
 {
@@ -163,7 +246,27 @@ void InfraConfigrationsPolicy::InitPolicy()
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
+inline std::vector<std::vector<std::string>> PatternGodStatisticsPolicy::Get_All()
+{
+    std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
+        std::make_pair(CONFIG_DEF_PATTERN_FUTURE_VISION_CANDLES),
+        std::make_pair(CONFIG_DEF_SAVED_STATS_LEN)
+    };
+    return Get_AllConfigs(allConfigs);
+}
+
 inline void PatternGodStatisticsPolicy::InitPolicy()
 {
     Score_Future_Vision_Candles = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_FUTURE_VISION_CANDLES));
+    SavedDirectionStaticsLen = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_SAVED_STATS_LEN));
+}
+
+// ------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
+
+inline void BaseComparerPolicy::InitPolicy()
+{
+    Min_Similar_Results_To_Fusion = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIGS_MIN_SIMILAR_RESULTS_TO_FUSION));
+    PolynomComparerWeight = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_POLYNOM_FUSION_WEIGHT));
+    ScoreComparerWeight = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_SCORE_FUSION_WEIGHT));
 }

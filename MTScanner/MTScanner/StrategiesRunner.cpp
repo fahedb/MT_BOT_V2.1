@@ -13,8 +13,9 @@ void StrategiesRunner::Run_PatternGod(TimeLine& historyTimeLine)
 	XAUUSD_CurrentTable table;
 
 	HttpServerSyncer::UpdateCurrentTimeLine(&table);
-	ConfigrationsPolicy* policy = confs->Get_Policy();
-	policy->ScoreResultsCacheSizePerThread = (historyTimeLine.Get_TimeLineLen() / policy->ThreadsCount) * Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLineLen(); // Set the cache size per thread based on the history time line length and the number of threads
+	ScoreCachingPolicy* scoreCachePolicy = confs->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
+	ConfigrationsPolicy* confPolicy = confs->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
+	scoreCachePolicy->ScoreResultsCacheSizePerThread = (historyTimeLine.Get_TimeLineLen() / confPolicy->ThreadsCount) * Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLineLen(); // Set the cache size per thread based on the history time line length and the number of threads
 	confs->RefreshPolicy(); // Refresh all policies
 
 	while (true)
@@ -22,7 +23,7 @@ void StrategiesRunner::Run_PatternGod(TimeLine& historyTimeLine)
 		HttpServerSyncer::UpdateCurrentTimeLine(&table);
 		MTScannerUtils::ScoreResultsCacheCleanLogic(OneMinutePatternGodLogic(&patternScaner, &statisticsCalcucator, &historyTimeLine), m_scansCounter); // Start scanning
 		HttpServerSyncer::UpdateConfigs();
-		MTScannerUtils::GoToSleep(policy->TimeBetweenScans);
+		MTScannerUtils::GoToSleep(confPolicy->TimeBetweenScans);
 	}
 	tracer_thread.join();
 }
@@ -56,7 +57,7 @@ bool StrategiesRunner::OneMinutePatternGodLogic(PatternGod* patternScan, Statist
 		OrderEntity* tradeRes = tradeMngr->CheckForTrade_PatternGod(stats);
 		// -----------------------------------------------------------------------------------------------------
 
-		std::vector<TimeLineScored> similarPatterns = TimeLineBuilder::Build_TimeLineScored_Patterns(history, &results, currentTimeLine->size(), Configrations::getInstance()->Get_Policy()->Score_Future_Vision_Candles);
+		std::vector<TimeLineScored> similarPatterns = TimeLineBuilder::Build_TimeLineScored_Patterns(history, &results, currentTimeLine->size(), Configrations::getInstance()->Get_Policy<PatternGodStatisticsPolicy>(PolicyType::PatternGodStatisticsPolicy)->Score_Future_Vision_Candles);
 		stats.Add_Patterns(&similarPatterns, true);
 		stats.Add_CurrPattern(TimeLine(new std::vector<ChangeNode*>(*currentTimeLine), true));
 

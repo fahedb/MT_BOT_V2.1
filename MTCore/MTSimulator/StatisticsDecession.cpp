@@ -4,10 +4,9 @@
 
 CommonDirection StatisticsDecession::CalcHighestPipsChange(ChangeNode* start, DirectionStats* stats,int futureLen)
 {
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
-	int pipsChangeToCount = policy->Pattern_Min_PipsChange_ToCount;
+	int pipsChangeToCount = m_tradeMngrPolicy->Pattern_Min_PipsChange_ToCount;
 
-	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTime);
+	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTimeLong);
 	int pipChange = 0;
 	int candlesCounter = 0;
 
@@ -58,10 +57,8 @@ CommonDirection StatisticsDecession::CalcHighestPipsChange(ChangeNode* start, Di
 
 CommonDirection StatisticsDecession::CalcFirstPipsChange(ChangeNode* start, DirectionStats* stats,int futureLen)
 {
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
-
-	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTime);
-	int pipsChangeToCount = policy->Pattern_Min_PipsChange_ToCount;
+	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTimeLong);
+	int pipsChangeToCount = m_tradeMngrPolicy->Pattern_Min_PipsChange_ToCount;
 
 	int pipChange = 0;
 	int candlesCounter = 0;
@@ -96,10 +93,9 @@ CommonDirection StatisticsDecession::CalcFirstPipsChange(ChangeNode* start, Dire
 
 CommonDirection StatisticsDecession::CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stats,int futureLen)
 {
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
-	int pipsChangeToCount = policy->Pattern_Min_PipsChange_ToCount;
+	int pipsChangeToCount = m_tradeMngrPolicy->Pattern_Min_PipsChange_ToCount;
 
-	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTime);
+	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTimeLong);
 	int pipChange = 0;
 	int candlesCounter = 0;
 

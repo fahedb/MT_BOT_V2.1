@@ -67,6 +67,18 @@ IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
 	calcTotal(); // Recalculate the total
 	return *this;
 }
+IndicatorScore IndicatorScore::operator-(const IndicatorScore& other) const
+{
+	IndicatorScore result;
+
+	for (const auto& pair : scores) {
+		BarPeriod period = pair.first;
+		double res = pair.second - other.scores.at(period);
+		result.scores.at(period) = res >= 0 ? res : 0; // Sum scores for each BarPeriod
+	}
+	result.calcTotal(); // Recalculate the total
+	return result;
+}
 
 // ------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------
@@ -144,6 +156,20 @@ ScoresResult& ScoresResult::operator+=(const ScoresResult& other) {
 	totalScore.calcTotal();
 
 	return *this;
+}
+ScoresResult ScoresResult::operator-(const ScoresResult& other) const
+{
+
+	ScoresResult result;
+	IndicatorTypeList indList;
+
+	for (const auto& type : indList.types) { // Iterate through all IndicatorTypes
+		result.indicatorScores.at(type) = indicatorScores.at(type) - other.indicatorScores.at(type); // Combine scores for each IndicatorType
+	}
+	result.calcTotalResult(); // Combine total scores (no need to recalculate; just sum them)
+
+	return result;
+
 }
 
 // ------------------------------------------------------------------------------------------------------------

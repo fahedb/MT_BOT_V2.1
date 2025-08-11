@@ -28,9 +28,10 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* vec1,
 		Logger::getInstance().WriteLog("Vectors are not of the same size: " + std::to_string(vec1->size()) + " vs " + std::to_string(vec2->size()), false, true, LogType::ERR);
 		return ScoresResult(); // Return an empty ScoresResult if the vectors are not of the same size
 	}
-	const int polyLen = Configrations::getInstance()->Get_PolynomPolicy()->PolynomLen_ForScan;
+	
+	const int polyLen = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy)->EnablePolynomScan;
 	ScoreResultsCachePolynom* scoreResultsCache = ScoreResultsCachePolynom::getInstance();
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+	ScoreCachingPolicy* scoreCachePolicy = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
 
 	ScoresResult totalScore;
 	for (int i = 0; i < vec1->size(); i += polyLen)
@@ -47,7 +48,7 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* vec1,
 			vec2->begin() + (static_cast<size_t>(i) + static_cast<size_t>(polyLen)));
 
 		ScoresResult* foundRes = nullptr; // Initialize foundRes to nullptr
-		if (policy->EnableScoreCaching)
+		if (scoreCachePolicy->EnableScoreCaching)
 			 foundRes = TryFindCachedScore(partialVec1, partialVec2, threadIdx); // Try to find the score in the cache
 
 		if(foundRes) // If the score was found in the cache
@@ -84,7 +85,7 @@ TimeLinePolynomScore PolynomScoreCalcs::CalcScore(PolynomChangeNodePackage* hist
 
 	IndicatorTypeList indTypes;
 
-	PolynomComparerPolicy* policy = Configrations::getInstance()->Get_PolynomPolicy();
+	PolynomComparerPolicy* policy = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
 
 	for(const auto& indType : indTypes.types)
 	{
@@ -129,8 +130,8 @@ bool PolynomScoreCalcs::TryStoreScoreInCache(
 	if (histSegment.empty() || currSegment.empty())
 		return false;
 
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
-	if (!policy->EnableScoreCaching)
+	ScoreCachingPolicy* scoreCachePolicy = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
+	if (!scoreCachePolicy->EnableScoreCaching)
 		return false;
 
 	ScoreResultsCachePolynom* cache = ScoreResultsCachePolynom::getInstance();

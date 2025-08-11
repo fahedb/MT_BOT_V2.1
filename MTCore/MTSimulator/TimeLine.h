@@ -74,12 +74,12 @@ private:
 
         for (int i = 0; i < m_TL->size(); i++)
         {
-            const std::string& timeKey = m_TL->at(i)->point_DateTime;
+            long long timeKey = m_TL->at(i)->point_DateTimeLong;
             if (!m_DB_Map.ContainsKey(timeKey)) {
                 m_DB_Map.InsetIntoMap(timeKey, i);
             }
             else {
-                Logger::getInstance().WriteLog("!!!!! Duplicate point_DateTime in DB: " + timeKey + " !!!!!!", false, true, LogType::ERR);
+                Logger::getInstance().WriteLog("!!!!! Duplicate point_DateTime in DB: " + std::to_string(timeKey) + " !!!!!!", false, true, LogType::ERR);
             }
         }
     }

@@ -26,7 +26,7 @@ void PatternGodUtils::FilterDuplicatesTimeLines(std::vector<std::pair<ChangeNode
 
 	for (const auto& result : nodesResults2D)
 	{
-		int currIdx = historyDB_Map->GetIdx_Of_TimePoint(result.first->point_DateTime);
+		int currIdx = historyDB_Map->GetIdx_Of_TimePoint(result.first->point_DateTimeLong);
 		bool isDuplicate = false;
 
 
@@ -50,20 +50,20 @@ void PatternGodUtils::FilterDuplicatesTimeLines(std::vector<std::pair<ChangeNode
 
 void PatternGodUtils::filterByHighScores(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D)
 {
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
-	if (nodesResults2D.size() <= policy->Patter_Max_Patterns_To_Find) {
+	TradeManagerPolicy* policy = Configrations::getInstance()->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy);
+	if (nodesResults2D.size() <= policy->Pattern_Max_Patterns_To_Find) {
 		// If the vector has X or fewer elements, nothing needs to be done
 		return;
 	}
 
 	// Use partial_sort to sort the vector and get top X scores
-	std::partial_sort(nodesResults2D.begin(), nodesResults2D.begin() + policy->Patter_Max_Patterns_To_Find, nodesResults2D.end(),
+	std::partial_sort(nodesResults2D.begin(), nodesResults2D.begin() + policy->Pattern_Max_Patterns_To_Find, nodesResults2D.end(),
 		[](const std::pair<ChangeNode*, ScoresResult>& a, const std::pair<ChangeNode*, ScoresResult>& b) {
 			return a.second.totalScore.total > b.second.totalScore.total; // Sort by 'total' in descending order
 		});
 
 	// Resize the vector to keep only the top 10 elements
-	nodesResults2D.resize(policy->Patter_Max_Patterns_To_Find);
+	nodesResults2D.resize(policy->Pattern_Max_Patterns_To_Find);
 
 
 	double maxScore = nodesResults2D.front().second.totalScore.total;

@@ -9,7 +9,6 @@
 #include "Policies.h"
 #include "robin_hood.h"
 
-struct EMA_Check_Details;
 
 class Configrations // SingleTon class for all configrations of the program
 {

@@ -319,6 +319,9 @@
     <Filter Include="Strategies\PatternGod\ResultFusionEngine">
       <UniqueIdentifier>{20e9d7b6-7138-4391-927f-464c115b5846}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Strategies\PatternGod\Comparers\ComparersEnums">
+      <UniqueIdentifier>{1dae6a54-d6bf-42ca-a580-d338964f36b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -527,6 +530,9 @@
     </ClCompile>
     <ClCompile Include="Policies.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Normalizer.cpp">
+      <Filter>Math\Normalizer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -745,6 +751,12 @@
     </ClInclude>
     <ClInclude Include="ConfigsTableStaticProxy.h">
       <Filter>Configs\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Normalizer.h">
+      <Filter>Math\Normalizer</Filter>
+    </ClInclude>
+    <ClInclude Include="ComparersEnums.h">
+      <Filter>Strategies\PatternGod\Comparers\ComparersEnums</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

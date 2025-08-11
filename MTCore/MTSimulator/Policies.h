@@ -13,7 +13,10 @@ enum class PolicyType
     ConfigrationsPolicy,
     OrderTracerPolicy,
     OrdersPolicy,
-    TradeManagerPolicy
+    TradeManagerPolicy, 
+    ScoreCachingPolicy,
+    PatternGodStatisticsPolicy,
+    BaseComparerPolicy
 };
 struct PolicyTypeList
 {
@@ -25,7 +28,12 @@ struct PolicyTypeList
         PolicyType::ConfigrationsPolicy,
         PolicyType::OrderTracerPolicy,
         PolicyType::OrdersPolicy,
-        PolicyType::TradeManagerPolicy
+        PolicyType::TradeManagerPolicy,
+        PolicyType::ScoreCachingPolicy,
+        PolicyType::PatternGodStatisticsPolicy,
+        PolicyType::BaseComparerPolicy
+
+
     };
 };
 
@@ -38,12 +46,13 @@ class BasePolicy
 public:
     virtual ~BasePolicy() = default;
 
+	virtual std::vector<std::vector<std::string>> Get_All() = 0; // Pure virtual function to get all configurations
+
 protected:
     std::vector<std::vector<std::string>> Get_AllConfigs(std::vector<std::pair<std::string, std::string>> allConfigs);
 
 private:
 	virtual void InitPolicy() = 0; // Pure virtual function to initialize the policy
-	virtual std::vector<std::vector<std::string>> Get_All() = 0; // Pure virtual function to get all configurations
 };
 
 // ---------------------------------------------------------------------------------------------------
@@ -104,7 +113,7 @@ public:
         InitPolicy();
     }
 
-    std::vector<std::vector<std::string>> Get_All();
+    virtual std::vector<std::vector<std::string>> Get_All() override;
 
     int RSI_Wieght = 0;
     int EMA_Wieght = 0;
@@ -130,18 +139,7 @@ public:
     {
         InitPolicy();
     }
-    std::vector<std::vector<std::string>> Get_All()
-    {
-        std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
-            std::make_pair(CONFIGS_POLYNOM_EVAL_WEIGHT),
-            std::make_pair(CONFIGS_POLYNOM_RMSE_WEIGHT),
-            std::make_pair(CONFIGS_POLYNOM_COEFF_WEIGHT),
-            std::make_pair(CONFIG_DEF_ENABLE_POLYNOM_SCAN),
-            std::make_pair(CONFIGS_POLYNOM_LEN_FOR_SCAN)
-        };
-
-        return Get_AllConfigs(allConfigs);
-    }
+    virtual std::vector<std::vector<std::string>> Get_All() override;
 
     double weight_eval = 0.5; // Weight for evaluation score
     double weight_rmse = 0.3; // Weight for RMSE score
@@ -149,6 +147,34 @@ public:
 
     bool EnablePolynomScan = 0;
     int PolynomLen_ForScan = 5; // Length of the polynomial to scan
+
+private:
+    void InitPolicy();
+};
+
+// ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
+
+struct BaseComparerPolicy : public BasePolicy
+{
+public:
+    BaseComparerPolicy()
+    {
+        InitPolicy();
+    }
+    virtual std::vector<std::vector<std::string>> Get_All() override
+    {
+        std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
+            std::make_pair(CONFIGS_MIN_SIMILAR_RESULTS_TO_FUSION),
+            std::make_pair(CONFIG_POLYNOM_FUSION_WEIGHT),
+            std::make_pair(CONFIG_SCORE_FUSION_WEIGHT)
+        };
+        return Get_AllConfigs(allConfigs);
+    }
+    int Min_Similar_Results_To_Fusion = 2; // Default value for minimum similar results to fusion
+
+    double PolynomComparerWeight = 0.7; // Weight for polynomial fusion
+    double ScoreComparerWeight = 0.3; // Weight for score fusion
 
 private:
     void InitPolicy();
@@ -168,16 +194,7 @@ public:
     {
         InitPolicy();
     }
-    std::vector<std::vector<std::string>> Get_All()
-    {
-        std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
-            std::make_pair(CONFIG_DEF_ENABLE_TRADE_TRACING),
-            std::make_pair(CONFIG_DEF_ENABLE_DYNAMIC_TIMELINE_TRADE_TRACING),
-            std::make_pair(CONFIG_DEF_ENABLE_TRADE_TRACING)
-        };
-
-        return Get_AllConfigs(allConfigs);
-    }
+    virtual std::vector<std::vector<std::string>> Get_All() override;
 
     bool EnableTradeTracing = false;
     bool EnableDynamicTimeLine_TradeTracing = false;
@@ -198,27 +215,14 @@ public:
     {
         InitPolicy();
     }
-    std::vector<std::vector<std::string>> Get_All()
-    {
-        std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
-            std::make_pair(CONFIG_DEF_STOP_LOSS_DIFF),
-            std::make_pair(CONFIG_DEF_TAKE_PROFIT_DIFF),
-            std::make_pair(CONFIG_DEF_STOP_LOSS_START),
-            std::make_pair(CONFIG_DEF_TAKE_PROFIT_START),
-            std::make_pair(CONFIG_DEF_PATTERN_MIN_MEAN_PIPS_TO_EXECUTE_ORDER),
-            std::make_pair(CONFIG_DEF_PATTERN_MINIMUM_PIPS_CHANGE_TOCOUNT)
-        };
-
-        return Get_AllConfigs(allConfigs);
-    }
+    virtual std::vector<std::vector<std::string>> Get_All() override;
     int SL_start = 0;
     int TP_start = 0;
 
-    int TP_diff = 0;
     int SL_diff = 0;
+    int TP_diff = 0;
 
-    double Min_MeanPips_ToExecute_Order = 0.0;
-    double Pattern_Min_PipsChange_ToCount = 0.0;
+	bool Dynamic_SL_TP = false; // Dynamic Stop Loss and Take Profit
 
 private:
     void InitPolicy();
@@ -239,6 +243,8 @@ public:
         InitPolicy();
     }
 
+    virtual std::vector<std::vector<std::string>> Get_All() override;
+
     bool EnableScoreCaching = true;
     long ScoreResultsCacheSizePerThread = 100000; // Default size for each thread's cache
     int maxScorePossibleForChangeNodes = 0;
@@ -257,14 +263,18 @@ public:
     {
         InitPolicy();
     }
+    
+    virtual std::vector<std::vector<std::string>> Get_All() override;
 
-    double Patter_Min_Patterns_ToTake_Action = 0.0;
-    double Patter_Max_Patterns_To_Find = 0.0;
+    double Pattern_Min_Patterns_ToTake_Action = 0.0;
+    double Pattern_Max_Patterns_To_Find = 0.0;
     double Pattern_TopScore_ThresholdRatio = 0.0;
     double Pattern_Min_Percent_To_ExecuteOrder = 0.0;
-    int Pattern_Activate_Alternative_ExecuteOrder = 0;
     double Pattern_Diff_Percent_To_ExecuteOrder_Alternative = 0.0;
     double Pattern_Max_Noise_To_ExecuteOrder_Alternative = 0.0;
+    int Pattern_Activate_Alternative_ExecuteOrder = 0;
+    double Pattern_Min_PipsChange_ToCount = 0.0;
+    double Min_MeanPips_ToExecute_Order = 0.0;
 
 private:
     void InitPolicy();
@@ -277,7 +287,10 @@ public:
     {
         InitPolicy();
     }
+    virtual std::vector<std::vector<std::string>> Get_All() override;
     int Score_Future_Vision_Candles = 0;
+    int SavedDirectionStaticsLen = 0;
+
 
 private:
     void InitPolicy();
@@ -285,6 +298,8 @@ private:
 
 // ---------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------
+
+
 
 // <summary>
 /// Class for Configurations Policy.
@@ -298,10 +313,10 @@ public:
     {
         InitPolicy(); // Initialize the policy
 	}
+    virtual std::vector<std::vector<std::string>> Get_All() override;
 
     double Score_Min_TotalScore_ToAct_PerCandle = 0;
     int Pattern_CurrentTimeLineLen = 0;
-    int SavedDirectionStaticsLen = 0;
     int EMA_len_for_Pattern_Export = 0;
     int TimeBetweenScans = 0;
     bool Export_Patterns_PNG_To_Telegram = false;

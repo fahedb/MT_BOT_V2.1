@@ -9,7 +9,7 @@ ScoreResultsCache::ScoreResultsCache()
 	}
 	m_scoreResultsCache.resize(threadsCount); // Resize the cache to hold scores for each thread
 
-	long chunkSize = Configrations::getInstance()->Get_Policy()->ScoreResultsCacheSizePerThread; // Get the cache size per thread from the policy
+	long chunkSize = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->ScoreResultsCacheSizePerThread; // Get the cache size per thread from the policy
 	for (int i = 0; i < threadsCount; i++)
 	{
 		m_scoreResultsCache.at(i).reserve(chunkSize); // Reserve space for the expected number of results to avoid multiple reallocations

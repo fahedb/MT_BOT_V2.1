@@ -1,11 +1,23 @@
 #include "PatternGod_BaseComparer.h"
 
+PatternGod_BaseComparer::~PatternGod_BaseComparer()
+{
+	if (m_historyDB_Map != nullptr) {
+		delete m_historyDB_Map; // Free the history DB map
+		m_historyDB_Map = nullptr;
+	}
+	if (m_currDB_Map != nullptr) {
+		delete m_currDB_Map; // Free the current DB map
+		m_currDB_Map = nullptr;
+	}
+}
+
 inline int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D) // Scan for patterns in the history time line compared to the current time line
 {
 	std::mutex resultMutex, local2DResultMutex;
 
 	Logger& logger = Logger::getInstance();
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
 	if (m_currentTL == nullptr) {
 		logger.WriteLog("Current time line is not set for comparison.", true, true, LogType::ERR);
 		return 0;

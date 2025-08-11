@@ -131,8 +131,8 @@ private:
     static bool PreConditionBuild()
     {
         // Check if the cache is enabled and if the polynom length is set
-        Configrations* config = Configrations::getInstance();
-        if (!config->Get_Policy()->EnablePolynomScan || config->Get_PolynomPolicy()->PolynomLen_ForScan <= 0) {
+        PolynomComparerPolicy* polynomComparerPolicy = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
+        if (!polynomComparerPolicy->EnablePolynomScan || polynomComparerPolicy->PolynomLen_ForScan <= 0) {
             Logger::getInstance().WriteLog("Polynom scan is not enabled or polynom length is not set.", true, true, LogType::ERR);
             return false; // Precondition failed
         }
@@ -148,7 +148,7 @@ public:
         // Create a PolynomTimeLine from the nodes
 		PolynomTimeLineCache* cache = PolynomTimeLineCache::getInstance();
 		Configrations* config = Configrations::getInstance();
-        int polyLen = config->Get_PolynomPolicy()->PolynomLen_ForScan;
+        int polyLen = config->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy)->PolynomLen_ForScan;
 
 		int buildCount = 0;
         int nodesSize = nodes.size();

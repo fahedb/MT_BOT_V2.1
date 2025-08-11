@@ -4,7 +4,7 @@ inline void PatternGod::InitComparers() // Initialize the comparers with the his
 {
 	m_comparers.push_back(std::make_unique<PatternGod_PolynomComparer>(m_historyTL));
 	m_comparers.push_back(std::make_unique<PatternGod_ScoreComparer>(m_historyTL));
-
+	
 	// *** Add more comparers as needed ***
 
 	if (m_currentTL)

@@ -76,8 +76,8 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	virtual std::string GetDB_PhysicalFileName() override { return	Configrations::getInstance()->Get_ConfigValue(DBFILE_DEFUALT_DB_FILE); }
-	virtual std::string GetDB_PhysicalFileName_Json() override { return	Configrations::getInstance()->Get_ConfigValue(DBFILE_DEFUALT_DB_FILE_JSON); }
+	virtual std::string GetDB_PhysicalFileName() override { return	Configrations::getInstance()->Get_Config_DB(DBFILE_DEFUALT_DB_FILE); }
+	virtual std::string GetDB_PhysicalFileName_Json() override { return	Configrations::getInstance()->Get_Config_DB(DBFILE_DEFUALT_DB_FILE_JSON); }
 protected:
 	int index = 0; // Index of selection, used in get next entity functions
 	virtual int tableCols() { return HistoryPricesTablesCols; } // To get columns number, Not used any more

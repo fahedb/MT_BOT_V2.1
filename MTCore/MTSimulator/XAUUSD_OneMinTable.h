@@ -25,8 +25,8 @@ public:
 		Set_DATA_DB_FileName(fileName);
 	}
 	_Points GetPointPlace() { return _Points::Points_XAUUSD; }
-	virtual std::string GetDB_PhysicalFileName() {return	Configrations::getInstance()->Get_ConfigValue(DBFILE_XAUUSD_M1_DATA);}
-	virtual std::string GetDB_PhysicalFileName_Json() {return	Configrations::getInstance()->Get_ConfigValue(DBFILE_XAUUSD_M1_DATA_JSON);}
+	virtual std::string GetDB_PhysicalFileName() {return	Configrations::getInstance()->Get_Config_DB(DBFILE_XAUUSD_M1_DATA);}
+	virtual std::string GetDB_PhysicalFileName_Json() {return	Configrations::getInstance()->Get_Config_DB(DBFILE_XAUUSD_M1_DATA_JSON);}
 	
 private:
 	virtual int GetColsNum() override { return DEF_COLUMN_NUM_XAUUSD_M1; }

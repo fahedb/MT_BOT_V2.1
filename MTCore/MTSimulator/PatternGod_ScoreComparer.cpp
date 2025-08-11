@@ -13,20 +13,21 @@
 
 ScoresResult PatternGod_ScoreComparer::CompareOneMinNodesPeriods(int startIdx, int threadIdx) // compare between periods of time in the history time line and the whole current time line
 {
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+	ScoreCachingPolicy* scoreCachePolicy = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
+	ConfigrationsPolicy* confPolicy = Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
 	ScoresResult periodScore;
 
 	int currentSize = static_cast<int>(m_currentTL->size());
 	int historyRemaining = static_cast<int>(m_historyTL->size()) - startIdx;
 	int limit = (currentSize < historyRemaining) ? currentSize : historyRemaining;
 	int currTotalScore = 0;
-	int maxScorePossible = policy->maxScorePossibleForChangeNodes;
-	int totalMinScoretoAct = limit * policy->Score_Min_TotalScore_ToAct_PerCandle;
+	int maxScorePossible = scoreCachePolicy->maxScorePossibleForChangeNodes;
+	int totalMinScoretoAct = limit * confPolicy->Score_Min_TotalScore_ToAct_PerCandle;
 	ScoreResultsCache* scoreResultsCache = ScoreResultsCache::getInstance();
 	std::vector<std::pair<std::pair<long long, long long>, ScoresResult>> scoreResults;
 
 	scoreResults.reserve(limit); // Reserve space for the expected number of results to avoid multiple reallocations
-	const bool enableCaching = policy->EnableScoreCaching;
+	const bool enableCaching = scoreCachePolicy->EnableScoreCaching;
 
 
 	for (int i = 0; i < limit; ++i)

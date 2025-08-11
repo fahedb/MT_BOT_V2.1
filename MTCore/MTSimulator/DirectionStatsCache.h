@@ -5,11 +5,11 @@
 class DirectionStatsCache
 {
 	std::vector<DirectionStats*> statsRep;
-
+	PatternGodStatisticsPolicy* m_statsPolicy = nullptr;
 public:
 	void Add_NewStat(DirectionStats& dirStat,bool moveMemory = false)
 	{
-		int maxStats = Configrations::getInstance()->Get_Policy()->SavedDirectionStaticsLen;
+		int maxStats = m_statsPolicy->SavedDirectionStaticsLen;
 		while (statsRep.size() >= maxStats)
 		{
 			DirectionStats* stats = statsRep.at(0);
@@ -24,7 +24,7 @@ public:
 
 	void Add_NewStat(DirectionStats* dirStat)
 	{
-		int maxStats = Configrations::getInstance()->Get_Policy()->SavedDirectionStaticsLen;
+		int maxStats = m_statsPolicy->SavedDirectionStaticsLen;
 		while (statsRep.size() >= maxStats)
 		{
 			DirectionStats* stats = statsRep.at(0);
@@ -75,8 +75,8 @@ public:
 private:
 	DirectionStatsCache()
 	{
-		ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
-		statsRep.reserve(policy->SavedDirectionStaticsLen);
+		m_statsPolicy = Configrations::getInstance()->Get_Policy<PatternGodStatisticsPolicy>(PolicyType::PatternGodStatisticsPolicy);
+		statsRep.reserve(m_statsPolicy->SavedDirectionStaticsLen);
 	}
 };
 
@@ -85,11 +85,12 @@ private:
 class DynamicDirectionStatsCache
 {
 	std::vector<DirectionStats*> statsRep;
+	PatternGodStatisticsPolicy* m_statsPolicy = nullptr;
 
 public:
 	void Add_NewStat(DirectionStats& dirStat, bool moveMemory = false)
 	{
-		int maxStats = Configrations::getInstance()->Get_Policy()->SavedDirectionStaticsLen;
+		int maxStats = m_statsPolicy->SavedDirectionStaticsLen;
 		while (statsRep.size() >= maxStats)
 		{
 			DirectionStats* stats = statsRep.at(0);
@@ -104,7 +105,7 @@ public:
 
 	void Add_NewStat(DirectionStats* dirStat)
 	{
-		int maxStats = Configrations::getInstance()->Get_Policy()->SavedDirectionStaticsLen;
+		int maxStats = m_statsPolicy->SavedDirectionStaticsLen;
 		while (statsRep.size() >= maxStats)
 		{
 			DirectionStats* stats = statsRep.at(0);
@@ -155,8 +156,8 @@ public:
 private:
 	DynamicDirectionStatsCache()
 	{
-		ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
-		statsRep.reserve(policy->SavedDirectionStaticsLen);
+		m_statsPolicy = Configrations::getInstance()->Get_Policy<PatternGodStatisticsPolicy>(PolicyType::PatternGodStatisticsPolicy);
+		statsRep.reserve(m_statsPolicy->SavedDirectionStaticsLen);
 	}
 };
 

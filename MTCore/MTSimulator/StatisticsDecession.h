@@ -15,6 +15,7 @@ class StatisticsDecession
 public:
 	StatisticsDecession(std::vector<ChangeNode*>* historyTL ,DBMap* historyDB_Map)
 	{
+		m_tradeMngrPolicy = Configrations::getInstance()->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy);
 		m_currentTL = nullptr;
 		m_historyTL = historyTL;
 		m_historyDB_Map = historyDB_Map;
@@ -23,6 +24,7 @@ public:
 	}
 	StatisticsDecession(TimeLine* history)
 	{
+		m_tradeMngrPolicy = Configrations::getInstance()->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy);
 		m_historyDB_Map = history->Get_DBMap();
 		m_historyTL = history->Get_TimeLine();
 		m_currentTL = nullptr;
@@ -37,7 +39,7 @@ public:
 		if (!potentioalRes || potentioalRes->empty())
 			return stats;
 
-		ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
+		PatternGodStatisticsPolicy* policy = Configrations::getInstance()->Get_Policy<PatternGodStatisticsPolicy>(PolicyType::PatternGodStatisticsPolicy);
 		stats.Set_TimePoint(m_currentTL->at(m_currentTL->size() - 1)->point_DateTime);
 		stats.Activate();
 
@@ -63,6 +65,8 @@ private:
 	CommonDirection CalcFirstPipsChange  (ChangeNode* start, DirectionStats* stats,int futureLen);
 	CommonDirection CalcGeneralPipsChange(ChangeNode* start, DirectionStats* stats,int futureLen);
 	CommonDirection CalcHighestPipsChange(ChangeNode* start, DirectionStats* stats,int futureLen);
+
+	TradeManagerPolicy* m_tradeMngrPolicy = nullptr; // Trade Manager Policy to get the configs from
 
 };
 

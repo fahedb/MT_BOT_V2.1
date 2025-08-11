@@ -170,6 +170,7 @@
     <ClCompile Include="JsonHandler_GraphContainer.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="MemoryUtils.cpp" />
+    <ClCompile Include="MinMaxFinder.cpp" />
     <ClCompile Include="MTChart.cpp" />
     <ClCompile Include="MTSimulatorUtils.cpp" />
     <ClCompile Include="Normalizer.cpp" />
@@ -250,6 +251,7 @@
     <ClInclude Include="JsonHandler_GraphContainer.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MemoryUtils.h" />
+    <ClInclude Include="MinMaxFinder.h" />
     <ClInclude Include="MTChart.h" />
     <ClInclude Include="MTSimulatorUtils.h" />
     <ClInclude Include="Normalizer.h" />

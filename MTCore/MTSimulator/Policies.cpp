@@ -22,7 +22,6 @@ std::vector<std::vector<std::string>> BasePolicy::Get_AllConfigs(std::vector<std
 inline std::vector<std::vector<std::string>> ConfigrationsPolicy::Get_All()
 {
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
-        std::make_pair(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT),
         std::make_pair(CONFIG_DEF_CURR_TIME_LINE_LEN),
         std::make_pair(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT),
         std::make_pair(CONFIG_DEF_TIME_BETWEEN_SCANS),
@@ -34,8 +33,6 @@ inline std::vector<std::vector<std::string>> ConfigrationsPolicy::Get_All()
 
 void ConfigrationsPolicy::InitPolicy()
 {
-    Score_Min_TotalScore_ToAct_PerCandle =
-        Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT));
 
     Pattern_CurrentTimeLineLen = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_CURR_TIME_LINE_LEN));
 
@@ -175,7 +172,8 @@ inline std::vector<std::vector<std::string>> PolynomComparerPolicy::Get_All()
         std::make_pair(CONFIGS_POLYNOM_RMSE_WEIGHT),
         std::make_pair(CONFIGS_POLYNOM_COEFF_WEIGHT),
         std::make_pair(CONFIG_DEF_ENABLE_POLYNOM_SCAN),
-        std::make_pair(CONFIGS_POLYNOM_LEN_FOR_SCAN)
+        std::make_pair(CONFIGS_POLYNOM_LEN_FOR_SCAN),
+		std::make_pair(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT_POLYNOM_COMPARER)
     };
 
     return Get_AllConfigs(allConfigs);
@@ -184,6 +182,7 @@ inline std::vector<std::vector<std::string>> PolynomComparerPolicy::Get_All()
 void PolynomComparerPolicy::InitPolicy()
 {
     EnablePolynomScan = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_ENABLE_POLYNOM_SCAN)) > 0 ? true : false;
+	ScoreToAct = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT_POLYNOM_COMPARER));
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -195,7 +194,9 @@ inline std::vector<std::vector<std::string>> ScoreComparerPolicy::Get_All()
         std::make_pair(CONFIG_DEF_RSI_WIEGHT),
         std::make_pair(CONFIG_DEF_EMA_WIEGHT),
         std::make_pair(CONFIG_DEF_ZLSMA_WIEGHT),
-        std::make_pair(CONFIG_DEF_VOLUME_WIEGHT)
+        std::make_pair(CONFIG_DEF_VOLUME_WIEGHT),
+		std::make_pair(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT_SCORE_COMPARER),
+		std::make_pair(CONFIG_DEF_ENABLE_SCORE_SCAN)
     };
 
     return Get_AllConfigs(allConfigs);
@@ -207,6 +208,8 @@ void ScoreComparerPolicy::InitPolicy()
     EMA_Wieght = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_EMA_WIEGHT));
     ZLSMA_Wieght = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_ZLSMA_WIEGHT));
     VOLUME_Wieght = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_VOLUME_WIEGHT));
+	EnableScoreScan = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_ENABLE_SCORE_SCAN)) > 0 ? true : false;
+	ScoreToAct = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT_SCORE_COMPARER));
 }
 
 // ------------------------------------------------------------------------------------------------------------------

@@ -114,12 +114,12 @@ public:
     }
 
     virtual std::vector<std::vector<std::string>> Get_All() override;
-
     int RSI_Wieght = 0;
     int EMA_Wieght = 0;
     int ZLSMA_Wieght = 0;
     int VOLUME_Wieght = 0;
-
+    bool EnableScoreScan = 0;
+    int ScoreToAct = 0;
 private:
     void InitPolicy();
 };
@@ -147,6 +147,8 @@ public:
 
     bool EnablePolynomScan = 0;
     int PolynomLen_ForScan = 5; // Length of the polynomial to scan
+
+    int ScoreToAct = 0;
 
 private:
     void InitPolicy();
@@ -315,7 +317,6 @@ public:
 	}
     virtual std::vector<std::vector<std::string>> Get_All() override;
 
-    double Score_Min_TotalScore_ToAct_PerCandle = 0;
     int Pattern_CurrentTimeLineLen = 0;
     int EMA_len_for_Pattern_Export = 0;
     int TimeBetweenScans = 0;

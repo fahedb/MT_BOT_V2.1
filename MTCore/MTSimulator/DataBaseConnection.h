@@ -1,6 +1,7 @@
 #pragma once
 #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <windows.h>
 #include <sqltypes.h>
 #include <sql.h>
@@ -11,6 +12,11 @@
 #include <fstream>
 #include <codecvt> // For wstring_convert
 
+/// <summary>
+/// Author: Fahed Elbatash
+/// /// Date: 2025-08-11
+/// MasterPieceSoft © 2025
+/// </summary>
 
 class DataBaseConnection
 {

@@ -29,7 +29,7 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* vec1,
 		return ScoresResult(); // Return an empty ScoresResult if the vectors are not of the same size
 	}
 	
-	const int polyLen = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy)->EnablePolynomScan;
+	const int polyLen = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy)->PolynomLen_ForScan;
 	ScoreResultsCachePolynom* scoreResultsCache = ScoreResultsCachePolynom::getInstance();
 	ScoreCachingPolicy* scoreCachePolicy = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
 

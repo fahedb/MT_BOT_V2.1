@@ -53,7 +53,7 @@ std::vector<TimeLineScored> TimeLineBuilder::Build_TimeLineScored_Patterns(TimeL
 	return similarPatterns;
 }
 
-std::vector<ChangeNode*> TimeLineBuilder::SplitChangeNodeFromScores(std::vector<std::pair<ChangeNode*, ScoresResult>>* line)
+std::vector<ChangeNode*> TimeLineBuilder::SplitChangeNodeFromScores(const std::vector<std::pair<ChangeNode*, ScoresResult>>* line)
 {
 	std::vector<ChangeNode*> resNodes;
 	resNodes.reserve(line->size());
@@ -62,6 +62,30 @@ std::vector<ChangeNode*> TimeLineBuilder::SplitChangeNodeFromScores(std::vector<
 		resNodes.push_back(line->at(i).first);
 	}
 	return resNodes;
+}
+
+std::vector<ScoresResult> TimeLineBuilder::SplitScoresFromChangeNode(const std::vector<std::pair<ChangeNode*, ScoresResult>>* line)
+{
+	std::vector<ScoresResult> resNodes;
+	resNodes.reserve(line->size());
+	for (int i = 0; i < line->size(); i++)
+	{
+		resNodes.push_back(line->at(i).second);
+	}
+	return resNodes;
+}
+
+std::vector<std::pair<ChangeNode*, ScoresResult>> TimeLineBuilder::CombineScoresAndChangeNodes(const std::vector<ChangeNode*>& chnVec, const std::vector<ScoresResult> &scoresVec)
+{
+	std::vector<std::pair<ChangeNode*, ScoresResult>> res;
+	if (chnVec.size() != scoresVec.size())
+		return res;
+	int idx = 0;
+	for (const auto& chN : chnVec)
+	{
+		res.emplace_back(chN, scoresVec.at(idx));
+	}
+	return res;
 }
 
 void TimeLineBuilder::Build_TimeLineDB(std::vector<ChangeNode*>* tl, DBMap* dbMap) {

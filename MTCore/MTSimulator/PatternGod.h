@@ -10,6 +10,8 @@ private:
 	std::vector<std::unique_ptr<PatternGod_BaseComparer>> m_comparers; // Vector to hold all comparers
 
 	std::vector<ChangeNode*>* m_historyTL;
+	DBMap* m_historyDB_Map = nullptr; // Database map for the history time line
+
 	std::vector<ChangeNode*>* m_currentTL;
 public:
 
@@ -17,12 +19,19 @@ public:
 	{
 		m_historyTL = historyTimeLine;
 		m_currentTL = currentTimeLine;
+
+		m_historyDB_Map = new DBMap(); // Initialize the history DB map
+		TimeLineBuilder::Build_TimeLineDB(m_historyTL,m_historyDB_Map); // Build the DB map for the history time line
+
 	}
 
 	PatternGod(std::vector<ChangeNode*>* historyTimeLine)
 	{
 		m_historyTL = historyTimeLine;
 		m_currentTL = nullptr; // Initialize current time line as nullptr
+
+		m_historyDB_Map = new DBMap(); // Initialize the history DB map
+		TimeLineBuilder::Build_TimeLineDB(m_historyTL, m_historyDB_Map); // Build the DB map for the history time line
 	}
 	PatternGod(TimeLine* historyTLP)
 	{
@@ -31,7 +40,8 @@ public:
 	}
 	~PatternGod()
 	{
-
+		if (m_historyDB_Map != nullptr)
+			delete m_historyDB_Map; // Free the history DB map
 	}
 	void InitComparers(); // Initialize the comparers with the history time line
 	void Set_CurrentTimeLine(std::vector<ChangeNode*>* currentTimeLine) { for (auto& comparer : m_comparers) comparer->Set_CurrentTimeLine(currentTimeLine); }
@@ -50,10 +60,10 @@ public:
 		int totalScans = 0;
 		
 
-		robin_hood::unordered_map<PatternGodComparerType, std::vector<std::pair<ChangeNode*, ScoresResult>>> resultPerComparer; // Map to hold results for each comparer
+		PatternGodComparerResultsMap resultPerComparer; // Map to hold results for each comparer
 		
 		int idx = 0;
-		for (auto& comparer : m_comparers)
+		for (const auto& comparer : m_comparers)
 		{
 			resultPerComparer[comparer->Get_ComparerType()] = std::vector<std::pair<ChangeNode*, ScoresResult>>(); // Initialize the result vector for each comparer
 
@@ -62,7 +72,7 @@ public:
 		}
 
 		// Need to merge results using ResultsFusion Engine...
-		resultNodes2D = PatternGod_ResultFusionEngine::FuseResults(&resultPerComparer); // Fuse results from all comparers
+		resultNodes2D = PatternGod_ResultFusionEngine::FuseResults(&resultPerComparer,m_historyDB_Map); // Fuse results from all comparers
 
 		return totalScans; // Return the total number of scans performed
 	}

@@ -23,7 +23,7 @@ inline int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vec
 		return 0;
 	}
 
-	int scoreToAct = static_cast<int> (m_currentTL->size()) * static_cast<double> (policy->Score_Min_TotalScore_ToAct_PerCandle);
+	int scoreToAct = static_cast<int> (m_currentTL->size()) * static_cast<double> (m_ScoreToAct);
 	if (scoreToAct <= 0)
 		scoreToAct = 0;
 

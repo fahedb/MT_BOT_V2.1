@@ -1,5 +1,6 @@
-#include "ChangeData.h"
 #include <future>
+#pragma once
+#include "ChangeData.h"
 #include "MTSimulatorUtils.h"
 #include "PatternGodUtils.h"
 #include "ScoreResultsCachePolynom.h"
@@ -7,8 +8,8 @@
 #include "TimeLineBuilder.h"
 #include "ComparersEnums.h"
 
-#pragma once
 
+typedef robin_hood::unordered_map<PatternGodComparerType, std::vector<std::pair<ChangeNode*, ScoresResult>>> PatternGodComparerResultsMap;
 
 class PatternGod_BaseComparer
 {
@@ -21,7 +22,7 @@ protected:
 
 	int m_scanCounter = 0; // Counter for the number of scans performed
 	int m_NumOfSkips_ForLowScoreScan = 0; 
-
+	double m_ScoreToAct = 0;
 	PatternGodComparerType m_comparerType = PatternGodComparerType::NONE; // Type of the comparer
 
 	PatternGod_BaseComparer(std::vector<ChangeNode*>* history) : m_historyTL(history)
@@ -44,12 +45,12 @@ public:
 	PatternGodComparerType Get_ComparerType() const { return m_comparerType; } // Get the comparer type
 	virtual int ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);
 
+	void Set_ScoreToAct(double scoreToAct) { m_ScoreToAct = scoreToAct; } // Set the score to act threshold
 protected:
 	
 	virtual void ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct,
 		std::mutex* maxResultLock,
 		ScoresResult* maxScore, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread);
-
 protected:
 	// ---------------------------------------------------------------------------------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------------------------------------------------------------------------------

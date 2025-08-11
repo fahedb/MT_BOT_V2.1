@@ -27,19 +27,7 @@ struct IndicatorScore {
 	// - operatpr
 	IndicatorScore operator-(const IndicatorScore& other) const;
 	// / operator to divide IndicatorScore by a other IndicatorScore
-	IndicatorScore operator/(const IndicatorScore& other) const
-	{
-		IndicatorScore result;
-		for (const auto& pair : scores) {
-			if (other.scores.at(pair.first) != 0) { // Avoid division by zero
-				result.scores[pair.first] = pair.second / other.scores.at(pair.first);
-			} else {
-				result.scores[pair.first] = 0.0; // Default to 0 if division by zero
-			}
-		}
-		result.calcTotal(); // Update the total score after division
-		return result;
-	}
+	IndicatorScore operator/(const IndicatorScore& other) const;
 
 };
 IndicatorScore operator*(const IndicatorScore& score, double factor); // External Multiply operator
@@ -62,21 +50,7 @@ struct ScoresResult {
 	// - operator to subtract two ScoresResult objects
 	ScoresResult operator-(const ScoresResult& other) const;
 	// / operator to divide ScoresResult by another ScoresResult
-	ScoresResult operator/(const ScoresResult& other) const
-	{
-		ScoresResult result;
-		for (const auto& pair : indicatorScores) {
-			if (other.indicatorScores.at(pair.first).total != 0) { // Avoid division by zero
-				result.indicatorScores[pair.first] = pair.second / other.indicatorScores.at(pair.first);
-			} else {
-				result.indicatorScores[pair.first].Reset(); // Reset to default if division by zero
-			}
-		}
-		result.calcTotalResult(); // Update the total score after division
-		return result;
-	}
-
-
+	ScoresResult operator/(const ScoresResult& other) const;
 private:
 	// Helper function to combine scores into totalScore
 	IndicatorScore combineScores() const;

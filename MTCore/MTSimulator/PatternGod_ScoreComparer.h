@@ -12,11 +12,7 @@ public:
 	~PatternGod_ScoreComparer() {}
 
 private:
-	void InitComaprer()
-	{
-		m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
-		Set_ComparerType(); // Initialize the comparer type
-	}
+	void InitComaprer();
 
 	virtual void Set_ComparerType() { m_comparerType = PatternGodComparerType::ScoreComparer; } // Set the comparer type
 	virtual ScoresResult CompareOneMinNodesPeriods(int startIdx, int threadIdx); // Compare one minute nodes periods in the history time line

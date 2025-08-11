@@ -11,6 +11,13 @@
 #include "MTSimulatorUtils.h"
 #include "PatternGodUtils.h"
 
+inline void PatternGod_ScoreComparer::InitComaprer()
+{
+	m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
+	m_ScoreToAct = Configrations::Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->ScoreToAct; // Get the score to act threshold from the policy
+	Set_ComparerType(); // Initialize the comparer type
+}
+
 ScoresResult PatternGod_ScoreComparer::CompareOneMinNodesPeriods(int startIdx, int threadIdx) // compare between periods of time in the history time line and the whole current time line
 {
 	ScoreCachingPolicy* scoreCachePolicy = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
@@ -22,7 +29,7 @@ ScoresResult PatternGod_ScoreComparer::CompareOneMinNodesPeriods(int startIdx, i
 	int limit = (currentSize < historyRemaining) ? currentSize : historyRemaining;
 	int currTotalScore = 0;
 	int maxScorePossible = scoreCachePolicy->maxScorePossibleForChangeNodes;
-	int totalMinScoretoAct = limit * confPolicy->Score_Min_TotalScore_ToAct_PerCandle;
+	int totalMinScoretoAct = limit * m_ScoreToAct;
 	ScoreResultsCache* scoreResultsCache = ScoreResultsCache::getInstance();
 	std::vector<std::pair<std::pair<long long, long long>, ScoresResult>> scoreResults;
 

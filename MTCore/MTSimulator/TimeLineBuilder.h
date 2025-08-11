@@ -16,7 +16,9 @@ public:
 	static TimeLine Build_TimeLine_Pattern(TimeLine* history, ChangeNode* head, int patternLen, int futureLen =0 );
 	static std::vector<TimeLine> Build_TimeLine_Patterns(TimeLine* history,std::vector<ChangeNode*>* heads, int patternLen,int futureLen = 0);
 	static std::vector<TimeLineScored> Build_TimeLineScored_Patterns(TimeLine* history, std::vector<std::pair<ChangeNode*,ScoresResult>>* heads, int patternLen, int futureLen = 0);
-	static std::vector<ChangeNode*> SplitChangeNodeFromScores(std::vector<std::pair<ChangeNode*, ScoresResult>>* line);
+	static std::vector<ChangeNode*> SplitChangeNodeFromScores(const std::vector<std::pair<ChangeNode*, ScoresResult>>* line);
+	static std::vector<ScoresResult> SplitScoresFromChangeNode(const std::vector<std::pair<ChangeNode*, ScoresResult>>* line);
+	static std::vector<std::pair<ChangeNode*, ScoresResult>> CombineScoresAndChangeNodes(const std::vector<ChangeNode*>& chnVec, const std::vector<ScoresResult>& scoresVec);
 	static void Build_TimeLineDB(std::vector<ChangeNode*>* tl, DBMap* dbMap);
 };
 

@@ -322,6 +322,9 @@
     <Filter Include="Strategies\PatternGod\Comparers\ComparersEnums">
       <UniqueIdentifier>{1dae6a54-d6bf-42ca-a580-d338964f36b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math\MaxMinFinder">
+      <UniqueIdentifier>{c5404005-1d3b-4b71-bfa4-a443395b3edc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -533,6 +536,9 @@
     </ClCompile>
     <ClCompile Include="Normalizer.cpp">
       <Filter>Math\Normalizer</Filter>
+    </ClCompile>
+    <ClCompile Include="MinMaxFinder.cpp">
+      <Filter>Math\MaxMinFinder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -757,6 +763,9 @@
     </ClInclude>
     <ClInclude Include="ComparersEnums.h">
       <Filter>Strategies\PatternGod\Comparers\ComparersEnums</Filter>
+    </ClInclude>
+    <ClInclude Include="MinMaxFinder.h">
+      <Filter>Math\MaxMinFinder</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

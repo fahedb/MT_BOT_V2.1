@@ -15,10 +15,10 @@ struct MinMaxFinder {
 
     MinMaxFinder(std::vector<T> data) : m_data(data) {}
     virtual ~MinMaxFinder() = default;
-    T Find_Min() const {
+    virtual T Find_Min() const {
         return *std::min_element(m_data.begin(), m_data.end());
     }
-    T Find_Max() const {
+    virtual T Find_Max() const {
         return *std::max_element(m_data.begin(), m_data.end());
     }
 
@@ -27,9 +27,12 @@ struct MinMaxFinder {
 };
 
 
-struct MinMaxFinderScoresResult : public MinMaxFinder<ScoresResult> {
-    MinMaxFinderScoresResult(std::vector<ScoresResult> data) : MinMaxFinder(data) {}
-
-    virtual ScoresResult Find_Min() const;
-    virtual ScoresResult Find_Max() const;
+struct MinMaxFinderScoresResult  {
+    MinMaxFinderScoresResult(std::vector<ScoresResult> data) : m_data(data) {}
+	std::vector<ScoresResult> m_data; 
+    ScoresResult Find_Min() const;
+    ScoresResult Find_Max() const;
+private:
+    double Find_MaxScore(IndicatorType indType, BarPeriod barP) const;
+    double Find_MinScore(IndicatorType indType, BarPeriod barP) const;
 };

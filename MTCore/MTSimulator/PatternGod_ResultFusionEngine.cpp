@@ -43,13 +43,13 @@ inline std::vector<std::pair<ChangeNode*, ScoresResult>> PatternGod_ResultFusion
 
     // Step2 : Fusing results based on the count of appearances
     std::vector<std::pair<ChangeNode*, ScoresResult>> fusedResults;
-
+	int minSimResultsToFuse = Configrations::getInstance()->Get_Policy<BaseComparerPolicy>(PolicyType::BaseComparerPolicy)->Min_Similar_Results_To_Fusion;
     for (std::unordered_map<long long, TempResult>::const_iterator it = appearances.begin(); it != appearances.end(); ++it)
     {
         long long timeKey = it->first;
         const TempResult& entry = it->second;
 
-        if (entry.count >= comparerTypeList.types.size() && nodePointers.count(timeKey))
+        if (entry.count >= minSimResultsToFuse && nodePointers.count(timeKey))
         {
             // Calc the final score by applying weights on ScoresResult objects
             ScoresResult finalScore;

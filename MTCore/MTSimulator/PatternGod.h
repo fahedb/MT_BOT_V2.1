@@ -72,7 +72,7 @@ public:
 		}
 
 		// Need to merge results using ResultsFusion Engine...
-		resultNodes2D = PatternGod_ResultFusionEngine::FuseResults(&resultPerComparer,m_historyDB_Map); // Fuse results from all comparers
+		resultNodes2D = PatternGod_ResultFusionEngine::FuseResults(resultPerComparer,m_historyDB_Map); // Fuse results from all comparers
 
 		return totalScans; // Return the total number of scans performed
 	}

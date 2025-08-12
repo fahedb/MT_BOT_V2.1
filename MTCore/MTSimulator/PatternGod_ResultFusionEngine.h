@@ -3,32 +3,26 @@
 #pragma once
 #include "PatternGod_BaseComparer.h"
 #include "Normalizer.h"
+#include "MinMaxFinder.h"
 
 class PatternGod_ResultFusionEngine
 {
 public:
 	static std::vector<std::pair<ChangeNode*, ScoresResult>> FuseResults(PatternGodComparerResultsMap& results, DBMap* historyDB_Map)
 	{
-		// Normalize all results
-		
-		//TimeLineBuilder::SplitScoresFromChangeNode(results); // Split ChangeNode from ScoresResult for normalization
-		// STEP 1: FUSE SIMILAR RESULTS
-        auto similarResultsFused = FuseSimilarResults(&results); // Call the function to fuse similar results based on comparer types
-		// STEP 2: Fuse and get highest scores using weights
-		//auto weightFusedResults = FuseResultsByWeights(results); // Fuse results by weights
+		// Get Normalized results
+		PatternGodComparerResultsMap normalizedResults = Get_NormalizedComparerMap(results);
 
-		// STEP 3: Combine all results
-		std::vector<std::pair<ChangeNode*, ScoresResult>> allResults(similarResultsFused.begin(), similarResultsFused.end());
-		//allResults.insert(allResults.end(), weightFusedResults.begin(), weightFusedResults.end());
+
+		// STEP 1: FUSE SIMILAR RESULTS
+		std::vector<std::pair<ChangeNode*, ScoresResult>> similarResultsFused = FuseSimilarResults(&normalizedResults); // Call the function to fuse similar results based on comparer types
+		
 
 		// STEP 4: Filter duplicates and return the final results
-		PatternGodUtils::FilterDuplicatesTimeLines(allResults, historyDB_Map);
-		return allResults; // Return the final fused results
+		PatternGodUtils::FilterDuplicatesTimeLines(similarResultsFused, historyDB_Map);
+		return similarResultsFused; // Return the final fused results
 
-	}
-	static std::vector<std::pair<ChangeNode*, ScoresResult>> FuseResultsByWeights(robin_hood::unordered_map<PatternGodComparerType, std::vector<std::pair<ChangeNode*, ScoresResult>>>* results)
-	{
-		
+
 	}
 
 	static std::vector<std::pair<ChangeNode*, ScoresResult>> FuseSimilarResults(robin_hood::unordered_map<PatternGodComparerType, std::vector<std::pair<ChangeNode*, ScoresResult>>>* results);
@@ -36,13 +30,27 @@ public:
 private:
 	static PatternGodComparerResultsMap Get_NormalizedComparerMap(PatternGodComparerResultsMap& results)
 	{
-		PatternGodComparerResultsMap normalizedMap;
-		for (const auto& pair : results)
+		PatternGodComparerResultsMap normalizedResults;
+		PatternGodComparerTypeList comparerTypes;
+
+		for (const auto& comparerType : comparerTypes.types)
 		{
-			auto tempScoreVec = TimeLineBuilder::SplitScoresFromChangeNode(&pair.second);
-			auto tempChNVec = TimeLineBuilder::SplitChangeNodeFromScores(&pair.second);
-			// Need to nomalize
+			auto scores = TimeLineBuilder::SplitScoresFromChangeNode(&results.at(comparerType));  // Split the scores from the change nodes
+			auto changeNodes = TimeLineBuilder::SplitChangeNodeFromScores(&results.at(comparerType)); // Split the change nodes from the scores
+
+			MinMaxFinderScoresResult minMaxFinder(scores); // Create a MinMaxFinderScoresResult object to find the min and max scores
+			ScoresResultRangeNormalizer normalizer(minMaxFinder.Find_Min(), minMaxFinder.Find_Max()); // Create a normalizer using the min and max scores
+
+			for (int i = 0; i < scores.size(); i++) // Replace Results with normalized once
+			{
+				scores.at(i) = normalizer.normalize(scores.at(i)); // Normalize the scores using the normalizer	
+			}
+
+			auto normalizedResPairs = TimeLineBuilder::CombineScoresAndChangeNodes(changeNodes, scores); // Combine the normalized scores with the change nodes
+
+			normalizedResults[comparerType] = normalizedResPairs;
 		}
+		return normalizedResults;
 	}
 
 };

@@ -193,9 +193,6 @@
     <Filter Include="DataStructers\TradeStructure\Src">
       <UniqueIdentifier>{a1d2f478-7942-4a10-9dd5-97c57f4e4540}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TradeTracer">
-      <UniqueIdentifier>{20445c29-c170-421a-aa78-10dff6412ba6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="DataStructers\TimeLine\Inc">
       <UniqueIdentifier>{00f3ff51-a35c-4d3d-9352-52253db2f7b8}</UniqueIdentifier>
     </Filter>
@@ -325,13 +322,184 @@
     <Filter Include="Math\MaxMinFinder">
       <UniqueIdentifier>{c5404005-1d3b-4b71-bfa4-a443395b3edc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ApplicationFlags\Inc">
+      <UniqueIdentifier>{2369b5c9-1e63-4448-a97c-02300667c776}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ApplicationFlags\Src">
+      <UniqueIdentifier>{642fc422-1aa6-43e5-b5f4-65c5b2956ce8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cache\CurrentTimeLineCache\Inc">
+      <UniqueIdentifier>{a81fb74e-23aa-4756-95fb-cf88835d2582}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cache\CurrentTimeLineCache\Src">
+      <UniqueIdentifier>{f44fb63f-975b-47bd-bd62-4740bb214ee6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cache\Resources\Inc">
+      <UniqueIdentifier>{79cfb384-1c66-4386-802f-1beadf4c4165}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cache\Resources\Src">
+      <UniqueIdentifier>{96916e44-edc2-4286-bc88-f2b464a7e872}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cache\ScoreResultsCache\Inc">
+      <UniqueIdentifier>{cab5b425-8c6e-479e-a4bd-2d960396bb12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cache\ScoreResultsCache\Src">
+      <UniqueIdentifier>{9e47cbf6-45c9-41f8-b3e9-acf4a43f491b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataExport\CSVExporter\Inc">
+      <UniqueIdentifier>{70116a2d-74a1-404f-876e-10f7fc2c2a13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataExport\CSVExporter\Src">
+      <UniqueIdentifier>{b400b0a3-bdbe-4361-9238-130ef40e46fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataExport\DataExporter">
+      <UniqueIdentifier>{fdaa8950-3d64-45f2-bd7b-29930b21521f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataExport\DataExporter\Inc">
+      <UniqueIdentifier>{1367b398-857a-41c3-8353-2dd9377ec5ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataExport\DataExporter\Src">
+      <UniqueIdentifier>{e0fa5664-196b-47d0-898c-4d5e039b63d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\GraphStruct\AnalyzePackage\Inc">
+      <UniqueIdentifier>{3a2de426-06a0-43d2-a01c-7dbc3b129f40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\GraphStruct\AnalyzePackage\Src">
+      <UniqueIdentifier>{f2ef5504-87cc-4eee-9318-4c0d40c372a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\GraphStruct\Graph">
+      <UniqueIdentifier>{6a8e3b5a-91cf-44f4-be5b-0b240695e8cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\GraphStruct\Graph\Inc">
+      <UniqueIdentifier>{cfbb500b-64c4-40f4-be1d-b59d08177cbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\GraphStruct\Graph\Src">
+      <UniqueIdentifier>{165cf601-754d-4873-9d33-3d2b27d76b8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\JsonHandler\Json">
+      <UniqueIdentifier>{e74aca1d-9c88-4f1f-a2fd-8708cb4ed028}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\JsonHandler\Json\Inc">
+      <UniqueIdentifier>{bc359472-c1d7-41a2-b2ee-a47ad1d48d1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\JsonHandler\Json\Src">
+      <UniqueIdentifier>{464406eb-5398-421c-996d-9f4404e21c5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\Keys\Inc">
+      <UniqueIdentifier>{16c9a8cf-5b7c-48ae-a5f9-2496670246dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\Keys\Src">
+      <UniqueIdentifier>{01376aec-9e95-4456-865a-797f8676467e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\SelectionNodesStructures\Inc">
+      <UniqueIdentifier>{f8e48c6e-a4bb-4920-b5c5-81319ab20889}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructers\SelectionNodesStructures\Src">
+      <UniqueIdentifier>{623543b4-00f9-4691-9918-8784ce69a106}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\DataStructures\Plynom\Builder\Inc">
+      <UniqueIdentifier>{2b6c7852-f38b-4267-bb02-da9478e55e43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\DataStructures\Plynom\Builder\Src">
+      <UniqueIdentifier>{7cee1f9a-f28c-4baa-839d-b0e1e70e9726}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\DataStructures\Plynom\Comparer\Src">
+      <UniqueIdentifier>{80f5e041-95d2-46ed-8d47-f73bfa579f45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\DataStructures\Plynom\Comparer\Inc">
+      <UniqueIdentifier>{5ed1821d-9b3e-4e92-84c2-6b9608aeaa46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\DataStructures\Plynom\Struct\Inc">
+      <UniqueIdentifier>{b645469f-aceb-4577-b103-3ba1951cfcd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\DataStructures\Plynom\Struct\Src">
+      <UniqueIdentifier>{7e9c665f-3c2b-4745-8851-c5008ea9e37e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\MaxMinFinder\Inc">
+      <UniqueIdentifier>{34a5e043-6ff4-440d-bb8f-4c95ed2f0058}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\MaxMinFinder\Src">
+      <UniqueIdentifier>{9e832abf-4f82-41a5-b598-8d129e36a193}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Normalizer\Src">
+      <UniqueIdentifier>{8d77ec61-7c5d-489f-98dd-a371dc349f57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Normalizer\Inc">
+      <UniqueIdentifier>{2e7b788e-b1f4-46fd-8c77-f2385ee8be01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryUtils\Inc">
+      <UniqueIdentifier>{37f5fe30-81dd-41b0-ad89-b0cfeea2e304}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryUtils\Src">
+      <UniqueIdentifier>{33e87d43-04d4-4c71-91eb-96c9eddaf62d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MultiThreading\Inc">
+      <UniqueIdentifier>{bf4ae9cb-d9c8-44c9-946a-09bbb0ad904b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MultiThreading\Src">
+      <UniqueIdentifier>{a36f0145-7d74-4191-b8e3-9676ed200787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Comparers\BaseComparer\Inc">
+      <UniqueIdentifier>{6f72549e-fc7a-44e2-bc31-b48284e82907}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Comparers\BaseComparer\Src">
+      <UniqueIdentifier>{b505676b-956f-44a1-99e3-c65401fb714c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\ResultFusionEngine\Inc">
+      <UniqueIdentifier>{cbd94d5d-d0da-450b-9d9e-39f4f62b583f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\ResultFusionEngine\Src">
+      <UniqueIdentifier>{0aef2f78-14a8-486d-8e63-aa0801a1f709}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Statistics\Inc">
+      <UniqueIdentifier>{b9f7b5ef-eaba-4855-877b-b579266f00f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Statistics\Src">
+      <UniqueIdentifier>{a4551660-0616-43af-b2e4-f161b590c364}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Utils\Inc">
+      <UniqueIdentifier>{7a06c764-45e7-4858-b540-7151358dc915}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\Utils\Src">
+      <UniqueIdentifier>{10e970e9-6af2-49c6-af4d-e3e0afb0d7e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\AllTablesBase\Inc">
+      <UniqueIdentifier>{ec468dcc-1217-4e59-b844-f209d033a86c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\AllTablesBase\Src">
+      <UniqueIdentifier>{a8a42cf1-e07e-4a8e-87d2-ab46a8200226}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\ConfigsTable\Inc">
+      <UniqueIdentifier>{3c223d44-acc2-40b2-b651-76ea77c2d651}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\ConfigsTable\Src">
+      <UniqueIdentifier>{60e68a02-4894-4ad5-8eef-e8929d5a2611}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\SeqTable\Inc">
+      <UniqueIdentifier>{ee20702e-e5fe-40d6-bae5-e66b19234f5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tables\SeqTable\Src">
+      <UniqueIdentifier>{b384ca13-50b5-4dc4-810a-f0bfab4438ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TradesManager\Src">
+      <UniqueIdentifier>{c10247cb-6e24-43c8-ab68-80cb85aebe04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TradesManager\Inc">
+      <UniqueIdentifier>{fd804d57-9042-4d0f-b363-0179a2b921ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\TradeTracer">
+      <UniqueIdentifier>{20445c29-c170-421a-aa78-10dff6412ba6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\TradeTracer\Inc">
+      <UniqueIdentifier>{306ccb09-79f4-4c05-ba65-efd2031c9fba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategies\PatternGod\TradeTracer\Src">
+      <UniqueIdentifier>{25b9e003-2c94-40c7-bb68-047fb8e16424}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BTables.cpp">
-      <Filter>Tables\AllTablesBase</Filter>
     </ClCompile>
     <ClCompile Include="EURUSD_CurrentTable.cpp">
       <Filter>Tables\PricesTables\EURUSD_Tables\src</Filter>
@@ -378,29 +546,11 @@
     <ClCompile Include="OrdersToExecute.cpp">
       <Filter>Tables\NewOrdersTable\Src</Filter>
     </ClCompile>
-    <ClCompile Include="ThreadPool.cpp">
-      <Filter>MultiThreading</Filter>
-    </ClCompile>
-    <ClCompile Include="ConfigsTable.cpp">
-      <Filter>Tables\ConfigsTable</Filter>
-    </ClCompile>
     <ClCompile Include="HTTP_Lgger.cpp">
       <Filter>LogsLogic\Src</Filter>
     </ClCompile>
-    <ClCompile Include="SeqNumTable.cpp">
-      <Filter>Tables\SeqTable</Filter>
-    </ClCompile>
-    <ClCompile Include="JasonHandler.cpp">
-      <Filter>DataStructers\JsonHandler</Filter>
-    </ClCompile>
     <ClCompile Include="ChangeDataBuilder.cpp">
       <Filter>DataStructers\ChangeStructure\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="SelectionNodes.cpp">
-      <Filter>DataStructers\SelectionNodesStructures</Filter>
-    </ClCompile>
-    <ClCompile Include="TradesManager.cpp">
-      <Filter>TradesManager</Filter>
     </ClCompile>
     <ClCompile Include="DirectionStats.cpp">
       <Filter>DataStructers\DirectionStats\Src</Filter>
@@ -417,9 +567,6 @@
     <ClCompile Include="DirectionStatsCache.cpp">
       <Filter>DataStructers\DirectionStats\Src</Filter>
     </ClCompile>
-    <ClCompile Include="TradeTracer.cpp">
-      <Filter>TradeTracer</Filter>
-    </ClCompile>
     <ClCompile Include="TimeLine.cpp">
       <Filter>DataStructers\TimeLine\Src</Filter>
     </ClCompile>
@@ -428,33 +575,6 @@
     </ClCompile>
     <ClCompile Include="TimeLineBuilder.cpp">
       <Filter>DataStructers\TimeLine\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="ScoreResultsCache.cpp">
-      <Filter>Cache\ScoreResultsCache</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphStructres.cpp">
-      <Filter>DataStructers\GraphStruct</Filter>
-    </ClCompile>
-    <ClCompile Include="AnalyzerGraphsPackage.cpp">
-      <Filter>DataStructers\GraphStruct\AnalyzePackage</Filter>
-    </ClCompile>
-    <ClCompile Include="DataExporter.cpp">
-      <Filter>DataExport</Filter>
-    </ClCompile>
-    <ClCompile Include="Static_CurrentTimeLineRep.cpp">
-      <Filter>Cache\CurrentTimeLineCache</Filter>
-    </ClCompile>
-    <ClCompile Include="ProccessFlags.cpp">
-      <Filter>ApplicationFlags</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryUtils.cpp">
-      <Filter>MemoryUtils</Filter>
-    </ClCompile>
-    <ClCompile Include="MTSimulatorUtils.cpp">
-      <Filter>Strategies\PatternGod\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="CSVExportData.cpp">
-      <Filter>DataExport\CSVExporter</Filter>
     </ClCompile>
     <ClCompile Include="JsonHandler_GraphContainer.cpp">
       <Filter>DataStructers\JsonHandler\GraphContainersJsonHandler\Src</Filter>
@@ -465,18 +585,6 @@
     <ClCompile Include="Converts.cpp">
       <Filter>Math\MathFuncs\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Polynom.h">
-      <Filter>Math\DataStructures\Plynom\Struct</Filter>
-    </ClCompile>
-    <ClCompile Include="Polynom.cpp">
-      <Filter>Math\DataStructures\Plynom\Struct</Filter>
-    </ClCompile>
-    <ClCompile Include="PolynomBuilder.cpp">
-      <Filter>Math\DataStructures\Plynom\Builder</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>Cache\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="PolynomScoreCalcs.cpp">
       <Filter>CalcScoreLogic\Src</Filter>
     </ClCompile>
@@ -486,17 +594,11 @@
     <ClCompile Include="PolynomChangeNodePackageBuilder.cpp">
       <Filter>DataStructers\ChangeStructure\Src</Filter>
     </ClCompile>
-    <ClCompile Include="PolynomKey.cpp">
-      <Filter>DataStructers\Keys</Filter>
-    </ClCompile>
     <ClCompile Include="PolynomTimeLine.cpp">
       <Filter>DataStructers\ChangeStructure\Src</Filter>
     </ClCompile>
     <ClCompile Include="PolynomScore.cpp">
       <Filter>DataStructers\ChangeStructure\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="PolynomComparer.cpp">
-      <Filter>Math\DataStructures\Plynom\Comparer</Filter>
     </ClCompile>
     <ClCompile Include="Policies.h">
       <Filter>Configs\Inc</Filter>
@@ -513,38 +615,104 @@
     <ClCompile Include="PatternGod_PolynomComparer.cpp">
       <Filter>Strategies\PatternGod\Comparers\PolynomComparer\Src</Filter>
     </ClCompile>
-    <ClCompile Include="StatisticsDecession.cpp">
-      <Filter>Strategies\PatternGod\Statistics</Filter>
-    </ClCompile>
     <ClCompile Include="PatternGod.cpp">
       <Filter>Strategies\PatternGod\PatternGod_Main\Src</Filter>
     </ClCompile>
     <ClCompile Include="PatternGod_ScoreComparer.cpp">
       <Filter>Strategies\PatternGod\Comparers\ScoreComparer\Src</Filter>
     </ClCompile>
-    <ClCompile Include="PatternGod_BaseComparer.cpp">
-      <Filter>Strategies\PatternGod\Comparers\BaseComparer</Filter>
-    </ClCompile>
-    <ClCompile Include="PatternGod_ResultFusionEngine.cpp">
-      <Filter>Strategies\PatternGod\ResultFusionEngine</Filter>
-    </ClCompile>
     <ClCompile Include="ConfigsTableStaticProxy.cpp">
       <Filter>Configs\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Policies.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="ProccessFlags.cpp">
+      <Filter>ApplicationFlags\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Normalizer.cpp">
-      <Filter>Math\Normalizer</Filter>
+    <ClCompile Include="Static_CurrentTimeLineRep.cpp">
+      <Filter>Cache\CurrentTimeLineCache\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Cache\Resources\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreResultsCache.cpp">
+      <Filter>Cache\ScoreResultsCache\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="CSVExportData.cpp">
+      <Filter>DataExport\CSVExporter\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="DataExporter.cpp">
+      <Filter>DataExport\DataExporter\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="AnalyzerGraphsPackage.cpp">
+      <Filter>DataStructers\GraphStruct\AnalyzePackage\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphStructres.cpp">
+      <Filter>DataStructers\GraphStruct\Graph\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="JasonHandler.cpp">
+      <Filter>DataStructers\JsonHandler\Json\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomKey.cpp">
+      <Filter>DataStructers\Keys\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectionNodes.cpp">
+      <Filter>DataStructers\SelectionNodesStructures\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomBuilder.cpp">
+      <Filter>Math\DataStructures\Plynom\Builder\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomComparer.cpp">
+      <Filter>Math\DataStructures\Plynom\Comparer\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Polynom.cpp">
+      <Filter>Math\DataStructures\Plynom\Struct\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Polynom.h">
+      <Filter>Math\DataStructures\Plynom\Struct\Inc</Filter>
     </ClCompile>
     <ClCompile Include="MinMaxFinder.cpp">
-      <Filter>Math\MaxMinFinder</Filter>
+      <Filter>Math\MaxMinFinder\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Normalizer.cpp">
+      <Filter>Math\Normalizer\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryUtils.cpp">
+      <Filter>MemoryUtils\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>MultiThreading\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Policies.cpp">
+      <Filter>Configs\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternGod_BaseComparer.cpp">
+      <Filter>Strategies\PatternGod\Comparers\BaseComparer\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternGod_ResultFusionEngine.cpp">
+      <Filter>Strategies\PatternGod\ResultFusionEngine\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="StatisticsDecession.cpp">
+      <Filter>Strategies\PatternGod\Statistics\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="MTSimulatorUtils.cpp">
+      <Filter>Strategies\PatternGod\Utils\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="BTables.cpp">
+      <Filter>Tables\AllTablesBase\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigsTable.cpp">
+      <Filter>Tables\ConfigsTable\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="SeqNumTable.cpp">
+      <Filter>Tables\SeqTable\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="TradesManager.cpp">
+      <Filter>TradesManager\Inc</Filter>
+    </ClCompile>
+    <ClCompile Include="TradeTracer.cpp">
+      <Filter>Strategies\PatternGod\TradeTracer\Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BTables.h">
-      <Filter>Tables\AllTablesBase</Filter>
-    </ClInclude>
     <ClInclude Include="EURUSD_CurrentTable.h">
       <Filter>Tables\PricesTables\EURUSD_Tables\Inc</Filter>
     </ClInclude>
@@ -599,29 +767,11 @@
     <ClInclude Include="OrdersToExecute.h">
       <Filter>Tables\NewOrdersTable\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="ThreadPool.h">
-      <Filter>MultiThreading</Filter>
-    </ClInclude>
-    <ClInclude Include="ConfigsTable.h">
-      <Filter>Tables\ConfigsTable</Filter>
-    </ClInclude>
     <ClInclude Include="HTTP_Lgger.h">
       <Filter>LogsLogic\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="SeqNumTable.h">
-      <Filter>Tables\SeqTable</Filter>
-    </ClInclude>
-    <ClInclude Include="JasonHandler.h">
-      <Filter>DataStructers\JsonHandler</Filter>
-    </ClInclude>
     <ClInclude Include="ChangeDataBuilder.h">
       <Filter>DataStructers\ChangeStructure\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="SelectionNodes.h">
-      <Filter>DataStructers\SelectionNodesStructures</Filter>
-    </ClInclude>
-    <ClInclude Include="TradesManager.h">
-      <Filter>TradesManager</Filter>
     </ClInclude>
     <ClInclude Include="DirectionStats.h">
       <Filter>DataStructers\DirectionStats\Inc</Filter>
@@ -644,9 +794,6 @@
     <ClInclude Include="DirectionStatsCache.h">
       <Filter>DataStructers\DirectionStats\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="TradeTracer.h">
-      <Filter>TradeTracer</Filter>
-    </ClInclude>
     <ClInclude Include="TimeLineBuilder.h">
       <Filter>DataStructers\TimeLine\Inc</Filter>
     </ClInclude>
@@ -655,33 +802,6 @@
     </ClInclude>
     <ClInclude Include="TimeLine.h">
       <Filter>DataStructers\TimeLine\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="ScoreResultsCache.h">
-      <Filter>Cache\ScoreResultsCache</Filter>
-    </ClInclude>
-    <ClInclude Include="AnalyzerGraphsPackage.h">
-      <Filter>DataStructers\GraphStruct\AnalyzePackage</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphStructres.h">
-      <Filter>DataStructers\GraphStruct</Filter>
-    </ClInclude>
-    <ClInclude Include="Static_CurrentTimeLineRep.h">
-      <Filter>Cache\CurrentTimeLineCache</Filter>
-    </ClInclude>
-    <ClInclude Include="ProccessFlags.h">
-      <Filter>ApplicationFlags</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryUtils.h">
-      <Filter>MemoryUtils</Filter>
-    </ClInclude>
-    <ClInclude Include="MTSimulatorUtils.h">
-      <Filter>Strategies\PatternGod\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="CSVExportData.h">
-      <Filter>DataExport\CSVExporter</Filter>
-    </ClInclude>
-    <ClInclude Include="DataExporter.h">
-      <Filter>DataExport</Filter>
     </ClInclude>
     <ClInclude Include="JsonHandler_GraphContainer.h">
       <Filter>DataStructers\JsonHandler\GraphContainersJsonHandler\Inc</Filter>
@@ -695,12 +815,6 @@
     <ClInclude Include="Converts.h">
       <Filter>Math\MathFuncs\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="PolynomBuilder.h">
-      <Filter>Math\DataStructures\Plynom\Builder</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceManager.h">
-      <Filter>Cache\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="PolynomScoreCalcs.h">
       <Filter>CalcScoreLogic\Inc</Filter>
     </ClInclude>
@@ -710,17 +824,11 @@
     <ClInclude Include="PolynomChangeNodePackageBuilder.h">
       <Filter>DataStructers\ChangeStructure\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="PolynomKey.h">
-      <Filter>DataStructers\Keys</Filter>
-    </ClInclude>
     <ClInclude Include="PolynomTimeLine.h">
       <Filter>DataStructers\ChangeStructure\Inc</Filter>
     </ClInclude>
     <ClInclude Include="PolynomScore.h">
       <Filter>DataStructers\ChangeStructure\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="PolynomComparer.h">
-      <Filter>Math\DataStructures\Plynom\Comparer</Filter>
     </ClInclude>
     <ClInclude Include="IndicatorEnums.h">
       <Filter>DataStructers\ChangeStructure\Inc</Filter>
@@ -740,32 +848,95 @@
     <ClInclude Include="PatternGod_PolynomComparer.h">
       <Filter>Strategies\PatternGod\Comparers\PolynomComparer\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="StatisticsDecession.h">
-      <Filter>Strategies\PatternGod\Statistics</Filter>
-    </ClInclude>
     <ClInclude Include="PatternGod.h">
       <Filter>Strategies\PatternGod\PatternGod_Main\Inc</Filter>
     </ClInclude>
     <ClInclude Include="PatternGod_ScoreComparer.h">
       <Filter>Strategies\PatternGod\Comparers\ScoreComparer\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="PatternGod_BaseComparer.h">
-      <Filter>Strategies\PatternGod\Comparers\BaseComparer</Filter>
-    </ClInclude>
-    <ClInclude Include="PatternGod_ResultFusionEngine.h">
-      <Filter>Strategies\PatternGod\ResultFusionEngine</Filter>
-    </ClInclude>
     <ClInclude Include="ConfigsTableStaticProxy.h">
       <Filter>Configs\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="Normalizer.h">
-      <Filter>Math\Normalizer</Filter>
     </ClInclude>
     <ClInclude Include="ComparersEnums.h">
       <Filter>Strategies\PatternGod\Comparers\ComparersEnums</Filter>
     </ClInclude>
+    <ClInclude Include="ProccessFlags.h">
+      <Filter>ApplicationFlags\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Static_CurrentTimeLineRep.h">
+      <Filter>Cache\CurrentTimeLineCache\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Cache\Resources\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreResultsCache.h">
+      <Filter>Cache\ScoreResultsCache\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="CSVExportData.h">
+      <Filter>DataExport\CSVExporter\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="DataExporter.h">
+      <Filter>DataExport\DataExporter\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="AnalyzerGraphsPackage.h">
+      <Filter>DataStructers\GraphStruct\AnalyzePackage\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphStructres.h">
+      <Filter>DataStructers\GraphStruct\Graph\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="JasonHandler.h">
+      <Filter>DataStructers\JsonHandler\Json\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomKey.h">
+      <Filter>DataStructers\Keys\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectionNodes.h">
+      <Filter>DataStructers\SelectionNodesStructures\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomBuilder.h">
+      <Filter>Math\DataStructures\Plynom\Builder\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomComparer.h">
+      <Filter>Math\DataStructures\Plynom\Comparer\Inc</Filter>
+    </ClInclude>
     <ClInclude Include="MinMaxFinder.h">
-      <Filter>Math\MaxMinFinder</Filter>
+      <Filter>Math\MaxMinFinder\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Normalizer.h">
+      <Filter>Math\Normalizer\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryUtils.h">
+      <Filter>MemoryUtils\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>MultiThreading\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternGod_BaseComparer.h">
+      <Filter>Strategies\PatternGod\Comparers\BaseComparer\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternGod_ResultFusionEngine.h">
+      <Filter>Strategies\PatternGod\ResultFusionEngine\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="StatisticsDecession.h">
+      <Filter>Strategies\PatternGod\Statistics\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="MTSimulatorUtils.h">
+      <Filter>Strategies\PatternGod\Utils\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="BTables.h">
+      <Filter>Tables\AllTablesBase\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigsTable.h">
+      <Filter>Tables\ConfigsTable\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="SeqNumTable.h">
+      <Filter>Tables\SeqTable\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="TradesManager.h">
+      <Filter>TradesManager\Src</Filter>
+    </ClInclude>
+    <ClInclude Include="TradeTracer.h">
+      <Filter>Strategies\PatternGod\TradeTracer\Inc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

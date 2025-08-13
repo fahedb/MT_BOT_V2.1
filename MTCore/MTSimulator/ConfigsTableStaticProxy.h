@@ -12,6 +12,8 @@ private:
 public:
     static std::string Get_ConfigValue_DB(const std::string& config, const std::string& defualt );
     static bool UpdateConfigValue_DB(const std::string& conf, const std::string& value);
+    static bool InsertConfigRow_DB(const std::vector<std::string>& confRow);
+    static bool IsConfigExists_DB(const std::string& conf);
 
     static std::string Get_ConfigValue(const std::string& conf) { return ReadConfigValue(conf); }
     static std::string Get_ConfigValue(const std::string& conf,const std::string& defualt) { 

@@ -54,7 +54,7 @@ DataBaseConnection::DataBaseConnection()
     SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
 
     // Connection string parameters
-    std::string connString = Configrations::getInstance()->Get_ConnectionString();
+    std::string connString = ConfigsTableStaticProxy::Get_ConfigValue(CONFIG_DEF_CONNECTION_STRING);
 
     // convert to wchar string
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;

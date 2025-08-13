@@ -18,6 +18,17 @@ enum class PolicyType
     PatternGodStatisticsPolicy,
     BaseComparerPolicy
 };
+
+// Hash function for PolicyType enum - needed for robin_hood::unordered_map
+namespace std {
+    template<>
+    struct hash<PolicyType> {
+        std::size_t operator()(const PolicyType& type) const {
+            return static_cast<std::size_t>(type);
+        }
+    };
+}
+
 struct PolicyTypeList
 {
     std::vector<PolicyType> types = {

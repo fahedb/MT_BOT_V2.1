@@ -6,6 +6,12 @@
 std::string ConfigsTableStaticProxy::Get_ConfigValue_DB(const std::string& config, const std::string& defualt)
 {
     DataBaseConnection* db_conn = Static_DBConnection::getInstance()->GetConnection();
+    if (!db_conn || !db_conn->IsConnected())
+    {
+		Logger::getInstance().WriteLog("Failed to connect to the database. Returning default value for config: " + config, true, true, LogType::ERR);
+		return defualt; // Return default value if DB connection fails
+	}
+
     ConfigsTable confTable(db_conn->Get_EnvHandler(), db_conn->Get_DBConnection());
 
     std::vector<std::string> row = confTable.GetConfigRow(config);
@@ -17,26 +23,81 @@ std::string ConfigsTableStaticProxy::Get_ConfigValue_DB(const std::string& confi
 bool ConfigsTableStaticProxy::UpdateConfigValue_DB(const std::string& conf, const std::string& value)
 {
     DataBaseConnection* db_conn = Static_DBConnection::getInstance()->GetConnection();
+    if (!db_conn || !db_conn->IsConnected())
+    {
+        Logger::getInstance().WriteLog("Failed to connect to the database. Could not update config !!! ", true, true, LogType::ERR);
+		return false; // Return false if DB connection fails
+    }
+
     ConfigsTable confTable(db_conn->Get_EnvHandler(), db_conn->Get_DBConnection());
     bool res = confTable.SetConfigValue(conf, value);
     return res;
 }
 
-std::vector<std::string> ConfigsTableStaticProxy::Get_ConfigRow_DB(const std::string& config, const std::string& defualt)
+bool ConfigsTableStaticProxy::InsertConfigRow_DB(const std::vector<std::string>& confRow)
 {
+    if(IsConfigExists_DB(confRow.at(0))) {
+        Logger::getInstance().WriteLog("Config already exists in DB: " + confRow.at(0), true, true, LogType::ERR);
+        return false; // Return false if config already exists
+	}
+
     DataBaseConnection* db_conn = Static_DBConnection::getInstance()->GetConnection();
+    if (!db_conn || !db_conn->IsConnected())
+    {
+        Logger::getInstance().WriteLog("Failed to connect to the database. Could not insert config row !!! ", true, true, LogType::ERR);
+        return false; // Return false if DB connection fails
+    }
     ConfigsTable confTable(db_conn->Get_EnvHandler(), db_conn->Get_DBConnection());
 
-    std::vector<std::string> conf = confTable.GetConfigRow(config);
-    if (conf.size())
-        return conf;
-    std::vector<std::string> cacheConf(confTable.tableCols());
-    cacheConf[0] = config;
-    cacheConf[1] = defualt;
-    cacheConf[2] = "Not found In DB\nTook it from cache !!";
-    cacheConf[3] = "1"; // Permission
-    cacheConf[4] = "1"; // Catagory
-    return cacheConf;
+	return confTable.InsertConfigRow(confRow); // Insert the config row into the database
+}
+
+bool ConfigsTableStaticProxy::IsConfigExists_DB(const std::string& conf) {
+    DataBaseConnection* db_conn = Static_DBConnection::getInstance()->GetConnection();
+    if (!db_conn || !db_conn->IsConnected())
+        return false; // Return false if DB connection fails
+    ConfigsTable confTable(db_conn->Get_EnvHandler(), db_conn->Get_DBConnection());
+    auto confRow = confTable.GetConfigRow(conf);
+    if (confRow.empty())
+		return false; // Not found in DB
+	return true; // Found in DB
+}
+
+std::vector<std::string> ConfigsTableStaticProxy::Get_ConfigRow_DB(const std::string& config, const std::string& defualt)
+{
+    auto createDefaultRow = [&](size_t colCount) {
+        std::vector<std::string> row(colCount);
+        row[0] = config;
+        row[1] = defualt;
+        row[2] = "Not found in DB\nTook it from cache !!";
+        row[3] = "1"; // Permission
+        row[4] = "1"; // Category
+        return row;
+        };
+
+    DataBaseConnection* dbConn = Static_DBConnection::getInstance()->GetConnection();
+    if (!dbConn || !dbConn->IsConnected()) {
+        // DB connection failed — return default row
+        return createDefaultRow(ConfigsTablesCols);
+    }
+
+    ConfigsTable confTable(dbConn->Get_EnvHandler(), dbConn->Get_DBConnection());
+    auto conf = confTable.GetConfigRow(config);
+
+    if (!conf.empty()) {
+        return conf; // Found in DB
+    }
+    else
+    {
+		Logger::getInstance().WriteLog("Config not found in DB: " + config + ". Inserting Config In DB, and return Defualt value.", true, true, LogType::ERR);
+		bool res = InsertConfigRow_DB(createDefaultRow(confTable.tableCols())); // Insert default row if not found
+        if(!res) {
+            Logger::getInstance().WriteLog("Failed to insert default config row into DB for config: " + config, true, true, LogType::ERR);
+		}
+    }
+
+    // Not found in DB — return default row
+    return createDefaultRow(confTable.tableCols());
 }
 
 std::string ConfigsTableStaticProxy::ReadConfigValue(const std::string& config)

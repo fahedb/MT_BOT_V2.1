@@ -1,6 +1,6 @@
 #include "Configrations.h"
-#include "ConfigsTable.h"
-#include "Converts.h"
+//#include "ConfigsTable.h"
+//#include "Converts.h"
 #include "ConfigsTableStaticProxy.h"
 
 

@@ -4,7 +4,7 @@
 #include "ConfigsTableStaticProxy.h"
 
 
-inline void Configrations::ResetPolicy()
+void Configrations::ResetPolicy()
 {
     PolicyTypeList policyTypes;
     for (const auto& type : policyTypes.types)
@@ -14,7 +14,7 @@ inline void Configrations::ResetPolicy()
     m_policies.clear();
 }
 
-inline void Configrations::InitPolicyMap()
+void Configrations::InitPolicyMap()
 {
     m_policies[PolicyType::InfraConfigrationsPolicy] = new InfraConfigrationsPolicy();
     m_policies[PolicyType::FusionEnginePolicy] = new FusionEnginePolicy();
@@ -45,7 +45,7 @@ std::vector<std::vector<std::string>> Configrations::Get_AllConfigRows_DB()
     return allConfigs;
 }
 
-inline void Configrations::RefreshPolicy() {
+void Configrations::RefreshPolicy() {
     ResetPolicy();
     InitPolicyMap();
 }

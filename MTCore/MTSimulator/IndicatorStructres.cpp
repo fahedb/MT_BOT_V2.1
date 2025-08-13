@@ -149,7 +149,7 @@ void ScoresResult::calcTotalResult() { // Calc total score of every object
 	totalScore.calcTotal();
 }
 
-inline void ScoresResult::Reset() { // Clear the scores and total
+void ScoresResult::Reset() { // Clear the scores and total
 	for (auto& pair : indicatorScores) {
 		pair.second.Reset(); // Reset each IndicatorScore
 	}

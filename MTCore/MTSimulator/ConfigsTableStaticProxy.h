@@ -14,7 +14,10 @@ public:
     static bool UpdateConfigValue_DB(const std::string& conf, const std::string& value);
 
     static std::string Get_ConfigValue(const std::string& conf) { return ReadConfigValue(conf); }
-    static std::string Get_ConfigValue(const std::string& conf,const std::string& defualt) { return ReadConfigValue(conf).length() ? ReadConfigValue(conf) : defualt; }
+    static std::string Get_ConfigValue(const std::string& conf,const std::string& defualt) { 
+        std::string res = ReadConfigValue(conf);
+        return res.length() ? res : defualt;
+    }
 
     static std::vector<std::string> Get_ConfigRow_DB(const std::string& config,const std::string& defualt);
 };

@@ -3,7 +3,6 @@
 
 void HttpServerSyncer::UpdateCurrentTimeLine(BasePricesTable* table)
 {
-	ConfigrationsPolicy* policy = Configrations::getInstance()->Get_Policy();
 	ExchangeData exChData;
 
 	std::string body = exChData.Get_NextCandleStick_M1();
@@ -46,7 +45,7 @@ void HttpServerSyncer::UpdateConfigs()
 
 	while (conf.first.length())
 	{
-		configarions->UpdateConfigValue_DB(conf.first, conf.second);
+		ConfigsTableStaticProxy::UpdateConfigValue_DB(conf.first, conf.second); // Update the config value in the database
 		conf = exh.Get_ConfToUpdate();
 	}
 	configarions->RefreshPolicy(); // Refresh all policies 

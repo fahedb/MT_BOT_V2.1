@@ -12,7 +12,7 @@ PatternGod_BaseComparer::~PatternGod_BaseComparer()
 	}
 }
 
-inline int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D) // Scan for patterns in the history time line compared to the current time line
+int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D) // Scan for patterns in the history time line compared to the current time line
 {
 	std::mutex resultMutex, local2DResultMutex;
 
@@ -71,7 +71,7 @@ inline int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vec
 	return static_cast<int>(resultNodes2D.size());
 }
 
-inline void PatternGod_BaseComparer::ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct, std::mutex* maxResultLock, ScoresResult* maxScore, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread)
+void PatternGod_BaseComparer::ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct, std::mutex* maxResultLock, ScoresResult* maxScore, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread)
 {
 
 	int estimatedItems = 20;

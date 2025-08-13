@@ -1,6 +1,6 @@
 #include "MinMaxFinder.h"
 
-inline ScoresResult MinMaxFinderScoresResult::Find_Min() const {
+ScoresResult MinMaxFinderScoresResult::Find_Min() const {
     ScoresResult res;
     res.Reset();
     
@@ -24,7 +24,7 @@ inline ScoresResult MinMaxFinderScoresResult::Find_Min() const {
     return res;
 }
 
-inline ScoresResult MinMaxFinderScoresResult::Find_Max() const
+ScoresResult MinMaxFinderScoresResult::Find_Max() const
 {
     ScoresResult res;
 	res.Reset(); // Reset the result to ensure it's empty before calculation

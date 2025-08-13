@@ -1,6 +1,6 @@
 #include "PatternGod_ResultFusionEngine.h"
 
-inline std::vector<std::pair<ChangeNode*, ScoresResult>> PatternGod_ResultFusionEngine::FuseSimilarResults(robin_hood::unordered_map<PatternGodComparerType, std::vector<std::pair<ChangeNode*, ScoresResult>>>* results)
+std::vector<std::pair<ChangeNode*, ScoresResult>> PatternGod_ResultFusionEngine::FuseSimilarResults(robin_hood::unordered_map<PatternGodComparerType, std::vector<std::pair<ChangeNode*, ScoresResult>>>* results)
 {
     struct TempResult {
         int count = 0;

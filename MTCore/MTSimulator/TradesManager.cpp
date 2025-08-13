@@ -41,7 +41,7 @@ OrderEntity* TradesManager::CheckForTrade_PatternGod(DirectionStats& stats) // F
 	return order;
 }
 
-inline CommonDirection TradesManager::CalcCommonDirection(DirectionStats& stats)
+CommonDirection TradesManager::CalcCommonDirection(DirectionStats& stats)
 {
 	if (!stats.IsActive())
 		return CommonDirection::BLUR;
@@ -57,7 +57,7 @@ inline CommonDirection TradesManager::CalcCommonDirection(DirectionStats& stats)
 	return CommonDirection::BLUR;
 }
 
-inline CommonDirection TradesManager::CalcCommonDirection_Pure(DirectionStats& stats)
+CommonDirection TradesManager::CalcCommonDirection_Pure(DirectionStats& stats)
 {
 	if (!stats.IsActive())
 		return CommonDirection::BLUR;
@@ -73,7 +73,7 @@ inline CommonDirection TradesManager::CalcCommonDirection_Pure(DirectionStats& s
 	return CommonDirection::BLUR;
 }
 
-inline CommonDirection TradesManager::CheckDirection(DirectionStats& stats, StatsType stype)
+CommonDirection TradesManager::CheckDirection(DirectionStats& stats, StatsType stype)
 {
 
 	int generalCount = stats.Get_TotalCount(stype);
@@ -124,7 +124,7 @@ inline CommonDirection TradesManager::CheckDirection(DirectionStats& stats, Stat
 	return CommonDirection::BLUR;
 }
 
-inline CommonDirection TradesManager::CheckDirection_Pure(DirectionStats& stats, StatsType stype)
+CommonDirection TradesManager::CheckDirection_Pure(DirectionStats& stats, StatsType stype)
 {
 	int generalCount = stats.Get_TotalCount(stype);
 	double upPercent = (double(stats.Get_UpCount(stype)) / generalCount) * 100.0;

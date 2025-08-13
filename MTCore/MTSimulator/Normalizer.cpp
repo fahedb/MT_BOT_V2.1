@@ -8,7 +8,7 @@
 ///////ScoresResultRangeNormalizer//////
 ////////////////////////////////////////
 
-inline ScoresResultRangeNormalizer::ScoresResultRangeNormalizer(const ScoresResult& minV, const ScoresResult& maxV)
+ScoresResultRangeNormalizer::ScoresResultRangeNormalizer(const ScoresResult& minV, const ScoresResult& maxV)
     : Normalizer(minV, maxV)
 {
     // Make sure to calculate the total results for min and max values

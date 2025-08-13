@@ -3,7 +3,7 @@
 #include "Static_DBConnection.h"
 
 
-inline std::string ConfigsTableStaticProxy::Get_ConfigValue_DB(const std::string& config, const std::string& defualt)
+std::string ConfigsTableStaticProxy::Get_ConfigValue_DB(const std::string& config, const std::string& defualt)
 {
     DataBaseConnection* db_conn = Static_DBConnection::getInstance()->GetConnection();
     ConfigsTable confTable(db_conn->Get_EnvHandler(), db_conn->Get_DBConnection());
@@ -14,7 +14,7 @@ inline std::string ConfigsTableStaticProxy::Get_ConfigValue_DB(const std::string
     return defualt;
 }
 
-inline bool ConfigsTableStaticProxy::UpdateConfigValue_DB(const std::string& conf, const std::string& value)
+bool ConfigsTableStaticProxy::UpdateConfigValue_DB(const std::string& conf, const std::string& value)
 {
     DataBaseConnection* db_conn = Static_DBConnection::getInstance()->GetConnection();
     ConfigsTable confTable(db_conn->Get_EnvHandler(), db_conn->Get_DBConnection());
@@ -39,7 +39,7 @@ std::vector<std::string> ConfigsTableStaticProxy::Get_ConfigRow_DB(const std::st
     return cacheConf;
 }
 
-inline std::string ConfigsTableStaticProxy::ReadConfigValue(const std::string& config)
+std::string ConfigsTableStaticProxy::ReadConfigValue(const std::string& config)
 {
     std::ifstream confFile(PATH_TO_CONFIG);
     if (!confFile.is_open())
@@ -70,7 +70,7 @@ std::string ConfigsTableStaticProxy::DefualtConfigValues(const std::string& conf
     return "";
 }
 
-inline std::string ConfigsTableStaticProxy::extractTextBetweenSymbols(const std::string& line) {
+std::string ConfigsTableStaticProxy::extractTextBetweenSymbols(const std::string& line) {
     size_t start = line.find(CONFIG_CONATINER_CHARACTER);
     size_t end = line.find(CONFIG_CONATINER_CHARACTER, start + 1);
 

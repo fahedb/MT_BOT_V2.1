@@ -11,7 +11,7 @@
 #include "MTSimulatorUtils.h"
 #include "PatternGodUtils.h"
 
-inline void PatternGod_ScoreComparer::InitComaprer()
+void PatternGod_ScoreComparer::InitComaprer()
 {
 	m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
 	m_ScoreToAct = Configrations::Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->ScoreToAct; // Get the score to act threshold from the policy

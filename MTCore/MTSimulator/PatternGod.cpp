@@ -1,6 +1,6 @@
 #include "PatternGod.h"
 
-inline void PatternGod::InitComparers() // Initialize the comparers with the history time line
+void PatternGod::InitComparers() // Initialize the comparers with the history time line
 {
 	m_comparers.push_back(std::make_unique<PatternGod_PolynomComparer>(m_historyTL));
 	m_comparers.push_back(std::make_unique<PatternGod_ScoreComparer>(m_historyTL));

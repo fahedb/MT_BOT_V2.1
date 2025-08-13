@@ -36,7 +36,7 @@ void DefualtProgramStart()
 
 void LoadJson_Data_ToDBFile()
 {
-	std::string dbFilePath = Configrations::getInstance()->Get_DB_FileDir() + Configrations::getInstance()->Get_ConfigValue(DBFILE_XAUUSD_M1_DATA_JSON);
+	std::string dbFilePath = Configrations::getInstance()->Get_DB_FileDir() + Configrations::getInstance()->Get_Config_Main(DBFILE_XAUUSD_M1_DATA_JSON);
 	ExchangeData exChData;
 	std::ofstream file(dbFilePath);
 	Logger& logger = Logger::getInstance();

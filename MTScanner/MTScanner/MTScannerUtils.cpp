@@ -12,7 +12,7 @@ void MTScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scan
 	if (isScanActivated)
 		scansNum++; // Increase the scans counter if a scan was activated
 
-	if (Configrations::getInstance()->Get_Policy()->CleanEveryXScans < scansNum)
+	if (Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->CleanEveryXScans < scansNum)
 	{
 		ScoreResultsCache::getInstance()->CleanOldResults();
 		scansNum = 0; // Reset the scans counter after cleaning
@@ -30,9 +30,9 @@ void MTScannerUtils::InitScanObjectsBeforeScan(PatternGod* patternScan, Statisti
 		"Scanning period bars count: " + std::to_string(currentTimeLine->size());
 	logger.WriteLog(startScanLog, true, true);
 
-	patternScan->Set_NewCurrentPeriod(currentTimeLine); // Set a new Current Period for PatternScan object for the new scan
+	patternScan->Set_CurrentTimeLine(currentTimeLine); // Set a new Current Period for PatternScan object for the new scan
 	statisticsCalcucator->Set_NewCurrentPeriod(currentTimeLine); // Set a new current period for Statistics calc
 
 	if (currTimeLineRep->Get_CurrTimeLine()->Get_TimeLineLen()) // Getting the max score possible for 2 nodes match
-		Configrations::getInstance()->Get_Policy()->maxScorePossibleForChangeNodes = ProxyScoreCalcs::CalcMaxScorePossible(currTimeLineRep->Get_CurrTimeLine()->Get_TimeLine()->at(0)).totalScore.total;
+		Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->maxScorePossibleForChangeNodes = ProxyScoreCalcs::CalcMaxScorePossible(currTimeLineRep->Get_CurrTimeLine()->Get_TimeLine()->at(0)).totalScore.total;
 }

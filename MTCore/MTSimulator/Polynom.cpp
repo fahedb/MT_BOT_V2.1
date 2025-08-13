@@ -15,5 +15,4 @@ void Polynom::AddMember(double front, int upper)
 			m_polynom.push_back(0);
 	}
 	m_polynom[upper] = front;
-	size = static_cast<int>(m_polynom.size());
 }

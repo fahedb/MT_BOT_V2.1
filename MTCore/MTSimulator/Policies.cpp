@@ -19,7 +19,7 @@ std::vector<std::vector<std::string>> BasePolicy::Get_AllConfigs(std::vector<std
 // ------------------------------------------------------------------------------------------------------------------
 
 
-inline std::vector<std::vector<std::string>> ConfigrationsPolicy::Get_All()
+std::vector<std::vector<std::string>> ConfigrationsPolicy::Get_All()
 {
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
         std::make_pair(CONFIG_DEF_CURR_TIME_LINE_LEN),
@@ -47,7 +47,7 @@ void ConfigrationsPolicy::InitPolicy()
 // ------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------
 
-inline std::vector<std::vector<std::string>> TradeManagerPolicy::Get_All()
+std::vector<std::vector<std::string>> TradeManagerPolicy::Get_All()
 {
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
         std::make_pair(CONFIG_DEF_PATTERN_MINIMUM_PATTERNS_TO_TAKE_ACTION),
@@ -93,7 +93,7 @@ void TradeManagerPolicy::InitPolicy()
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-inline std::vector<std::vector<std::string>> ScoreCachingPolicy::Get_All()
+std::vector<std::vector<std::string>> ScoreCachingPolicy::Get_All()
 {
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
         std::make_pair(CONFIG_DEF_ENABLE_SCORE_CACHEING),
@@ -115,7 +115,7 @@ void ScoreCachingPolicy::InitPolicy()
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-inline std::vector<std::vector<std::string>> OrdersPolicy::Get_All()
+std::vector<std::vector<std::string>> OrdersPolicy::Get_All()
 {
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
         std::make_pair(CONFIG_DEF_STOP_LOSS_START),
@@ -144,7 +144,7 @@ void OrdersPolicy::InitPolicy()
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-inline std::vector<std::vector<std::string>> OrderTracerPolicy::Get_All()
+std::vector<std::vector<std::string>> OrderTracerPolicy::Get_All()
 {
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
         std::make_pair(CONFIG_DEF_ENABLE_TRADE_TRACING),
@@ -165,7 +165,7 @@ void OrderTracerPolicy::InitPolicy()
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-inline std::vector<std::vector<std::string>> PolynomComparerPolicy::Get_All()
+std::vector<std::vector<std::string>> PolynomComparerPolicy::Get_All()
 {
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
         std::make_pair(CONFIGS_POLYNOM_EVAL_WEIGHT),
@@ -188,7 +188,7 @@ void PolynomComparerPolicy::InitPolicy()
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-inline std::vector<std::vector<std::string>> ScoreComparerPolicy::Get_All()
+std::vector<std::vector<std::string>> ScoreComparerPolicy::Get_All()
 {
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
         std::make_pair(CONFIG_DEF_RSI_WIEGHT),
@@ -232,7 +232,7 @@ void FusionEnginePolicy::InitPolicy()
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-inline std::vector<std::vector<std::string>> InfraConfigrationsPolicy::Get_All()
+std::vector<std::vector<std::string>> InfraConfigrationsPolicy::Get_All()
 {
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
         std::make_pair(CONFIG_HTTP_PORT)
@@ -249,7 +249,7 @@ void InfraConfigrationsPolicy::InitPolicy()
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-inline std::vector<std::vector<std::string>> PatternGodStatisticsPolicy::Get_All()
+std::vector<std::vector<std::string>> PatternGodStatisticsPolicy::Get_All()
 {
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
         std::make_pair(CONFIG_DEF_PATTERN_FUTURE_VISION_CANDLES),
@@ -258,7 +258,7 @@ inline std::vector<std::vector<std::string>> PatternGodStatisticsPolicy::Get_All
     return Get_AllConfigs(allConfigs);
 }
 
-inline void PatternGodStatisticsPolicy::InitPolicy()
+void PatternGodStatisticsPolicy::InitPolicy()
 {
     Score_Future_Vision_Candles = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_FUTURE_VISION_CANDLES));
     SavedDirectionStaticsLen = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_SAVED_STATS_LEN));
@@ -267,7 +267,7 @@ inline void PatternGodStatisticsPolicy::InitPolicy()
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-inline void BaseComparerPolicy::InitPolicy()
+void BaseComparerPolicy::InitPolicy()
 {
     Min_Similar_Results_To_Fusion = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIGS_MIN_SIMILAR_RESULTS_TO_FUSION));
     PolynomComparerWeight = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_POLYNOM_FUSION_WEIGHT));

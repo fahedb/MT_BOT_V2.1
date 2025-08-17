@@ -31,7 +31,7 @@ BaseIndicator::BaseIndicator(IndicatorValues curr) {
 IndicatorScore::IndicatorScore() {
 	BarPeriodList barPeriods;
 	for(const auto& period : barPeriods.periods) {
-		scores.at(period) = 0.0; // Initialize each BarPeriod with a score of 0
+		scores[period] = 0.0; // Initialize each BarPeriod with a score of 0
 	}
 	total = 0;
 }
@@ -133,7 +133,7 @@ ScoresResult::ScoresResult() // Just a constructor :)
 {
 	IndicatorTypeList indTypes;
 	for (const auto& type : indTypes.types) {
-		indicatorScores.at(type) = IndicatorScore(); // Initialize each IndicatorType with an empty IndicatorScore
+		indicatorScores[type] = IndicatorScore(); // Initialize each IndicatorType with an empty IndicatorScore
 	}
 }
 

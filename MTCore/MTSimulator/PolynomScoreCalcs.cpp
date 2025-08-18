@@ -34,7 +34,7 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* vec1,
 	ScoreCachingPolicy* scoreCachePolicy = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
 
 	ScoresResult totalScore;
-	for (int i = 0; i < vec1->size(); i += polyLen)
+	for (int i = 0; i < vec1->size(); i++)
 	{
 		if (i + polyLen > vec1->size() || i + polyLen > vec2->size())
 			break; // Break if we exceed the size of either vector

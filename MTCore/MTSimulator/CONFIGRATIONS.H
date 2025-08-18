@@ -58,7 +58,7 @@ private:
     }
     robin_hood::unordered_map<PolicyType, BasePolicy*> m_policies; // Cache for config values
     
-    void ResetPolicy();
+	void ResetPolicy(); // Before calling this function, make sure no other thread is using the policies
     void InitPolicyMap();
 	
 };

@@ -46,7 +46,8 @@ std::vector<std::vector<std::string>> Configrations::Get_AllConfigRows_DB()
 }
 
 void Configrations::RefreshPolicy() {
-    ResetPolicy();
-    InitPolicyMap();
+    for(const auto& pair : m_policies) {
+        pair.second->Refresh(); // Refresh each policy
+	}
 }
 

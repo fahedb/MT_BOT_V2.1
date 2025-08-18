@@ -1,5 +1,6 @@
 #include "Logger.h"
 #include "ThreadPool.h"
+#include <Windows.h>
 
 /// <Logger>
 /// Logger class function, For logging data
@@ -21,7 +22,7 @@ void Logger::WriteLog(std::string log, bool newSection,bool sendToLogServer, Log
         logToPrint += "\n";
 
     logToPrint += GetFormattedCurrTime() + log;
-    
+    OutputDebugStringA(logToPrint.c_str());
     std::lock_guard<std::mutex> lock(m_logMutex);
     std::cout << logToPrint;
     *(m_logFile) << logToPrint;

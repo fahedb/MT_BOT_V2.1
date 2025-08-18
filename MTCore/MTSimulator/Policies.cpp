@@ -122,7 +122,9 @@ std::vector<std::vector<std::string>> OrdersPolicy::Get_All()
         std::make_pair(CONFIG_DEF_TAKE_PROFIT_START),
         std::make_pair(CONFIG_DEF_STOP_LOSS_DIFF),
         std::make_pair(CONFIG_DEF_TAKE_PROFIT_DIFF),
-        std::make_pair(CONFiG_DEF_ENABLE_DYNAMIC_TP_SL)
+        std::make_pair(CONFiG_DEF_ENABLE_DYNAMIC_TP_SL),
+		std::make_pair(CONFIG_DEF_MAIN_ORDER_SIZE_IN_LOT),
+		std::make_pair(CONFIG_DEF_SUPPORT_ORDER_SIZE_IN_LOT)
     };
 
     return Get_AllConfigs(allConfigs);
@@ -137,8 +139,8 @@ void OrdersPolicy::InitPolicy()
     TP_start = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_TAKE_PROFIT_START));
 
     Dynamic_SL_TP = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFiG_DEF_ENABLE_DYNAMIC_TP_SL)) != 0 ? true : false;
-
-
+	Main_Order_Size_In_Lot = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_MAIN_ORDER_SIZE_IN_LOT));
+	Support_Order_Size_In_Lot = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_SUPPORT_ORDER_SIZE_IN_LOT));
 }
 
 // ------------------------------------------------------------------------------------------------------------------

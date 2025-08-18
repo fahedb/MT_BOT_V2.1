@@ -15,6 +15,7 @@ void MTScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scan
 	if (Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->CleanEveryXScans < scansNum)
 	{
 		ScoreResultsCache::getInstance()->CleanOldResults();
+		ScoreResultsCachePolynom::getInstance()->CleanOldResults();
 		scansNum = 0; // Reset the scans counter after cleaning
 	}
 }

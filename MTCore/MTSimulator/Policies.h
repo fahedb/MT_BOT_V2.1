@@ -58,7 +58,7 @@ public:
     virtual ~BasePolicy() = default;
 
 	virtual std::vector<std::vector<std::string>> Get_All() = 0; // Pure virtual function to get all configurations
-
+	virtual void Refresh() { InitPolicy(); } // Refresh the policy by re-initializing it
 protected:
     std::vector<std::vector<std::string>> Get_AllConfigs(std::vector<std::pair<std::string, std::string>> allConfigs);
 
@@ -235,6 +235,9 @@ public:
     int SL_diff = 0;
     int TP_diff = 0;
 
+	double Main_Order_Size_In_Lot = 0.0; // Default main order size in lots
+    double Support_Order_Size_In_Lot = 0.0; // Default support order size in lots
+    
 	bool Dynamic_SL_TP = false; // Dynamic Stop Loss and Take Profit
 
 private:

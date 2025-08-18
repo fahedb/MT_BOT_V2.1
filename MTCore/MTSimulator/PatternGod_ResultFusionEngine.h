@@ -4,6 +4,7 @@
 #include "PatternGod_BaseComparer.h"
 #include "Normalizer.h"
 #include "MinMaxFinder.h"
+#define NORMALIZE_WEIGHT 100 // Normalization weight for scores
 
 class PatternGod_ResultFusionEngine
 {
@@ -43,7 +44,7 @@ private:
 
 			for (int i = 0; i < scores.size(); i++) // Replace Results with normalized once
 			{
-				scores.at(i) = normalizer.normalize(scores.at(i)); // Normalize the scores using the normalizer	
+				scores.at(i) = normalizer.normalize(scores.at(i), NORMALIZE_WEIGHT); // Normalize the scores using the normalizer	
 			}
 
 			auto normalizedResPairs = TimeLineBuilder::CombineScoresAndChangeNodes(changeNodes, scores); // Combine the normalized scores with the change nodes

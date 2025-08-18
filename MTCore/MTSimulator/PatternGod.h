@@ -72,13 +72,11 @@ public:
 
 		PatternGodComparerResultsMap resultPerComparer; // Map to hold results for each comparer
 		
-		int idx = 0;
 		for (const auto& comparer : m_comparers)
 		{
 			resultPerComparer[comparer->Get_ComparerType()] = std::vector<std::pair<ChangeNode*, ScoresResult>>(); // Initialize the result vector for each comparer
-
-			totalScans += comparer->ScanForOneMinPatterns_MultiThreaded(resultPerComparer[comparer->Get_ComparerType()]); // Scan for patterns using each comparer
-			idx++;
+			if (comparer->IsScanEnabled())
+				totalScans += comparer->ScanForOneMinPatterns_MultiThreaded(resultPerComparer[comparer->Get_ComparerType()]); // Scan for patterns using each comparer
 		}
 
 		// Need to merge results using ResultsFusion Engine...

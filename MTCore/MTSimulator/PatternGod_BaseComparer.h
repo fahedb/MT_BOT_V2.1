@@ -14,6 +14,7 @@ typedef robin_hood::unordered_map<PatternGodComparerType, std::vector<std::pair<
 class PatternGod_BaseComparer
 {
 protected:
+	bool m_isEnabled = true; // Flag to indicate if the comparer is enabled
 	std::vector<ChangeNode*>* m_historyTL;
 	DBMap* m_historyDB_Map = nullptr;
 
@@ -71,6 +72,7 @@ public:
 		TimeLineBuilder::Build_TimeLineDB(curr, m_currDB_Map);
 
 	} // Set the current time line for comparison
+	virtual bool IsScanEnabled() { return m_isEnabled; } // Check if the scan is enabled
 
 };
 

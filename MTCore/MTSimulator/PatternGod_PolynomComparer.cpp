@@ -2,6 +2,7 @@
 
 void PatternGod_PolynomComparer::InitComaprer()
 {
+	m_isEnabled = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy)->EnablePolynomScan; // Get the enabled status from the policy
 	m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
 	Set_ComparerType(); // Initialize the comparer type
 	m_ScoreToAct = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy)->ScoreToAct; // Get the score to act threshold from the policy

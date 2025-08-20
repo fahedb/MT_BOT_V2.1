@@ -32,6 +32,7 @@ void MTScannerUtils::InitScanObjectsBeforeScan(PatternGod* patternScan, Statisti
 	logger.WriteLog(startScanLog, true, true);
 
 	patternScan->Set_CurrentTimeLine(currentTimeLine); // Set a new Current Period for PatternScan object for the new scan
+	patternScan->RefreshComparers(); // Refresh the comparers to use the new current time line
 	statisticsCalcucator->Set_NewCurrentPeriod(currentTimeLine); // Set a new current period for Statistics calc
 
 	if (currTimeLineRep->Get_CurrTimeLine()->Get_TimeLineLen()) // Getting the max score possible for 2 nodes match

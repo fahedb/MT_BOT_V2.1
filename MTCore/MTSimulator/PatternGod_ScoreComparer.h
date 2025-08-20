@@ -10,7 +10,10 @@ public:
 	PatternGod_ScoreComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr) : PatternGod_BaseComparer(history, curr) { InitComaprer(); }
 
 	~PatternGod_ScoreComparer() {}
-
+	virtual void RefreshComparer()
+	{
+		InitComaprer(); // Reinitialize the comparer
+	}
 private:
 	void InitComaprer();
 

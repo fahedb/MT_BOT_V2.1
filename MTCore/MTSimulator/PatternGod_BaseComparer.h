@@ -43,6 +43,8 @@ protected:
 public:
 	~PatternGod_BaseComparer(); 
 
+	virtual void RefreshComparer() = 0;
+	
 	PatternGodComparerType Get_ComparerType() const { return m_comparerType; } // Get the comparer type
 	virtual int ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);
 

@@ -111,7 +111,7 @@
       <AdditionalIncludeDirectories>C:\Users\Fahed\Documents\GitHub\MT_BOT_V2.1\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator\;$(SolutionDir)..\HTTPCore;C:\Users\Fahed\Documents\GitHub\MT_BOT_V2.1\vcpkg\installed\x64-windows\include;C:\Users\Fahed\Documents\GitHub\MT_BOT_V2.1\vcpkg\installed\x64-windows\include\nlohmann;C:\Users\Fahed\Documents\GitHub\MT_BOT_V2.1\vcpkg\installed\x64-windows\include\nlohmann</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>

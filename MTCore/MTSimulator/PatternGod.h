@@ -50,6 +50,13 @@ public:
 		if (m_historyDB_Map != nullptr && m_historyDB_Owner)
 			delete m_historyDB_Map; // Free the history DB map
 	}
+	void RefreshComparers()
+	{
+		for (auto& comparer : m_comparers)
+		{
+			comparer->RefreshComparer(); // Reinitialize the comparer
+		}
+	}
 	void InitComparers(); // Initialize the comparers with the history time line
 	void Set_CurrentTimeLine(std::vector<ChangeNode*>* currentTimeLine) { 
 		for (auto& comparer : m_comparers) comparer->Set_CurrentTimeLine(currentTimeLine);

@@ -10,7 +10,10 @@ public:
 	PatternGod_PolynomComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr) : PatternGod_BaseComparer(history, curr) { InitComaprer(); }
 
 	~PatternGod_PolynomComparer() {}
-
+	virtual void RefreshComparer() override
+	{
+		InitComaprer(); // Reinitialize the comparer
+	}
 private:
 	void InitComaprer();
 

@@ -81,6 +81,7 @@ public:
     // Insert with a key and a unique_ptr to PolynomTimeLine
     void InsertPolynomTimeLine(const PolynomTimeLineKey& key, std::unique_ptr<PolynomTimeLine> polynomTl, PolynomTimeLineCacheType cachT) {
         auto cache = GetPolynomTimeLineCache(cachT);
+		std::lock_guard<std::mutex> lock(m_cacheMutex); // Ensure thread safety
         cache->try_emplace(key, std::move(polynomTl));
     }
 
@@ -91,6 +92,8 @@ public:
         PolynomTimeLineKey key;
         key.startTimePoint = polynomTl->Get_Segment().first;
         key.endTimePoint = polynomTl->Get_Segment().second;
+
+        std::lock_guard<std::mutex> lock(m_cacheMutex); // Ensure thread safety
         cache->try_emplace(key, std::move(polynomTl));
     }
 
@@ -115,6 +118,7 @@ private:
 	}
     robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>> m_hist_polynomTimeLineCache;
     robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>> m_curr_polynomTimeLineCache;
+	std::mutex m_cacheMutex; // Mutex for thread safety
 };
 
 
@@ -139,6 +143,44 @@ private:
 		return true; // Precondition passed
     }
 public:
+    static int Build_PoylnomTimeLines_MultiThreaded(const std::vector<ChangeNode*>& nodes, PolynomTimeLineCacheType cachT) 
+    {
+        if (!PreConditionBuild()) {
+            return 0; // Precondition failed, no polynom timelines built
+        }
+		// Split the nodes to chunks for multi-threading
+
+        int threadCount = ThreadPool::getInstance()->Get_ThreadsNum();
+		int chunkSize = nodes.size() / threadCount;
+
+		std::vector< std::vector<ChangeNode*>> chunks;
+        for(size_t i = 0; i < nodes.size(); i += chunkSize) {
+            std::vector<ChangeNode*> chunk(nodes.begin() + i, nodes.begin() + std::min(i + chunkSize, nodes.size()));
+            chunks.push_back(chunk);
+		}
+
+        std::vector<std::future<void>> futures;
+
+		std::vector<robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>> tempCaches(threadCount);
+        
+        for (int t = 0; t < threadCount; ++t) {
+            auto prom = std::make_shared<std::promise<void>>();
+            futures.push_back(prom->get_future());
+			auto& chunk = chunks[t % chunks.size()]; // Use modulo to handle cases where threadCount > chunks.size()
+            robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>& tempCache = tempCaches[t];
+            ThreadPool::getInstance()->enqueueTask(
+                [chunk, tempCache, prom]() {
+                    Build_PolynomTimeLines_InTempMap(chunk, PolynomTimeLineCacheType::HISTORICAL, tempCache);
+                    prom->set_value();
+                },
+                TaskPriority::High
+            );
+        }
+
+    }
+    static PolynomTimeLine* Get_PolynomTimeLine(const robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>& cache, const PolynomTimeLineKey& key, PolynomTimeLineCacheType cachT);
+    static void Build_PolynomTimeLines_InTempMap(const std::vector<ChangeNode*>& nodes, PolynomTimeLineCacheType cachT, robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>& tempCache);
+
     static int Build_PoylnomTimeLines(const std::vector<ChangeNode*>& nodes, PolynomTimeLineCacheType cachT) {
         
         if(!PreConditionBuild()) {

@@ -56,7 +56,7 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* vec1,
 			totalScore += *foundRes; // Add the cached score to the total score
 			continue; // Skip to the next iteration if the score was found in the cache
 		}
-		
+
 		PolynomChangeNodePackage package1(partialVec1); // Create a package for the first vector
 		PolynomChangeNodePackage package2(partialVec2); // Create a package for the second vector
 

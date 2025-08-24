@@ -147,6 +147,11 @@ int PolynomTimeLineCacheManager::Build_PoylnomTimeLines_MultiThreaded(const std:
         f.wait();
     }
 	MergeTempCaches_Into_SignletonCache(tempCaches, cachT); // Merge all temporary caches into the singleton cache
+    int totalBuilt = 0;
+    for (const auto& tempCache : tempCaches)
+    {
+		totalBuilt += tempCache.size(); // Count the total number of built polynomial timelines
+    }
     return 0;
 
 }
@@ -189,7 +194,7 @@ int PolynomTimeLineCacheManager::Build_PoylnomTimeLines(const std::vector<Change
 
 }
 
-void MergeTempCaches_Into_SignletonCache(std::vector<robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>>& tempCaches, PolynomTimeLineCacheType cachT) // Merges temporary caches into the main cache.
+void PolynomTimeLineCacheManager::MergeTempCaches_Into_SignletonCache(std::vector<robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>>& tempCaches, PolynomTimeLineCacheType cachT) // Merges temporary caches into the main cache.
 {
     PolynomTimeLineCache* cache = PolynomTimeLineCache::getInstance();
     for (auto& tempCache : tempCaches) {

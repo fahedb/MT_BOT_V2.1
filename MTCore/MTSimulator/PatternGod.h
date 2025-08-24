@@ -92,4 +92,3 @@ public:
 		return totalScans; // Return the total number of scans performed
 	}
 };
-

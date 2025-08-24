@@ -4,7 +4,6 @@
 #include "CONFIGRATIONS.H"
 #include "PolynomKey.h"
 
-
 #pragma once
 class PolynomChangeNodePackage
 {

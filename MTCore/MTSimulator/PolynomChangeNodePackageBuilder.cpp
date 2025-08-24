@@ -1,10 +1,45 @@
 #include "PolynomChangeNodePackageBuilder.h"
 #include "PolynomTimeLine.h"
+#include "PolynomTimeLineCache.h"
+
+PolynomTimeLineCache* m_cache = nullptr; // Initialize the cache pointer to nullptr
+
+PolynomMap TryFindInCache(PolynomTimeLineKey PolynomKey)
+{
+	PolynomTimeLine* foundRes = nullptr; // Initialize foundRes to nullptr
+
+	if (m_cache == nullptr) // If the cache is not initialized
+	{
+		m_cache = PolynomTimeLineCache::getInstance(); // Get the singleton instance of PolynomTimeLineCache
+	}
+
+	foundRes = m_cache->GetPolynomTimeLine(PolynomKey, PolynomTimeLineCacheType::CURRENT); // Retrieve the current polynomial timeline cache
+	if (foundRes != nullptr) // If a polynomial timeline is found in the cache
+	{
+		return foundRes->Get_PolynomPackage()->m_map; // Return the polynomial map from the found timeline
+	}
+
+	foundRes = m_cache->GetPolynomTimeLine(PolynomKey, PolynomTimeLineCacheType::HISTORICAL); // Retrieve the historical polynomial timeline cache
+	if (foundRes != nullptr) // If a polynomial timeline is found in the cache
+	{
+		return foundRes->Get_PolynomPackage()->m_map; // Return the polynomial map from the found timeline
+	}
+	return PolynomMap(); // Return an empty polynomial map if not found in cache
+}
 
 PolynomMap PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vector<ChangeNode*> nodes)
 {
-	PolynomMap polynomMap; // Map to hold polynomials with keys as PolynomKey (IndicatorType, IndicatorLen, IndicatorValueType)
+	PolynomTimeLineKey key;
 
+	key.startTimePoint = nodes.front()->point_DateTimeLong; // Set the start time point from the first node
+	key.endTimePoint = nodes.back()->point_DateTimeLong; // Set the end time point from the last node
+	
+	PolynomMap polynomMap = TryFindInCache(key); // Try to find the polynomial in the cache
+	if(polynomMap.size())
+	{
+		return polynomMap; // If found in cache, return the cached polynomial map
+	}
+	
 	IndicatorTypeList indTypes; // List of indicator types
 	IndicatorLenList indLengths; // List of indicator lengths
 	IndicatorValueTypeList indValueTypes; // List of indicator value types (Value or Slope)

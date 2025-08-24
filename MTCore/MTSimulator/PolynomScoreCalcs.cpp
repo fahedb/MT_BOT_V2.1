@@ -48,8 +48,8 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* vec1,
 			vec2->begin() + (static_cast<size_t>(i) + static_cast<size_t>(polyLen)));
 
 		ScoresResult* foundRes = nullptr; // Initialize foundRes to nullptr
-		if (scoreCachePolicy->EnableScoreCaching)
-			 foundRes = TryFindCachedScore(partialVec1, partialVec2, threadIdx); // Try to find the score in the cache
+		//if (scoreCachePolicy->EnableScoreCaching)
+		//	 foundRes = TryFindCachedScore(partialVec1, partialVec2, threadIdx); // Try to find the score in the cache
 
 		if(foundRes) // If the score was found in the cache
 		{

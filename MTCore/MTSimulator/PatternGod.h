@@ -3,6 +3,7 @@
 #include "PatternGod_PolynomComparer.h"
 #include "PatternGod_ScoreComparer.h"
 #include "PatternGod_ResultFusionEngine.h"
+#include <chrono>
 
 class PatternGod
 {
@@ -78,14 +79,16 @@ public:
 		
 
 		PatternGodComparerResultsMap resultPerComparer; // Map to hold results for each comparer
-		
+		auto start = std::chrono::high_resolution_clock::now();
 		for (const auto& comparer : m_comparers)
 		{
 			resultPerComparer[comparer->Get_ComparerType()] = std::vector<std::pair<ChangeNode*, ScoresResult>>(); // Initialize the result vector for each comparer
 			if (comparer->IsScanEnabled())
 				totalScans += comparer->ScanForOneMinPatterns_MultiThreaded(resultPerComparer[comparer->Get_ComparerType()]); // Scan for patterns using each comparer
 		}
-
+		auto end = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+		Logger::getInstance().WriteLog("Performance: Total Scan Time: " + std::to_string(duration) + " ms", false, true, LogType::LOG);
 		// Need to merge results using ResultsFusion Engine...
 		resultNodes2D = PatternGod_ResultFusionEngine::FuseResults(resultPerComparer,m_historyDB_Map); // Fuse results from all comparers
 

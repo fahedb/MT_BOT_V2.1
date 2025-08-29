@@ -1,58 +1,11 @@
 #include "TimeLine.h"
 #include "CONFIGRATIONS.H"
 #include "PolynomTimeLine.h"
+#include "HashingStructs.h"
 #include <memory>
 #include <future>
 
 #pragma once
-
-/// <summary>
-/// Class to save current timeline 
-/// And long current timeLine (last X bars (by a config) )
-/// </summary>
-struct PolynomTimeLineKey
-{
-	// Default constructor
-	PolynomTimeLineKey() : startTimePoint(0), endTimePoint(0) {}
-	// Constructor with parameters
-	PolynomTimeLineKey(long long start,long long end) : startTimePoint(start), endTimePoint(end) {}
-
-	long long startTimePoint; // Start time point of the timeline
-	long long endTimePoint; // End time point of the timeline
-
-    bool operator==(const PolynomTimeLineKey& other) const {
-        return startTimePoint == other.startTimePoint &&
-            endTimePoint == other.endTimePoint;
-    }
-};
-
-/// <summary>
-/// Specializes the robin_hood::hash template to provide a custom hash function for PolynomTimeLineKey objects.
-/// This allows PolynomTimeLineKey to be used as a key in unordered maps.
-/// </summary>
-/// Author: Fahed Elbatash
-/// Date: 2025-07-22
-namespace robin_hood {
-    template<>
-	struct hash<PolynomTimeLineKey> { // Custom hash function for PolynomTimeLineKey
-        size_t operator()(const PolynomTimeLineKey& key) const {
-            size_t h1 = robin_hood::hash<long long>()(key.startTimePoint);
-            size_t h2 = robin_hood::hash<long long>()(key.endTimePoint);
-            return h1 ^ (h2 << 1);
-        }
-    };
-
-    // Hash function for pair of PolynomTimeLineKeys
-    template <>
-    struct hash<std::pair<PolynomTimeLineKey, PolynomTimeLineKey>> {
-        size_t operator()(const std::pair<PolynomTimeLineKey, PolynomTimeLineKey>& p) const {
-            size_t h1 = robin_hood::hash<PolynomTimeLineKey>{}(p.first);
-            size_t h2 = robin_hood::hash<PolynomTimeLineKey>{}(p.second);
-            // Combine hashes
-            return h1 ^ (h2 << 1);
-        }
-    };
-}
 enum class PolynomTimeLineCacheType
 {
     HISTORICAL, // Historical polynomial timelines

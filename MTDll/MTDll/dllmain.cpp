@@ -78,8 +78,10 @@ int IsOrderClosed(int seqNum)
 	Logger& logger = Logger::getInstance();
 	logger.WriteToDebug("IsOrderClosed called with seqNum: " + std::to_string(seqNum));
 	logger.WriteToDebug("IsOrderClosed: Sending HTTP request to check order status for seqNum: " + std::to_string(seqNum));
+	httplib::Headers header;
 
-    httplib::Result res = HTTPClient::getInstance().Send_Get(HTTP_SERVICE_MTScanner_GetOrderData);
+	header.insert(std::make_pair(HTTP_PARAM_TradeSeqNum, std::to_string(seqNum)));
+    httplib::Result res = HTTPClient::getInstance().Send_Get(HTTP_SERVICE_MTScanner_GetOrderData, header);
     if (!res)
     {
        Logger::getInstance().WriteLog("DLL Error while trying to send an HTTP request to server", false, true, LogType::SPECIAL_LOG);
@@ -162,13 +164,15 @@ int CheckForNewOrders_HTTP(DLL_OrderStruct_P order)
     std::string seqNum = res->get_header_value(HTTP_PARAM_TradeSeqNum);
     std::string stopLoss = res->get_header_value(HTTP_PARAM_OrderStopLoss);
     std::string takeProfit = res->get_header_value(HTTP_PARAM_OrderTakeProfit);
-
+	logger.WriteToDebug("Symbol: " + symbol + ", SeqNum: " + seqNum + ", StopLoss: " + stopLoss + ", TakeProfit: " + takeProfit);
+    
     order->pair = DLL_CoinsPairUtils::Get_CoinsPair_FromString(symbol);
     order->type = DLL_OrderTypeUtils::Get_OrderType_FromString(type);
     order->seqNum = Converts::ToInt(seqNum);
     order->status = DLL_OrderStatus::DLL_ORDER_STATUS_OPEN;
     order->stopLoss = Converts::ToInt(stopLoss);
-    order->stopLoss = Converts::ToInt(takeProfit);
+    order->takeProfit = Converts::ToInt(takeProfit);
+    
     return 1;
 }
 bool InsertNewBar_HTTP_M1(char* timePoint, char* symbol, CandleStruct data)

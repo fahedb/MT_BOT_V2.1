@@ -36,7 +36,8 @@ int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std
 
 	std::vector<std::vector < std::pair< ChangeNode*, ScoresResult>>> resultNodesPerThread(threadCount);
 	ThreadPool* tPool = ThreadPool::getInstance();
-	Logger::getInstance().WriteLog("Polynom Scan Started", false, true, LogType::LOG); // Log before stop low priority tasks
+	std::string scannerName = Get_ComparerType() == PatternGodComparerType::PolynomComparer ? "Polynom " : "Score ";
+	Logger::getInstance().WriteLog(scannerName + "Scan Started", false, true, LogType::LOG); // Log before stop low priority tasks
 	tPool->Set_PauseLowPriorityTasks(true);
 
 	std::vector<std::future<void>> futures;
@@ -67,13 +68,18 @@ int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std
 	PatternGodUtils::FilterDuplicatesTimeLines(resultNodes2D, m_historyDB_Map);
 	PatternGodUtils::filterByHighScores(resultNodes2D);
 	logger.WriteLog(PatternGodUtils::BuildScanResultLog(resultNodes2D), false, true);
+	
+	m_scanCounter++;
+	if(m_scanCounter >= 1000)
+		m_scanCounter = 0;
 
 	return static_cast<int>(resultNodes2D.size());
 }
 
 void PatternGod_BaseComparer::ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct, std::mutex* maxResultLock, ScoresResult* maxScore, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread)
 {
-
+	m_cacheHits[threadIndex] = 0; // Reset cache hits for this thread
+	m_cacheMisses[threadIndex] = 0; // Reset cache misses for this thread
 	int estimatedItems = 20;
 	Logger& logger = Logger::getInstance();
 	resultNodesPerThread->reserve(estimatedItems);
@@ -90,7 +96,8 @@ void PatternGod_BaseComparer::ProccessScanChunk(int startIdx, int endIdx, int th
 		}
 		else
 		{
-			i += m_NumOfSkips_ForLowScoreScan;
+			if (m_scanCounter % 8 != 0) // Every 8 scans, we do a full scan without skips to load cache better
+				i += m_NumOfSkips_ForLowScoreScan;
 		}
 		if (maxLocalScore.totalScore.total < resScore.totalScore.total)
 			maxLocalScore = resScore;
@@ -102,4 +109,11 @@ void PatternGod_BaseComparer::ProccessScanChunk(int startIdx, int endIdx, int th
 		if (maxScore->totalScore.total < maxLocalScore.totalScore.total)
 			*maxScore = maxLocalScore;
 	}
+	// Write logs for this thread
+	logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] processed indices [" + std::to_string(startIdx) + " - " + std::to_string(endIdx - 1) + "]"
+		+ "\nfound " + std::to_string(resultNodesPerThread->size()) + " results"
+		+ "\nmax score: " + std::to_string(maxLocalScore.totalScore.total)
+		+ "\ncache hits : " + std::to_string(m_cacheHits[threadIndex])
+		+ "\ncache misses : " + std::to_string(m_cacheMisses[threadIndex])
+		, false, false, LogType::LOG);
 }

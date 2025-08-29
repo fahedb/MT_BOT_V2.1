@@ -266,7 +266,7 @@ public:
     int maxScorePossibleForChangeNodes = 0;
     int Max_Orders_InRow = 0;
     int Sleep_Minuts_after_Max_Orders_InRow = 0;
-    int CleanEveryXScans = 10; // Default to clean cache every 10 scans
+    int CleanEveryXScans = 3; // Default to clean cache every 10 scans
 
 private:
     void InitPolicy();

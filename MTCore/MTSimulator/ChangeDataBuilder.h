@@ -69,6 +69,8 @@ public:
 		chN->m_lowPrice = chN->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
 		return chN;
 	}
-
+	static int ExtractMonth(long long tp) {
+		return (tp / 1000000000000LL) % 100;
+	}
 };
 

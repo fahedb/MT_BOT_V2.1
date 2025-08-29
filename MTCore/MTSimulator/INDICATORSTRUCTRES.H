@@ -8,15 +8,13 @@
 
 struct IndicatorScore {
 
-	robin_hood::unordered_map<BarPeriod, double> scores; // Scores for each length
-	int total=0;
 
 	IndicatorScore();
 	// Calculate the total score
 	void calcTotal();
 	void Reset() { // Clear the scores and total
-		for(auto& pair : scores) {
-			pair.second = 0.0; // Reset each BarPeriod score to 0
+		for(auto& res : scores) {
+			res = 0.0; // Reset each BarPeriod score to 0
 		}
 		total = 0;
 	}
@@ -29,14 +27,14 @@ struct IndicatorScore {
 	// / operator to divide IndicatorScore by a other IndicatorScore
 	IndicatorScore operator/(const IndicatorScore& other) const;
 
+	std::vector<double> scores; // Scores for each length
+	int total=0;
 };
 IndicatorScore operator*(const IndicatorScore& score, double factor); // External Multiply operator
 IndicatorScore operator*(double factor, const IndicatorScore& score); // External Multiply operator
 
 struct ScoresResult {
 
-	robin_hood::unordered_map<IndicatorType, IndicatorScore> indicatorScores;
-	IndicatorScore totalScore;
 
 	ScoresResult();
 	// Calculates and updates the total score based on other scores
@@ -51,6 +49,8 @@ struct ScoresResult {
 	ScoresResult operator-(const ScoresResult& other) const;
 	// / operator to divide ScoresResult by another ScoresResult
 	ScoresResult operator/(const ScoresResult& other) const;
+	std::vector<IndicatorScore> indicatorScores;
+	IndicatorScore totalScore;
 private:
 	// Helper function to combine scores into totalScore
 	IndicatorScore combineScores() const;
@@ -72,8 +72,14 @@ enum GravityType
 };
 
 struct IndicatorValues {
-	void Set_SingleSlope(BarPeriod barP, double slope) { slopes[barP] = slope; } // Set the slope for the specified BarPeriod
-	void Set_SingleValue(BarPeriod barP, double val) { values[barP] = val; }// Set the value for the specified BarPeriod
+	IndicatorValues() 
+	{
+		BarPeriodList barPeriods;
+		values.assign(barPeriods.periods.size(), 0.0); // Initialize the vector with zeros for each BarPeriod
+		slopes.assign(barPeriods.periods.size(), 0.0); // Initialize the vector with zeros for each BarPeriod
+	}
+	void Set_SingleSlope(BarPeriod barP, double slope) { slopes[static_cast<int>(barP)] = slope; } // Set the slope for the specified BarPeriod
+	void Set_SingleValue(BarPeriod barP, double val) { values[static_cast<int>(barP)] = val; }// Set the value for the specified BarPeriod
 	
 	void Set_Value(IndicatorValueType valueType, BarPeriod barP, double val) // General function to set value or slope based on IndicatorValueType
 	{
@@ -85,8 +91,8 @@ struct IndicatorValues {
 			Logger::getInstance().WriteLog("IndicatorValues::Set_Value : Invalid IndicatorValueType.", false, true, LogType::ERR);
 	}
 	
-	double Get_SingleValue(BarPeriod barP) const { return values.at(barP); } // Get the value for the specified BarPeriod
-	double Get_SingleSlope(BarPeriod barP) const { return slopes.at(barP); } // Get the slope for the specified BarPeriod
+	double Get_SingleValue(BarPeriod barP) const { return values.at(static_cast<int>(barP)); } // Get the value for the specified BarPeriod
+	double Get_SingleSlope(BarPeriod barP) const { return slopes.at(static_cast<int>(barP)); } // Get the slope for the specified BarPeriod
 
 	double Get_Value(IndicatorValueType valueType, BarPeriod barP) const // General function to get value or slope based on IndicatorValueType
 	{
@@ -96,9 +102,10 @@ struct IndicatorValues {
 			return Get_SingleSlope(barP);
 		return 0.0; // Default case, should not happen
 	}
+private:
 	// Indicator Values
-	robin_hood::unordered_map<BarPeriod, double> values; // Values for each length
-	robin_hood::unordered_map<BarPeriod, double> slopes; // Slopes for each length
+	std::vector<double> values; // Values for each length
+	std::vector<double> slopes; // Slopes for each length
 
 };
 
@@ -108,7 +115,7 @@ class BaseIndicator
 public:
 	virtual void SetValues(IndicatorValues curr, IndicatorValues prev);
 	BaseIndicator(IndicatorValues curr);
-	IndicatorValues Get_IndicatorValues() { return m_curr_BarValues; }
+	IndicatorValues& Get_IndicatorValues() { return m_curr_BarValues; }
 	IndicatorValues* Get_IndicatorValues_Pointer() { return &m_curr_BarValues; }
 
 protected:
@@ -141,8 +148,6 @@ public:
 	ZLSMA_Ind(IndicatorValues curr) : BaseIndicator(curr) {}
 };
 
-#define INDICATOR_TYPES_VEC_LEN 5
-#define INDICATOR_LEN_VEC_LEN 5
 
 class IndicatorMap
 {

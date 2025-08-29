@@ -24,6 +24,9 @@ protected:
 	int m_scanCounter = 0; // Counter for the number of scans performed
 	int m_NumOfSkips_ForLowScoreScan = 0; 
 	double m_ScoreToAct = 0;
+	std::vector<int> m_cacheHits; // Counter for cache hits per thread
+	std::vector<int> m_cacheMisses; // Counter for cache misses per thread
+
 	PatternGodComparerType m_comparerType = PatternGodComparerType::NONE; // Type of the comparer
 
 	PatternGod_BaseComparer(std::vector<ChangeNode*>* history) : m_historyTL(history)
@@ -31,6 +34,8 @@ protected:
 		m_historyDB_Map = new DBMap();
 		m_currDB_Map = new DBMap();
 		TimeLineBuilder::Build_TimeLineDB(history, m_historyDB_Map);
+		m_cacheHits.resize(ThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize cache hits for each thread
+		m_cacheMisses.resize(ThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize cache misses for each thread
 	}
 	PatternGod_BaseComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr) : m_historyTL(history), m_currentTL(curr)
 	{
@@ -38,6 +43,8 @@ protected:
 		m_currDB_Map = new DBMap();
 		TimeLineBuilder::Build_TimeLineDB(history, m_historyDB_Map);
 		TimeLineBuilder::Build_TimeLineDB(curr, m_currDB_Map);
+		m_cacheHits.resize(ThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize cache hits for each thread
+		m_cacheMisses.resize(ThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize cache misses for each thread
 	}
 
 public:

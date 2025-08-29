@@ -19,13 +19,13 @@ double CalcSinglePolynomScore(Polynom* hist, Polynom* curr, PolynomComparerPolic
 
 }
 
-ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* vec1, std::vector<ChangeNode*>* vec2,int threadIdx)
+ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* hist, std::vector<ChangeNode*>* curr,int threadIdx)
 {
-	if (vec1->empty() || vec2->empty())
+	if (hist->empty() || curr->empty())
 		return ScoresResult(); // Return an empty ScoresResult if either vector is empty
-	if (vec1->size() != vec2->size())
+	if (hist->size() != curr->size())
 	{
-		Logger::getInstance().WriteLog("Vectors are not of the same size: " + std::to_string(vec1->size()) + " vs " + std::to_string(vec2->size()), false, true, LogType::ERR);
+		Logger::getInstance().WriteLog("Vectors are not of the same size: " + std::to_string(hist->size()) + " vs " + std::to_string(curr->size()), false, true, LogType::ERR);
 		return ScoresResult(); // Return an empty ScoresResult if the vectors are not of the same size
 	}
 	
@@ -34,22 +34,22 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* vec1,
 	ScoreCachingPolicy* scoreCachePolicy = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
 
 	ScoresResult totalScore;
-	for (int i = 0; i < vec1->size(); i++)
+	for (int i = 0; i < hist->size(); i++)
 	{
-		if (i + polyLen > vec1->size() || i + polyLen > vec2->size())
+		if (i + polyLen > hist->size() || i + polyLen > curr->size())
 			break; // Break if we exceed the size of either vector
 
 		std::vector<ChangeNode*> partialVec1(
-			vec1->begin() + (static_cast<size_t>(i)),
-			vec1->begin() + (static_cast<size_t>(i) + static_cast<size_t>(polyLen)));
+			hist->begin() + (static_cast<size_t>(i)),
+			hist->begin() + (static_cast<size_t>(i) + static_cast<size_t>(polyLen)));
 
 		std::vector<ChangeNode*> partialVec2(
-			vec2->begin() + (static_cast<size_t>(i)),
-			vec2->begin() + (static_cast<size_t>(i) + static_cast<size_t>(polyLen)));
+			curr->begin() + (static_cast<size_t>(i)),
+			curr->begin() + (static_cast<size_t>(i) + static_cast<size_t>(polyLen)));
 
 		ScoresResult* foundRes = nullptr; // Initialize foundRes to nullptr
-		//if (scoreCachePolicy->EnableScoreCaching)
-		//	 foundRes = TryFindCachedScore(partialVec1, partialVec2, threadIdx); // Try to find the score in the cache
+		if (scoreCachePolicy->EnableScoreCaching)
+			 foundRes = TryFindCachedScore(partialVec1, partialVec2, threadIdx); // Try to find the score in the cache
 
 		if(foundRes) // If the score was found in the cache
 		{
@@ -96,7 +96,7 @@ TimeLinePolynomScore PolynomScoreCalcs::CalcScore(PolynomChangeNodePackage* hist
 			for(const auto& valType : indValueTypes.valueTypes)
 			{
 				auto polynomKey = PolynomKey(indType, indLen, valType);
-				score.GetScoreContainer(valType)->indicatorScores.at(indType).scores[BarPeriod::M1] += CalcSinglePolynomScore(hist->GetPolynom(polynomKey), curr->GetPolynom(polynomKey), policy);
+				score.GetScoreContainer(valType)->indicatorScores.at(static_cast<int>(indType)).scores[static_cast<int>(BarPeriod::M1)] += CalcSinglePolynomScore(hist->GetPolynom(polynomKey), curr->GetPolynom(polynomKey), policy);
 			}
 		}
 	}
@@ -116,6 +116,10 @@ ScoresResult* PolynomScoreCalcs::TryFindCachedScore(const std::vector<ChangeNode
 	PolynomTimeLineKey histKey(vec1.at(0)->point_DateTimeLong, vec1.back()->point_DateTimeLong);
 	PolynomTimeLineKey currKey(vec2.at(0)->point_DateTimeLong, vec2.back()->point_DateTimeLong);
 
+	if (histKey.startTimePoint == 20240719153500000 && histKey.endTimePoint == 20240719153900000 && currKey.startTimePoint == 1785 && currKey.endTimePoint == 1789)
+	{
+		int tt = 0;
+	}
 	ScoresResult* foundRes = scoreResultsCache->GetScoreResult(histKey, currKey, threadIdx);
 	return foundRes;
 }

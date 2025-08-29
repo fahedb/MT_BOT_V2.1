@@ -4,6 +4,12 @@
 /////////// Base Indicator class Functions//////////
 /////////// Author: Fahed.b				  //////////
 ////////////////////////////////////////////////////
+const IndicatorTypeList m_glob_indTypes;
+const IndicatorLenList m_glob_indLens;
+const BarPeriodList m_glob_barPeriods;
+
+const int m_IndTypesLen = m_glob_indTypes.types.size();
+const int m_indLensLen = m_glob_indLens.lengths.size();
 
 void BaseIndicator::SetValues(IndicatorValues curr, IndicatorValues prev)
 {
@@ -29,10 +35,7 @@ BaseIndicator::BaseIndicator(IndicatorValues curr) {
 
 // Just a constructor :)
 IndicatorScore::IndicatorScore() {
-	BarPeriodList barPeriods;
-	for(const auto& period : barPeriods.periods) {
-		scores[period] = 0.0; // Initialize each BarPeriod with a score of 0
-	}
+	scores.assign(m_glob_barPeriods.periods.size(), 0.0);
 	total = 0;
 }
 
@@ -41,8 +44,8 @@ IndicatorScore::IndicatorScore() {
 
 void IndicatorScore::calcTotal() { // Calculate the total score
 	total = 0; // Reset total before calculation
-	for (const auto& pair : scores) {
-		total += pair.second; // Sum up all the scores
+	for (const auto res : scores) {
+		total += res; // Sum up all the scores
 	}
 }
 
@@ -51,18 +54,19 @@ void IndicatorScore::calcTotal() { // Calculate the total score
 
 IndicatorScore IndicatorScore::operator+(const IndicatorScore& other) const { 
 	IndicatorScore result;
-
-	for(const auto& pair : scores) {
-		BarPeriod period = pair.first;
-		result.scores.at(period) = pair.second + other.scores.at(period); // Sum scores for each BarPeriod
+	int idx = 0;
+	for(const auto res : scores) {
+		result.scores.at(idx) = res + other.scores.at(idx); // Sum scores for each BarPeriod
+		idx++;
 	}
 	result.calcTotal(); // Recalculate the total
 	return result;
 }
 IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
-	for(const auto& pair : scores) {
-		BarPeriod period = pair.first;
-		scores.at(period) += other.scores.at(period); // Add scores for each BarPeriod
+	int idx = 0;
+	for(const auto res : scores) {
+		scores[idx] += other.scores[idx]; // Add scores for each BarPeriod
+		idx++;
 	}
 	calcTotal(); // Recalculate the total
 	return *this;
@@ -70,11 +74,11 @@ IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
 IndicatorScore IndicatorScore::operator-(const IndicatorScore& other) const
 {
 	IndicatorScore result;
-
-	for (const auto& pair : scores) {
-		BarPeriod period = pair.first;
-		double res = pair.second - other.scores.at(period);
-		result.scores.at(period) = res >= 0 ? res : 0; // Sum scores for each BarPeriod
+	int idx = 0;
+	for (const auto score : scores) {
+		double res = score - other.scores.at(idx);
+		result.scores.at(idx) = res >= 0 ? res : 0; // Sum scores for each BarPeriod
+		idx++;
 	}
 	result.calcTotal(); // Recalculate the total
 	return result;
@@ -82,13 +86,16 @@ IndicatorScore IndicatorScore::operator-(const IndicatorScore& other) const
 IndicatorScore IndicatorScore::operator/(const IndicatorScore& other) const
 {
 	IndicatorScore result;
-	for (const auto& pair : scores) {
-		if (other.scores.at(pair.first) != 0) { // Avoid division by zero
-			result.scores[pair.first] = pair.second / other.scores.at(pair.first);
+	int idx = 0;
+	for (const auto score : scores) {
+
+		if (other.scores[idx] != 0) { // Avoid division by zero
+			result.scores[idx] = score / other.scores[idx];
 		}
 		else {
-			result.scores[pair.first] = 0.0; // Default to 0 if division by zero
+			result.scores[idx] = 0.0; // Default to 0 if division by zero
 		}
+		idx++;
 	}
 	result.calcTotal(); // Update the total score after division
 	return result;
@@ -100,10 +107,10 @@ IndicatorScore IndicatorScore::operator/(const IndicatorScore& other) const
 IndicatorScore operator*(const IndicatorScore& score, double factor) // External function to multiply IndicatorScore by a factor
 {
 	IndicatorScore result;
-
-	for (auto it = score.scores.begin(); it != score.scores.end(); ++it)
+	
+	for (int idx = 0; idx < score.scores.size(); idx++)
 	{
-		result.scores[it->first] = it->second * factor; // Scale each score (double) by the factor
+		result.scores[idx] = score.scores[idx] * factor; // Scale each score (double) by the factor
 	}
 	result.calcTotal(); // Recalculate the total score after scaling
 
@@ -131,18 +138,15 @@ IndicatorScore operator*(double factor, const IndicatorScore& score) // External
 
 ScoresResult::ScoresResult() // Just a constructor :)
 {
-	IndicatorTypeList indTypes;
-	for (const auto& type : indTypes.types) {
-		indicatorScores[type] = IndicatorScore(); // Initialize each IndicatorType with an empty IndicatorScore
-	}
+	indicatorScores.assign(m_IndTypesLen, IndicatorScore()); // Initialize the vector with empty IndicatorScores
 }
 
 // ------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------
 
 void ScoresResult::calcTotalResult() { // Calc total score of every object
-	for(auto& pair : indicatorScores) {
-		pair.second.calcTotal(); // Calculate total for each IndicatorScore
+	for(auto& indScore : indicatorScores) {
+		indScore.calcTotal(); // Calculate total for each IndicatorScore
 	}
 
 	totalScore = combineScores();
@@ -151,7 +155,7 @@ void ScoresResult::calcTotalResult() { // Calc total score of every object
 
 void ScoresResult::Reset() { // Clear the scores and total
 	for (auto& pair : indicatorScores) {
-		pair.second.Reset(); // Reset each IndicatorScore
+		pair.Reset(); // Reset each IndicatorScore
 	}
 	totalScore.Reset(); // Reset the total score
 }
@@ -161,9 +165,9 @@ void ScoresResult::Reset() { // Clear the scores and total
 
 ScoresResult& ScoresResult::operator+=(const ScoresResult& other) {
 
-	IndicatorTypeList indTypes;
-	for (const auto& type : indTypes.types) {
-		indicatorScores.at(type) += other.indicatorScores.at(type); // Add scores for each IndicatorType
+
+	for (const auto type : m_glob_indTypes.types) {
+		indicatorScores[int(type)] += other.indicatorScores[int(type)]; // Add scores for each IndicatorType
 	}
 
 	totalScore = combineScores();
@@ -175,10 +179,9 @@ ScoresResult ScoresResult::operator-(const ScoresResult& other) const
 {
 
 	ScoresResult result;
-	IndicatorTypeList indList;
 
-	for (const auto& type : indList.types) { // Iterate through all IndicatorTypes
-		result.indicatorScores.at(type) = indicatorScores.at(type) - other.indicatorScores.at(type); // Combine scores for each IndicatorType
+	for (const auto& type : m_glob_indTypes.types) { // Iterate through all IndicatorTypes
+		result.indicatorScores[int(type)] = indicatorScores[int(type)] - other.indicatorScores[int(type)]; // Combine scores for each IndicatorType
 	}
 	result.calcTotalResult(); // Combine total scores (no need to recalculate; just sum them)
 
@@ -188,13 +191,15 @@ ScoresResult ScoresResult::operator-(const ScoresResult& other) const
 ScoresResult ScoresResult::operator/(const ScoresResult& other) const
 {
 	ScoresResult result;
-	for (const auto& pair : indicatorScores) {
-		if (other.indicatorScores.at(pair.first).total != 0) { // Avoid division by zero
-			result.indicatorScores[pair.first] = pair.second / other.indicatorScores.at(pair.first);
+	int idx = 0;
+	for (const auto res : indicatorScores) {
+		if (other.indicatorScores[idx].total != 0) { // Avoid division by zero
+			result.indicatorScores[idx] = res / other.indicatorScores[idx];
 		}
 		else {
-			result.indicatorScores[pair.first].Reset(); // Reset to default if division by zero
+			result.indicatorScores[idx].Reset(); // Reset to default if division by zero
 		}
+		idx++;
 	}
 	result.calcTotalResult(); // Update the total score after division
 	return result;
@@ -205,10 +210,10 @@ ScoresResult ScoresResult::operator/(const ScoresResult& other) const
 ScoresResult ScoresResult::operator+(const ScoresResult& other) const {
 	
 	ScoresResult result;
-	IndicatorTypeList indList;
-
-	for(const auto& type : indList.types) { // Iterate through all IndicatorTypes
-		result.indicatorScores.at(type) = indicatorScores.at(type) + other.indicatorScores.at(type); // Combine scores for each IndicatorType
+	
+	for(int i=0 ; i < other.indicatorScores.size(); i++)
+	{
+		result.indicatorScores[i] = indicatorScores[i] + other.indicatorScores[i]; // Combine scores for each IndicatorType
 	}
 	result.calcTotalResult(); // Combine total scores (no need to recalculate; just sum them)
 
@@ -223,13 +228,11 @@ IndicatorScore ScoresResult::combineScores() const { // function to combine scor
 	IndicatorScore combined;
 	combined.Reset(); // Reset combined scores
 
-	BarPeriodList barPeriods;
 
-	for(const auto& period : barPeriods.periods) { // Iterate through all BarPeriods
+	for(const auto period : m_glob_barPeriods.periods) { // Iterate through all BarPeriods
 		if (period == BarPeriod::NONE) continue; // Skip NONE period
-		IndicatorTypeList indTypes;
-		for(auto& type : indTypes.types) { // Iterate through all IndicatorTypes
-			combined.scores.at(period) += indicatorScores.at(type).scores.at(period); // Sum scores for each BarPeriod and IndicatorType
+		for(auto& type : m_glob_indTypes.types) { // Iterate through all IndicatorTypes
+			combined.scores[int(period)] += indicatorScores[int(type)].scores[int(period)]; // Sum scores for each BarPeriod and IndicatorType
 		}
 	}
 	return combined;
@@ -242,10 +245,10 @@ ScoresResult operator*(const ScoresResult& score, double factor) // External fun
 {
 	ScoresResult result;
 
-	for (auto it = score.indicatorScores.begin(); it != score.indicatorScores.end(); ++it)
+	for (int idx = 0; idx < score.indicatorScores.size(); idx++)
 	{
-		IndicatorScore scaledScore = it->second * factor; // „Â¯˘ ˘‚Ì ÏŒIndicatorScore È‰È‰ operator*
-		result.indicatorScores[it->first] = scaledScore;
+		IndicatorScore scaledScore = score.indicatorScores[idx] * factor; // „Â¯˘ ˘‚Ì ÏŒIndicatorScore È‰È‰ operator*
+		result.indicatorScores[idx] = scaledScore;
 	}
 	result.calcTotalResult(); // Recalculate the total score after scaling
 	return result;
@@ -272,12 +275,12 @@ ScoresResult operator*(double factor, const ScoresResult& score) // External fun
 
 IndicatorMap::IndicatorMap() 
 {
-	m_vec.resize(INDICATOR_TYPES_VEC_LEN); // Reserve space for 5 elements
+	m_vec.resize(m_IndTypesLen); // Reserve space for 5 elements
 	
-	for (int i = 0; i < INDICATOR_TYPES_VEC_LEN; i++)
+	for (int i = 0; i < m_IndTypesLen; i++)
 	{
-		m_vec.at(i).resize(INDICATOR_LEN_VEC_LEN); // Reserve space for 5 elements in each vector
-		for (int j = 0; j < INDICATOR_LEN_VEC_LEN; j++)
+		m_vec.at(i).resize(m_indLensLen); // Reserve space for 5 elements in each vector
+		for (int j = 0; j < m_indLensLen; j++)
 		{
 			m_vec.at(i).at(j) = nullptr; // Initialize each element to nullptr
 		}
@@ -289,9 +292,9 @@ IndicatorMap::IndicatorMap()
 
 void IndicatorMap::Set_Indicator(IndicatorType type, IndicatorLen len, IndicatorValues val,bool forceInsert /*false*/)
 {
-	int typeIdx = static_cast<int>(Indicators_Utils::Get_TypeIndex(type));
-	int lenIdx = static_cast<int>(Indicators_Utils::Get_LenIndex(len));
-	if (typeIdx < 0 || typeIdx >= INDICATOR_TYPES_VEC_LEN || lenIdx < 0 || lenIdx >= INDICATOR_LEN_VEC_LEN)
+	int typeIdx = static_cast<int>(type);
+	int lenIdx = static_cast<int>(len);
+	if (typeIdx < 0 || typeIdx >= m_indLensLen || lenIdx < 0 || lenIdx >= m_indLensLen)
 	{
 		Logger::getInstance().WriteLog("IndicatorMap::Set_Indicator : Invalid IndicatorType or IndicatorLen index.", false, true, LogType::ERR);
 		return;
@@ -326,9 +329,9 @@ void IndicatorMap::Set_Ind_SingleSlope(IndicatorType type, IndicatorLen len, Bar
 
 BaseIndicator* IndicatorMap::Get_Indicator(IndicatorType type, IndicatorLen len) // Function to Get Indicaor ptr
 {
-	int typeIdx = static_cast<int>(Indicators_Utils::Get_TypeIndex(type));
-	int lenIdx = static_cast<int>(Indicators_Utils::Get_LenIndex(len));
-	if (typeIdx < 0 || typeIdx >= INDICATOR_TYPES_VEC_LEN || lenIdx < 0 || lenIdx >= INDICATOR_LEN_VEC_LEN)
+	int typeIdx = static_cast<int>(type);
+	int lenIdx = static_cast<int>((len));
+	if (typeIdx < 0 || typeIdx >= m_IndTypesLen || lenIdx < 0 || lenIdx >= m_indLensLen)
 	{
 		Logger::getInstance().WriteLog("IndicatorMap::Get_Indicator : Invalid IndicatorType or IndicatorLen index.", false, true, LogType::ERR);
 		return nullptr;
@@ -365,10 +368,10 @@ void IndicatorMap::Set_IndSlope(BaseIndicator* ind, BarPeriod barP, double val)
 
 void IndicatorMap::Validate_Indicator(IndicatorType type, IndicatorLen len)
 {
-	int typeIdx = static_cast<int>(Indicators_Utils::Get_TypeIndex(type));
-	int lenIdx = static_cast<int>(Indicators_Utils::Get_LenIndex(len));
+	int typeIdx = static_cast<int>(type);
+	int lenIdx = static_cast<int>(len);
 
-	if (typeIdx < 0 || typeIdx >= INDICATOR_TYPES_VEC_LEN || lenIdx < 0 || lenIdx >= INDICATOR_LEN_VEC_LEN)
+	if (typeIdx < 0 || typeIdx >= m_glob_indTypes.types.size() || lenIdx < 0 || lenIdx >= m_glob_indLens.lengths.size())
 	{
 		Logger::getInstance().WriteLog("IndicatorMap::Validate_Indicator : Invalid IndicatorType or IndicatorLen index.", false, true, LogType::ERR);
 		return;

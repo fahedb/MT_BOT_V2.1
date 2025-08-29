@@ -8,7 +8,9 @@ class EmaScoreCalcs;
 class ZlsmaScoreCalcs;
 class RelativeScoreCalcs;
 
-
+const BarPeriodList m_glob_barPeriods;
+const IndicatorTypeList m_glob_indTypes;
+const IndicatorLenList m_glob_indLengths;
 
 class RelativeScoreCalcs
 {
@@ -57,14 +59,13 @@ public:
 		const IndicatorValues& hist = ChNHistory->Get_Indicator_Pointer(IndicatorType::RSI, len)->Get_IndicatorValues();
 		const IndicatorValues& curr = ChNcurr->Get_Indicator_Pointer(IndicatorType::RSI, len)->Get_IndicatorValues();
 
-		BarPeriodList barPeriods;
-		for( auto& period : barPeriods.periods) { // Iterate through all BarPeriods
+		for(const auto period : m_glob_barPeriods.periods) { // Iterate through all BarPeriods
 			if (period == BarPeriod::NONE) continue; // Skip NONE period
 			double localScore = 0;
 
 			localScore = RelativeScoreCalcs::CalcScore(hist.Get_Value(IndicatorValueType::Slope, period), curr.Get_Value(IndicatorValueType::Slope, period), weight); // Calculate the score for each BarPeriod
 			localScore += RelativeScoreCalcs::CalcScore(hist.Get_Value(IndicatorValueType::Value, period), curr.Get_Value(IndicatorValueType::Value, period), weight); // Add the value score for each BarPeriod
-			score.scores.at(period) = localScore; // Store the score for the BarPeriod
+			score.scores.at(static_cast<int>(period)) = localScore; // Store the score for the BarPeriod
 		}
 
 		score.calcTotal();
@@ -84,11 +85,10 @@ public:
 		const IndicatorValues& hist = histIndPointer->Get_IndicatorValues();
 		const IndicatorValues& curr = currIndPointer->Get_IndicatorValues();
 
-		BarPeriodList barPeriods;
 		
-		for (auto& period : barPeriods.periods) { // Iterate through all BarPeriods for slopes
+		for (auto& period : m_glob_barPeriods.periods) { // Iterate through all BarPeriods for slopes
 			if (period == BarPeriod::NONE) continue; // Skip NONE period
-			score.scores.at(period) = RelativeScoreCalcs::CalcScore(hist.Get_Value(IndicatorValueType::Slope, period), curr.Get_Value(IndicatorValueType::Slope, period), weight); // Calculate the score for each BarPeriod
+			score.scores.at(static_cast<int>(period)) = RelativeScoreCalcs::CalcScore(hist.Get_Value(IndicatorValueType::Slope, period), curr.Get_Value(IndicatorValueType::Slope, period), weight); // Calculate the score for each BarPeriod
 		}
 
 		double histRange = histHigh - histLow;
@@ -97,11 +97,11 @@ public:
 		double normHist =0;
 		double normCurr =0;
 
-		for (auto& period : barPeriods.periods) { // Iterate through all BarPeriods for values
+		for (auto& period : m_glob_barPeriods.periods) { // Iterate through all BarPeriods for values
 			if (period == BarPeriod::NONE) continue; // Skip NONE period
 			normHist = (hist.Get_Value(IndicatorValueType::Value, period) - histLow) / histRange;
 			normCurr = (curr.Get_Value(IndicatorValueType::Value, period) - currLow) / currRange;
-			score.scores.at(period) += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
+			score.scores.at(static_cast<int>(period)) += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
 		}
 
 		score.calcTotal();
@@ -159,14 +159,13 @@ public:
 		IndicatorValues histindV = histIndPointer->Get_IndicatorValues();
 		IndicatorValues currindV = currIndPointer->Get_IndicatorValues();
 
-		BarPeriodList barPeriods;
-		for (auto& period : barPeriods.periods) { // Iterate through all BarPeriods
+		for (auto& period : m_glob_barPeriods.periods) { // Iterate through all BarPeriods
 			if (period == BarPeriod::NONE) continue; // Skip NONE period
 			double localScore = 0;
 
 			localScore = RelativeScoreCalcs::CalcScore(histindV.Get_Value(IndicatorValueType::Slope, period), currindV.Get_Value(IndicatorValueType::Slope, period), weight); // Calculate the score for each BarPeriod
 			localScore += RelativeScoreCalcs::CalcScore(histindV.Get_Value(IndicatorValueType::Value, period), currindV.Get_Value(IndicatorValueType::Value, period), weight); // Add the value score for each BarPeriod
-			score.scores.at(period) = localScore; // Store the score for the BarPeriod
+			score.scores.at(int(period)) = localScore; // Store the score for the BarPeriod
 		}
 
 		return score;
@@ -192,8 +191,7 @@ public:
 		IndicatorScore score;
 		score.Reset();
 
-		IndicatorLenList indLengths;
-		for (const auto& len : indLengths.lengths) {
+		for (const auto& len : m_glob_indLengths.lengths) {
 			if (len == IndicatorLen::NONE) continue; // Skip NONE length
 			score += General_MA_ScoreCalcs::CalcScore(ChNHistory, ChNcurr, histLow, histHigh, currLow, currHigh, IndicatorType::ZLSMA, len, weight);
 		}
@@ -214,9 +212,9 @@ public:
 		score.Reset();
 
 		// Calc all the scores
-		score.indicatorScores.at(IndicatorType::RSI) = RsiScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
-		score.indicatorScores.at(IndicatorType::EMA) = EmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
-		score.indicatorScores.at(IndicatorType::ZLSMA) = ZlsmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
+		score.indicatorScores.at(static_cast<int>(IndicatorType::RSI)) = RsiScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
+		score.indicatorScores.at(static_cast<int>(IndicatorType::EMA)) = EmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
+		score.indicatorScores.at(static_cast<int>(IndicatorType::ZLSMA)) = ZlsmaScoreCalcs::Calc_AllLensScore(historyNode, currentNode);
 
 		//score.volumeScore = VolumeScoreCalcs::CalcScore(historyNode, currentNode);
 		// Sum all the scores into one Object
@@ -229,15 +227,13 @@ public:
 		ScoresResult average;
 		average.totalScore.Reset();
 
-		IndicatorTypeList indTypes;
-		IndicatorLenList indLengths;
-		BarPeriodList barPeriods;
 
-		for (const auto& type : indTypes.types) {
-			for (const auto& period : barPeriods.periods) {
+
+		for (const auto& type : m_glob_indTypes.types) {
+			for (const auto& period : m_glob_barPeriods.periods) {
 				if (period == BarPeriod::NONE) continue; // Skip NONE period
 //				auto& scoreContainer = average.indicatorScores[type].scores[period];
-				average.indicatorScores[type].scores[period] = score.indicatorScores[type].scores[period] / timeLineLen; // Calculate the average score for each BarPeriod
+				average.indicatorScores[static_cast<int>(type)].scores[static_cast<int>(period)] = score.indicatorScores[static_cast<int>(type)].scores[static_cast<int>(period)] / timeLineLen; // Calculate the average score for each BarPeriod
 			}
 
 		}

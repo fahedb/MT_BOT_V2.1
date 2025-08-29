@@ -98,7 +98,7 @@ std::string PatternGodUtils::BuildScanResultLog(const std::vector<std::pair<Chan
 		IndicatorTypeList indTypes;
 		for (const auto& type : indTypes.types) {
 			std::string strType = Http_Utils::Get_String_IndicatorType(type);
-			logStream << "    | " << strType << ": " << score.indicatorScores.at(type).total << "\n";
+			logStream << "    | " << strType << ": " << score.indicatorScores.at(static_cast<int>(type)).total << "\n";
 		}
 	}
 	return logStream.str();

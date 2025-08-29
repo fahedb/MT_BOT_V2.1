@@ -39,7 +39,7 @@ public:
 		XAUUSD_OneMinTable table(Configrations::getInstance()->Get_DB_FileDir());
 		HistoryTimeLineLoader historyLoader(history, &table);
 		historyLoader.Run();
-		Sleep(60000);
+		//Sleep(60000);
 		Logger::getInstance().WriteLog("About to run PatternGod !!", true, true, LogType::SPECIAL_LOG);
 		TimeLine historyTimeLine(&history);
 		Run_PatternGod(historyTimeLine);

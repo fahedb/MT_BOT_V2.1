@@ -45,6 +45,13 @@ ScoresResult* ScoreResultsCachePolynom::GetScoreResult(const PolynomTimeLineKey&
 	if (it != m_scoreResultsCache.at(threadIdx).end()) {
 		return &it->second; // Return the cached score result
 	}
+	if (false)
+	{
+		int size = static_cast<int>(m_scoreResultsCache.at(threadIdx).size());
+		// get first elemnt in the map
+		auto firstElem = m_scoreResultsCache.at(threadIdx).begin();
+		int tt = 0;
+	}
 	return nullptr; // Return an empty ScoresResult if not found
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------

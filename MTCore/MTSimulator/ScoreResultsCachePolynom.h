@@ -8,7 +8,6 @@
 #include "robin_hood.h"
 #include <future>      // std::async, std::future
 #include "HashingStructs.h"
-#include "PolynomTimeLineCache.h"
 
 /// <summary>
 /// Static function for ScoreResultsCachePolynom,

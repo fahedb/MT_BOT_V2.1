@@ -9,12 +9,26 @@ void MTScannerUtils::GoToSleep(int seconds)
 
 void MTScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scansNum)
 {
+	
+	ScoreResultsCache* scoreResultsCache = ScoreResultsCache::getInstance();
 	if (isScanActivated)
-		scansNum++; // Increase the scans counter if a scan was activated
+	{
+		std::vector<size_t> sizes = scoreResultsCache->GetCacheSizes();
+		std::string cacheSizes = "Score Results Cache Sizes per Thread:\n";
 
+		for (size_t i = 0; i < sizes.size(); i++)
+		{
+			cacheSizes += "Thread [" + std::to_string(i) + "] : ";
+			cacheSizes += std::to_string(sizes[i]);
+			cacheSizes += "\n";
+		}
+
+		Logger::getInstance().WriteLog("Cache Status before clean:\n " + cacheSizes, false, true, LogType::LOG);
+		scansNum++; // Increase the scans counter if a scan was activated
+	}
 	if (Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->CleanEveryXScans < scansNum)
 	{
-		ScoreResultsCache::getInstance()->CleanOldResults();
+		scoreResultsCache->CleanOldResults();
 		ScoreResultsCachePolynom::getInstance()->CleanOldResults();
 		scansNum = 0; // Reset the scans counter after cleaning
 	}

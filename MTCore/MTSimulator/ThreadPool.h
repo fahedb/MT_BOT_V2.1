@@ -6,6 +6,7 @@
 #include <queue>
 #include <condition_variable>
 #include <functional>
+#include <thread>
 
 #pragma once
 
@@ -14,8 +15,8 @@ enum class TaskPriority {
 	Low
 };
 
-// **îçì÷ú Thread Pool îåúàîú ì-C++11**
-class ThreadPool {
+// **ï¿½ï¿½ï¿½ï¿½ï¿½ Thread Pool ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½-C++11**
+class MTThreadPool {
 
 private:
     std::vector<std::thread> m_workers;
@@ -29,19 +30,20 @@ private:
 
     void workerThread();
 
-    ThreadPool(const ThreadPool&) = delete;
-    ThreadPool& operator=(const ThreadPool&) = delete;
+    MTThreadPool(const MTThreadPool&) = delete;
+    MTThreadPool& operator=(const MTThreadPool&) = delete;
 
-    ThreadPool();
-    ~ThreadPool();
+    MTThreadPool();
+    ~MTThreadPool();
 public:
 	void enqueueTask(std::function<void()> task, TaskPriority priority = TaskPriority::Low); // Add a task to the queue with specified priority
     size_t Get_ThreadsNum() { return m_workersNum; }
     void Set_PauseLowPriorityTasks(bool pause) { m_pauseLowTasks = pause; }
     bool IsLowPriorityPaused() { return m_pauseLowTasks; }
+    bool IsCurrentThreadWorker() const; // Check if current thread is a worker thread
     // Static method to get the instance of the Singleton
-    static ThreadPool* getInstance() {
-        static ThreadPool instance; // Guaranteed to be destroyed and instantiated on first use
+    static MTThreadPool* getInstance() {
+        static MTThreadPool instance; // Guaranteed to be destroyed and instantiated on first use
         return &instance;
     }
 };

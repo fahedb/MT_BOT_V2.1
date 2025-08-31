@@ -5,7 +5,7 @@ ScoreResultsCache::ScoreResultsCache()
 {
 	int threadsCount = Converts::ToInt(ResourceManager::getInstance()->Get_Data(THREADS_COUNT)); // Get the number of threads from the resource manager
 	if (threadsCount <= 0) {
-		threadsCount = ThreadPool::getInstance()->Get_ThreadsNum(); // Default to 1 thread if the count is invalid
+		threadsCount = MTThreadPool::getInstance()->Get_ThreadsNum(); // Default to 1 thread if the count is invalid
 	}
 	m_scoreResultsCache.resize(threadsCount); // Resize the cache to hold scores for each thread
 
@@ -82,7 +82,7 @@ void ScoreResultsCache::CleanOldResults() // Do not use This function in a seper
 	//Getting the older TimePoint
 	long long oldestTP = Converts::ToLongLong(Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine()->at(0)->point_DateTime);
 
-	ThreadPool::getInstance()->Set_PauseLowPriorityTasks(true);
+	MTThreadPool::getInstance()->Set_PauseLowPriorityTasks(true);
 	std::vector<std::future<void>> futures;
 	for (int i = 0; i < m_scoreResultsCache.size(); i++) {
 		for (int t = 0; t < m_scoreResultsCache.at(i).size(); t++)
@@ -90,7 +90,7 @@ void ScoreResultsCache::CleanOldResults() // Do not use This function in a seper
 			auto prom = std::make_shared<std::promise<void>>();
 			futures.push_back(prom->get_future());
 			auto* relevantMap = &m_scoreResultsCache.at(i).at(t);
-			ThreadPool::getInstance()->enqueueTask(
+			MTThreadPool::getInstance()->enqueueTask(
 				[this, i, oldestTP, prom, relevantMap]() {
 					ScoreResultsCache::CleanOldResultsForThread(i, oldestTP, relevantMap);
 					prom->set_value();
@@ -103,7 +103,7 @@ void ScoreResultsCache::CleanOldResults() // Do not use This function in a seper
 	for (auto& f : futures)
 		f.get(); // Wait till the end
 	Logger::getInstance().WriteLog("Cleaning Results Cache Finished", false, true, LogType::LOG);
-	ThreadPool::getInstance()->Set_PauseLowPriorityTasks(false);
+	MTThreadPool::getInstance()->Set_PauseLowPriorityTasks(false);
 	m_cleaningInProgress.store(false); // Reset the flag 
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------

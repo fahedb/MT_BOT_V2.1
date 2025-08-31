@@ -48,7 +48,7 @@ public:
 	int InitFileMapForRead() { // Init indexes and maps, and return chunk size
 		InitFileMap();
 		long linesCount = GetFileLinesCount();
-		int threadsNum = ThreadPool::getInstance()->Get_ThreadsNum();
+		int threadsNum = MTThreadPool::getInstance()->Get_ThreadsNum();
 		int chunkSize =  static_cast<long>(linesCount) / threadsNum;
 
 		for (int t = 0; t < threadsNum; t++)

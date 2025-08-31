@@ -34,8 +34,8 @@ protected:
 		m_historyDB_Map = new DBMap();
 		m_currDB_Map = new DBMap();
 		TimeLineBuilder::Build_TimeLineDB(history, m_historyDB_Map);
-		m_cacheHits.resize(ThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize cache hits for each thread
-		m_cacheMisses.resize(ThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize cache misses for each thread
+		m_cacheHits.resize(MTThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize cache hits for each thread
+		m_cacheMisses.resize(MTThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize cache misses for each thread
 	}
 	PatternGod_BaseComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr) : m_historyTL(history), m_currentTL(curr)
 	{
@@ -43,8 +43,8 @@ protected:
 		m_currDB_Map = new DBMap();
 		TimeLineBuilder::Build_TimeLineDB(history, m_historyDB_Map);
 		TimeLineBuilder::Build_TimeLineDB(curr, m_currDB_Map);
-		m_cacheHits.resize(ThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize cache hits for each thread
-		m_cacheMisses.resize(ThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize cache misses for each thread
+		m_cacheHits.resize(MTThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize cache hits for each thread
+		m_cacheMisses.resize(MTThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize cache misses for each thread
 	}
 
 public:

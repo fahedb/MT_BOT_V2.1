@@ -4,7 +4,7 @@
 
 PolynomTimeLineCache* m_cache = nullptr; // Initialize the cache pointer to nullptr
 
-PolynomMap TryFindInCache(PolynomTimeLineKey PolynomKey)
+const PolynomMap& TryFindInCache(PolynomTimeLineKey PolynomKey)
 {
 	PolynomTimeLine* foundRes = nullptr; // Initialize foundRes to nullptr
 
@@ -34,12 +34,12 @@ PolynomMap PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vect
 	key.startTimePoint = nodes.front()->point_DateTimeLong; // Set the start time point from the first node
 	key.endTimePoint = nodes.back()->point_DateTimeLong; // Set the end time point from the last node
 	
-	PolynomMap polynomMap = TryFindInCache(key); // Try to find the polynomial in the cache
-	if(polynomMap.size())
+	const PolynomMap& cachedPolynomMap = TryFindInCache(key); // Try to find the polynomial in the cache
+	if(cachedPolynomMap.size())
 	{
-		return polynomMap; // If found in cache, return the cached polynomial map
+		return cachedPolynomMap; // If found in cache, return the cached polynomial map
 	}
-	
+	PolynomMap cacledPolynomMap;
 	IndicatorTypeList indTypes; // List of indicator types
 	IndicatorLenList indLengths; // List of indicator lengths
 	IndicatorValueTypeList indValueTypes; // List of indicator value types (Value or Slope)
@@ -51,10 +51,10 @@ PolynomMap PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vect
 		{
 			for(const auto& valueType : indValueTypes.valueTypes) // Iterate through each value type (Value or Slore)
 			{
-				polynomMap[PolynomKey(type, len, valueType)] = BuildPolynomForIndicator(nodes, type, len, valueType); // Build polynomial for the given type, length, and value type
+				cacledPolynomMap[PolynomKey(type, len, valueType)] = BuildPolynomForIndicator(nodes, type, len, valueType); // Build polynomial for the given type, length, and value type
 			}
 		}
 	}
 
-	return polynomMap;
+	return cacledPolynomMap;
 }

@@ -116,7 +116,7 @@ int PolynomTimeLineCacheManager::Build_PoylnomTimeLines_MultiThreaded(const std:
     }
     // Split the nodes to chunks for multi-threading
 
-    int threadCount = ThreadPool::getInstance()->Get_ThreadsNum();
+    int threadCount = MTThreadPool::getInstance()->Get_ThreadsNum();
     int chunkSize = nodes.size() / threadCount;
 
     std::vector< std::vector<ChangeNode*>> chunks;
@@ -134,7 +134,7 @@ int PolynomTimeLineCacheManager::Build_PoylnomTimeLines_MultiThreaded(const std:
         futures.push_back(prom->get_future());
         auto& chunk = chunks[t % chunks.size()]; // Use modulo to handle cases where threadCount > chunks.size()
         auto& tempCache = tempCaches[t];
-        ThreadPool::getInstance()->enqueueTask(
+        MTThreadPool::getInstance()->enqueueTask(
             [chunk, &tempCache, prom]() {
                 Build_PolynomTimeLines_InTempMap(chunk, PolynomTimeLineCacheType::HISTORICAL, tempCache);
                 prom->set_value();
@@ -152,7 +152,7 @@ int PolynomTimeLineCacheManager::Build_PoylnomTimeLines_MultiThreaded(const std:
     {
 		totalBuilt += tempCache.size(); // Count the total number of built polynomial timelines
     }
-    return 0;
+    return totalBuilt;
 
 }
 

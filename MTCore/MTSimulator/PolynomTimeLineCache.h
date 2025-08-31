@@ -39,6 +39,7 @@ public:
 
 	void MergeIntoCache(robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>& tempCache, PolynomTimeLineCacheType cachT); // Merge a temporary cache into the main cache
 private:
+
     
     robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>* GetPolynomTimeLineCache(PolynomTimeLineCacheType type);
 

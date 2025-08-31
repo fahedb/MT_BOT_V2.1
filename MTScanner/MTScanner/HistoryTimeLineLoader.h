@@ -33,8 +33,8 @@ public:
 
 		LoadHistoryToVector_MultiThreaded(m_table);
 		m_table->RemoveSelect();
-		//int polysBuilt = PolynomTimeLineCacheManager::Build_PoylnomTimeLines_MultiThreaded(m_hitoryTimeLine,PolynomTimeLineCacheType::HISTORICAL); // Build polynomial timelines from the loaded ChangeNodes and cache them
-		//Logger::getInstance().WriteLog("Built " + std::to_string(polysBuilt) + " polynomial timelines from the history loaded ChangeNodes.", true, true, LogType::SPECIAL_LOG);
+		int polysBuilt = PolynomTimeLineCacheManager::Build_PoylnomTimeLines_MultiThreaded(m_hitoryTimeLine,PolynomTimeLineCacheType::HISTORICAL); // Build polynomial timelines from the loaded ChangeNodes and cache them
+		Logger::getInstance().WriteLog("Built " + std::to_string(polysBuilt) + " polynomial timelines from the history loaded ChangeNodes.", true, true, LogType::SPECIAL_LOG);
 	}
 
 private:

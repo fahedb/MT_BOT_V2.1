@@ -19,5 +19,9 @@ private:
 
 	virtual void Set_ComparerType() { m_comparerType = PatternGodComparerType::PolynomComparer; } // Set the comparer type -- Pure virtual function
 	virtual ScoresResult CompareOneMinNodesPeriods(int startIdx, int threadIdx); // Compare one minute nodes periods in the history time line
+	
+	virtual void ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct
+		, std::mutex* maxResultLock, ScoresResult* maxScore
+		, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread) override;
 };
 

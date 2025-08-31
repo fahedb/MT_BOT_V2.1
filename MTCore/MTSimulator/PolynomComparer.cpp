@@ -1,9 +1,9 @@
 #include "PolynomComparer.h"
 #include <cmath>
 
-double PolynomComparer::EvaluatePolynom(const Polynom& p, double x)
+double PolynomComparer::EvaluatePolynom(Polynom& p, double x)
 {
-    const auto& coeffs = p.GetCoefficients();
+    const std::vector<double>& coeffs = p.GetCoefficients();
     double result = 0.0;
     double xPower = 1.0;
 
@@ -16,7 +16,7 @@ double PolynomComparer::EvaluatePolynom(const Polynom& p, double x)
     return result;
 }
 
-double PolynomComparer::Compare_ByWeightedCoefficients(const Polynom& p1, const Polynom& p2)
+double PolynomComparer::Compare_ByWeightedCoefficients(Polynom& p1,Polynom& p2)
 {
     const auto& c1 = p1.GetCoefficients();
     const auto& c2 = p2.GetCoefficients();
@@ -38,7 +38,7 @@ double PolynomComparer::Compare_ByWeightedCoefficients(const Polynom& p1, const 
 	return numerator / (std::sqrt(denom1) * std::sqrt(denom2)); // Return cosine similarity between the two polynomials
 }
 
-double PolynomComparer::Compare_ByEval(const Polynom& p1, const Polynom& p2, double fromX, double toX, int steps)
+double PolynomComparer::Compare_ByEval(Polynom& p1,Polynom& p2, double fromX, double toX, int steps)
 {
     if (steps <= 0 || fromX >= toX)
         return 0;
@@ -60,7 +60,7 @@ double PolynomComparer::Compare_ByEval(const Polynom& p1, const Polynom& p2, dou
 }
 
 
-double PolynomComparer::Compare_ByRMSE(const Polynom& p1, const Polynom& p2, double fromX, double toX, int steps)
+double PolynomComparer::Compare_ByRMSE( Polynom& p1,Polynom& p2, double fromX, double toX, int steps)
 {
     if (steps <= 0 || fromX >= toX)
         return 0;

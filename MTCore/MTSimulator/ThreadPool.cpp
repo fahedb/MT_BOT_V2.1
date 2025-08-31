@@ -1,7 +1,8 @@
 #include "ThreadPool.h"
+#include <thread>
 
 // Constructor
-ThreadPool::ThreadPool() : m_stop(false), m_pauseLowTasks(false) {
+MTThreadPool::MTThreadPool() : m_stop(false), m_pauseLowTasks(false) {
     m_workersNum = std::thread::hardware_concurrency() - 1; // Get the number of hardware threads
     for (size_t i = 0; i < m_workersNum; ++i) {
         m_workers.emplace_back([this] { workerThread(); });
@@ -9,7 +10,7 @@ ThreadPool::ThreadPool() : m_stop(false), m_pauseLowTasks(false) {
 }
 
 // Close all threads
-ThreadPool::~ThreadPool() {
+MTThreadPool::~MTThreadPool() {
     {
         std::unique_lock<std::mutex> lock(m_queueMutex);
         m_stop = true;
@@ -21,7 +22,7 @@ ThreadPool::~ThreadPool() {
 }
 
 // Add a task to the queue
-void ThreadPool::enqueueTask(std::function<void()> task,TaskPriority priority) {
+void MTThreadPool::enqueueTask(std::function<void()> task,TaskPriority priority) {
     {
         std::unique_lock<std::mutex> lock(m_queueMutex);
 
@@ -36,7 +37,7 @@ void ThreadPool::enqueueTask(std::function<void()> task,TaskPriority priority) {
 }
 
 // Logic for threads - Running till there is no tasks
-void ThreadPool::workerThread() {
+void MTThreadPool::workerThread() {
     while (true) {
         std::function<void()> task;
         {
@@ -73,4 +74,15 @@ void ThreadPool::workerThread() {
             std::cerr << "Task threw unknown exception." << std::endl;
         }
     }
+}
+
+// Check if current thread is a worker thread
+bool MTThreadPool::IsCurrentThreadWorker() const {
+    std::thread::id currentThreadId = std::this_thread::get_id();
+    for (const auto& worker : m_workers) {
+        if (worker.get_id() == currentThreadId) {
+            return true;
+        }
+    }
+    return false;
 }

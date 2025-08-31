@@ -176,7 +176,7 @@ bool BTables::InitFileMap()
 	m_hMapping = hMapping;
 	m_startCharPtr = fileData;
 	m_endCharPtr = fileData + fileSize.QuadPart;
-	int threadsNum = ThreadPool::getInstance()->Get_ThreadsNum();
+	int threadsNum = MTThreadPool::getInstance()->Get_ThreadsNum();
 	for (int i = 0; i < threadsNum; i++)
 	{
 		m_currFileIdxPlaces.push_back(std::make_pair(fileData, fileData));

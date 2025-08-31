@@ -41,7 +41,7 @@ void ConfigrationsPolicy::InitPolicy()
     TimeBetweenScans = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
     Export_Patterns_PNG_To_Telegram = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM)) > 0 ? true : false;
     Enable_Patterns_PNG_Export = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFG_DEF_ENABLE_PATTERNS_PNG_EXPORT)) > 0 ? true : false;
-    ThreadsCount = ThreadPool::getInstance()->Get_ThreadsNum();
+    ThreadsCount = MTThreadPool::getInstance()->Get_ThreadsNum();
 }
 
 // ------------------------------------------------------------------------------------------------------------

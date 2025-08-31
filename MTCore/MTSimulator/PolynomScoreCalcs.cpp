@@ -2,6 +2,11 @@
 #include "PolynomTimeLineCache.h"
 #include "ScoreResultsCachePolynom.h"
 
+const IndicatorTypeList m_glob_indTypes;
+const IndicatorLenList m_glob_indLengths;
+const IndicatorValueTypeList m_glob_indValueTypes;
+const BarPeriodList m_glob_barPeriods;
+
 double CalcSinglePolynomScore(Polynom* hist, Polynom* curr, PolynomComparerPolicy* policy, const int weight = 10) {
 	if (!hist || !curr)
 		return 0.0;
@@ -19,7 +24,7 @@ double CalcSinglePolynomScore(Polynom* hist, Polynom* curr, PolynomComparerPolic
 
 }
 
-ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* hist, std::vector<ChangeNode*>* curr,int threadIdx)
+ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* hist, std::vector<ChangeNode*>* curr,int threadIdx, int& cacheHits, int& cacheMisses)
 {
 	if (hist->empty() || curr->empty())
 		return ScoresResult(); // Return an empty ScoresResult if either vector is empty
@@ -34,6 +39,9 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* hist,
 	ScoreCachingPolicy* scoreCachePolicy = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
 
 	ScoresResult totalScore;
+	int totalCacheHits = 0;
+	int totalCacheMisses = 0;
+
 	for (int i = 0; i < hist->size(); i++)
 	{
 		if (i + polyLen > hist->size() || i + polyLen > curr->size())
@@ -51,11 +59,14 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* hist,
 		if (scoreCachePolicy->EnableScoreCaching)
 			 foundRes = TryFindCachedScore(partialVec1, partialVec2, threadIdx); // Try to find the score in the cache
 
-		if(foundRes) // If the score was found in the cache
+		if (foundRes) // If the score was found in the cache
 		{
+			totalCacheHits++;
 			totalScore += *foundRes; // Add the cached score to the total score
 			continue; // Skip to the next iteration if the score was found in the cache
 		}
+		else
+			totalCacheMisses++;
 
 		PolynomChangeNodePackage package1(partialVec1); // Create a package for the first vector
 		PolynomChangeNodePackage package2(partialVec2); // Create a package for the second vector
@@ -69,6 +80,8 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* hist,
 			TryStoreScoreInCache(partialVec1, partialVec2, localScore, threadIdx); // Try to store the score in the cache
 
 	}
+	cacheHits += totalCacheHits;
+	cacheMisses += totalCacheMisses;
 	return totalScore; // Return the total score calculated from all polynomial comparisons
 }
 
@@ -83,17 +96,13 @@ TimeLinePolynomScore PolynomScoreCalcs::CalcScore(PolynomChangeNodePackage* hist
 	}
 	// Calculate EMA scores for each polynomial
 
-	IndicatorTypeList indTypes;
-
 	PolynomComparerPolicy* policy = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
 
-	for(const auto& indType : indTypes.types)
+	for(const auto& indType : m_glob_indTypes.types)
 	{
-		IndicatorLenList indLengths;
-		for(const auto& indLen : indLengths.lengths)
+		for(const auto& indLen : m_glob_indLengths.lengths)
 		{
-			IndicatorValueTypeList indValueTypes;
-			for(const auto& valType : indValueTypes.valueTypes)
+			for(const auto& valType : m_glob_indValueTypes.valueTypes)
 			{
 				auto polynomKey = PolynomKey(indType, indLen, valType);
 				score.GetScoreContainer(valType)->indicatorScores.at(static_cast<int>(indType)).scores[static_cast<int>(BarPeriod::M1)] += CalcSinglePolynomScore(hist->GetPolynom(polynomKey), curr->GetPolynom(polynomKey), policy);
@@ -116,10 +125,6 @@ ScoresResult* PolynomScoreCalcs::TryFindCachedScore(const std::vector<ChangeNode
 	PolynomTimeLineKey histKey(vec1.at(0)->point_DateTimeLong, vec1.back()->point_DateTimeLong);
 	PolynomTimeLineKey currKey(vec2.at(0)->point_DateTimeLong, vec2.back()->point_DateTimeLong);
 
-	if (histKey.startTimePoint == 20240719153500000 && histKey.endTimePoint == 20240719153900000 && currKey.startTimePoint == 1785 && currKey.endTimePoint == 1789)
-	{
-		int tt = 0;
-	}
 	ScoresResult* foundRes = scoreResultsCache->GetScoreResult(histKey, currKey, threadIdx);
 	return foundRes;
 }

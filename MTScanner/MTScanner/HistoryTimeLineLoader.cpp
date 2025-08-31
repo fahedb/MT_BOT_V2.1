@@ -29,7 +29,7 @@ void HistoryTimeLineLoader::InitHistoryToVectorLoader(BasePricesTable* tb)
 void HistoryTimeLineLoader::ChangeNodeLoader(std::vector<std::vector<ChangeNode*>>* reads2D, BasePricesTable* tb)
 {
 	Logger& logger = Logger::getInstance();
-	int threadCount = static_cast<int>(ThreadPool::getInstance()->Get_ThreadsNum());
+	int threadCount = static_cast<int>(MTThreadPool::getInstance()->Get_ThreadsNum());
 
 	std::vector<std::future<void>> futures;
 
@@ -37,7 +37,7 @@ void HistoryTimeLineLoader::ChangeNodeLoader(std::vector<std::vector<ChangeNode*
 		auto prom = std::make_shared<std::promise<void>>();
 		futures.push_back(prom->get_future());
 		int chunkSize = m_chunkSize;
-		ThreadPool::getInstance()->enqueueTask(
+		MTThreadPool::getInstance()->enqueueTask(
 			[t, chunkSize, tb, reads2D, prom]() {
 				processChunk(t, chunkSize, tb, reads2D);
 				prom->set_value();
@@ -64,7 +64,7 @@ void HistoryTimeLineLoader::processChunk(int threadIndex, int chunkSize, BasePri
 
 void HistoryTimeLineLoader::ChangeNodeThreadsLoadsMerger(std::vector<std::vector<ChangeNode*>>& reads2D, std::vector<ChangeNode*>& hitoryTimeLine)
 {
-	int threadCount = static_cast<int>(ThreadPool::getInstance()->Get_ThreadsNum());
+	int threadCount = static_cast<int>(MTThreadPool::getInstance()->Get_ThreadsNum());
 	// Merge results
 	for (int i = 0; i < threadCount; i++)
 	{
@@ -82,7 +82,7 @@ void HistoryTimeLineLoader::LoadHistoryToVector_MultiThreaded(BasePricesTable* t
 {
 	InitHistoryToVectorLoader(tb); // Initialize the loader with the table
 
-	std::vector< std::vector<ChangeNode*>> reads2D(static_cast<size_t>(ThreadPool::getInstance()->Get_ThreadsNum()));
+	std::vector< std::vector<ChangeNode*>> reads2D(static_cast<size_t>(MTThreadPool::getInstance()->Get_ThreadsNum()));
 
 	ChangeNodeLoader(&reads2D, tb); // Load ChangeNodes into a 2D vector, each thread gets its own vector
 	ChangeNodeThreadsLoadsMerger(reads2D, m_hitoryTimeLine); // Merge the results from all threads into a single vector

@@ -11,7 +11,7 @@ void Logger::WriteLog(std::string log, bool newSection,bool sendToLogServer, Log
 {
     if (sendToLogServer)
     {
-        ThreadPool::getInstance()->enqueueTask([log, logType,this]() {
+        MTThreadPool::getInstance()->enqueueTask([log, logType,this]() {
             this->Http_Send_Log(log, logType);
             }, TaskPriority::Low);
     }

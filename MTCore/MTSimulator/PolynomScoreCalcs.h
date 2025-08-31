@@ -16,7 +16,7 @@
 class PolynomScoreCalcs
 {
 public:
-    static ScoresResult CompareTimeLines(std::vector<ChangeNode*>* vec1, std::vector<ChangeNode*>* vec2,int threadIdx);
+    static ScoresResult CompareTimeLines(std::vector<ChangeNode*>* vec1, std::vector<ChangeNode*>* vec2,int threadIdx, int& cacheHits, int& cacheMisses);
 private:
     static TimeLinePolynomScore CalcScore(PolynomChangeNodePackage* hist, PolynomChangeNodePackage* curr);
     static ScoresResult* TryFindCachedScore(const std::vector<ChangeNode*>& vec1, const std::vector<ChangeNode*>& vec2, int threadIdx);

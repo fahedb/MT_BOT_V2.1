@@ -28,14 +28,14 @@ int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std
 		scoreToAct = 0;
 
 	ScoresResult maxScore;
-	int threadCount = ThreadPool::getInstance()->Get_ThreadsNum(); // Number of threads
+	int threadCount = MTThreadPool::getInstance()->Get_ThreadsNum(); // Number of threads
 	int historySize = static_cast<int>(m_historyTL->size());
 	int chunkSize = historySize / threadCount;
 
 	logger.WriteLog("Score to Act: " + std::to_string(scoreToAct), false, true);
 
 	std::vector<std::vector < std::pair< ChangeNode*, ScoresResult>>> resultNodesPerThread(threadCount);
-	ThreadPool* tPool = ThreadPool::getInstance();
+	MTThreadPool* tPool = MTThreadPool::getInstance();
 	std::string scannerName = Get_ComparerType() == PatternGodComparerType::PolynomComparer ? "Polynom " : "Score ";
 	Logger::getInstance().WriteLog(scannerName + "Scan Started", false, true, LogType::LOG); // Log before stop low priority tasks
 	tPool->Set_PauseLowPriorityTasks(true);

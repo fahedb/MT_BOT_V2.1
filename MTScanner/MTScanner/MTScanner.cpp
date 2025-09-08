@@ -4,8 +4,6 @@
 void DefualtProgramStart();
 void LoadJson_Data_ToDBFile();
 
-void Test();
-
 int main(int argc, char* argv[])
 {
 	IndicatorScore testScore;
@@ -17,26 +15,9 @@ int main(int argc, char* argv[])
 		LoadJson_Data_ToDBFile();
 	}
 	else {
-		Test();
 		DefualtProgramStart();
 	}
 	http_thread.join();
-}
-void Test()
-{
-	TradesManager* tradeMngr = TradesManager::getInstance();
-	OrdersPolicy* m_ordersPolicy = Configrations::getInstance()->Get_Policy<OrdersPolicy>(PolicyType::OrdersPolicy);
-
-	OrderEntity* order = new OrderEntity(OrderType::LONG, "202508291200000", "202508291200000", CoinsPair::XAUUSD);
-	order->Set_TakeProfit(m_ordersPolicy->TP_start);
-	order->Set_StopLoss( m_ordersPolicy->SL_start);
-
-	if (order)
-	{
-		OrderEntityCache::getInstance()->Add_NewOrder(order); // Add the order to the cache
-		tradeMngr->Send_TraddeSignal(order->Get_PairType_str(), int(order->Get_OrderType()), order->Get_OrderSeqNum(),
-		order->Get_StopLoss(), order->Get_TakeProfit()); // Send the trade signal to the exchange
-	}
 }
 void DefualtProgramStart()
 {

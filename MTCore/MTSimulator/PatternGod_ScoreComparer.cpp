@@ -141,5 +141,5 @@ void PatternGod_ScoreComparer::ProccessScanChunk(int startIdx, int endIdx, int t
 		+ "\nmax score: " + std::to_string(maxLocalScore.totalScore.total)
 		+ "\ncache hits : " + std::to_string(m_cacheHits[threadIndex])
 		+ "\ncache misses : " + std::to_string(m_cacheMisses[threadIndex])
-		, false, true, LogType::LOG);
+		, false, false, LogType::LOG);
 }

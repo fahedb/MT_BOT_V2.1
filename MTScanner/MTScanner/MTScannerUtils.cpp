@@ -23,7 +23,7 @@ void MTScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scan
 			cacheSizes += "\n";
 		}
 
-		Logger::getInstance().WriteLog("Cache Status before clean:\n " + cacheSizes, false, true, LogType::LOG);
+		Logger::getInstance().WriteLog("Cache Status before clean:\n " + cacheSizes, false, false, LogType::LOG);
 		scansNum++; // Increase the scans counter if a scan was activated
 	}
 	if (Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->CleanEveryXScans < scansNum)

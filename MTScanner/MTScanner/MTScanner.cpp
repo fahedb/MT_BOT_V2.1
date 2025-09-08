@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 		LoadJson_Data_ToDBFile();
 	}
 	else {
-		Test();
+		//Test();
 		DefualtProgramStart();
 	}
 	http_thread.join();

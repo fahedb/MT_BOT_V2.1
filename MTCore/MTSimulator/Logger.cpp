@@ -9,7 +9,7 @@
 
 void Logger::WriteLog(std::string log, bool newSection,bool sendToLogServer, LogType logType)
 {
-    if (sendToLogServer)
+	if (sendToLogServer && false) // temporarily disabled
     {
         MTThreadPool::getInstance()->enqueueTask([log, logType,this]() {
             this->Http_Send_Log(log, logType);
@@ -22,11 +22,11 @@ void Logger::WriteLog(std::string log, bool newSection,bool sendToLogServer, Log
         logToPrint += "\n";
 
     logToPrint += GetFormattedCurrTime() + log;
-    OutputDebugStringA(logToPrint.c_str());
+    
     std::lock_guard<std::mutex> lock(m_logMutex);
+    OutputDebugStringA(logToPrint.c_str());
     std::cout << logToPrint;
-    *(m_logFile) << logToPrint;
-    m_logFile->flush();
+    
 }
 
 void Logger::Http_Send_Patterns(std::vector<std::string> paths, std::string barP, std::string indL)

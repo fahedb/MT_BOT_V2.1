@@ -1,5 +1,6 @@
 #include "MTScannerUtils.h"
 #include "ScoreCalcs.h"
+#include "PolynomTimeLineCache.h"
 
 void MTScannerUtils::GoToSleep(int seconds)
 {
@@ -30,6 +31,7 @@ void MTScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scan
 	{
 		scoreResultsCache->CleanOldResults();
 		ScoreResultsCachePolynom::getInstance()->CleanOldResults();
+		PolynomTimeLineCache::getInstance()->CleanOldResults();
 		scansNum = 0; // Reset the scans counter after cleaning
 	}
 }

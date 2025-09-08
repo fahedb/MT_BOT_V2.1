@@ -31,6 +31,7 @@ ScoresResult PatternGod_PolynomComparer::CompareOneMinNodesPeriods(int startIdx,
 
 void PatternGod_PolynomComparer::ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct, std::mutex* maxResultLock, ScoresResult* maxScore, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread)
 {
+	Logger::getInstance().WriteLog("Thread [" + std::to_string(threadIndex) + "] started processing indices [" + std::to_string(startIdx) + " - " + std::to_string(endIdx - 1) + "]", false, false, LogType::LOG);
 	m_cacheHits[threadIndex] = 0; // Reset cache hits for this thread
 	m_cacheMisses[threadIndex] = 0; // Reset cache misses for this thread
 	int estimatedItems = 20;

@@ -69,8 +69,16 @@ public:
 		chN->m_lowPrice = chN->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
 		return chN;
 	}
-	static int ExtractMonth(long long tp) {
-		return (tp / 1000000000000LL) % 100;
+	int ExtractMonth(long long tp) {
+		// Better month extraction for timestamp format YYYYMMDDHHMMSSSSS
+		// Extract month from position 5-6 (0-based)
+		int month = ((tp / 100000000000LL) % 100);
+		// Ensure month is in valid range 1-12, then convert to 0-11
+		if (month < 1 || month > 12) {
+			Logger::getInstance().WriteLog("Invalid month extracted: " + std::to_string(month) + " from timestamp: " + std::to_string(tp), false, true, LogType::ERR);
+			return 0; // Default to January if invalid
+		}
+		return month - 1; // Convert to 0-based index
 	}
 };
 

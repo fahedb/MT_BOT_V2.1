@@ -4,13 +4,9 @@
 #include "HashingStructs.h"
 #include <memory>
 #include <future>
+#include "CacheEnums.h"
 
 #pragma once
-enum class PolynomTimeLineCacheType
-{
-    HISTORICAL, // Historical polynomial timelines
-    CURRENT // Current polynomial timelines
-};
 
 // <summary>
 /// This class is a Singleton that manages a cache of polynomial timelines.
@@ -18,12 +14,17 @@ enum class PolynomTimeLineCacheType
 /// </summary>
 /// Author: Fahed Elbatash
 /// Date: 2025-07-22
+/// 
+
+typedef robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>> PolynomTimeLineCacheMap; //
 class PolynomTimeLineCache
 {
 
 public:
 
-    PolynomTimeLineCache() {}
+    PolynomTimeLineCache() {
+		m_hist_polynomTimeLineCache.resize(12); // Initialize historical cache for 12 months
+    }
     PolynomTimeLineCache(const PolynomTimeLineCache&) = delete;
     PolynomTimeLineCache& operator=(const PolynomTimeLineCache&) = delete;
 
@@ -38,13 +39,14 @@ public:
     PolynomTimeLine* GetPolynomTimeLine(const PolynomTimeLineKey& key, PolynomTimeLineCacheType cachT);// Retrieve a PolynomTimeLine by its key
 
 	void MergeIntoCache(robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>& tempCache, PolynomTimeLineCacheType cachT); // Merge a temporary cache into the main cache
+    void CleanOldResults();
 private:
-
+    void ClearMap(PolynomTimeLineCacheMap& map, long long oldestTP);
     
-    robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>* GetPolynomTimeLineCache(PolynomTimeLineCacheType type);
+    robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>* GetPolynomTimeLineCache(PolynomTimeLineCacheType type, int monthIdx);
 
-    robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>> m_hist_polynomTimeLineCache;
-    robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>> m_curr_polynomTimeLineCache;
+    std::vector<PolynomTimeLineCacheMap> m_hist_polynomTimeLineCache;
+    PolynomTimeLineCacheMap m_curr_polynomTimeLineCache;
 	std::mutex m_cacheMutex; // Mutex for thread safety
 };
 

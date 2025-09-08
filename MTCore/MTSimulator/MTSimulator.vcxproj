@@ -151,6 +151,7 @@
     <ClCompile Include="AnalyzerGraphsPackage.cpp" />
     <ClCompile Include="BasePricesTable.cpp" />
     <ClCompile Include="BTables.cpp" />
+    <ClCompile Include="CacheEnums.h" />
     <ClCompile Include="ChangeData.cpp" />
     <ClCompile Include="ChangeDataBuilder.cpp" />
     <ClCompile Include="Configrations.cpp" />

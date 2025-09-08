@@ -1,19 +1,18 @@
 #include "PolynomComparer.h"
 #include <cmath>
 
-double PolynomComparer::EvaluatePolynom(Polynom& p, double x)
+double PolynomComparer::EvaluatePolynom(Polynom& p, double x) // Optimal evaluation using Horner's method for max performance
 {
-    const std::vector<double>& coeffs = p.GetCoefficients();
-    double result = 0.0;
-    double xPower = 1.0;
+    const auto& a = p.GetCoefficients();
+    const double* beg = a.data();
+    const double* end = beg + a.size();
 
-    for (double c : coeffs)
-    {
-        result += c * xPower;
-        xPower *= x;
+    double r = 0.0;
+    while (end != beg) {
+        --end;
+        r = r * x + *end;
     }
-
-    return result;
+    return r;
 }
 
 double PolynomComparer::Compare_ByWeightedCoefficients(Polynom& p1,Polynom& p2)

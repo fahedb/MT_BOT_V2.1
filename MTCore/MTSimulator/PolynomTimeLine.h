@@ -9,10 +9,10 @@ class PolynomTimeLine
 {
 public:
     // Default constructor
-    PolynomTimeLine(const std::vector<ChangeNode*>& nodes)
+    PolynomTimeLine(const std::vector<ChangeNode*>& nodes,PolynomTimeLineCacheType cT)
         : m_segment(nodes.at(0)->point_DateTimeLong, nodes.at(nodes.size() - 1)->point_DateTimeLong),
           m_timeLine(std::make_unique<TimeLine>(nodes)),
-          m_polynomPackage(std::make_unique<PolynomChangeNodePackage>(nodes))
+          m_polynomPackage(std::make_unique<PolynomChangeNodePackage>(nodes,cT))
     {}
 
     // Constructor for PolynomTimeLine with ownership transfer

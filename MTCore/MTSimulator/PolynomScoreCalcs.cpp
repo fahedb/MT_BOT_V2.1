@@ -68,8 +68,8 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* hist,
 		else
 			totalCacheMisses++;
 
-		PolynomChangeNodePackage package1(partialVec1); // Create a package for the first vector
-		PolynomChangeNodePackage package2(partialVec2); // Create a package for the second vector
+		PolynomChangeNodePackage package1(partialVec1,PolynomTimeLineCacheType::HISTORICAL); // Create a package for the first vector
+		PolynomChangeNodePackage package2(partialVec2, PolynomTimeLineCacheType::CURRENT); // Create a package for the second vector
 
 		TimeLinePolynomScore localScore = CalcScore(&package1, &package2); // calculate the score for the current polynomials
 

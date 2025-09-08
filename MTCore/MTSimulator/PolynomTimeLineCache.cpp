@@ -1,16 +1,29 @@
 #include "PolynomTimeLineCache.h"
+#include "Static_CurrentTimeLineRep.h"
 
 //PolynomTimeLineCache
 //PolynomTimeLineCache Functions
+int ExtractMonth(long long tp) {
+    // Better month extraction for timestamp format YYYYMMDDHHMMSSSSS
+    // Extract month from position 5-6 (0-based)
+    int month = ((tp / 100000000000LL) % 100);
+    // Ensure month is in valid range 1-12, then convert to 0-11
+    if (month < 1 || month > 12) {
+        return 0; // Default to January if invalid
+    }
+    return month - 1; // Convert to 0-based index
+}
 
 void PolynomTimeLineCache::InsertPolynomTimeLine(const PolynomTimeLineKey& key, std::unique_ptr<PolynomTimeLine> polynomTl, PolynomTimeLineCacheType cachT) {
-    auto cache = GetPolynomTimeLineCache(cachT);
+	int monthIdx = ExtractMonth(key.startTimePoint);
+    auto cache = GetPolynomTimeLineCache(cachT,monthIdx);
     std::lock_guard<std::mutex> lock(m_cacheMutex); // Ensure thread safety
     cache->try_emplace(key, std::move(polynomTl));
 }
 
 void PolynomTimeLineCache::InsertPolynomTimeLine(std::unique_ptr<PolynomTimeLine> polynomTl, PolynomTimeLineCacheType cachT) {
-    auto cache = GetPolynomTimeLineCache(cachT);
+	int monthIdx = ExtractMonth(polynomTl->Get_Segment().first);
+    auto cache = GetPolynomTimeLineCache(cachT,monthIdx);
 
     PolynomTimeLineKey key;
     key.startTimePoint = polynomTl->Get_Segment().first;
@@ -21,7 +34,8 @@ void PolynomTimeLineCache::InsertPolynomTimeLine(std::unique_ptr<PolynomTimeLine
 }
 
 PolynomTimeLine* PolynomTimeLineCache::GetPolynomTimeLine(const PolynomTimeLineKey& key, PolynomTimeLineCacheType cachT) {
-    auto cache = GetPolynomTimeLineCache(cachT);
+    int monthIdx = ExtractMonth(key.startTimePoint);
+    auto cache = GetPolynomTimeLineCache(cachT,monthIdx);
 
     auto it = cache->find(key);
     if (it != cache->end()) {
@@ -29,9 +43,9 @@ PolynomTimeLine* PolynomTimeLineCache::GetPolynomTimeLine(const PolynomTimeLineK
     }
     return nullptr;
 }
-robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>* PolynomTimeLineCache::GetPolynomTimeLineCache(PolynomTimeLineCacheType type) {
+robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>* PolynomTimeLineCache::GetPolynomTimeLineCache(PolynomTimeLineCacheType type,int monthIdx) {
     if (type == PolynomTimeLineCacheType::HISTORICAL) {
-        return &m_hist_polynomTimeLineCache;
+        return &m_hist_polynomTimeLineCache.at(monthIdx);
     }
     else {
         return &m_curr_polynomTimeLineCache;
@@ -39,10 +53,27 @@ robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>*
 }
 
 void PolynomTimeLineCache::MergeIntoCache(robin_hood::unordered_map<PolynomTimeLineKey, std::unique_ptr<PolynomTimeLine>>&tempCache, PolynomTimeLineCacheType cachT) {
-    auto cache = GetPolynomTimeLineCache(cachT);
     std::lock_guard<std::mutex> lock(m_cacheMutex); // Ensure thread safety
     for (auto& p : tempCache) {
+        int monthIdx = ExtractMonth(p.first.startTimePoint);
+        auto cache = GetPolynomTimeLineCache(cachT, monthIdx);
         cache->try_emplace(p.first, std::move(p.second));
+    }
+}
+
+void PolynomTimeLineCache::CleanOldResults() {
+    // Need to clear only the current
+    ClearMap(m_curr_polynomTimeLineCache, Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine()->at(0)->point_DateTimeLong);
+}
+
+void PolynomTimeLineCache::ClearMap(PolynomTimeLineCacheMap& map, long long oldestTP) {
+    for (auto it = map.begin(); it != map.end(); ) {
+        long long timePoint2Long = it->first.endTimePoint; // Extract the end time point of the timeline
+        if (timePoint2Long < oldestTP) {
+            it = map.erase(it); // Remove the element and get the next iterator
+        }
+        else
+            ++it; // Move to the next element
     }
 }
 
@@ -54,6 +85,7 @@ void PolynomTimeLineCache::MergeIntoCache(robin_hood::unordered_map<PolynomTimeL
 
 bool PolynomTimeLineCacheManager::PreConditionBuild()
 {
+    PolynomChangeNodePackageBuilder::Set_Cache(); // Initialize the polynomial builder cache
     // Check if the cache is enabled and if the polynom length is set
     PolynomComparerPolicy* polynomComparerPolicy = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
     if (!polynomComparerPolicy->EnablePolynomScan || polynomComparerPolicy->PolynomLen_ForScan <= 0) {
@@ -102,7 +134,7 @@ void PolynomTimeLineCacheManager::Build_PolynomTimeLines_InTempMap(const std::ve
             continue; // Skip if already exists
         }
 
-        auto polynomTimeLine = std::make_unique<PolynomTimeLine>(segmentNodes);
+        auto polynomTimeLine = std::make_unique<PolynomTimeLine>(segmentNodes, cachT);
         tempCache.try_emplace(key, std::move(polynomTimeLine));
         buildCount++;
     }
@@ -186,7 +218,7 @@ int PolynomTimeLineCacheManager::Build_PoylnomTimeLines(const std::vector<Change
             continue; // Skip if already exists
         }
 
-        auto polynomTimeLine = std::make_unique<PolynomTimeLine>(segmentNodes);
+        auto polynomTimeLine = std::make_unique<PolynomTimeLine>(segmentNodes, cachT);
         cache->InsertPolynomTimeLine(key, std::move(polynomTimeLine), cachT);
         buildCount++;
     }

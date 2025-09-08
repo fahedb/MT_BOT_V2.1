@@ -711,6 +711,9 @@
     <ClCompile Include="TradeTracer.cpp">
       <Filter>Strategies\PatternGod\TradeTracer\Src</Filter>
     </ClCompile>
+    <ClCompile Include="CacheEnums.h">
+      <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EURUSD_CurrentTable.h">

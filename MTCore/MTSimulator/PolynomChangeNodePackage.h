@@ -9,9 +9,9 @@ class PolynomChangeNodePackage
 {
 public:
 	// Default constructor
-	PolynomChangeNodePackage(const std::vector<ChangeNode*>& nodes)
+	PolynomChangeNodePackage(const std::vector<ChangeNode*>& nodes, PolynomTimeLineCacheType cT)
 	{
-		m_map = PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(nodes);
+		m_map = PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(nodes, cT, m_inCache);
 	}
 	// Copy constructor
 	PolynomChangeNodePackage(const PolynomChangeNodePackage& other)
@@ -34,6 +34,7 @@ public:
 		m_map.clear(); // Clear the map
 	}
 	PolynomMap m_map;
+	int m_inCache = 0; // Indicates if the polynomials were retrieved from cache (1) or newly computed (0)
 	Polynom* GetPolynom(const PolynomKey& key)
 	{
 		auto it = m_map.find(key);

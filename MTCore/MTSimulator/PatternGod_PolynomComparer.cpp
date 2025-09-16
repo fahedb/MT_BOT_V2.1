@@ -6,6 +6,8 @@ void PatternGod_PolynomComparer::InitComaprer()
 	m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
 	Set_ComparerType(); // Initialize the comparer type
 	m_ScoreToAct = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy)->ScoreToAct; // Get the score to act threshold from the policy
+	m_polyCacheHits.resize(MTThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize polynomial cache hits for each thread
+	m_polyCacheMisses.resize(MTThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize polynomial cache misses for each thread
 }
 
 ScoresResult PatternGod_PolynomComparer::CompareOneMinNodesPeriods(int startIdx, int threadIdx)
@@ -23,7 +25,7 @@ ScoresResult PatternGod_PolynomComparer::CompareOneMinNodesPeriods(int startIdx,
 	ScoresResult periodScore;
 	periodScore.Reset(); // Reset the score to ensure it's empty before calculation
 
-	periodScore = PolynomScoreCalcs::CompareTimeLines(&histVec, m_currentTL, threadIdx,m_cacheHits[threadIdx],m_cacheMisses[threadIdx]); // Calculate the score by comparing the historical vector with the current time line
+	periodScore = PolynomScoreCalcs::CompareTimeLines(&histVec, m_currentTL, threadIdx, m_cacheHits[threadIdx], m_cacheMisses[threadIdx], m_polyCacheHits[threadIdx], m_polyCacheMisses[threadIdx]); // Calculate the score by comparing the historical vector with the current time line
 
 	return periodScore;
 }
@@ -34,6 +36,8 @@ void PatternGod_PolynomComparer::ProccessScanChunk(int startIdx, int endIdx, int
 	Logger::getInstance().WriteLog("Thread [" + std::to_string(threadIndex) + "] started processing indices [" + std::to_string(startIdx) + " - " + std::to_string(endIdx - 1) + "]", false, false, LogType::LOG);
 	m_cacheHits[threadIndex] = 0; // Reset cache hits for this thread
 	m_cacheMisses[threadIndex] = 0; // Reset cache misses for this thread
+	m_polyCacheHits[threadIndex] = 0; // Reset poly cache hits for this thread
+	m_polyCacheMisses[threadIndex] = 0; // Reset poly cache misses for this thread
 	int estimatedItems = 20;
 	Logger& logger = Logger::getInstance();
 	resultNodesPerThread->reserve(estimatedItems);
@@ -69,5 +73,7 @@ void PatternGod_PolynomComparer::ProccessScanChunk(int startIdx, int endIdx, int
 		+ "\nmax score: " + std::to_string(maxLocalScore.totalScore.total)
 		+ "\ncache hits : " + std::to_string(m_cacheHits[threadIndex])
 		+ "\ncache misses : " + std::to_string(m_cacheMisses[threadIndex])
+		+ "\npoly cache hits : " + std::to_string(m_polyCacheHits[threadIndex])
+		+ "\npoly cache misses : " + std::to_string(m_polyCacheMisses[threadIndex])
 		, false, false, LogType::LOG);
 }

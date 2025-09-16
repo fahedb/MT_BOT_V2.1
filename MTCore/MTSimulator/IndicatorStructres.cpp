@@ -63,11 +63,15 @@ IndicatorScore IndicatorScore::operator+(const IndicatorScore& other) const {
 	return result;
 }
 IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
-	int idx = 0;
-	for(const auto res : scores) {
-		scores[idx] += other.scores[idx]; // Add scores for each BarPeriod
-		idx++;
-	}
+	
+	assert(scores.size() == other.scores.size());
+	const size_t n = scores.size();
+	double* dst = scores.data();
+	const double* src = other.scores.data();
+
+	for (size_t i = 0; i < n; ++i)
+		dst[i] += src[i];
+
 	calcTotal(); // Recalculate the total
 	return *this;
 }

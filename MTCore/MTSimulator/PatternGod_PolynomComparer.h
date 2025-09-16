@@ -15,6 +15,8 @@ public:
 		InitComaprer(); // Reinitialize the comparer
 	}
 private:
+	std::vector<int> m_polyCacheHits; // Counter for polynomial cache hits per thread
+	std::vector<int> m_polyCacheMisses; // Counter for polynomial cache misses per thread
 	void InitComaprer();
 
 	virtual void Set_ComparerType() { m_comparerType = PatternGodComparerType::PolynomComparer; } // Set the comparer type -- Pure virtual function

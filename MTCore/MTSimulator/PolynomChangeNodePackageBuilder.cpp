@@ -19,28 +19,30 @@ PolynomMap* TryFindInCache(PolynomTimeLineKey PolynomKey, PolynomTimeLineCacheTy
 
 	if (foundRes != nullptr) // If a polynomial timeline is found in the cache
 	{
-		return &foundRes->Get_PolynomPackage()->m_map; // Return the polynomial map from the found timeline
+		return foundRes->Get_PolynomPackage()->GetPolynomMap_ptr(); // Return the polynomial map from the found timeline
 	}
 	return nullptr; // Return an empty polynomial map if not found in cache
 }
-
-
-PolynomMap PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vector<ChangeNode*> nodes, PolynomTimeLineCacheType cT,int& inCache)
+PolynomMap& PolynomChangeNodePackageBuilder::TryFindPolynomInCache(std::vector<ChangeNode*> nodes, PolynomTimeLineCacheType cT, int& inCache)
 {
 	PolynomTimeLineKey key;
 
 	key.startTimePoint = nodes.front()->point_DateTimeLong; // Set the start time point from the first node
 	key.endTimePoint = nodes.back()->point_DateTimeLong; // Set the end time point from the last node
-	
-	PolynomMap* cachedPolynomMap = TryFindInCache(key,cT); // Try to find the polynomial in the cache
-	if(cachedPolynomMap)
+
+	PolynomMap* cachedPolynomMap = TryFindInCache(key, cT); // Try to find the polynomial in the cache
+	if (cachedPolynomMap)
 	{
 		inCache = 1;
 		return *cachedPolynomMap; // If found in cache, return the cached polynomial map
 	}
-	
 	inCache = 0;
-	
+	PolynomMap map;
+	return map; // If not found in cache, return an empty polynomial map
+}
+
+PolynomMap PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vector<ChangeNode*> nodes, PolynomTimeLineCacheType cT)
+{
 	PolynomMap cacledPolynomMap;
 
 	// Build polynomials for different indicators and lengths

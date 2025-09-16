@@ -9,7 +9,7 @@
 
 void Logger::WriteLog(std::string log, bool newSection,bool sendToLogServer, LogType logType)
 {
-	if (sendToLogServer) // temporarily disabled
+	if (sendToLogServer && false) // temporarily disabled
     {
         MTThreadPool::getInstance()->enqueueTask([log, logType,this]() {
             this->Http_Send_Log(log, logType);

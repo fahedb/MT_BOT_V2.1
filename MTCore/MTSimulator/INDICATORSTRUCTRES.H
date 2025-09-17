@@ -13,10 +13,14 @@ struct IndicatorScore {
 	// Calculate the total score
 	void calcTotal();
 	void Reset() { // Clear the scores and total
-		for(auto& res : scores) {
-			res = 0.0; // Reset each BarPeriod score to 0
+		for(int i =0; i < BAR_PERIODS_COUNT; i++) {
+			m_scores[i] = 0.0; // Reset each score to 0.0
 		}
-		total = 0;
+	}
+	int getSize() const { return m_size; }
+	double Get_Score(BarPeriod barP) const { 
+		if (barP == BarPeriod::NONE) return 0.0; // Handle NONE period case
+		return m_scores[static_cast<int>(barP)]; 
 	}
 	// Overload the + operator for IndicatorScore
 	IndicatorScore operator+(const IndicatorScore& other) const;
@@ -27,7 +31,8 @@ struct IndicatorScore {
 	// / operator to divide IndicatorScore by a other IndicatorScore
 	IndicatorScore operator/(const IndicatorScore& other) const;
 
-	std::vector<double> scores; // Scores for each length
+	double m_scores[BAR_PERIODS_COUNT] = { 0 }; // Scores for each length
+	int m_size = BAR_PERIODS_COUNT;
 	int total=0;
 };
 IndicatorScore operator*(const IndicatorScore& score, double factor); // External Multiply operator

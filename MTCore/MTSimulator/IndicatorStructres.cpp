@@ -35,7 +35,6 @@ BaseIndicator::BaseIndicator(IndicatorValues curr) {
 
 // Just a constructor :)
 IndicatorScore::IndicatorScore() {
-	scores.assign(m_glob_barPeriods.periods.size(), 0.0);
 	total = 0;
 }
 
@@ -44,8 +43,9 @@ IndicatorScore::IndicatorScore() {
 
 void IndicatorScore::calcTotal() { // Calculate the total score
 	total = 0; // Reset total before calculation
-	for (const auto res : scores) {
-		total += res; // Sum up all the scores
+	const int mySize = m_size;
+	for (int i = 0; i < m_size; i++) {
+		total += m_scores[i]; // Sum up all the scores
 	}
 }
 
@@ -54,23 +54,19 @@ void IndicatorScore::calcTotal() { // Calculate the total score
 
 IndicatorScore IndicatorScore::operator+(const IndicatorScore& other) const { 
 	IndicatorScore result;
-	int idx = 0;
-	for(const auto res : scores) {
-		result.scores.at(idx) = res + other.scores.at(idx); // Sum scores for each BarPeriod
-		idx++;
+	const int mySize = m_size;
+	for (int i = 0; i < mySize; i++) {
+		result.m_scores[i] = m_scores[i] + other.m_scores[i]; // Sum scores for each BarPeriod
 	}
 	result.calcTotal(); // Recalculate the total
 	return result;
 }
 IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
 	
-	assert(scores.size() == other.scores.size());
-	const size_t n = scores.size();
-	double* dst = scores.data();
-	const double* src = other.scores.data();
-
-	for (size_t i = 0; i < n; ++i)
-		dst[i] += src[i];
+	const size_t mySize = m_size;
+	
+	for (size_t i = 0; i < mySize; ++i)
+		m_scores[i] += other.m_scores[i];
 
 	calcTotal(); // Recalculate the total
 	return *this;
@@ -78,11 +74,12 @@ IndicatorScore& IndicatorScore::operator+=(const IndicatorScore& other) {
 IndicatorScore IndicatorScore::operator-(const IndicatorScore& other) const
 {
 	IndicatorScore result;
-	int idx = 0;
-	for (const auto score : scores) {
-		double res = score - other.scores.at(idx);
-		result.scores.at(idx) = res >= 0 ? res : 0; // Sum scores for each BarPeriod
-		idx++;
+
+	const int myScore = getSize();
+
+	for (int i = 0; i < myScore; i++) {
+		double res = m_scores[i] - other.m_scores[i];
+		result.m_scores[i] = res >= 0 ? res : 0; // Sum scores for each BarPeriod
 	}
 	result.calcTotal(); // Recalculate the total
 	return result;
@@ -90,16 +87,17 @@ IndicatorScore IndicatorScore::operator-(const IndicatorScore& other) const
 IndicatorScore IndicatorScore::operator/(const IndicatorScore& other) const
 {
 	IndicatorScore result;
-	int idx = 0;
-	for (const auto score : scores) {
+	
+	const int mySize = getSize();
 
-		if (other.scores[idx] != 0) { // Avoid division by zero
-			result.scores[idx] = score / other.scores[idx];
+	for (int i = 0; i < mySize; i++) {
+
+		if (other.m_scores[i] != 0) { // Avoid division by zero
+			result.m_scores[i] = m_scores[i] / other.m_scores[i];
 		}
 		else {
-			result.scores[idx] = 0.0; // Default to 0 if division by zero
+			result.m_scores[i] = 0.0; // Default to 0 if division by zero
 		}
-		idx++;
 	}
 	result.calcTotal(); // Update the total score after division
 	return result;
@@ -111,10 +109,11 @@ IndicatorScore IndicatorScore::operator/(const IndicatorScore& other) const
 IndicatorScore operator*(const IndicatorScore& score, double factor) // External function to multiply IndicatorScore by a factor
 {
 	IndicatorScore result;
-	
-	for (int idx = 0; idx < score.scores.size(); idx++)
+	const int mySize = score.getSize();
+
+	for (int idx = 0; idx < mySize; idx++)
 	{
-		result.scores[idx] = score.scores[idx] * factor; // Scale each score (double) by the factor
+		result.m_scores[idx] = score.m_scores[idx] * factor; // Scale each score (double) by the factor
 	}
 	result.calcTotal(); // Recalculate the total score after scaling
 
@@ -231,12 +230,12 @@ IndicatorScore ScoresResult::combineScores() const { // function to combine scor
 
 	IndicatorScore combined;
 	combined.Reset(); // Reset combined scores
+	const int barPeriodsSize = combined.getSize();
+	const int indTypesSize = m_glob_indTypes.types.size();
 
-
-	for(const auto period : m_glob_barPeriods.periods) { // Iterate through all BarPeriods
-		if (period == BarPeriod::NONE) continue; // Skip NONE period
-		for(auto& type : m_glob_indTypes.types) { // Iterate through all IndicatorTypes
-			combined.scores[int(period)] += indicatorScores[int(type)].scores[int(period)]; // Sum scores for each BarPeriod and IndicatorType
+	for (int p = 0; p < barPeriodsSize; p++) { // Iterate through all BarPeriods
+		for (int t = 0; t < indTypesSize; t++) { // Iterate through all IndicatorTypes
+			combined.m_scores[p] += indicatorScores[t].m_scores[p]; // Sum scores for each BarPeriod and IndicatorType
 		}
 	}
 	return combined;

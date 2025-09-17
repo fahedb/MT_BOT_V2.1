@@ -16,7 +16,7 @@ ScoresResult MinMaxFinderScoresResult::Find_Min() const {
 		minIndScore.Reset(); // Reset the indicator score to ensure it's empty before calculation
         for (const auto& barP : barPeriods.periods)
         {
-			minIndScore.scores.at(static_cast<int>(barP)) = Find_MinScore(indType, barP);
+            minIndScore.m_scores[static_cast<int>(barP)] = Find_MinScore(indType, barP);
         }
 		res.indicatorScores[static_cast<int>(indType)] = minIndScore; // Set the minimum scores for the indicator type
     }
@@ -42,7 +42,7 @@ ScoresResult MinMaxFinderScoresResult::Find_Max() const
 		maxIndScore.Reset(); // Reset the indicator score to ensure it's empty before calculation
         for (const auto& barP : barPeriods.periods)
         {
-			maxIndScore.scores.at(static_cast<int>(barP)) = Find_MaxScore(indType, barP);
+			maxIndScore.m_scores[static_cast<int>(barP)] = Find_MaxScore(indType, barP);
 		}
 		res.indicatorScores[static_cast<int>(indType)] = maxIndScore; // Set the maximum scores for the indicator type
 	}
@@ -56,9 +56,9 @@ double MinMaxFinderScoresResult::Find_MaxScore(IndicatorType indType, BarPeriod 
     double max = std::numeric_limits<double>::lowest();
     for (const auto& score : m_data)
     {
-        if (score.indicatorScores.at(static_cast<int>(indType)).scores.at(static_cast<int>(barP)) > max)
+        if (score.indicatorScores.at(static_cast<int>(indType)).m_scores[static_cast<int>(barP)] > max)
         {
-            max = score.indicatorScores.at(static_cast<int>(indType)).scores.at(static_cast<int>(barP));
+            max = score.indicatorScores.at(static_cast<int>(indType)).m_scores[static_cast<int>(barP)];
         }
     }
 	return max;
@@ -70,9 +70,9 @@ double MinMaxFinderScoresResult::Find_MinScore(IndicatorType indType, BarPeriod 
     double min = std::numeric_limits<double>::max();
     for (const auto& score : m_data)
     {
-        if (score.indicatorScores.at(static_cast<int>(indType)).scores.at(static_cast<int>(barP)) < min)
+        if (score.indicatorScores.at(static_cast<int>(indType)).m_scores[static_cast<int>(barP)] < min)
         {
-            min = score.indicatorScores.at(static_cast<int>(indType)).scores.at(static_cast<int>(barP));
+            min = score.indicatorScores.at(static_cast<int>(indType)).m_scores[static_cast<int>(barP)];
         }
     }
 	return min;

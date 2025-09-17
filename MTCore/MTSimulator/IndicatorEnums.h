@@ -24,6 +24,7 @@ enum struct IndicatorType
 
 // <IndicatorTypeList>
 // This struct contains a list of available indicator types.
+#define INDICATOR_TYPES_COUNT 3 // Number of defined indicator types excluding NONE -- Need to be updated if new types are added
 struct IndicatorTypeList
 {
 	std::vector<IndicatorType> types = { IndicatorType::EMA, IndicatorType::RSI, IndicatorType::ZLSMA };
@@ -62,6 +63,7 @@ enum class BarPeriod {
 };
 // <BarPeriodList>
 // This struct contains a list of available bar periods.
+#define BAR_PERIODS_COUNT 6 // Number of defined bar periods excluding NONE -- Need to be updated if new periods are added
 struct BarPeriodList
 {
 	std::vector<BarPeriod> periods = { BarPeriod::M1, BarPeriod::M5, BarPeriod::M15, BarPeriod::M30, BarPeriod::H1, BarPeriod::H4 };

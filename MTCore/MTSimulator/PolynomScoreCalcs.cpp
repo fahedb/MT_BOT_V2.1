@@ -130,7 +130,7 @@ TimeLinePolynomScore PolynomScoreCalcs::CalcScore(PolynomChangeNodePackage* hist
 			for(const auto& valType : m_glob_indValueTypes.valueTypes)
 			{
 				auto polynomKey = PolynomKey(indType, indLen, valType);
-				score.GetScoreContainer(valType)->indicatorScores.at(static_cast<int>(indType)).scores[static_cast<int>(BarPeriod::M1)] += CalcSinglePolynomScore(hist->GetPolynom(polynomKey), curr->GetPolynom(polynomKey), policy);
+				score.GetScoreContainer(valType)->indicatorScores.at(static_cast<int>(indType)).m_scores[static_cast<int>(BarPeriod::M1)] += CalcSinglePolynomScore(hist->GetPolynom(polynomKey), curr->GetPolynom(polynomKey), policy);
 			}
 		}
 	}

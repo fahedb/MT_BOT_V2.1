@@ -35,7 +35,7 @@ IndicatorScore RsiScoreCalcs::CalcScore(ChangeNode* ChNHistory, ChangeNode* ChNc
 
 		localScore = RelativeScoreCalcs::CalcScore(hist.Get_Value(IndicatorValueType::Slope, period), curr.Get_Value(IndicatorValueType::Slope, period), weight); // Calculate the score for each BarPeriod
 		localScore += RelativeScoreCalcs::CalcScore(hist.Get_Value(IndicatorValueType::Value, period), curr.Get_Value(IndicatorValueType::Value, period), weight); // Add the value score for each BarPeriod
-		score.scores.at(static_cast<int>(period)) = localScore; // Store the score for the BarPeriod
+		score.m_scores[static_cast<int>(period)] = localScore; // Store the score for the BarPeriod
 	}
 
 	score.calcTotal();
@@ -54,7 +54,7 @@ IndicatorScore General_MA_ScoreCalcs::CalcScore(ChangeNode* ChNHistory, ChangeNo
 
 	for (auto& period : m_glob_barPeriods.periods) { // Iterate through all BarPeriods for slopes
 		if (period == BarPeriod::NONE) continue; // Skip NONE period
-		score.scores.at(static_cast<int>(period)) = RelativeScoreCalcs::CalcScore(hist.Get_Value(IndicatorValueType::Slope, period), curr.Get_Value(IndicatorValueType::Slope, period), weight); // Calculate the score for each BarPeriod
+		score.m_scores[static_cast<int>(period)] = RelativeScoreCalcs::CalcScore(hist.Get_Value(IndicatorValueType::Slope, period), curr.Get_Value(IndicatorValueType::Slope, period), weight); // Calculate the score for each BarPeriod
 	}
 
 	double histRange = histHigh - histLow;
@@ -67,7 +67,7 @@ IndicatorScore General_MA_ScoreCalcs::CalcScore(ChangeNode* ChNHistory, ChangeNo
 		if (period == BarPeriod::NONE) continue; // Skip NONE period
 		normHist = (hist.Get_Value(IndicatorValueType::Value, period) - histLow) / histRange;
 		normCurr = (curr.Get_Value(IndicatorValueType::Value, period) - currLow) / currRange;
-		score.scores.at(static_cast<int>(period)) += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
+		score.m_scores[static_cast<int>(period)] += RelativeScoreCalcs::CalcScore(normHist, normCurr, weight);
 	}
 
 	score.calcTotal();
@@ -103,7 +103,7 @@ ScoresResult ProxyScoreCalcs::CalcAverageScore(ScoresResult score, int timeLineL
 		for (const auto& period : m_glob_barPeriods.periods) {
 			if (period == BarPeriod::NONE) continue; // Skip NONE period
 			//				auto& scoreContainer = average.indicatorScores[type].scores[period];
-			average.indicatorScores[static_cast<int>(type)].scores[static_cast<int>(period)] = score.indicatorScores[static_cast<int>(type)].scores[static_cast<int>(period)] / timeLineLen; // Calculate the average score for each BarPeriod
+			average.indicatorScores[static_cast<int>(type)].m_scores[static_cast<int>(period)] = score.indicatorScores[static_cast<int>(type)].m_scores[static_cast<int>(period)] / timeLineLen; // Calculate the average score for each BarPeriod
 		}
 
 	}
@@ -152,7 +152,7 @@ IndicatorScore VolumeScoreCalcs::CalcScore(ChangeNode* ChNHistory, ChangeNode* C
 
 		localScore = RelativeScoreCalcs::CalcScore(histindV.Get_Value(IndicatorValueType::Slope, period), currindV.Get_Value(IndicatorValueType::Slope, period), weight); // Calculate the score for each BarPeriod
 		localScore += RelativeScoreCalcs::CalcScore(histindV.Get_Value(IndicatorValueType::Value, period), currindV.Get_Value(IndicatorValueType::Value, period), weight); // Add the value score for each BarPeriod
-		score.scores.at(int(period)) = localScore; // Store the score for the BarPeriod
+		score.m_scores[int(period)] = localScore; // Store the score for the BarPeriod
 	}
 
 	return score;

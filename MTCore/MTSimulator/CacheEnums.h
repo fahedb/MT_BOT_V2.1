@@ -1,5 +1,5 @@
 #pragma once
-enum class PolynomTimeLineCacheType
+enum class CacheType
 {
     HISTORICAL, // Historical polynomial timelines
     CURRENT // Current polynomial timelines

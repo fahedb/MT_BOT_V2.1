@@ -31,7 +31,7 @@ void HttpServerSyncer::UpdateCurrentTimeLine(BasePricesTable* table)
 
 	if (newBar) // If we have a new bar, we need to update the current timeline polynom cache
 	{
-		int polysBuilt = PolynomTimeLineCacheManager::Build_PoylnomTimeLines(*currTimeLineRep->Get_CurrTimeLine()->Get_TimeLine(), PolynomTimeLineCacheType::CURRENT);
+		int polysBuilt = PolynomTimeLineCacheManager::Build_PoylnomTimeLines(*currTimeLineRep->Get_CurrTimeLine()->Get_TimeLine(), CacheType::CURRENT);
 		logger.WriteLog("Built " + std::to_string(polysBuilt) + " polynomial timelines from the current timeline.", true, true, LogType::LOG);
 	}
 	logger.WriteLog("No new Bars to recieve");

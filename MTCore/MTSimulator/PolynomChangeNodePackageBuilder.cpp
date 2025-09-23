@@ -8,14 +8,11 @@ IndicatorLenList m_glob_indLengths; // List of indicator lengths
 IndicatorValueTypeList m_glob_indValueTypes; // List of indicator value types (Value or Slope)
 PolynomTimeLineCache* m_cache = nullptr; // Initialize the cache pointer to nullptr
 
-PolynomMap* TryFindInCache(PolynomTimeLineKey PolynomKey, PolynomTimeLineCacheType cT)
+PolynomMap* TryFindInCache(PolynomTimeLineKey PolynomKey, CacheType cT)
 {
 	PolynomTimeLine* foundRes = nullptr; // Initialize foundRes to nullptr
 
-	if (cT == PolynomTimeLineCacheType::CURRENT)
-		foundRes = m_cache->GetPolynomTimeLine(PolynomKey, PolynomTimeLineCacheType::CURRENT); // Retrieve the current polynomial timeline cache
-	else
-		foundRes = m_cache->GetPolynomTimeLine(PolynomKey, PolynomTimeLineCacheType::HISTORICAL); // Retrieve the historical polynomial timeline cache
+	foundRes = m_cache->GetPolynomTimeLine(PolynomKey, cT); // Retrieve the historical polynomial timeline cache
 
 	if (foundRes != nullptr) // If a polynomial timeline is found in the cache
 	{
@@ -23,7 +20,7 @@ PolynomMap* TryFindInCache(PolynomTimeLineKey PolynomKey, PolynomTimeLineCacheTy
 	}
 	return nullptr; // Return an empty polynomial map if not found in cache
 }
-PolynomMap& PolynomChangeNodePackageBuilder::TryFindPolynomInCache(std::vector<ChangeNode*> nodes, PolynomTimeLineCacheType cT, int& inCache)
+PolynomMap& PolynomChangeNodePackageBuilder::TryFindPolynomInCache(std::vector<ChangeNode*> nodes, CacheType cT, int& inCache)
 {
 	PolynomTimeLineKey key;
 
@@ -41,7 +38,7 @@ PolynomMap& PolynomChangeNodePackageBuilder::TryFindPolynomInCache(std::vector<C
 	return map; // If not found in cache, return an empty polynomial map
 }
 
-PolynomMap PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vector<ChangeNode*> nodes, PolynomTimeLineCacheType cT)
+PolynomMap PolynomChangeNodePackageBuilder::BuildPolynomForChangeNodes(std::vector<ChangeNode*> nodes, CacheType cT)
 {
 	PolynomMap cacledPolynomMap;
 

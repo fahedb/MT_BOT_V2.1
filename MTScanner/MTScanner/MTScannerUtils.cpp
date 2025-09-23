@@ -30,8 +30,8 @@ void MTScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scan
 	if (Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->CleanEveryXScans < scansNum)
 	{
 		scoreResultsCache->CleanOldResults();
-		ScoreResultsCachePolynom::getInstance()->CleanOldResults();
-		PolynomTimeLineCache::getInstance()->CleanOldResults();
+		ScoreResultsCachePolynom::getInstance()->ClearOldResults(false);
+		PolynomTimeLineCache::getInstance()->ClearOldResults(false);
 		scansNum = 0; // Reset the scans counter after cleaning
 	}
 }

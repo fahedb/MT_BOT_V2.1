@@ -45,8 +45,9 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* hist,
 	int totalPolyCacheHits = 0;
 	int totalPolyCacheMisses = 0;
 
-	PolynomTimeLineCacheMap currPolyCache;
-	PolynomTimeLineCacheMap histPolyCache;
+	// Temporary caches for polynomial timelines
+	robin_hood::unordered_map<PolynomTimeLineKey, PolynomTimeLine> histPolyCache;
+	robin_hood::unordered_map<PolynomTimeLineKey, PolynomTimeLine> currPolyCache;
 
 	for (int i = 0; i < hist->size(); i++)
 	{
@@ -77,26 +78,27 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* hist,
 			curr->begin() + (static_cast<size_t>(i) + static_cast<size_t>(polyLen)));
 
 		
-		auto polyTomeLine1 = std::make_unique<PolynomTimeLine>(partialVec1, PolynomTimeLineCacheType::HISTORICAL); // Ensure the polynomials are built and cached
-		auto polyTomeLine2 = std::make_unique<PolynomTimeLine>(partialVec2, PolynomTimeLineCacheType::CURRENT); // Ensure the polynomials are built and cached
+		PolynomTimeLine polyTomeLine1(partialVec1, CacheType::HISTORICAL); // Ensure the polynomials are built and cached
+		PolynomTimeLine polyTomeLine2(partialVec2, CacheType::CURRENT); // Ensure the polynomials are built and cached
 
-		if(polyTomeLine2->Get_PolynomPackage()->m_inCache)
+		if(polyTomeLine2.Get_PolynomPackage()->m_inCache)
 			totalPolyCacheHits++;
 		else
 			totalPolyCacheMisses++;
 
-		TimeLinePolynomScore localScore = CalcScore(polyTomeLine1->Get_PolynomPackage(), polyTomeLine2->Get_PolynomPackage()); // calculate the score for the current polynomials
+		TimeLinePolynomScore localScore = CalcScore(polyTomeLine1.Get_PolynomPackage(), polyTomeLine2.Get_PolynomPackage()); // calculate the score for the current polynomials
 
 		totalScore += *localScore.GetScoreContainer(IndicatorValueType::Value);
 		totalScore += *localScore.GetScoreContainer(IndicatorValueType::Slope);
 
 		if (!foundRes)
 			TryStoreScoreInCache(partialVec1, partialVec2, localScore, threadIdx); // Try to store the score in the cache
+		
 		// Cache the polynomials if they were not from cache
-		if(!polyTomeLine1->Get_PolynomPackage()->m_inCache)
-			histPolyCache[PolynomTimeLineKey(partialVec1.front()->point_DateTimeLong, partialVec1.back()->point_DateTimeLong)] = std::move(polyTomeLine1);
-		if(!polyTomeLine2->Get_PolynomPackage()->m_inCache)
-			currPolyCache[PolynomTimeLineKey(partialVec2.front()->point_DateTimeLong, partialVec2.back()->point_DateTimeLong)] = std::move(polyTomeLine2);
+		if(!polyTomeLine1.Get_PolynomPackage()->m_inCache)
+			histPolyCache.try_emplace(PolynomTimeLineKey(partialVec1.front()->point_DateTimeLong, partialVec1.back()->point_DateTimeLong),std::move(polyTomeLine1));
+		if (!polyTomeLine2.Get_PolynomPackage()->m_inCache)
+			currPolyCache.try_emplace(PolynomTimeLineKey(partialVec2.front()->point_DateTimeLong, partialVec2.back()->point_DateTimeLong), std::move(polyTomeLine2));
 	}
 	resCacheHits += totalCacheHits;
 	resCacheMisses += totalCacheMisses;
@@ -104,8 +106,8 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* hist,
 	polyCacheMisses += totalPolyCacheMisses;
 
 	// Merge the newly built polynomial timelines into the singleton cache
-	PolynomTimeLineCache::getInstance()->MergeIntoCache(histPolyCache, PolynomTimeLineCacheType::HISTORICAL);
-	PolynomTimeLineCache::getInstance()->MergeIntoCache(currPolyCache, PolynomTimeLineCacheType::CURRENT);
+	PolynomTimeLineCache::getInstance()->MergeIntoCache(histPolyCache, CacheType::HISTORICAL);
+	PolynomTimeLineCache::getInstance()->MergeIntoCache(currPolyCache, CacheType::CURRENT);
 
 	return totalScore; // Return the total score calculated from all polynomial comparisons
 }

@@ -11,8 +11,8 @@ typedef robin_hood::unordered_map<PolynomKey, Polynom> PolynomMap;
 class PolynomChangeNodePackageBuilder
 {
 public:
-	static PolynomMap& TryFindPolynomInCache(std::vector<ChangeNode*> nodes, PolynomTimeLineCacheType cT, int& inCache);
-	static PolynomMap BuildPolynomForChangeNodes(std::vector<ChangeNode*> nodes,PolynomTimeLineCacheType cT);
+	static PolynomMap& TryFindPolynomInCache(std::vector<ChangeNode*> nodes, CacheType cT, int& inCache);
+	static PolynomMap BuildPolynomForChangeNodes(std::vector<ChangeNode*> nodes, CacheType cT);
 	static void Set_Cache();
 private:
 		static Polynom BuildPolynomForIndicator(std::vector<ChangeNode*> nodes,IndicatorType indT,IndicatorLen indL,IndicatorValueType indVT,BarPeriod indP = BarPeriod::M1)

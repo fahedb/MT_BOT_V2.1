@@ -9,7 +9,7 @@ class PolynomChangeNodePackage
 {
 public:
 	// Default constructor
-	explicit PolynomChangeNodePackage(const std::vector<ChangeNode*>& nodes, PolynomTimeLineCacheType cT)
+	explicit PolynomChangeNodePackage(const std::vector<ChangeNode*>& nodes, CacheType cT)
 	{
 		m_inCache = 0;
 		PolynomMap* cached = nullptr;

@@ -151,6 +151,7 @@
     <ClCompile Include="AnalyzerGraphsPackage.cpp" />
     <ClCompile Include="BasePricesTable.cpp" />
     <ClCompile Include="BTables.cpp" />
+    <ClCompile Include="BTimeLineCache.cpp" />
     <ClCompile Include="CacheEnums.h" />
     <ClCompile Include="ChangeData.cpp" />
     <ClCompile Include="ChangeDataBuilder.cpp" />
@@ -225,6 +226,7 @@
     <ClInclude Include="AnalyzerGraphsPackage.h" />
     <ClInclude Include="BasePricesTable.h" />
     <ClInclude Include="BTables.h" />
+    <ClInclude Include="BTimeLineCache.h" />
     <ClInclude Include="CandleData.h" />
     <ClInclude Include="ChangeData.h" />
     <ClInclude Include="ChangeDataBuilder.h" />

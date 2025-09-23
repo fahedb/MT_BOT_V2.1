@@ -496,6 +496,9 @@
     <Filter Include="Strategies\PatternGod\TradeTracer\Src">
       <UniqueIdentifier>{25b9e003-2c94-40c7-bb68-047fb8e16424}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cache\Base">
+      <UniqueIdentifier>{b9efb480-672f-4e47-ac85-a181bdb1cd09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartPoint.cpp">
@@ -713,6 +716,9 @@
     </ClCompile>
     <ClCompile Include="CacheEnums.h">
       <Filter>DataStructers\ChangeStructure\Inc</Filter>
+    </ClCompile>
+    <ClCompile Include="BTimeLineCache.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -940,6 +946,9 @@
     </ClInclude>
     <ClInclude Include="TradeTracer.h">
       <Filter>Strategies\PatternGod\TradeTracer\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="BTimeLineCache.h">
+      <Filter>DefinedTables</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

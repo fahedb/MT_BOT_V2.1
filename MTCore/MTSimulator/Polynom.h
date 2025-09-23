@@ -15,7 +15,7 @@ class Polynom
 private:
 	std::vector<double> m_polynom; // The index of the vector is the Power, and the value is the coefficient
 public:
-	int GetSize() const { return m_polynom.size(); } // Get the size of the polynomial
+	int GetSize() const { return static_cast<int>(m_polynom.size()); } // Get the size of the polynomial
 	void SetPolynom(const std::vector<double>& polynom)
 	{
 		m_polynom = polynom;

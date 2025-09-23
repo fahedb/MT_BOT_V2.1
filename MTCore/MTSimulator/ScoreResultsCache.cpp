@@ -1,5 +1,6 @@
 #include "ScoreResultsCache.h"
 #include "ThreadPool.h"
+#include "PolynomTimeLineCache.h"
 
 ScoreResultsCache::ScoreResultsCache()
 {
@@ -38,8 +39,6 @@ void ScoreResultsCache::CleanOldResultsForThread(int threadIdx, long long oldest
 
 ScoresResult* ScoreResultsCache::GetScoreResult(const std::string& timePoint1, const std::string& timePoint2, int threadIdx)
 {
-	if (timePoint1 == "20221201070500000" && timePoint2 == "1752")
-		int k = 0;
 	long long timePoint1Long = Converts::ToLongLong(timePoint1);
 	long long timePoint2Long = Converts::ToLongLong(timePoint2);
 	std::pair<long long, long long> timePointKey = std::make_pair(timePoint1Long, timePoint2Long); // Create a pair of time points for caching
@@ -55,8 +54,6 @@ ScoresResult* ScoreResultsCache::GetScoreResult(const std::string& timePoint1, c
 
 ScoresResult* ScoreResultsCache::GetScoreResult(long long timePoint1, long long timePoint2, int threadIdx)
 {
-	if (timePoint1 == 20221201070500000 && timePoint2 == 1790)
-		int k = 0;
 	int monthIdx = ExtractMonth(timePoint1);
 	auto it = m_scoreResultsCache.at(threadIdx).at(monthIdx).find(std::make_pair(timePoint1, timePoint2));
 	if (it != m_scoreResultsCache.at(threadIdx).at(monthIdx).end()) {
@@ -73,6 +70,20 @@ std::vector<size_t> ScoreResultsCache::GetCacheSizes() {
 	return sizes;
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+// Extract start time point from the key
+void PolynomTimeLineCache::CleanTask(long long oldestTP, BaseCacheMap* cacheMap) // Cleaning task for a specific cache map
+{
+	for (auto it = cacheMap->begin(); it != cacheMap->end(); ) {
+		long long timePoint2Long = it->first.endTimePoint; // Extract the end time point of the timeline
+		if (timePoint2Long < oldestTP) {
+			it = cacheMap->erase(it); // Remove the element and get the next iterator
+		}
+		else
+			++it; // Move to the next element
+	}
+}
 
 void ScoreResultsCache::CleanOldResults() // Do not use This function in a seperated thread - Use it only in the main thread of scanning
 {

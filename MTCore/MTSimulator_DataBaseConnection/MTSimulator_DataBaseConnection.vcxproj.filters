@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Static connection">
+      <UniqueIdentifier>{f5f4f57c-a5a0-4b6b-987f-ea48f5289a8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataBaseConnection">
+      <UniqueIdentifier>{3fe34dcb-9e6f-4cf8-93c8-e46d6ecd6fc0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Static_DBConnection.cpp">
+      <Filter>Static connection</Filter>
+    </ClCompile>
+    <ClCompile Include="DataBaseConnection.cpp">
+      <Filter>DataBaseConnection</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Static_DBConnection.h">
+      <Filter>Static connection</Filter>
+    </ClInclude>
+    <ClInclude Include="DataBaseConnection.h">
+      <Filter>DataBaseConnection</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

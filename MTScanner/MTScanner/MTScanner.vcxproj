@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Fahed\Documents\GitHub\MT_BOT_V2.1\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator\;$(SolutionDir)..\HTTPCore\;C:\Users\Fahed\Documents\GitHub\MT_BOT_V2.1\vcpkg\installed\x64-windows\include\nlohmann;C:\Users\Fahed\Documents\GitHub\MT_BOT_V2.1\vcpkg\installed\x64-windows\include\nlohmann</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -162,8 +162,47 @@
     <ResourceCompile Include="MTScanner.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MTCore\MTSimulator\MTSimulator.vcxproj">
-      <Project>{26cb6981-5cc5-4ded-8470-7e6b8db5c4e1}</Project>
+    <ProjectReference Include="..\..\HTTPCore\HTTPCore.vcxproj">
+      <Project>{795c2df4-ee54-4683-a658-ec0881eec905}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Cache\MTSimulator_Cache.vcxproj">
+      <Project>{98afafd3-5a1d-496d-95b1-1aca99e3b752}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Casts\MTSimulator_Casts.vcxproj">
+      <Project>{3e62cd3b-c447-43e0-8dd5-b053c53cefb2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Compare\MTSimulator_Compare.vcxproj">
+      <Project>{88590916-6249-48bb-93fd-150e4e84f16d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Configurations\MTSimulator_Configurations.vcxproj">
+      <Project>{cd63cc16-213c-427f-add8-082d87bdd52a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_DataBaseConnection\MTSimulator_DataBaseConnection.vcxproj">
+      <Project>{0f67c953-62c4-45f9-91fc-94e22a9bbcf9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_DataExporter\MTSimulator_DataExporter.vcxproj">
+      <Project>{96e28090-01d5-4275-9739-2c3f80482659}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Logger\MTSimulator_Logger.vcxproj">
+      <Project>{00196295-8402-4a56-ac04-38ebb4b28cea}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_MTThreadPool\MTSimulator_MTThreadPool.vcxproj">
+      <Project>{1baf2f58-4ee0-4d76-88ff-8a3900f208ac}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_ResourcesManager\MTSimulator_ResourcesManager.vcxproj">
+      <Project>{93ce40de-5c0f-4c93-933a-795bf58d3a74}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Statistics\MTSimulator_Statistics.vcxproj">
+      <Project>{2414419e-9dac-42fb-8316-7455abd3b8fe}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Tables\MTSimulator_Tables.vcxproj">
+      <Project>{d8912637-4cc5-4764-bb4c-1abb56523bc7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_TimeLines\MTSimulator_TimeLines.vcxproj">
+      <Project>{c8453010-93d3-40ae-abc3-581108bbbc5b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_TradeManager\MTSimulator_TradeManager.vcxproj">
+      <Project>{62826318-b85a-4ea9-a3fe-53d8809dd28e}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

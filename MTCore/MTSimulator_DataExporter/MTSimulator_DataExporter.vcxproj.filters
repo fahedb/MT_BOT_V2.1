@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="DataExporter">
+      <UniqueIdentifier>{eb89940f-d5f4-4433-9e33-2ddd2bb2ad21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Json">
+      <UniqueIdentifier>{d9af3804-6def-4cbc-9f0e-3eee5adc79ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataExporter\General">
+      <UniqueIdentifier>{88486b3f-3d7c-4368-bfc9-e5ec9fae25c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataExporter\CSV">
+      <UniqueIdentifier>{878f3c78-2125-4854-9d7f-cd6d0d66a80a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Draw">
+      <UniqueIdentifier>{da7406ec-508b-4f42-be6e-552fc043af33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Draw\Chart">
+      <UniqueIdentifier>{8a9c8e5b-3f0b-4716-8a3d-8c0c7f968673}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataExporter\Pattern">
+      <UniqueIdentifier>{d3b191b2-0777-4f89-89e7-08b2eb981b09}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="JasonHandler.cpp">
+      <Filter>Json</Filter>
+    </ClCompile>
+    <ClCompile Include="DataExporter.cpp">
+      <Filter>DataExporter\General</Filter>
+    </ClCompile>
+    <ClCompile Include="CSVExportData.cpp">
+      <Filter>DataExporter\CSV</Filter>
+    </ClCompile>
+    <ClCompile Include="MTChart.cpp">
+      <Filter>Draw\Chart</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternExporter.cpp">
+      <Filter>DataExporter\Pattern</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="JasonHandler.h">
+      <Filter>Json</Filter>
+    </ClInclude>
+    <ClInclude Include="DataExporter.h">
+      <Filter>DataExporter\General</Filter>
+    </ClInclude>
+    <ClInclude Include="CSVExportData.h">
+      <Filter>DataExporter\CSV</Filter>
+    </ClInclude>
+    <ClInclude Include="MTChart.h">
+      <Filter>Draw\Chart</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternExporter.h">
+      <Filter>DataExporter\Pattern</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

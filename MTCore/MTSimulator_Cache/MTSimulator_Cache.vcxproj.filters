@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="BaseCache">
+      <UniqueIdentifier>{504519c5-34ea-4cf2-b4bd-5eec3731e225}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScoreCache">
+      <UniqueIdentifier>{dd17b581-7f1b-475c-854d-06cca880ba0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PolynomScoreCache">
+      <UniqueIdentifier>{7a4c446e-805a-474f-b371-ae9a937d8021}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PolynomTimeLineCache">
+      <UniqueIdentifier>{25e011fe-f468-4a2a-9943-cfd3a351f645}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CurrTimeLineCache">
+      <UniqueIdentifier>{6923ef76-86e8-4309-845e-f552038968a3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BTimeLineCache.cpp">
+      <Filter>BaseCache</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreResultsCache.cpp">
+      <Filter>ScoreCache</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreResultsCachePolynom.cpp">
+      <Filter>PolynomScoreCache</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomTimeLineCache.cpp">
+      <Filter>PolynomTimeLineCache</Filter>
+    </ClCompile>
+    <ClCompile Include="Static_CurrentTimeLineRep.cpp">
+      <Filter>CurrTimeLineCache</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BTimeLineCache.h">
+      <Filter>BaseCache</Filter>
+    </ClInclude>
+    <ClInclude Include="CacheEnums.h">
+      <Filter>BaseCache</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreResultsCachePolynom.h">
+      <Filter>PolynomScoreCache</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreResultsCache.h">
+      <Filter>ScoreCache</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomTimeLineCache.h">
+      <Filter>PolynomTimeLineCache</Filter>
+    </ClInclude>
+    <ClInclude Include="Static_CurrentTimeLineRep.h">
+      <Filter>CurrTimeLineCache</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

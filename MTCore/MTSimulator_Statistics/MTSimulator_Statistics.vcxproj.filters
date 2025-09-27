@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Statistics Engines">
+      <UniqueIdentifier>{066ea3cd-f235-4e20-a859-3de3f4c9735d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StatsStructs">
+      <UniqueIdentifier>{fb9c1f58-6028-440b-9ac1-b07bf372e2d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direction">
+      <UniqueIdentifier>{7d0e853c-0ca5-40fb-b5b1-e2b7b1d603d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direction\Struct">
+      <UniqueIdentifier>{1977bdff-ef8e-47f3-a15f-add7cf00a4d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direction\Cache">
+      <UniqueIdentifier>{6eecdb98-9bc6-400d-8146-3faf620a24d4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="StatisticsDecession.h">
+      <Filter>Statistics Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionStatsCache.h">
+      <Filter>Direction\Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionStats.h">
+      <Filter>Direction\Struct</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="StatisticsDecession.cpp">
+      <Filter>Statistics Engines</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionStatsCache.cpp">
+      <Filter>Direction\Cache</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionStats.cpp">
+      <Filter>Direction\Struct</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

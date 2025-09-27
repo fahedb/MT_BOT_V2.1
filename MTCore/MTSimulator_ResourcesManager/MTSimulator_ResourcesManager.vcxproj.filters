@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ProcessFlags">
+      <UniqueIdentifier>{c5b2c0e3-3127-4952-a06d-eb5b6bbe2389}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resouce Manager">
+      <UniqueIdentifier>{c36a0991-13fb-4561-b0be-0bf4f0483875}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ProccessFlags.cpp">
+      <Filter>ProcessFlags</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Resouce Manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ProccessFlags.h">
+      <Filter>ProcessFlags</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Resouce Manager</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

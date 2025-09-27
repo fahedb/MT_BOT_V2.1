@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="TradeManager">
+      <UniqueIdentifier>{065df1ae-6a6c-4bf9-bc90-e79c0ced1511}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TradeTracer">
+      <UniqueIdentifier>{55351570-6a34-4ac5-88c6-646be9198d5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Orders">
+      <UniqueIdentifier>{9acd66d6-4063-4bd1-8bc9-b81f8bbccaac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Orders\Struct">
+      <UniqueIdentifier>{67e37eff-e954-4a08-b939-61d3a9199d28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Orders\Queue">
+      <UniqueIdentifier>{df6e77c4-6bb9-46e9-a1ca-9ba4a4a595d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Orders\Enums">
+      <UniqueIdentifier>{1e4c94c7-f37d-4658-961b-8347b2e5f396}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Orders\Cache">
+      <UniqueIdentifier>{6eb640be-37e4-4b62-83e6-9150bed0a0e1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="OrdersStructCache.cpp">
+      <Filter>Orders\Cache</Filter>
+    </ClCompile>
+    <ClCompile Include="OrdersToExecute.cpp">
+      <Filter>Orders\Queue</Filter>
+    </ClCompile>
+    <ClCompile Include="OrderStruct.cpp">
+      <Filter>Orders\Struct</Filter>
+    </ClCompile>
+    <ClCompile Include="TradesManager.cpp">
+      <Filter>TradeManager</Filter>
+    </ClCompile>
+    <ClCompile Include="TradeTracer.cpp">
+      <Filter>TradeTracer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TradeTracer.h">
+      <Filter>TradeTracer</Filter>
+    </ClInclude>
+    <ClInclude Include="OrdersToExecute.h">
+      <Filter>Orders\Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="OrdersStructCache.h">
+      <Filter>Orders\Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="OrderType.h">
+      <Filter>Orders\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="OrderStruct.h">
+      <Filter>Orders\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="TradesManager.h">
+      <Filter>TradeManager</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

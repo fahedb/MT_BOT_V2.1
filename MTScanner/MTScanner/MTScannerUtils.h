@@ -1,4 +1,3 @@
-#include "ScoreResultsCache.h"
 #include "PatternGod.h"
 #include "StatisticsDecession.h"
 

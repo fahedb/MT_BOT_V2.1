@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Logger">
+      <UniqueIdentifier>{a7d06d52-f65c-4672-be15-55aa6bccc8dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTP_Logger">
+      <UniqueIdentifier>{0c44f240-0b3e-427b-a448-052b84a8d89e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="HTTP_Lgger.cpp">
+      <Filter>HTTP_Logger</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="httplib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LOGGER.H">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="HTTP_Lgger.h">
+      <Filter>HTTP_Logger</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

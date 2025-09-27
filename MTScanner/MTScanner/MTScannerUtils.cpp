@@ -1,6 +1,11 @@
 #include "MTScannerUtils.h"
 #include "ScoreCalcs.h"
+#include "LOGGER.H"
+
 #include "PolynomTimeLineCache.h"
+#include "ScoreResultsCachePolynom.h"
+#include "ScoreResultsCache.h"
+
 
 void MTScannerUtils::GoToSleep(int seconds)
 {
@@ -14,7 +19,7 @@ void MTScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scan
 	ScoreResultsCache* scoreResultsCache = ScoreResultsCache::getInstance();
 	if (isScanActivated)
 	{
-		std::vector<size_t> sizes = scoreResultsCache->GetCacheSizes();
+		std::vector<size_t> sizes = scoreResultsCache->GetMyCacheSizes();
 		std::string cacheSizes = "Score Results Cache Sizes per Thread:\n";
 
 		for (size_t i = 0; i < sizes.size(); i++)
@@ -29,7 +34,7 @@ void MTScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scan
 	}
 	if (Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->CleanEveryXScans < scansNum)
 	{
-		scoreResultsCache->CleanOldResults();
+		scoreResultsCache->ClearOldResults(false);
 		ScoreResultsCachePolynom::getInstance()->ClearOldResults(false);
 		PolynomTimeLineCache::getInstance()->ClearOldResults(false);
 		scansNum = 0; // Reset the scans counter after cleaning

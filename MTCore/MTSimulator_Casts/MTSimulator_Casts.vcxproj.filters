@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Converts">
+      <UniqueIdentifier>{62113301-102c-41cb-8709-2d2832c71b56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProcessData">
+      <UniqueIdentifier>{b9e3280e-0f39-41bc-b4fa-0420ea9633f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{b1a13651-dbfd-4355-add8-75607602c70c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Converts.cpp">
+      <Filter>Converts</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessData.cpp">
+      <Filter>ProcessData</Filter>
+    </ClCompile>
+    <ClCompile Include="MathExtentions.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Converts.h">
+      <Filter>Converts</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessData.h">
+      <Filter>ProcessData</Filter>
+    </ClInclude>
+    <ClInclude Include="MathExtentions.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -5,12 +5,10 @@
 #include "TradeTracer.h"
 #include "ScoreResultsCache.h"
 #include "HistoryTimeLineLoader.h"
-#include "TradeTracer.h"
 #include "DataExporter.h"
 #include "HttpServerSyncer.h"
-#include "LOGGER.H"
 #include <future>
-
+#include "PatternGod.h"
 
 
 /// <summary>	

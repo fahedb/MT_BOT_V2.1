@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="TimeLine Core">
+      <UniqueIdentifier>{8B7A83BB-121A-AD01-4FC7-37F1C7A54376}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Change Data">
+      <UniqueIdentifier>{2A32D752-A2FF-4FC7-37F1-C7A54376A066}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Indicators">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TimeLine Core\Builder">
+      <UniqueIdentifier>{cfae5157-3722-431f-9ecd-2f9c5e78719b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TimeLine Core\Scored TimeLine">
+      <UniqueIdentifier>{8961bf42-61d5-458f-b893-e03a88d5d2e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TimeLine Core\Database">
+      <UniqueIdentifier>{625FBE52-EBFB-9399-5380-89BD4B0488EB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DLL CandleData">
+      <UniqueIdentifier>{80faee61-a8a6-4d5e-bd89-44b175f39550}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Polynom">
+      <UniqueIdentifier>{d1a28dc3-25e2-4256-95e3-4e6e2abe0b52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Polynom\Struct">
+      <UniqueIdentifier>{cdc65aed-715e-4186-b5dc-32cee08a3c11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Polynom\PolynomChangeNodePackage">
+      <UniqueIdentifier>{35a5f58c-556e-4ee6-bfb1-76f4c9b45feb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Polynom\Builders">
+      <UniqueIdentifier>{d737c887-6fef-4df7-952b-a56be79d3c0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Polynom\Builders\Polynom">
+      <UniqueIdentifier>{b30e97ac-8169-46e3-a457-328a23f386c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Polynom\Builders\PolynomChangeNodePackage">
+      <UniqueIdentifier>{8630b84c-bfe0-4449-a3bf-03e39223d2df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Polynom\TimeLine">
+      <UniqueIdentifier>{e9161d62-7b33-47ca-88d6-8e9aaa7df2f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Polynom\Graph">
+      <UniqueIdentifier>{18331584-8471-4974-993b-b7341598c8bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Polynom\Graph\Struct">
+      <UniqueIdentifier>{86a29c04-e8a8-48ac-aa1a-b50aae8eb41d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Polynom\Graph\Utils">
+      <UniqueIdentifier>{5d48b74a-d91f-4434-82b1-55718ec825b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Polynom\Key">
+      <UniqueIdentifier>{5e33789d-60f8-4521-80ac-e3b1db0c16fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Score">
+      <UniqueIdentifier>{6c2d801c-3a03-4707-a513-088bdf434a5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Change Data\Struct">
+      <UniqueIdentifier>{fb898519-c819-4f26-89a1-aafb386b9dda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Change Data\Builder">
+      <UniqueIdentifier>{f64d5072-6038-4f63-936e-d05369b5daa9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Change Data\SelectionNode">
+      <UniqueIdentifier>{18067fce-6834-4356-a989-d348f2af3603}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Change Data\Enums">
+      <UniqueIdentifier>{386ff84b-4a2a-4346-a68e-d640c660167a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TimeLine Core\TimeLine">
+      <UniqueIdentifier>{2ac5a25f-0797-48a6-a41a-b55a5f73e0bd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DBMap.cpp">
+      <Filter>TimeLine Core\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="IndicatorStructres.cpp">
+      <Filter>Indicators</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeLine.cpp">
+      <Filter>TimeLine Core\TimeLine</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeLineBuilder.cpp">
+      <Filter>TimeLine Core\Builder</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeLineScored.cpp">
+      <Filter>TimeLine Core\Scored TimeLine</Filter>
+    </ClCompile>
+    <ClCompile Include="Polynom.cpp">
+      <Filter>Polynom\Struct</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomChangeNodePackage.cpp">
+      <Filter>Polynom\PolynomChangeNodePackage</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomBuilder.cpp">
+      <Filter>Polynom\Builders\Polynom</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomChangeNodePackageBuilder.cpp">
+      <Filter>Polynom\Builders\PolynomChangeNodePackage</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomTimeLine.cpp">
+      <Filter>Polynom\TimeLine</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphStructres.cpp">
+      <Filter>Polynom\Graph\Struct</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphUtils.cpp">
+      <Filter>Polynom\Graph\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomKey.cpp">
+      <Filter>Polynom\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="PolynomScore.cpp">
+      <Filter>Score</Filter>
+    </ClCompile>
+    <ClCompile Include="ChangeData.cpp">
+      <Filter>Change Data\Struct</Filter>
+    </ClCompile>
+    <ClCompile Include="ChangeDataBuilder.cpp">
+      <Filter>Change Data\Builder</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectionNodes.cpp">
+      <Filter>Change Data\SelectionNode</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DBMap.h">
+      <Filter>TimeLine Core\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="INDICATORSTRUCTRES.H">
+      <Filter>Indicators</Filter>
+    </ClInclude>
+    <ClInclude Include="IndicatorEnums.h">
+      <Filter>Indicators</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLine.h">
+      <Filter>TimeLine Core\TimeLine</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLineBuilder.h">
+      <Filter>TimeLine Core\Builder</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLineScored.h">
+      <Filter>TimeLine Core\Scored TimeLine</Filter>
+    </ClInclude>
+    <ClInclude Include="CandleData.h">
+      <Filter>DLL CandleData</Filter>
+    </ClInclude>
+    <ClInclude Include="Polynom.h">
+      <Filter>Polynom\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomChangeNodePackage.h">
+      <Filter>Polynom\PolynomChangeNodePackage</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomBuilder.h">
+      <Filter>Polynom\Builders\Polynom</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomChangeNodePackageBuilder.h">
+      <Filter>Polynom\Builders\PolynomChangeNodePackage</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomTimeLine.h">
+      <Filter>Polynom\TimeLine</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphStructres.h">
+      <Filter>Polynom\Graph\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphUtils.h">
+      <Filter>Polynom\Graph\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomKey.h">
+      <Filter>Polynom\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="PolynomScore.h">
+      <Filter>Score</Filter>
+    </ClInclude>
+    <ClInclude Include="ChangeData.h">
+      <Filter>Change Data\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="ChangeDataBuilder.h">
+      <Filter>Change Data\Builder</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectionNodes.h">
+      <Filter>Change Data\SelectionNode</Filter>
+    </ClInclude>
+    <ClInclude Include="CoinsPair.h">
+      <Filter>Change Data\Enums</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

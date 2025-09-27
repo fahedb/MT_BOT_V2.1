@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="BaseTable">
+      <UniqueIdentifier>{bf2824e2-c885-4ab0-b5b5-76dbde7f4e3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PairsTables">
+      <UniqueIdentifier>{37984e78-4a36-4804-a91e-0e94564aa980}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configs">
+      <UniqueIdentifier>{64f0455e-3277-42dd-adca-d59015d0e2e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PairsTables\EURUSD">
+      <UniqueIdentifier>{4158d6e8-a39a-447b-96e3-c1bd7e44685d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PairsTables\XAUUSD">
+      <UniqueIdentifier>{7bf1e540-c02d-4692-8386-3bd561f56c5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Defs">
+      <UniqueIdentifier>{036ff2fb-3474-491e-b3c6-143afcd84443}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PairsTables\BasePriceTable">
+      <UniqueIdentifier>{dcb4aeaf-9491-4709-89c1-10d82de61ba2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SeqNumTable">
+      <UniqueIdentifier>{cc377ec0-7ce8-4396-81a0-9aebddc24fd1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="EURUSD_CurrentTable.cpp">
+      <Filter>PairsTables\EURUSD</Filter>
+    </ClCompile>
+    <ClCompile Include="BTables.cpp">
+      <Filter>BaseTable</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigsTable.cpp">
+      <Filter>Configs</Filter>
+    </ClCompile>
+    <ClCompile Include="BasePricesTable.cpp">
+      <Filter>PairsTables\BasePriceTable</Filter>
+    </ClCompile>
+    <ClCompile Include="XAUUSD_CurrentTable.cpp">
+      <Filter>PairsTables\XAUUSD</Filter>
+    </ClCompile>
+    <ClCompile Include="XAUUSD_OneMinTable.cpp">
+      <Filter>PairsTables\XAUUSD</Filter>
+    </ClCompile>
+    <ClCompile Include="SeqNumTable.cpp">
+      <Filter>SeqNumTable</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="XAUUSD_CurrentTable.h">
+      <Filter>PairsTables\XAUUSD</Filter>
+    </ClInclude>
+    <ClInclude Include="XAUUSD_OneMinTable.h">
+      <Filter>PairsTables\XAUUSD</Filter>
+    </ClInclude>
+    <ClInclude Include="EURUSD_CurrentTable.h">
+      <Filter>PairsTables\EURUSD</Filter>
+    </ClInclude>
+    <ClInclude Include="BTables.h">
+      <Filter>BaseTable</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigsTable.h">
+      <Filter>Configs</Filter>
+    </ClInclude>
+    <ClInclude Include="DefinedTables.h">
+      <Filter>Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="BasePricesTable.h">
+      <Filter>PairsTables\BasePriceTable</Filter>
+    </ClInclude>
+    <ClInclude Include="SeqNumTable.h">
+      <Filter>SeqNumTable</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

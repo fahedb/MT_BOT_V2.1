@@ -1,6 +1,8 @@
 #include "StrategiesRunner.h"
 #include "MTScannerUtils.h"
 
+#include "TimeLineBuilder.h"
+
 void StrategiesRunner::Run_PatternGod(TimeLine& historyTimeLine)
 {
 	Logger& logger = Logger::getInstance();

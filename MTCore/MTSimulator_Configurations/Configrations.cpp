@@ -1,5 +1,6 @@
 #include "Configrations.h"
 #include "ConfigsTableStaticProxy.h"
+#include "DataBaseConnection.h"
 
 //#include "ConfigsTable.h"
 //#include "Converts.h"
@@ -10,6 +11,7 @@
 Configrations::Configrations() {
     m_connString = ConfigsTableStaticProxy::Get_ConfigValue(CONFIG_DEF_CONNECTION_STRING);
     m_filesDBDir = ConfigsTableStaticProxy::Get_ConfigValue(CONFIG_DEF_FILES_DB_DIR);
+    DataBaseConnection::Set_ConnectionString(m_connString);
     InitPolicyMap();
 }
 

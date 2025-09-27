@@ -132,10 +132,11 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <StringPooling>true</StringPooling>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

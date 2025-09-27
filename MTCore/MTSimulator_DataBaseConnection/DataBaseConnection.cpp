@@ -1,4 +1,5 @@
 #include "DataBaseConnection.h"
+std::string m_glob_connectionString;
 
 DataBaseConnection::DataBaseConnection(const std::string& serverName,const std::string& dataBase, const std::string& userName, const std::string& pass) {
     SQLHENV henv;       // Environment handle
@@ -53,7 +54,11 @@ DataBaseConnection::DataBaseConnection()
     SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
 
     // Connection string parameters
-    std::string connString = "DRIVER={SQL Server};SERVER=localhost;DATABASE=Prices;Integrated Security=SSPI;";
+    std::string connString;
+    if (m_glob_connectionString.length())
+        connString = m_glob_connectionString;
+    else
+        connString = "DRIVER={SQL Server};SERVER=localhost;DATABASE=Prices;Integrated Security=SSPI;";
 
     // convert to wchar string
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
@@ -121,4 +126,9 @@ bool DataBaseConnection::IsConnected() {
     ret = SQLGetConnectAttr(m_DBConnectionHandler, SQL_ATTR_CONNECTION_DEAD, &connStatus, 0, NULL);
 
     return (SQL_SUCCEEDED(ret) && connStatus == SQL_CD_FALSE); // אם False - החיבור חי
+}
+
+void DataBaseConnection::Set_ConnectionString(std::string connStr)
+{
+    m_glob_connectionString = connStr;
 }

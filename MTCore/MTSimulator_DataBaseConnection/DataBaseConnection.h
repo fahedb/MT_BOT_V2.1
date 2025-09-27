@@ -41,7 +41,7 @@ public :
         SQLFreeHandle(SQL_HANDLE_ENV, m_envHandler);
     }
     bool IsConnected();
-
+    static void Set_ConnectionString(std::string connStr);
 private:
     SQLHENV m_envHandler;
     SQLHDBC m_DBConnectionHandler;

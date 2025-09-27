@@ -1,7 +1,7 @@
 ﻿#include "StrategiesRunner.h"
 #include "ProccessFlags.h"
 #include "CONFIGRATIONS.H"
-
+#include "DataBaseConnection.h"
 void DefualtProgramStart();
 void LoadJson_Data_ToDBFile();
 
@@ -21,8 +21,16 @@ int main(int argc, char* argv[])
 	http_thread.join();
 }
 
+void Init()
+{
+	std::string connStr = Configrations::getInstance()->Get_ConnectionString();
+	DataBaseConnection::Set_ConnectionString(connStr);
+}
+
+
 void DefualtProgramStart()
 {
+	Init();
 	StrategiesRunner runner;
 	runner.Run();
 }

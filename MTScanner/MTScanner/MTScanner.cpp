@@ -2,12 +2,14 @@
 #include "ProccessFlags.h"
 #include "CONFIGRATIONS.H"
 #include "DataBaseConnection.h"
+#include "ScoreResultsCachePolynom.h"
 void DefualtProgramStart();
 void LoadJson_Data_ToDBFile();
 
 
 int main(int argc, char* argv[])
 {
+	ScoreResultsCachePolynom* scoreResultsCache = ScoreResultsCachePolynom::getInstance();
 	ProccessFlags::InitProccessFlags(argc, argv);
 
 	std::thread http_thread(ExchangeData::Start_DataExchange);

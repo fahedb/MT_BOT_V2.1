@@ -28,9 +28,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="OrdersStructCache.cpp">
-      <Filter>Orders\Cache</Filter>
-    </ClCompile>
     <ClCompile Include="OrdersToExecute.cpp">
       <Filter>Orders\Queue</Filter>
     </ClCompile>
@@ -42,6 +39,9 @@
     </ClCompile>
     <ClCompile Include="TradeTracer.cpp">
       <Filter>TradeTracer</Filter>
+    </ClCompile>
+    <ClCompile Include="OrdersStructCache.cpp">
+      <Filter>Orders\Cache</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

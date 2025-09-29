@@ -117,7 +117,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\MTCore\MTSimulator\;$(SolutionDir)..\HTTPCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Tables;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Casts;..\..\MTCore\MTSimulator_DataExporter;..\..\MTCore\MTSimulator_TimeLines;..\..\MTCore\MTSimulator_TradeManager;..\..\MTCore\MTSimulator_Logger;$(SolutionDir)..\HTTPCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -137,7 +137,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\MTCore\MTSimulator\;$(SolutionDir)..\HTTPCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Tables;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Casts;..\..\MTCore\MTSimulator_DataExporter;..\..\MTCore\MTSimulator_TimeLines;..\..\MTCore\MTSimulator_TradeManager;..\..\MTCore\MTSimulator_Logger;$(SolutionDir)..\HTTPCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -166,8 +166,38 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MTCore\MTSimulator\MTSimulator.vcxproj">
-      <Project>{26cb6981-5cc5-4ded-8470-7e6b8db5c4e1}</Project>
+    <ProjectReference Include="..\..\HTTPCore\HTTPCore.vcxproj">
+      <Project>{795c2df4-ee54-4683-a658-ec0881eec905}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Casts\MTSimulator_Casts.vcxproj">
+      <Project>{3e62cd3b-c447-43e0-8dd5-b053c53cefb2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Configurations\MTSimulator_Configurations.vcxproj">
+      <Project>{cd63cc16-213c-427f-add8-082d87bdd52a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_DataExporter\MTSimulator_DataExporter.vcxproj">
+      <Project>{96e28090-01d5-4275-9739-2c3f80482659}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Logger\MTSimulator_Logger.vcxproj">
+      <Project>{00196295-8402-4a56-ac04-38ebb4b28cea}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_MTThreadPool\MTSimulator_MTThreadPool.vcxproj">
+      <Project>{1baf2f58-4ee0-4d76-88ff-8a3900f208ac}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_ResourcesManager\MTSimulator_ResourcesManager.vcxproj">
+      <Project>{93ce40de-5c0f-4c93-933a-795bf58d3a74}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Statistics\MTSimulator_Statistics.vcxproj">
+      <Project>{2414419e-9dac-42fb-8316-7455abd3b8fe}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Tables\MTSimulator_Tables.vcxproj">
+      <Project>{d8912637-4cc5-4764-bb4c-1abb56523bc7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_TimeLines\MTSimulator_TimeLines.vcxproj">
+      <Project>{c8453010-93d3-40ae-abc3-581108bbbc5b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_TradeManager\MTSimulator_TradeManager.vcxproj">
+      <Project>{62826318-b85a-4ea9-a3fe-53d8809dd28e}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

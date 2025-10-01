@@ -14,6 +14,15 @@ public:
         static ProccessFlagsRep instance; // Guaranteed to be destroyed and instantiated on first use
         return instance;
     }
+    bool IsFlagExist(const std::string& flagToFind)
+    {
+        for (const auto& flag : m_flags)
+        {
+            if (flagToFind == flag)
+                return true;
+        }
+        return false;
+	}
     bool GetFlagValue(const std::string& flagToFind,std::string& flagValue)
     {
         for (int i = 0; i < m_flags.size(); i++)
@@ -27,16 +36,7 @@ public:
         }
         return false;
     }
-
-    bool GetFlagValue(const std::string& flagToFind)
-    {
-        for (int i = 0; i < m_flags.size(); i++)
-        {
-            if (flagToFind == m_flags.at(i))
-                return true;
-        }
-        return false;
-    }
+    
 
     void Set_Flags(int argc, char* argv[])
     {
@@ -63,7 +63,7 @@ private:
 class ProccessFlags
 {
 public:
-    static bool FindSwitch(const std::string& flag) { return ProccessFlagsRep::getInstance().GetFlagValue(flag); }
+    static bool FindSwitch(const std::string& flag) { return ProccessFlagsRep::getInstance().IsFlagExist(flag); }
     static std::string GetSwitch(const std::string& flag) {
         std::string flagValue;
         ProccessFlagsRep::getInstance().GetFlagValue(flag, flagValue);

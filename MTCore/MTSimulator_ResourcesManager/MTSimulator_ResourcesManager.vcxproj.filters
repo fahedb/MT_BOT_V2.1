@@ -4,7 +4,7 @@
     <Filter Include="ProcessFlags">
       <UniqueIdentifier>{c5b2c0e3-3127-4952-a06d-eb5b6bbe2389}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resouce Manager">
+    <Filter Include="ProcessFlags\Resouce Manager">
       <UniqueIdentifier>{c36a0991-13fb-4561-b0be-0bf4f0483875}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -13,7 +13,7 @@
       <Filter>ProcessFlags</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
-      <Filter>Resouce Manager</Filter>
+      <Filter>ProcessFlags\Resouce Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -21,7 +21,8 @@
       <Filter>ProcessFlags</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManager.h">
-      <Filter>Resouce Manager</Filter>
+      <Filter>ProcessFlags\Resouce Manager</Filter>
     </ClInclude>
+    <ClInclude Include="FlagsDef.h" />
   </ItemGroup>
 </Project>

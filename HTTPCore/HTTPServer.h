@@ -21,7 +21,7 @@ private:
 	}
 
     void Get_ScanningStatus(const httplib::Request& req, httplib::Response& res) { res.set_header(HTTP_PARAM_STATUS, m_requests.GetStatus_Scanning()); }
-
+	void Handle_IsScanOnGoing(const httplib::Request& req, httplib::Response& res) { res.set_header(HTTP_PARAM_IsScanOnGoing, m_requests.Get_IsScanning() ? HTTP_PARAM_VALUE_True : HTTP_PARAM_VALUE_False); }
     void Stop_Scanning(const httplib::Request& req, httplib::Response& res) { m_requests.Set_RunningStatus(false); }
     void Run_Scanning(const httplib::Request& req, httplib::Response& res) { m_requests.Set_RunningStatus(true); }
 
@@ -135,6 +135,11 @@ public:
         m_srv.Post(HTTP_SERVICE_MTSCanner_CloseOrder, [this](const httplib::Request& req, httplib::Response& res)
             {
                 this->CloseOrder(req, res);
+            });
+
+        m_srv.Get(HTTP_SERVICE_IsScanOnGoing, [this](const httplib::Request& req, httplib::Response& res)
+            {
+				this->Handle_IsScanOnGoing(req, res);
             });
 
         m_srv.listen("0.0.0.0", m_port);

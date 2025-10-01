@@ -9,7 +9,7 @@ void LoadJson_Data_ToDBFile();
 int main(int argc, char* argv[])
 {
 	ProccessFlags::InitProccessFlags(argc, argv);
-
+	
 	std::thread http_thread(ExchangeData::Start_DataExchange);
 	if (ProccessFlags::FindSwitch("-dataLoad"))
 	{

@@ -15,6 +15,7 @@
 #define HTTP_SERVICE_IsThereAnTrade		"/IsThereAnTrade"
 #define HTTP_SERVICE_NewBar_M1			"/NewBar_M1"
 #define HTTP_SERVICE_NewBar_JSON_DB_M1	"/NewBar_JSON_DB_M1"
+#define HTTP_SERVICE_IsScanOnGoing		"/IsScanOnGoing"
 
 #define HTTP_SERVICE_Get_OrdersSummey_CSV "/OrdersSummery_CSV"
 
@@ -28,7 +29,7 @@
 #define HTTP_PARAM_OrderStopLoss "OrderStopLoss"
 #define HTTP_PARAM_OrderTakeProfit "OrderTakeProfit"
 #define HTTP_PARAM_OrderStatus "OrderStatus"
-
+#define HTTP_PARAM_IsScanOnGoing "IsScanOnGoing"
 #define HTTP_PARAM_ConfigName "ConfigName"
 #define HTTP_PARAM_ConfigValue "ConfigValue"
 #define HTTP_PARAM_ConfigExplain "ConfigExplain"
@@ -45,6 +46,10 @@
 #define HTTP_PARAM_VALUE_Status_LoadingData "Loading_Data"
 #define HTTP_PARAM_VALUE_Status_Stopped "Stopped"
 #define HTTP_PARAM_VALUE_Status_Running "Running"
+
+#define HTTP_PARAM_VALUE_True "True"
+#define HTTP_PARAM_VALUE_False "False"
+
 #define HTTP_PARAM_MEMBER_Indicator_Len	"IndicatorLen"
 #define HTTP_PARAM_MEMBER_Bar_Period	"BarPeriod"
 

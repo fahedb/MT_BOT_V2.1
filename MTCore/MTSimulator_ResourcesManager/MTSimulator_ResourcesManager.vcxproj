@@ -130,6 +130,7 @@
     <ClCompile Include="ResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FlagsDef.h" />
     <ClInclude Include="ProccessFlags.h" />
     <ClInclude Include="ResourceManager.h" />
   </ItemGroup>

@@ -6,15 +6,14 @@
 #include <codecvt>
 #include <vector>
 #include "ExtentionF.h"
-#include "DataBaseConnection.h"
 #include "OrdersToExecute.h"
 #include "CandleData.h"
-#include "XAUUSD_CurrentTable.h"
-#include "XAUUSD_OneMinTable.h"
 #include "Logger.h"
 #include "JasonHandler.h"
 #include "HTTPClient.h"
 #include "DLL_OrderStruct.h"
+#include "OrderType.h"
+#include "Converts.h"
 
 std::string GetTableName(std::string symbol);
 
@@ -22,7 +21,6 @@ std::string GetTableName(std::string symbol);
 extern "C" __declspec(dllimport) int CheckForNewOrders_HTTP(DLL_OrderStruct_P order);
 extern "C" __declspec(dllimport) int GetOrderDataBySeqNum(int seqNum, DLL_OrderStruct_P order);
 
-extern "C" __declspec(dllimport) bool TruncCurrTableForFreshStart(char* symbol);
 extern "C" __declspec(dllimport) bool InsertNewBar_HTTP_M1(char* timePoint, char* symbol, CandleStruct data);
 extern "C" __declspec(dllimport) bool InsertNewBar_HTTP_M1_JSON_DB(char* timePoint, char* symbol, CandleStruct data);
 extern "C" __declspec(dllimport) bool InsertNewBar_M1_JSON_DB(char* timePoint, char* symbol, CandleStruct data);
@@ -30,6 +28,7 @@ extern "C" __declspec(dllimport) double Get_MainTrade_Size();
 extern "C" __declspec(dllimport) double Get_SupportTrade_Size();
 extern "C" __declspec(dllimport) int GetFutureVision();
 extern "C" __declspec(dllimport) void CloseOrder(int seqNum);
+extern "C" __declspec(dllimport) void WaitForScanFinish();
 
 extern "C" __declspec(dllimport) int Get_TP_Diff();
 extern "C" __declspec(dllimport) int Get_SL_Diff();
@@ -37,17 +36,6 @@ extern "C" __declspec(dllimport) int Get_TP_Start();
 extern "C" __declspec(dllimport) int Get_SL_Start();
 extern "C" __declspec(dllimport) int IsOrderClosed(int seqNum);
 
-
-/// Start of MTSimulator Functions
-bool TruncCurrTableForFreshStart(char* symbol)
-{
-    //TODO: Function to truncate current tables 
-    DataBaseConnection db;
-    XAUUSD_CurrentTable table(db.Get_EnvHandler(), db.Get_DBConnection());
-    std::string command = "truncate table " + table.Get_TableName();
-    return table.FreeStyleCommand(command);
-
-}
 
 void CloseOrder(int seqNum)
 {
@@ -381,3 +369,16 @@ int Get_TP_Diff()
 }
 
 
+void WaitForScanFinish()
+{
+    Logger& logger  = Logger::getInstance();
+    httplib::Result res = HTTPClient::getInstance().Send_Get(HTTP_SERVICE_IsScanOnGoing);
+    std::string scanStatus = res->get_header_value(HTTP_PARAM_IsScanOnGoing);
+    while (scanStatus == HTTP_PARAM_VALUE_True)
+    {
+        logger.WriteToDebug("WaitForScanFinish: Scan is ongoing, waiting for 100ms before rechecking");
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        res = HTTPClient::getInstance().Send_Get(HTTP_SERVICE_IsScanOnGoing);
+        scanStatus = res->get_header_value(HTTP_PARAM_IsScanOnGoing);
+	}
+}

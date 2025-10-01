@@ -181,3 +181,9 @@ void RequestHandler::Set_NewOrder(const std::string& symbol, int long_short, int
 	newOrder.takeProfit = takeProfit;
 	m_ordersToExecute.push(newOrder);
 }
+
+
+void RequestHandler::Handle_IsScanOnGoing(httplib::Response& res)
+{
+	Get_IsScanning() ? res.set_header(HTTP_PARAM_IsScanOnGoing, HTTP_PARAM_VALUE_True) : res.set_header(HTTP_PARAM_IsScanOnGoing, HTTP_PARAM_VALUE_False);
+}

@@ -5,11 +5,17 @@
 /// <Logger>
 /// Logger class function, For logging data
 /// <Logger>
+int m_glob_logCounter = 0;
 
-
-void Logger::WriteLog(std::string log, bool newSection,bool sendToLogServer, LogType logType)
+void Logger::WriteLog(const std::string& log, bool newSection,bool sendToLogServer, LogType logType)
 {
-	if (sendToLogServer && false) // temporarily disabled
+    //m_glob_logCounter++;
+    //if(m_glob_logCounter% 100 != 0) // Just to avoid too many logs
+	//	return; // temporarily disabled
+    //if(m_glob_logCounter > 1000000)
+	//	m_glob_logCounter = 0;
+	
+    if (sendToLogServer && false) // temporarily disabled
     {
         MTThreadPool::getInstance()->enqueueTask([log, logType,this]() {
             this->Http_Send_Log(log, logType);

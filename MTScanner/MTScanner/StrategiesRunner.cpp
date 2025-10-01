@@ -1,6 +1,5 @@
 #include "StrategiesRunner.h"
 #include "MTScannerUtils.h"
-
 #include "TimeLineBuilder.h"
 
 void StrategiesRunner::Run_PatternGod(TimeLine& historyTimeLine)
@@ -25,7 +24,9 @@ void StrategiesRunner::Run_PatternGod(TimeLine& historyTimeLine)
 		HttpServerSyncer::UpdateCurrentTimeLine(&table);
 		MTScannerUtils::ScoreResultsCacheCleanLogic(OneMinutePatternGodLogic(&patternScaner, &statisticsCalcucator, &historyTimeLine), m_scansCounter); // Start scanning
 		HttpServerSyncer::UpdateConfigs();
-		MTScannerUtils::GoToSleep(confPolicy->TimeBetweenScans);
+		HttpServerSyncer::Set_IsScanning(false); // Set scanning to false after scan is done -- Set true in the precondition function
+
+		MTScannerUtils::GoToSleep(1);
 	}
 	tracer_thread.join();
 }
@@ -103,5 +104,8 @@ bool StrategiesRunner::ScanPreCondition()
 	}
 
 	m_lastTimePoint = currentTimeLine->at(currentTimeLine->size() - 1)->point_DateTime;
+
+	HttpServerSyncer::Set_IsScanning(true);
+	
 	return true;
 }

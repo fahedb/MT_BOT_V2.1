@@ -24,8 +24,8 @@ public:
         static Logger instance; // Guaranteed to be destroyed and instantiated on first use
         return instance;
     }
-    void WriteLog(std::string log, bool newSection = false, bool sendToLogServer = false, LogType logType = LogType::LOG);
-	void WriteToDebug(std::string log) { OutputDebugStringA(log.c_str()); }
+    void WriteLog(const std::string& log, bool newSection = false, bool sendToLogServer = false, LogType logType = LogType::LOG);
+	void WriteToDebug(const std::string& log) { OutputDebugStringA(log.c_str()); }
     void Http_Send_Log(std::string log, LogType logType) { m_httpLogger->Send_Log(log, "text", httplib::Headers(), logType); }
     void Http_Send_Patterns(std::vector<std::string> paths, std::string barP, std::string indL);
     void LogPatternPngs(std::vector<std::string> paths, std::string barP, std::string indL) { std::thread(&Logger::Http_Send_Patterns, this, paths, barP, indL).detach(); }

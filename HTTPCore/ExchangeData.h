@@ -21,6 +21,9 @@ public:
 	void DoneLoadingData() { m_httpsrv->Get_RequestHandler()->Set_LoadingData(false); }
 	static void Start_DataExchange() { RUN_HTTPSRV();}
 
+	bool IsScanningRunning() { return m_httpsrv->Get_RequestHandler()->Get_IsScanning(); }
+	void SetScanningRunning(bool status) { m_httpsrv->Get_RequestHandler()->Set_IsScanning(status); }
+
 	void Push_NewConfig(std::vector<std::string> confvec) { m_httpsrv->Get_RequestHandler()->PushNewConfig(confvec); }
 	std::pair<std::string, std::string> Get_ConfToUpdate() { return m_httpsrv->Get_RequestHandler()->GetNextConfigToUpdate(); }
 

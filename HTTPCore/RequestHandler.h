@@ -42,7 +42,10 @@ private:
 
 	bool m_runningStatus = true;
 	bool m_loadingDataStatus = true;
+	std::atomic<bool> m_isScanning = false;
 public:
+	bool Set_IsScanning(bool status) { return m_isScanning.exchange(status); }
+	bool Get_IsScanning() { return m_isScanning.load(); }
 
 	std::vector<ConfigStruct> Get_AllConfigs() { return m_confVec; }
 	ConfigStruct Get_Config(std::string& config);
@@ -64,5 +67,7 @@ public:
 	void Handle_IsThereAnTrade(httplib::Response& res);
 	void Handle_CloseOrder(const httplib::Request& req, httplib::Response& res);
 	void Handle_GetOrderData(const httplib::Request& req, httplib::Response& res);
+	void Handle_IsScanOnGoing(httplib::Response& res);
+
 };
 

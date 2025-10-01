@@ -58,9 +58,9 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histT
 
 		ScoresResult* foundRes = nullptr; // Initialize foundRes to nullptr
 		if (scoreCachePolicy->EnableScoreCaching)
-			 foundRes = TryFindCachedScore(PolynomTimeLineKey(histTL->at(i)->point_DateTimeLong, histTL->at(i+polyLen - 1)->point_DateTimeLong ),
-										   PolynomTimeLineKey(currTL->at(i)->point_DateTimeLong, currTL->at(i + polyLen - 1)->point_DateTimeLong)
-											, threadIdx); // Try to find the score in the cache
+			foundRes = TryFindCachedScore(PolynomTimeLineKey(histTL->at(i)->point_DateTimeLong, histTL->at(i + polyLen - 1)->point_DateTimeLong),
+				PolynomTimeLineKey(currTL->at(i)->point_DateTimeLong, currTL->at(i + polyLen - 1)->point_DateTimeLong)
+				, threadIdx); // Try to find the score in the cache
 
 		if (foundRes) // If the score was found in the cache
 		{
@@ -99,21 +99,31 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histT
 		PolynomTimeLine* hist = histPoly ? histPoly : histLocal.get();
 		PolynomTimeLine* curr = currPoly ? currPoly : currLocal.get();
 
-		
-		TimeLinePolynomScore localScore = CalcScore(hist->Get_PolynomPackage(),	curr->Get_PolynomPackage());
 
-		
+		TimeLinePolynomScore localScore = CalcScore(hist->Get_PolynomPackage(), curr->Get_PolynomPackage());
+
+
 		totalScore += *localScore.GetScoreContainer(IndicatorValueType::Value);
 		totalScore += *localScore.GetScoreContainer(IndicatorValueType::Slope);
 
 		if (!foundRes)
 			TryStoreScoreInCache(partialVec1, partialVec2, localScore, threadIdx); // Try to store the score in the cache
-		
+
 		// Cache the polynomials if they were not from cache
-		if(!histPoly)
-			histPolyCache.try_emplace(currKey,std::move(*histLocal.get()));
+		if (!histPoly)
+		{
+			totalPolyCacheMisses++;
+			histPolyCache.try_emplace(currKey, std::move(*histLocal.get()));
+		}
+		else
+			totalPolyCacheHits++;
 		if (!currPoly)
+		{
+			totalPolyCacheMisses++;
 			currPolyCache.try_emplace(histKey, std::move(*currLocal.get()));
+		}
+		else
+			totalPolyCacheHits++;
 	}
 	resCacheHits += totalCacheHits;
 	resCacheMisses += totalCacheMisses;

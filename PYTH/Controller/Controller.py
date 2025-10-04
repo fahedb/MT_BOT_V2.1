@@ -10,11 +10,13 @@ from Settings import (
     Set_Config_InServer,
     HEADER_CONFIG_NAME,
     HEADER_CONFIG_VALUE,
+    HEADER_CONFIG_POLICY_CATAGORY,
     HEADER_CONFIG_PERMISIION,
     HEADER_STATUS_CURRENTSTATUS,
     HEADER_STATUS_VALUE_STOPPED,
     HEADER_STATUS_VALUE_RUNNING,
     HEADER_STATUS_VALUE_LOADINGDATA,
+
 )
 
 # 🔑 סיסמה למשתמשים שרוצים גישה
@@ -25,14 +27,14 @@ STATUS_MAIN_MENU = "main_menu"
 # יצירת לקוח טלגרם כ-Bot API
 api_id = 23246402  
 api_hash = "a7b0f858ed8460c807f63ceaae0a0495"  
-bot_token = "7104772193:AAG5k9DWcneyh65fT_lwkIa1hy15Nl6LjQ"
+bot_token = "7104772193:AAEpXZanXlDY2H7nPC2dkwkfIYIEy6no4mw"
 client = TelegramClient("bot_session", api_id, api_hash).start(bot_token=bot_token)
 
 # 📌 רשימת משתמשים שאושרו לאחר שהזינו סיסמה
 authorized_users = {}
 user_states = {}  # מילון לניהול הסטטוס של המשתמשים
 print(bot_token);
-All_Configs_names = Get_AllConfigsNames()  # שליפת כל שמות ההגדרות
+All_Configs_with_catagory = Get_AllConfigsNames() or []
 print("here2")
 
 # 📌 פונקציה לאימות משתמשים עם סיסמה
@@ -160,21 +162,37 @@ async def callback_handler(event):
     elif data == "main_menu":
         await show_main_menu(event)
     elif data == "set_settings":
-        user_states[event.sender_id] = "awaiting_config_selection"
-        buttons = [[Button.inline(config, f"config_set_{config}")] for config in All_Configs_names]
+        # שלב ראשון: הצגת קטגוריות
+        user_states[event.sender_id] = "awaiting_category_for_set"
+        categories = list(set([cfg.get("ConfigPolicyCategory", "לא מוגדר") for cfg in All_Configs_with_catagory]))
+        buttons = [[Button.inline(cat, f"set_cat_{cat}")] for cat in categories]
         buttons.append([Button.inline("🔙 חזרה", b"settings")])
-        await event.respond("✏️ **בחר הגדרה כדי לערוך אותה:**", buttons=buttons)
+        await event.respond("📂 **בחר קטגוריה לעריכת הגדרה:**", buttons=buttons)
 
     elif data == "get_settings":
-        user_states[event.sender_id] = "awaiting_config_selection"
-
-        # יצירת כפתורים עם שמות ההגדרות
-        buttons = [[Button.inline(config, f"config_get_{config}")] for config in All_Configs_names]
-
-        # כפתור חזרה
+        # שלב ראשון: הצגת קטגוריות
+        user_states[event.sender_id] = "awaiting_category_for_get"
+        categories = list(set([cfg.get("ConfigPolicyCategory", "לא מוגדר") for cfg in All_Configs_with_catagory]))
+        buttons = [[Button.inline(cat, f"get_cat_{cat}")] for cat in categories]
         buttons.append([Button.inline("🔙 חזרה", b"settings")])
+        await event.respond("📂 **בחר קטגוריה להצגת הגדרות:**", buttons=buttons)
+    # טיפול בבחירת קטגוריה לשינוי הגדרה
+    elif data.startswith("set_cat_"):
+        cat = data[len("set_cat_"):]
+        user_states[event.sender_id] = f"awaiting_config_selection_set_{cat}"
+        configs = [cfg["ConfigName"] for cfg in All_Configs_with_catagory if cfg.get("ConfigPolicyCategory") == cat]
+        buttons = [[Button.inline(config, f"config_set_{config}")] for config in configs]
+        buttons.append([Button.inline("🔙 חזרה", b"set_settings")])
+        await event.respond(f"✏️ **בחר הגדרה לעריכה בקטגוריה:** `{cat}`", buttons=buttons)
 
-        await event.respond("📜 **בחר הגדרה להצגת הערך שלה:**", buttons=buttons)
+    # טיפול בבחירת קטגוריה להצגת ערך הגדרה
+    elif data.startswith("get_cat_"):
+        cat = data[len("get_cat_"):]
+        user_states[event.sender_id] = f"awaiting_config_selection_get_{cat}"
+        configs = [cfg["ConfigName"] for cfg in All_Configs_with_catagory if cfg.get("ConfigPolicyCategory") == cat]
+        buttons = [[Button.inline(config, f"config_get_{config}")] for config in configs]
+        buttons.append([Button.inline("🔙 חזרה", b"get_settings")])
+        await event.respond(f"📜 **בחר הגדרה להצגה בקטגוריה:** `{cat}`", buttons=buttons)
 
     elif data.startswith("config_set_"):
         config_name = data[len("config_set_"):]
@@ -187,7 +205,9 @@ async def callback_handler(event):
         await event.edit(f"🔄 מחפש את ההגדרה: **{config_name}**...")
 
         # קריאה לשרת לקבלת המידע
+        print("Before getting config: " + config_name)
         config_data = Get_Config_FromServer(config_name)
+        print("After getting config: " + config_name)
 
         if config_data:
             config_value = config_data.get("ConfigValue", "לא נמצא")

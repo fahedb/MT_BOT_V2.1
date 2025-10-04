@@ -33,6 +33,7 @@
 #define HTTP_PARAM_ConfigName "ConfigName"
 #define HTTP_PARAM_ConfigValue "ConfigValue"
 #define HTTP_PARAM_ConfigExplain "ConfigExplain"
+#define HTTP_PARAM_ConfigPolicyCategory "ConfigPolicyCategory"
 #define HTTP_PARAM_ConfigPermission "ConfigPermission"
 #define HTTP_PARAM_ConfigCatagory "ConfigCatagory"
 

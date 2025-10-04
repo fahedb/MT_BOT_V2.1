@@ -1,51 +1,9 @@
 #include <string>
 #include "ConfigsTableStaticProxy.h"
+#include "PolicyTypeEnum.h"
 
 #pragma once
 
-enum class PolicyType
-{
-    InfraConfigrationsPolicy,
-    FusionEnginePolicy,
-    ScoreComparerPolicy,
-    PolynomComparerPolicy,
-    ConfigrationsPolicy,
-    OrderTracerPolicy,
-    OrdersPolicy,
-    TradeManagerPolicy, 
-    ScoreCachingPolicy,
-    PatternGodStatisticsPolicy,
-    BaseComparerPolicy
-};
-
-// Hash function for PolicyType enum - needed for robin_hood::unordered_map
-namespace std {
-    template<>
-    struct hash<PolicyType> {
-        std::size_t operator()(const PolicyType& type) const {
-            return static_cast<std::size_t>(type);
-        }
-    };
-}
-
-struct PolicyTypeList
-{
-    std::vector<PolicyType> types = {
-        PolicyType::InfraConfigrationsPolicy,
-        PolicyType::FusionEnginePolicy,
-        PolicyType::ScoreComparerPolicy,
-        PolicyType::PolynomComparerPolicy,
-        PolicyType::ConfigrationsPolicy,
-        PolicyType::OrderTracerPolicy,
-        PolicyType::OrdersPolicy,
-        PolicyType::TradeManagerPolicy,
-        PolicyType::ScoreCachingPolicy,
-        PolicyType::PatternGodStatisticsPolicy,
-        PolicyType::BaseComparerPolicy
-
-
-    };
-};
 
 /// <summary>
 /// Base class for all policies.
@@ -55,12 +13,11 @@ class BasePolicy
 {
 public:
     virtual ~BasePolicy() = default;
-
-	virtual std::vector<std::vector<std::string>> Get_All() = 0; // Pure virtual function to get all configurations
+	virtual std::vector<std::vector<std::string>> Get_All();
 	virtual void Refresh() { InitPolicy(); } // Refresh the policy by re-initializing it
+	virtual PolicyType GetPolicyType() const = 0; // Pure virtual function to get the policy type
 protected:
-    std::vector<std::vector<std::string>> Get_AllConfigs(std::vector<std::pair<std::string, std::string>> allConfigs);
-
+	std::vector<std::pair<std::string, std::string>> m_allConfigs; // Store all configurations as pairs of <config_name, config_value>
 private:
 	virtual void InitPolicy() = 0; // Pure virtual function to initialize the policy
 };
@@ -81,7 +38,7 @@ public:
         InitPolicy();
     }
     std::string http_server_port;
-    virtual std::vector<std::vector<std::string>> Get_All() override;
+	virtual PolicyType GetPolicyType() const override { return PolicyType::InfraConfigrationsPolicy; }
 private:
     void InitPolicy();
 };
@@ -100,9 +57,8 @@ public:
     {
         InitPolicy(); // Initialize the policy
 	}
-    virtual std::vector<std::vector<std::string>> Get_All() override;
     int Min_Similar_Results_To_Fusuion = 0; // Default value for maximum score possible for change nodes
-
+	virtual PolicyType GetPolicyType() const override { return PolicyType::FusionEnginePolicy; }
 private:
     void InitPolicy() override;
 };
@@ -122,8 +78,8 @@ public:
     {
         InitPolicy();
     }
+	virtual PolicyType GetPolicyType() const override { return PolicyType::ScoreComparerPolicy; }
 
-    virtual std::vector<std::vector<std::string>> Get_All() override;
     int RSI_Wieght = 0;
     int EMA_Wieght = 0;
     int ZLSMA_Wieght = 0;
@@ -149,7 +105,7 @@ public:
     {
         InitPolicy();
     }
-    virtual std::vector<std::vector<std::string>> Get_All() override;
+	virtual PolicyType GetPolicyType() const override { return PolicyType::PolynomComparerPolicy; }
 
     double weight_eval = 0.5; // Weight for evaluation score
     double weight_rmse = 0.3; // Weight for RMSE score
@@ -174,15 +130,8 @@ public:
     {
         InitPolicy();
     }
-    virtual std::vector<std::vector<std::string>> Get_All() override
-    {
-        std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
-            std::make_pair(CONFIGS_MIN_SIMILAR_RESULTS_TO_FUSION),
-            std::make_pair(CONFIG_POLYNOM_FUSION_WEIGHT),
-            std::make_pair(CONFIG_SCORE_FUSION_WEIGHT)
-        };
-        return Get_AllConfigs(allConfigs);
-    }
+	virtual PolicyType GetPolicyType() const override { return PolicyType::BaseComparerPolicy; }
+
     int Min_Similar_Results_To_Fusion = 2; // Default value for minimum similar results to fusion
 
     double PolynomComparerWeight = 0.7; // Weight for polynomial fusion
@@ -206,8 +155,8 @@ public:
     {
         InitPolicy();
     }
-    virtual std::vector<std::vector<std::string>> Get_All() override;
-
+	virtual PolicyType GetPolicyType() const override { return PolicyType::OrderTracerPolicy; }
+    
     bool EnableTradeTracing = false;
     bool EnableDynamicTimeLine_TradeTracing = false;
     int TraceCurrTimeLineLen = 0;
@@ -227,7 +176,8 @@ public:
     {
         InitPolicy();
     }
-    virtual std::vector<std::vector<std::string>> Get_All() override;
+	virtual PolicyType GetPolicyType() const override { return PolicyType::OrdersPolicy; }
+
     int SL_start = 0;
     int TP_start = 0;
 
@@ -257,8 +207,7 @@ public:
     {
         InitPolicy();
     }
-
-    virtual std::vector<std::vector<std::string>> Get_All() override;
+	virtual PolicyType GetPolicyType() const override { return PolicyType::ScoreCachingPolicy; }
 
     bool EnableScoreCaching = true;
     long ScoreResultsCacheSizePerThread = 100000; // Default size for each thread's cache
@@ -278,9 +227,8 @@ public:
     {
         InitPolicy();
     }
+	virtual PolicyType GetPolicyType() const override { return PolicyType::TradeManagerPolicy; }
     
-    virtual std::vector<std::vector<std::string>> Get_All() override;
-
     double Pattern_Min_Patterns_ToTake_Action = 0.0;
     double Pattern_Max_Patterns_To_Find = 0.0;
     double Pattern_TopScore_ThresholdRatio = 0.0;
@@ -302,10 +250,16 @@ public:
     {
         InitPolicy();
     }
-    virtual std::vector<std::vector<std::string>> Get_All() override;
+	virtual PolicyType GetPolicyType() const override { return PolicyType::PatternGodStatisticsPolicy; }
+
     int Score_Future_Vision_Candles = 0;
     int SavedDirectionStaticsLen = 0;
 
+	bool Enable_Weighted_Voting = false;
+	int Weighting_Method_for_Weighting = 0; // 0 = Linear, 1 = PowerLaw, 2 = SoftMax
+
+	double softmax_T_param_for_Weighting = 0.5;
+	double powerlaw_exponent_for_Weighting = 2.0;
 
 private:
     void InitPolicy();
@@ -328,7 +282,7 @@ public:
     {
         InitPolicy(); // Initialize the policy
 	}
-    virtual std::vector<std::vector<std::string>> Get_All() override;
+	virtual PolicyType GetPolicyType() const override { return PolicyType::ConfigrationsPolicy; }
 
     int Pattern_CurrentTimeLineLen = 0;
     int EMA_len_for_Pattern_Export = 0;

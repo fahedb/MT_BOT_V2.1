@@ -86,28 +86,3 @@ std::vector<std::pair<ChangeNode*, ScoresResult>> PatternGod_ResultFusionEngine:
 
     return fusedResults;
 }
-
-inline PatternGodComparerResultsMap PatternGod_ResultFusionEngine::Get_NormalizedComparerMap(PatternGodComparerResultsMap& results)
-{
-    PatternGodComparerResultsMap normalizedResults;
-    PatternGodComparerTypeList comparerTypes;
-
-    for (const auto& comparerType : comparerTypes.types)
-    {
-        auto scores = TimeLineBuilder::SplitScoresFromChangeNode(&results.at(comparerType));  // Split the scores from the change nodes
-        auto changeNodes = TimeLineBuilder::SplitChangeNodeFromScores(&results.at(comparerType)); // Split the change nodes from the scores
-
-        MinMaxFinderScoresResult minMaxFinder(scores); // Create a MinMaxFinderScoresResult object to find the min and max scores
-        ScoresResultRangeNormalizer normalizer(minMaxFinder.Find_Min(), minMaxFinder.Find_Max()); // Create a normalizer using the min and max scores
-
-        for (int i = 0; i < scores.size(); i++) // Replace Results with normalized once
-        {
-            scores.at(i) = normalizer.normalize(scores.at(i), NORMALIZE_WEIGHT); // Normalize the scores using the normalizer	
-        }
-
-        auto normalizedResPairs = TimeLineBuilder::CombineScoresAndChangeNodes(changeNodes, scores); // Combine the normalized scores with the change nodes
-
-        normalizedResults[comparerType] = normalizedResPairs;
-    }
-    return normalizedResults;
-}

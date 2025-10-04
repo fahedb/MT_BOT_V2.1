@@ -1,5 +1,5 @@
-#include "ComparersEnums.h"
-#include "IndicatorStructres.h"
+#include <utility>
+
 #pragma once
 
 template<typename T>
@@ -14,26 +14,6 @@ struct Normalizer {
     T rangeVal;
 };
 
-
-struct ScoresResultRangeNormalizer final : Normalizer<ScoresResult>
-{
-    explicit ScoresResultRangeNormalizer(const ScoresResult& minV, const ScoresResult& maxV);
-
-    ScoresResult normalize(const ScoresResult& r, double weight = 1) const override
-    {
-        if (!hasValidRange) {
-			// No valid range, return an empty ScoresResult
-            return ScoresResult{};
-        }
-
-		// Sub the min value from the result and divide by the range value
-        ScoresResult tmp = r - minVal;
-        return (tmp / rangeVal) * weight;
-    }
-
-private:
-    bool hasValidRange = true;
-};
 
 struct DoubleRangeNormalizer final : Normalizer<double>
 {

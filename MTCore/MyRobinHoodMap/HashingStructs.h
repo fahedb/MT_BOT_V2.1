@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 #include <stdlib.h>
 
 // Hash function for std::pair<ssize_t,ssize_t>
@@ -25,6 +26,7 @@ namespace std {
     };
 }
 
+
 // Hash functions for PolynomTimeLineKey
 struct PolynomTimeLineKey
 {
@@ -40,28 +42,93 @@ struct PolynomTimeLineKey
         return startTimePoint == other.startTimePoint &&
             endTimePoint == other.endTimePoint;
     }
+
+    static long long Cut_SecondsAndMilliSeconds(long long timePoint) // Exmaple for TimePoint: 20250328225200000 -- YYYYMMDDHHMMSSmmm 
+    {
+        if(timePoint < 100000000000000) // Less than 14 digits
+			return timePoint; // No seconds or milliseconds to cut
+        auto tp = (timePoint / 100000LL); // Remove seconds and milliseconds
+        return tp;
+
+    }
 };
+
+
 
 // Hash function for PolynomTimeLineKey
 namespace robin_hood {
+
+    namespace detail_hash {
+        static inline uint64_t rotl(uint64_t x, unsigned r) noexcept {
+            return (x << r) | (x >> (64 - r));
+        }
+		// SplitMix64 is a simple and fast hash function with good avalanche properties.
+        static inline uint64_t mix64(uint64_t x) noexcept {
+            x ^= x >> 30; x *= 0xbf58476d1ce4e5b9ULL;
+            x ^= x >> 27; x *= 0x94d049bb133111ebULL;
+            x ^= x >> 31;
+            return x;
+        }
+        static inline uint64_t combine(uint64_t a, uint64_t b) noexcept {
+			// Well distributed for small changes in a or b
+            uint64_t h = a ^ rotl(b, 31) ^ (a + 0x9e3779b97f4a7c15ULL) * 0x9ddfea08eb382d69ULL;
+            return mix64(h);
+        }
+    }
+
     template<>
     struct hash<PolynomTimeLineKey> {
-        size_t operator()(const PolynomTimeLineKey& key) const {
-            // Simple but effective hash for timestamps
-            // Uses prime numbers to avoid collisions
-            return key.startTimePoint * 31 + key.endTimePoint * 17;
+        size_t operator()(const PolynomTimeLineKey& key) const noexcept {
+            using namespace detail_hash;
+			// Important: work in uint64_t to get well-defined overflows
+			long long start = PolynomTimeLineKey::Cut_SecondsAndMilliSeconds(key.startTimePoint);
+			long long end = PolynomTimeLineKey::Cut_SecondsAndMilliSeconds(key.endTimePoint);
+
+            uint64_t a = mix64(static_cast<uint64_t>(start));
+            uint64_t b = mix64(static_cast<uint64_t>(end) ^ 0x9e3779b97f4a7c15ULL);
+            uint64_t h = combine(a, b);
+            return static_cast<size_t>(h);
         }
     };
 
-    // Hash function for pair of PolynomTimeLineKeys
-    template <>
+    template<>
     struct hash<std::pair<PolynomTimeLineKey, PolynomTimeLineKey>> {
-        size_t operator()(const std::pair<PolynomTimeLineKey, PolynomTimeLineKey>& p) const {
-            // Simple but effective hash for timestamp pairs
-            // Combines both keys with different prime multipliers
-            size_t h1 = p.first.startTimePoint * 31 + p.first.endTimePoint * 17;
-            size_t h2 = p.second.startTimePoint * 23 + p.second.endTimePoint * 19;
-            return h1 * 37 + h2 * 41;
+        size_t operator()(const std::pair<PolynomTimeLineKey, PolynomTimeLineKey>& p) const noexcept {
+            using namespace detail_hash;
+			// Return the hash of the pair by combining the hashes of the two PolynomTimeLineKeys
+            robin_hood::hash<PolynomTimeLineKey> kh;
+            uint64_t h1 = static_cast<uint64_t>(kh(p.first));
+            uint64_t h2 = static_cast<uint64_t>(kh(p.second));
+            uint64_t h = combine(mix64(h1), mix64(h2 ^ 0x243f6a8885a308d3ULL));
+            return static_cast<size_t>(h);
         }
     };
-}
+
+} // namespace robin_hood
+
+
+//
+//// Hash function for PolynomTimeLineKey
+//namespace robin_hood {
+//    template<>
+//    struct hash<PolynomTimeLineKey> {
+//        size_t operator()(const PolynomTimeLineKey& key) const {
+//            // Simple but effective hash for timestamps
+//            // Uses prime numbers to avoid collisions
+//            return key.startTimePoint * 31ULL + key.endTimePoint * 17ULL;
+//        }
+//    };
+//
+//    // Hash function for pair of PolynomTimeLineKeys
+//    template <>
+//    struct hash<std::pair<PolynomTimeLineKey, PolynomTimeLineKey>> {
+//        size_t operator()(const std::pair<PolynomTimeLineKey, PolynomTimeLineKey>& p) const {
+//            // Simple but effective hash for timestamp pairs
+//            // Combines both keys with different prime multipliers
+//			
+//            size_t h1 = p.first.startTimePoint * 31ULL + p.first.endTimePoint * 17ULL;
+//            size_t h2 = p.second.startTimePoint * 23ULL + p.second.endTimePoint * 19ULL;
+//            return h1 * 37ULL + h2 * 41ULL;
+//        }
+//    };
+//}

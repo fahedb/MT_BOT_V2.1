@@ -10,6 +10,12 @@
     <Filter Include="Math">
       <UniqueIdentifier>{b1a13651-dbfd-4355-add8-75607602c70c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Normalizer">
+      <UniqueIdentifier>{78587ebe-4f31-43f1-b26c-6e8f92c96911}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MaxMinFinder">
+      <UniqueIdentifier>{8a0429c5-b220-42b2-b7db-1c2e4df20f73}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Converts.cpp">
@@ -21,6 +27,12 @@
     <ClCompile Include="MathExtentions.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="Normalizer.cpp">
+      <Filter>Normalizer</Filter>
+    </ClCompile>
+    <ClCompile Include="MinMaxFinder.cpp">
+      <Filter>MaxMinFinder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Converts.h">
@@ -31,6 +43,12 @@
     </ClInclude>
     <ClInclude Include="MathExtentions.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="MinMaxFinder.h">
+      <Filter>MaxMinFinder</Filter>
+    </ClInclude>
+    <ClInclude Include="Normalizer.h">
+      <Filter>Normalizer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

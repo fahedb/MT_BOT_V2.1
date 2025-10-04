@@ -16,10 +16,6 @@ void DataExporter::Export_All_Statistics_Data(DirectionStats& stats, bool tradeD
 		if (tradeDecRes)Logger::getInstance().WriteLog(summery_logs.at(i), false, true, LogType::SPECIAL_LOG); // if there is a trade, send also to SPECIAL log
 	}
 
-	logger.WriteLog("Start export data to json...");
-	Export_DataToJson(stats, false);
-	logger.WriteLog("Done export data to json");
-
 	if (policy->Enable_Patterns_PNG_Export)
 	{
 		logger.WriteLog("Start export pngs...");
@@ -27,35 +23,38 @@ void DataExporter::Export_All_Statistics_Data(DirectionStats& stats, bool tradeD
 		logger.WriteLog("Done export pngs");
 	}
 
-	if (tradeDecRes) Export_DataToJson(stats, true);
-
-	if (tradeDecRes) Export_DataToCSV(stats);
 	logger.WriteLog("Done export all data");
 
 }
 
 std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
 {
-	int totalCount_general = stats.Get_TotalCount(StatsType::General);
-	double general_upPercent = (double(stats.Get_UpCount(StatsType::General)) / totalCount_general) * 100.0;
-	double general_downPercent = (double(stats.Get_DownCount(StatsType::General)) / totalCount_general) * 100.0;
-	double general_blurPercent = (double(stats.Get_BlurCount(StatsType::General)) / totalCount_general) * 100.0;
+	int totalCount_general = stats.Get_Total(StatsType::General);
+	auto generalDirectionMap = stats.Get_VotedPercentages(StatsType::General);
 
-	int totalCount_first = stats.Get_TotalCount(StatsType::First);
-	double first_upPercent = (double(stats.Get_UpCount(StatsType::First)) / totalCount_first) * 100.0;
-	double first_downPercent = (double(stats.Get_DownCount(StatsType::First)) / totalCount_first) * 100.0;
-	double first_blurPercent = (double(stats.Get_BlurCount(StatsType::First)) / totalCount_first) * 100.0;
+	double general_upPercent =		generalDirectionMap[CommonDirection::UP];
+	double general_downPercent =	generalDirectionMap[CommonDirection::DOWN];
+	double general_blurPercent =	generalDirectionMap[CommonDirection::BLUR];
 
-	int totalCount_highest = stats.Get_TotalCount(StatsType::Highest);
-	double highest_upPercent = (double(stats.Get_UpCount(StatsType::Highest)) / totalCount_highest) * 100.0;
-	double highest_downPercent = (double(stats.Get_DownCount(StatsType::Highest)) / totalCount_highest) * 100.0;
-	double highest_blurPercent = (double(stats.Get_BlurCount(StatsType::Highest)) / totalCount_highest) * 100.0;
+	int totalCount_first = stats.Get_Total(StatsType::First);
+	auto firstDirectionMap = stats.Get_VotedPercentages(StatsType::First);
 
-	Logger::getInstance().WriteLog("Patterns count found: " + std::to_string(stats.Get_TotalCount(StatsType::General)), false, true);
+	double first_upPercent =	firstDirectionMap[CommonDirection::UP];
+	double first_blurPercent =	firstDirectionMap[CommonDirection::BLUR];
+	double first_downPercent =	firstDirectionMap[CommonDirection::DOWN];
+
+	int totalCount_highest = stats.Get_Total(StatsType::Highest);
+	auto highestDirectionMap = stats.Get_VotedPercentages(StatsType::Highest);
+
+	double highest_upPercent = highestDirectionMap[CommonDirection::UP];
+	double highest_downPercent = highestDirectionMap[CommonDirection::DOWN];
+	double highest_blurPercent = highestDirectionMap[CommonDirection::BLUR];
+
+	Logger::getInstance().WriteLog("Patterns count found: " + std::to_string(totalCount_general), false, true);
 
 	std::string general_summeryLog = "Stats Summary (General decession calcs !!):\n" +
 		std::string("Time Point: ") + stats.Get_TimePoint() + "\n" +
-		std::string("Patterns Count: ") + std::to_string(stats.Get_TotalCount(StatsType::General)) + "\n" +
+		std::string("Patterns Count: ") + std::to_string(totalCount_general) + "\n" +
 		std::string("UP: ") + std::to_string(general_upPercent) + "%\n" +
 		"DOWN: " + std::to_string(general_downPercent) + "%\n" +
 		"NOISE: " + std::to_string(general_blurPercent) + "%\n" +
@@ -144,63 +143,6 @@ std::vector<std::string> DataExporter::PrepareSummeryLogs(DirectionStats& stats)
 	summery_logs.push_back(positiveStepsMeansLog);
 	summery_logs.push_back(negativeStepsMeansLog);
 	return summery_logs;
-}
-
-void DataExporter::Export_DataToJson(DirectionStats& stats, bool tradeDecRes)
-{
-	auto j = JasonHandler::Build_Json_ForStats(stats);
-	std::string filePath = "C:\\MTDB\\";
-	filePath += "AllSummery.json";
-	std::lock_guard<std::mutex> lock(m_jsonFileLocker);
-	std::ofstream file(filePath, std::ios::app);
-	file << j.dump() << "\n";
-	file.close();
-
-	if (tradeDecRes)
-	{
-		std::string ordersfilePath = "C:\\MTDB\\";
-		ordersfilePath += "OrderSummery.json";
-		std::ofstream ordersFile(ordersfilePath, std::ios::app);
-		ordersFile << j.dump() << "\n";
-		ordersFile.close();
-	}
-
-}
-
-void DataExporter::Export_DataToCSV(DirectionStats& stats)
-{
-	int totalCount_general = stats.Get_TotalCount(StatsType::General);
-	double general_upPercent = (double(stats.Get_UpCount(StatsType::General)) / totalCount_general) * 100.0;
-	double general_downPercent = (double(stats.Get_DownCount(StatsType::General)) / totalCount_general) * 100.0;
-	double general_blurPercent = (double(stats.Get_BlurCount(StatsType::General)) / totalCount_general) * 100.0;
-
-	int totalCount_first = stats.Get_TotalCount(StatsType::First);
-	double first_upPercent = (double(stats.Get_UpCount(StatsType::First)) / totalCount_first) * 100.0;
-	double first_downPercent = (double(stats.Get_DownCount(StatsType::First)) / totalCount_first) * 100.0;
-	double first_blurPercent = (double(stats.Get_BlurCount(StatsType::First)) / totalCount_first) * 100.0;
-
-	std::lock_guard<std::mutex> lock(m_csvFileLocker);
-
-	CSVExportData exData("ordersSummery.csv");
-	exData.InsertNewColumn(stats.Get_TimePoint());
-
-	exData.InsertNewColumn(std::to_string(general_upPercent));
-	exData.InsertNewColumn(std::to_string(general_downPercent));
-	exData.InsertNewColumn(std::to_string(general_blurPercent));
-	exData.InsertNewColumn(std::to_string(stats.mean(StatsType::General)));
-	exData.InsertNewColumn(std::to_string(stats.stddev(StatsType::General)));
-	exData.InsertNewColumn(std::to_string(stats.meanIndexes(StatsType::General)));
-
-
-	exData.InsertNewColumn(std::to_string(first_upPercent));
-	exData.InsertNewColumn(std::to_string(first_downPercent));
-	exData.InsertNewColumn(std::to_string(first_blurPercent));
-	exData.InsertNewColumn(std::to_string(stats.mean(StatsType::First)));
-	exData.InsertNewColumn(std::to_string(stats.stddev(StatsType::First)));
-	exData.InsertNewColumn(std::to_string(stats.meanIndexes(StatsType::First)));
-
-	exData.NewRow();
-	exData.DoneInsertingData();
 }
 
 void DataExporter::Send_For_PNGExport(DirectionStats& stats)

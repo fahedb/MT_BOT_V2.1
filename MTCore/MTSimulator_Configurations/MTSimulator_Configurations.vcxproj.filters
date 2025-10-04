@@ -13,6 +13,9 @@
     <Filter Include="ProxyTable">
       <UniqueIdentifier>{11fd1128-b42f-4976-b442-8a4202ccd1ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Enums">
+      <UniqueIdentifier>{69cdf2c5-f0dc-444c-89ae-668ebbe11ba4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CONFIGRATIONS.H">
@@ -27,6 +30,9 @@
     <ClInclude Include="robin_hood.h" />
     <ClInclude Include="ConfigsTableStaticProxy.h">
       <Filter>ProxyTable</Filter>
+    </ClInclude>
+    <ClInclude Include="PolicyTypeEnum.h">
+      <Filter>Enums</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

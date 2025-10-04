@@ -40,13 +40,13 @@ public:
     }
     virtual void CleanTask(long long oldestTP, BaseCacheMap* relevantMap) override;
 	virtual long long GetStartTP(const PolynomTimeLineKey& key) override { return key.startTimePoint; } // Use the start time point of the key as the reference
-    void InsertPolynomTimeLine(const PolynomTimeLineKey& key, PolynomTimeLine&& polynomTl, CacheType cachT, bool externalLock = false) {  // Insert with a key and a PolynomTimeLine (move)
+    void InsertPolynomTimeLine(PolynomTimeLineKey& key, PolynomTimeLine&& polynomTl, CacheType cachT, bool externalLock = false) {  // Insert with a key and a PolynomTimeLine (move)
         if (!externalLock)
             std::lock_guard<std::mutex> lock(m_cacheMutex); // Ensure thread safety
         Insert(key, std::move(polynomTl), cachT, 0);
     }
     
-    PolynomTimeLine* GetPolynomTimeLine(const PolynomTimeLineKey& key, CacheType cachT)// Retrieve a PolynomTimeLine by its key
+    PolynomTimeLine* GetPolynomTimeLine(PolynomTimeLineKey& key, CacheType cachT)// Retrieve a PolynomTimeLine by its key
     {
         return Get(key, cachT, 0);
     }

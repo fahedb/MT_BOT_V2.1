@@ -1,5 +1,4 @@
 #pragma once
-#include "INDICATORSTRUCTRES.H"
 #include <vector>
 #include <limits>
 
@@ -26,13 +25,3 @@ struct MinMaxFinder {
 	std::vector<T> m_data;
 };
 
-
-struct MinMaxFinderScoresResult  {
-    MinMaxFinderScoresResult(std::vector<ScoresResult> data) : m_data(data) {}
-	std::vector<ScoresResult> m_data; 
-    ScoresResult Find_Min() const;
-    ScoresResult Find_Max() const;
-private:
-    double Find_MaxScore(IndicatorType indType, BarPeriod barP) const;
-    double Find_MinScore(IndicatorType indType, BarPeriod barP) const;
-};

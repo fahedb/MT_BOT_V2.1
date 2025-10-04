@@ -76,14 +76,16 @@ CommonDirection TradesManager::CalcCommonDirection_Pure(DirectionStats& stats)
 CommonDirection TradesManager::CheckDirection(DirectionStats& stats, StatsType stype)
 {
 
-	int generalCount = stats.Get_TotalCount(stype);
-	double upPercent = (double(stats.Get_UpCount(stype)) / generalCount) * 100.0;
-	double downPercent = (double(stats.Get_DownCount(stype)) / generalCount) * 100.0;
-	double blurPercent = (double(stats.Get_BlurCount(stype)) / generalCount) * 100.0;
+	int patternsCount= stats.Get_Total(stype);
+	auto directionMap = stats.Get_VotedPercentages(stype);
+
+	double upPercent = directionMap[CommonDirection::UP];
+	double downPercent = directionMap[CommonDirection::DOWN];
+	double blurPercent = directionMap[CommonDirection::BLUR];
 
 	double meanPips = stats.mean(StatsType::General);
 
-	if (generalCount >= m_tradeMngrPolicy->Pattern_Min_Patterns_ToTake_Action)
+	if (patternsCount >= m_tradeMngrPolicy->Pattern_Min_Patterns_ToTake_Action)
 	{
 		bool isStrongUp = upPercent > m_tradeMngrPolicy->Pattern_Min_Percent_To_ExecuteOrder
 			&& (meanPips) >= m_tradeMngrPolicy->Min_MeanPips_ToExecute_Order;
@@ -126,10 +128,12 @@ CommonDirection TradesManager::CheckDirection(DirectionStats& stats, StatsType s
 
 CommonDirection TradesManager::CheckDirection_Pure(DirectionStats& stats, StatsType stype)
 {
-	int generalCount = stats.Get_TotalCount(stype);
-	double upPercent = (double(stats.Get_UpCount(stype)) / generalCount) * 100.0;
-	double downPercent = (double(stats.Get_DownCount(stype)) / generalCount) * 100.0;
-	double blurPercent = (double(stats.Get_BlurCount(stype)) / generalCount) * 100.0;
+	int generalCount = stats.Get_Total(stype);
+	auto directionMap = stats.Get_VotedPercentages(stype);
+
+	double upPercent = directionMap[CommonDirection::UP];
+	double downPercent = directionMap[CommonDirection::DOWN];
+	double blurPercent = directionMap[CommonDirection::BLUR];
 
 	double meanPips = stats.mean(StatsType::General);
 

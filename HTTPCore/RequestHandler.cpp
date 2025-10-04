@@ -57,6 +57,7 @@ void RequestHandler::PushNewConfig(std::vector<std::string>& conf)
 	configStruct.explain = conf.at(2);
 	configStruct.m_permission = Converts::ToInt(conf.at(3));
 	configStruct.m_catagory = Converts::ToInt(conf.at(4));
+	configStruct.policyCategory = conf.at(5);
 	configStruct.need_To_Update = false;
 
 	m_confVec.push_back(configStruct);

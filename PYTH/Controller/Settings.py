@@ -4,6 +4,8 @@ SERVER_URL = "http://localhost:8080"
 
 HEADER_CONFIG_NAME ="ConfigName"
 HEADER_CONFIG_VALUE = "ConfigValue"
+HEADER_CONFIG_CATAGORY = "ConfigCategory"
+HEADER_CONFIG_POLICY_CATAGORY = "ConfigPolicyCategory"
 HEADER_CONFIG_PERMISIION = "ConfigPermission"
 
 HEADER_STATUS_CURRENTSTATUS = "Status"
@@ -12,20 +14,25 @@ HEADER_STATUS_VALUE_STOPPED = "Stopped"
 HEADER_STATUS_VALUE_RUNNING = "Running"
 HEADER_STATUS_VALUE_LOADINGDATA = "LoadingData"
 
+
 def Get_AllConfigsNames():
     service = "/GetAllConfigsNames"
     reqUrl = SERVER_URL + service
     session = requests.Session()
     try:
-
-        response = session.get(reqUrl, timeout=30)  # קריאה עם זמן מקסימום של 5 שניות
-        response.raise_for_status()  # אם הסטטוס אינו תקין, תזרק שגיאה
-
-        # שמירת ה-Body לקובץ
-        body_content = response.text  # שמירת ה-Body בפורמט טקסט
-        lines =body_content.split("\n")
-        return lines
-    
+        response = session.get(reqUrl, timeout=30)
+        response.raise_for_status()
+        body_content = response.text
+        lines = body_content.split("\n")
+        # כל שורה: שם,קטגוריה
+        configs = []
+        for line in lines:
+            parts = line.strip().split(",")
+            if len(parts) == 2:
+                configs.append({"ConfigName": parts[0], "ConfigPolicyCategory": parts[1]})
+            elif len(parts) == 1 and parts[0]:
+                configs.append({"ConfigName": parts[0], "ConfigPolicyCategory": "לא מוגדר"})
+        return configs
     except requests.exceptions.RequestException as e:
         print(f"❌ שגיאה בביצוע הבקשה: {e}")
         return None
@@ -124,10 +131,11 @@ def Get_Config_FromServer(config):
         # שליפת ההדרים
         config_name = response.headers.get(HEADER_CONFIG_NAME, "Unknown")
         config_value = response.headers.get(HEADER_CONFIG_VALUE, "Unknown")
-
+        config_catagory = response.headers.get(HEADER_CONFIG_CATAGORY, "Unknown")
         # שמירת ה-Body לקובץ
         body_content = response.text  # שמירת ה-Body בפורמט טקסט
-        return {"ConfigName": config_name, "ConfigValue": config_value, "ConfigExplain": body_content}
+        return {"ConfigName": config_name, "ConfigValue": config_value, "ConfigExplain": body_content, "ConfigPolicyCategory": config_catagory}
+
 
     except requests.exceptions.RequestException as e:
         print(f"❌ שגיאה בביצוע הבקשה: {e}")

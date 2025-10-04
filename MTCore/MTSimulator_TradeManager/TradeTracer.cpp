@@ -51,10 +51,6 @@ DirectionStats* TradeTracer::DynamicTradeTracing(OrderEntity* order)
 	m_patternScanner->ScanForOneMinPatterns_MultiThreaded(potentialMatches_WResults);
 
 
-	std::vector<ChangeNode*> potentialMatches;
-	for (int i = 0; i < potentialMatches_WResults.size(); i++)
-		potentialMatches.push_back(potentialMatches_WResults.at(i).first);
-
 	// Our stats should be until the end of the future len
 	int futureLen = (m_confPolicy->Pattern_CurrentTimeLineLen + m_statsPolicy->Score_Future_Vision_Candles) - toScanPeriod.size();
 	// If the future length is negative, we should set it to 1, That means, if we a pattern that is longer than the current timeLine + future len we will get the stats for a single bar
@@ -62,7 +58,7 @@ DirectionStats* TradeTracer::DynamicTradeTracing(OrderEntity* order)
 	if (futureLen <= 0)
 		futureLen = 1;
 
-	DirectionStats* stats = new DirectionStats(std::move(m_statisticsEngine->DetectCommonDirection(&potentialMatches, futureLen)));
+	DirectionStats* stats = new DirectionStats(std::move(m_statisticsEngine->DetectCommonDirection(&potentialMatches_WResults, futureLen)));
 
 	std::vector<TimeLineScored> scoredTimeLine = TimeLineBuilder::Build_TimeLineScored_Patterns(m_historyTL, &potentialMatches_WResults, toScanPeriod.size(), futureLen);
 	TimeLine currTL(toScanPeriod);

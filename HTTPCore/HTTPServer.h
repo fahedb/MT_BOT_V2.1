@@ -34,7 +34,7 @@ private:
         for (int i = 0; i < confVec.size(); i++)
         {
             if (confVec.at(i).label.size())
-                body += confVec.at(i).label + "\n";
+                body += confVec.at(i).label + "," + confVec.at(i).policyCategory + "\n";
         }
         res.body = body;
     }
@@ -47,6 +47,7 @@ private:
             return;
         res.set_header(HTTP_PARAM_ConfigName, confSt.label);
         res.set_header(HTTP_PARAM_ConfigValue, confSt.value);
+		res.set_header(HTTP_PARAM_ConfigPolicyCategory, confSt.policyCategory);
         std::string explain_utf8 = confSt.explain;
         res.body = explain_utf8;
 

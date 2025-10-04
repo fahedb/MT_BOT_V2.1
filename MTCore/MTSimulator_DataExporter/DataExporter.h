@@ -19,9 +19,7 @@ public:
 	static void Export_All_Statistics_Data(DirectionStats& stats, bool tradeDecRes);
 private: 
 	static std::vector<std::string> PrepareSummeryLogs(DirectionStats& stats);
-	static void Export_DataToJson(DirectionStats& stats, bool tradeDecRes);
-	static void Export_DataToCSV(DirectionStats& stats);
-
+	
 	static void Send_For_PNGExport(DirectionStats& stats);
 
 };

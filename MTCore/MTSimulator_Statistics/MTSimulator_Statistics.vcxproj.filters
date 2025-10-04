@@ -4,17 +4,38 @@
     <Filter Include="Statistics Engines">
       <UniqueIdentifier>{066ea3cd-f235-4e20-a859-3de3f4c9735d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="StatsStructs">
-      <UniqueIdentifier>{fb9c1f58-6028-440b-9ac1-b07bf372e2d0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Direction">
       <UniqueIdentifier>{7d0e853c-0ca5-40fb-b5b1-e2b7b1d603d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Direction\Struct">
-      <UniqueIdentifier>{1977bdff-ef8e-47f3-a15f-add7cf00a4d1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Direction\Cache">
       <UniqueIdentifier>{6eecdb98-9bc6-400d-8146-3faf620a24d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VoteLogic">
+      <UniqueIdentifier>{faa34dce-608b-418c-a74a-d656a1ec7bd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VoteLogic\WeightedVote">
+      <UniqueIdentifier>{7a113919-052a-4dff-ae64-6adbf0bc4dc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VoteLogic\MajorityVote">
+      <UniqueIdentifier>{9cfdcf76-23a1-4179-887f-c1d174460c1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enums">
+      <UniqueIdentifier>{dbbfb72d-8fcd-4a2e-96a4-4f0e6f60da89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VoteLogic\BaseVote">
+      <UniqueIdentifier>{4374b755-a3aa-43be-900b-d6e433b031cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VoteLogic\Enums">
+      <UniqueIdentifier>{6dcc68f9-f779-4a09-b067-779eed8c9dbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direction\VoteStruct">
+      <UniqueIdentifier>{fb9c1f58-6028-440b-9ac1-b07bf372e2d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direction\DirectionStats">
+      <UniqueIdentifier>{1977bdff-ef8e-47f3-a15f-add7cf00a4d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direction\StepsMean">
+      <UniqueIdentifier>{7c52c915-8225-4a17-ae26-f3b9c43eb4a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -25,7 +46,31 @@
       <Filter>Direction\Cache</Filter>
     </ClInclude>
     <ClInclude Include="DirectionStats.h">
-      <Filter>Direction\Struct</Filter>
+      <Filter>Direction\DirectionStats</Filter>
+    </ClInclude>
+    <ClInclude Include="MajorityVote.h">
+      <Filter>VoteLogic\MajorityVote</Filter>
+    </ClInclude>
+    <ClInclude Include="WeightedVote.h">
+      <Filter>VoteLogic\WeightedVote</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonDirection.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseVote.h">
+      <Filter>VoteLogic\BaseVote</Filter>
+    </ClInclude>
+    <ClInclude Include="VoteWeightMethodEnum.h">
+      <Filter>VoteLogic\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="VotingStruct.h">
+      <Filter>Direction\VoteStruct</Filter>
+    </ClInclude>
+    <ClInclude Include="StepsMean.h">
+      <Filter>Direction\StepsMean</Filter>
+    </ClInclude>
+    <ClInclude Include="StatsTypeEnum.h">
+      <Filter>Enums</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -36,7 +81,22 @@
       <Filter>Direction\Cache</Filter>
     </ClCompile>
     <ClCompile Include="DirectionStats.cpp">
-      <Filter>Direction\Struct</Filter>
+      <Filter>Direction\DirectionStats</Filter>
+    </ClCompile>
+    <ClCompile Include="MajorityVote.cpp">
+      <Filter>VoteLogic\MajorityVote</Filter>
+    </ClCompile>
+    <ClCompile Include="WeightedVote.cpp">
+      <Filter>VoteLogic\WeightedVote</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseVote.cpp">
+      <Filter>VoteLogic\BaseVote</Filter>
+    </ClCompile>
+    <ClCompile Include="VotingStruct.cpp">
+      <Filter>Direction\VoteStruct</Filter>
+    </ClCompile>
+    <ClCompile Include="StepsMean.cpp">
+      <Filter>Direction\StepsMean</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

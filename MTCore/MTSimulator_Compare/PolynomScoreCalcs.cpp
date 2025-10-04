@@ -80,9 +80,9 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histT
 			currTL->begin() + (static_cast<size_t>(i) + static_cast<size_t>(polyLen)));
 
 		// PolynomTimeLine objects for the current segments
-		const PolynomTimeLineKey histKey{ partialVec1.front()->point_DateTimeLong,
+		PolynomTimeLineKey histKey{ partialVec1.front()->point_DateTimeLong,
 										  partialVec1.back()->point_DateTimeLong };
-		const PolynomTimeLineKey currKey{ partialVec2.front()->point_DateTimeLong,
+		PolynomTimeLineKey currKey{ partialVec2.front()->point_DateTimeLong,
 										  partialVec2.back()->point_DateTimeLong };
 
 		// Get from cache (can be nullptr)
@@ -174,7 +174,7 @@ ScoresResult* PolynomScoreCalcs::TryFindCachedScore(const PolynomTimeLineKey& hi
 	return ScoreResultsCachePolynom::getInstance()->GetScoreResult(histKey, currKey, threadIdx);
 }
 
-PolynomTimeLine* PolynomScoreCalcs::TryFindPolynomInCache(const PolynomTimeLineKey& key, CacheType cT)
+PolynomTimeLine* PolynomScoreCalcs::TryFindPolynomInCache(PolynomTimeLineKey& key, CacheType cT)
 {
 	PolynomTimeLine* foundRes = nullptr; // Initialize foundRes to nullptr
 	foundRes = PolynomTimeLineCache::getInstance()->GetPolynomTimeLine(key, cT); // Retrieve the historical polynomial timeline cache

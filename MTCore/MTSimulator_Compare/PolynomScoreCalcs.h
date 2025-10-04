@@ -21,7 +21,7 @@ public:
 private:
     static TimeLinePolynomScore CalcScore(PolynomChangeNodePackage* hist, PolynomChangeNodePackage* curr);
     static ScoresResult* TryFindCachedScore(const PolynomTimeLineKey& histKey, const PolynomTimeLineKey& currKey, int threadIdx);
-    static PolynomTimeLine* TryFindPolynomInCache(const PolynomTimeLineKey& key, CacheType cT);
+    static PolynomTimeLine* TryFindPolynomInCache(PolynomTimeLineKey& key, CacheType cT);
     static bool TryStoreScoreInCache(const std::vector<ChangeNode*>& histSegment, const std::vector<ChangeNode*>& currSegment, TimeLinePolynomScore& score, int threadIdx);
 };
 

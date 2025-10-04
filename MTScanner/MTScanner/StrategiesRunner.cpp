@@ -49,8 +49,7 @@ bool StrategiesRunner::OneMinutePatternGodLogic(PatternGod* patternScan, Statist
 		// Start building stats 
 		logger.WriteLog("Start detecting common direction...", false, false);
 
-		std::vector<ChangeNode*> headsOfPotentialRes = TimeLineBuilder::SplitChangeNodeFromScores(&results);
-		DirectionStats stats = statisticsCalcucator->DetectCommonDirection(&headsOfPotentialRes);
+		DirectionStats stats = statisticsCalcucator->DetectCommonDirection(&results);
 
 		logger.WriteLog("Done detecting common direction.", false, false);
 		// -----------------------------------------------------------------------------------------------------

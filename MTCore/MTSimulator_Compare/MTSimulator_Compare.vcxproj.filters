@@ -60,12 +60,6 @@
     <ClCompile Include="PatternGod_ResultFusionEngine.cpp">
       <Filter>PatternGod\Fusion</Filter>
     </ClCompile>
-    <ClCompile Include="MinMaxFinder.cpp">
-      <Filter>PatternGod\Utils\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="Normalizer.cpp">
-      <Filter>PatternGod\Utils\Src</Filter>
-    </ClCompile>
     <ClCompile Include="PatternGodUtils.cpp">
       <Filter>PatternGod\Utils\Src</Filter>
     </ClCompile>
@@ -97,12 +91,6 @@
     </ClInclude>
     <ClInclude Include="PatternGod_ResultFusionEngine.h">
       <Filter>PatternGod\Fusion</Filter>
-    </ClInclude>
-    <ClInclude Include="MinMaxFinder.h">
-      <Filter>PatternGod\Utils\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="Normalizer.h">
-      <Filter>PatternGod\Utils\Inc</Filter>
     </ClInclude>
     <ClInclude Include="PatternGodUtils.h">
       <Filter>PatternGod\Utils\Inc</Filter>

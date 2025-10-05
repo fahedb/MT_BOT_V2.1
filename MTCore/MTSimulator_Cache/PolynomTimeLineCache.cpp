@@ -2,6 +2,7 @@
 #include "Static_CurrentTimeLineRep.h"
 #include "Logger.h"
 #include "ThreadPool.h"
+#include "Converts.h"
 
 void PolynomTimeLineCache::CleanTask(long long oldestTP, BaseCacheMap* cacheMap) // Cleaning task for a specific cache map
 {
@@ -15,6 +16,14 @@ void PolynomTimeLineCache::CleanTask(long long oldestTP, BaseCacheMap* cacheMap)
     }
 }
 
+
+void PolynomTimeLineCache::ClearOldResults(bool forceSynchronous)
+{
+    if (!CleanPreCondition())
+        return;
+    long long oldestTP = Converts::ToLongLong(Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine()->at(0)->point_DateTime);
+    CleanTask(oldestTP, &m_curr);
+}
 
 void PolynomTimeLineCache::MergeIntoCache(robin_hood::unordered_map<PolynomTimeLineKey, PolynomTimeLine>& tempCache, CacheType cachT) {
     std::lock_guard<std::mutex> lock(m_cacheMutex); // Ensure thread safety

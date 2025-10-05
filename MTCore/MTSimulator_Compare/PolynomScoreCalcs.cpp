@@ -113,14 +113,14 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histT
 		if (!histPoly)
 		{
 			totalPolyCacheMisses++;
-			histPolyCache.try_emplace(currKey, std::move(*histLocal.get()));
+			histPolyCache.try_emplace(histKey, std::move(*histLocal.get()));
 		}
 		else
 			totalPolyCacheHits++;
 		if (!currPoly)
 		{
 			totalPolyCacheMisses++;
-			currPolyCache.try_emplace(histKey, std::move(*currLocal.get()));
+			currPolyCache.try_emplace(currKey, std::move(*currLocal.get()));
 		}
 		else
 			totalPolyCacheHits++;

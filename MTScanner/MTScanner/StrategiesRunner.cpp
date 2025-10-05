@@ -26,7 +26,7 @@ void StrategiesRunner::Run_PatternGod(TimeLine& historyTimeLine)
 		HttpServerSyncer::UpdateConfigs();
 		HttpServerSyncer::Set_IsScanning(false); // Set scanning to false after scan is done -- Set true in the precondition function
 
-		MTScannerUtils::GoToSleep(1);
+		MTScannerUtils::GoToSleep(0.1);
 	}
 	tracer_thread.join();
 }

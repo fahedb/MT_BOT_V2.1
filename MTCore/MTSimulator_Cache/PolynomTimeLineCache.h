@@ -45,7 +45,8 @@ public:
             std::lock_guard<std::mutex> lock(m_cacheMutex); // Ensure thread safety
         Insert(key, std::move(polynomTl), cachT, 0);
     }
-    
+    virtual void ClearOldResults(bool forceSynchronous) override;
+
     PolynomTimeLine* GetPolynomTimeLine(PolynomTimeLineKey& key, CacheType cachT)// Retrieve a PolynomTimeLine by its key
     {
         return Get(key, cachT, 0);

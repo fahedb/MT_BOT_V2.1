@@ -23,6 +23,7 @@ void PolynomTimeLineCache::ClearOldResults(bool forceSynchronous)
         return;
     long long oldestTP = Converts::ToLongLong(Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine()->at(0)->point_DateTime);
     CleanTask(oldestTP, &m_curr);
+    m_cleaningInProgress.store(false); // Reset the flag 
 }
 
 void PolynomTimeLineCache::MergeIntoCache(robin_hood::unordered_map<PolynomTimeLineKey, PolynomTimeLine>& tempCache, CacheType cachT) {

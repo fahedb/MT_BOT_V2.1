@@ -26,7 +26,7 @@ protected:
 
 	PatternGod_BaseComparer(std::vector<ChangeNode*>* history);
 	PatternGod_BaseComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr);
-
+	int m_MaxScoreFound = 0;
 public:
 	~PatternGod_BaseComparer(); 
 

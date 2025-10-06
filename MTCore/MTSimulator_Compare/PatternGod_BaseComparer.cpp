@@ -97,6 +97,8 @@ int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std
 	if(m_scanCounter >= 1000)
 		m_scanCounter = 0;
 
+	m_MaxScoreFound = maxScore.totalScore.total;
+	m_ScoreToAct = (m_MaxScoreFound - 200) > 0 ? (m_MaxScoreFound - 200) : 0; // Adjust the score to act based on the max score found
 	return static_cast<int>(resultNodes2D.size());
 }
 

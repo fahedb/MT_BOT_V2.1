@@ -26,8 +26,6 @@ namespace std {
     };
 }
 
-
-// Hash functions for PolynomTimeLineKey
 struct PolynomTimeLineKey
 {
     // Default constructor
@@ -53,6 +51,13 @@ struct PolynomTimeLineKey
     }
 };
 
+#define USE_ROBUST_HASH_FUNCTIONS
+
+#ifdef USE_ROBUST_HASH_FUNCTIONS
+
+// //////////////////////////////////////////////////////////////////////////
+// Main robust hash functions /////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////
 
 
 // Hash function for PolynomTimeLineKey
@@ -107,28 +112,44 @@ namespace robin_hood {
 } // namespace robin_hood
 
 
-//
-//// Hash function for PolynomTimeLineKey
-//namespace robin_hood {
-//    template<>
-//    struct hash<PolynomTimeLineKey> {
-//        size_t operator()(const PolynomTimeLineKey& key) const {
-//            // Simple but effective hash for timestamps
-//            // Uses prime numbers to avoid collisions
-//            return key.startTimePoint * 31ULL + key.endTimePoint * 17ULL;
-//        }
-//    };
-//
-//    // Hash function for pair of PolynomTimeLineKeys
-//    template <>
-//    struct hash<std::pair<PolynomTimeLineKey, PolynomTimeLineKey>> {
-//        size_t operator()(const std::pair<PolynomTimeLineKey, PolynomTimeLineKey>& p) const {
-//            // Simple but effective hash for timestamp pairs
-//            // Combines both keys with different prime multipliers
-//			
-//            size_t h1 = p.first.startTimePoint * 31ULL + p.first.endTimePoint * 17ULL;
-//            size_t h2 = p.second.startTimePoint * 23ULL + p.second.endTimePoint * 19ULL;
-//            return h1 * 37ULL + h2 * 41ULL;
-//        }
-//    };
-//}
+#else
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Alternative simple but effective hash functions //////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////////////
+
+
+// Hash function for PolynomTimeLineKey
+namespace robin_hood {
+    template<>
+    struct hash<PolynomTimeLineKey> {
+        size_t operator()(const PolynomTimeLineKey& key) const {
+            // Simple but effective hash for timestamps
+            // Uses prime numbers to avoid collisions
+			long long start = PolynomTimeLineKey::Cut_SecondsAndMilliSeconds(key.startTimePoint);
+			long long end = PolynomTimeLineKey::Cut_SecondsAndMilliSeconds(key.endTimePoint);
+
+            return start * 31ULL + end * 17ULL;
+        }
+    };
+
+    // Hash function for pair of PolynomTimeLineKeys
+    template <>
+    struct hash<std::pair<PolynomTimeLineKey, PolynomTimeLineKey>> {
+        size_t operator()(const std::pair<PolynomTimeLineKey, PolynomTimeLineKey>& p) const {
+            // Simple but effective hash for timestamp pairs
+            // Combines both keys with different prime multipliers
+			long long firstStart = PolynomTimeLineKey::Cut_SecondsAndMilliSeconds(p.first.startTimePoint);
+			long long firstEnd = PolynomTimeLineKey::Cut_SecondsAndMilliSeconds(p.first.endTimePoint);
+
+			long long secondStart = PolynomTimeLineKey::Cut_SecondsAndMilliSeconds(p.second.startTimePoint);
+			long long secondEnd = PolynomTimeLineKey::Cut_SecondsAndMilliSeconds(p.second.endTimePoint);
+
+            size_t h1 = firstStart * 31ULL + firstEnd * 17ULL;
+            size_t h2 = secondStart * 23ULL + secondEnd * 19ULL;
+            return h1 * 37ULL + h2 * 41ULL;
+        }
+    };
+}
+
+#endif

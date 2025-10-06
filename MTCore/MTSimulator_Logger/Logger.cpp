@@ -15,7 +15,7 @@ void Logger::WriteLog(const std::string& log, bool newSection,bool sendToLogServ
     //if(m_glob_logCounter > 1000000)
 	//	m_glob_logCounter = 0;
 	
-    if (sendToLogServer && false) // temporarily disabled
+    if (sendToLogServer ) // temporarily disabled
     {
         MTThreadPool::getInstance()->enqueueTask([log, logType,this]() {
             this->Http_Send_Log(log, logType);

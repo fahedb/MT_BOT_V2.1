@@ -4,17 +4,51 @@
 #include "PolynomScoreCalcs.h"
 #include "Logger.h"
 
-void PatternGod_PolynomComparer::InitComaprer()
+void PatternGod_PolynomComparer::ResetMyCacheCounters(int threadIdx)
 {
-	m_isEnabled = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy)->EnablePolynomScan; // Get the enabled status from the policy
-	m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
-	Set_ComparerType(); // Initialize the comparer type
-	m_ScoreToAct = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy)->ScoreToAct; // Get the score to act threshold from the policy
-	m_polyCacheHits.resize(MTThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize polynomial cache hits for each thread
-	m_polyCacheMisses.resize(MTThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize polynomial cache misses for each thread
+	PatternGod_BaseComparer::ResetMyCacheCounters(threadIdx); // Call base class method to reset base cache counters
+	if (threadIdx >= 0 && threadIdx < m_polyCacheHits.size())
+	{
+		m_polyCacheHits[threadIdx] = 0; // Reset polynomial cache hits for this thread
+		m_polyCacheMisses[threadIdx] = 0; // Reset polynomial cache misses for this thread
+	}
 }
 
-ScoresResult PatternGod_PolynomComparer::CompareOneMinNodesPeriods(int startIdx, int threadIdx)
+void PatternGod_PolynomComparer::InitComaprer()
+{
+	PolynomComparerPolicy* polyCompPolicy = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
+	m_isEnabled = polyCompPolicy->EnablePolynomScan; // Get the enabled status from the policy
+	m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
+	Set_ComparerType(); // Initialize the comparer type
+	if (m_MaxScoreFound > 0)
+		m_ScoreToAct = static_cast<double>(m_MaxScoreFound - 250) / static_cast<double>(m_currentTL->size());
+	else
+		m_ScoreToAct = polyCompPolicy->ScoreToAct; // Get the score to act threshold from the policy
+
+	m_polyCacheHits.resize(MTThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize polynomial cache hits for each thread
+	m_polyCacheMisses.resize(MTThreadPool::getInstance()->Get_ThreadsNum(), 0); // Initialize polynomial cache misses for each thread
+	m_polyLen = polyCompPolicy->PolynomLen_ForScan; // Get the polynomial length from the policy
+}
+
+void PatternGod_PolynomComparer::InitMaxScorePossibleForTimeLine(int polyLen)
+{
+	if (m_MaxScorePossibleForPolynom == 0)
+	{
+		std::vector<ChangeNode*> vec(
+			m_currentTL->begin(),
+			m_currentTL->begin() + polyLen // Use up to the first 10 nodes for estimation
+		);
+		PolynomChangeNodePackage vecPackage(vec);
+
+		TimeLinePolynomScore maxScorePossible = PolynomScoreCalcs::CalcScore(&vecPackage, &vecPackage);
+		ScoresResult scoreRes;
+		scoreRes += *maxScorePossible.GetScoreContainer(IndicatorValueType::Value);
+		scoreRes += *maxScorePossible.GetScoreContainer(IndicatorValueType::Slope);
+		m_MaxScorePossibleForPolynom = scoreRes.totalScore.total;
+	}
+}
+
+ScoresResult PatternGod_PolynomComparer::CompareOneMinNodesPeriods(int startIdx, int threadIdx, int totalScoreToAct)
 {
 	int currentSize = static_cast<int>(m_currentTL->size());
 	
@@ -29,27 +63,26 @@ ScoresResult PatternGod_PolynomComparer::CompareOneMinNodesPeriods(int startIdx,
 	ScoresResult periodScore;
 	periodScore.Reset(); // Reset the score to ensure it's empty before calculation
 
-	periodScore = PolynomScoreCalcs::CompareTimeLines(&histVec, m_currentTL, threadIdx, m_cacheHits[threadIdx], m_cacheMisses[threadIdx], m_polyCacheHits[threadIdx], m_polyCacheMisses[threadIdx]); // Calculate the score by comparing the historical vector with the current time line
+	periodScore = PolynomScoreCalcs::CompareTimeLines(&histVec, m_currentTL, threadIdx, m_cacheHits[threadIdx], m_cacheMisses[threadIdx], m_polyCacheHits[threadIdx], m_polyCacheMisses[threadIdx], m_MaxScorePossibleForPolynom, totalScoreToAct); // Calculate the score by comparing the historical vector with the current time line
 
 	return periodScore;
 }
 
 
-void PatternGod_PolynomComparer::ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct, std::mutex* maxResultLock, ScoresResult* maxScore, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread)
+void PatternGod_PolynomComparer::ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int totalScoreToAct, std::mutex* maxResultLock, ScoresResult* maxScore, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread)
 {
 	Logger::getInstance().WriteLog("Thread [" + std::to_string(threadIndex) + "] started processing indices [" + std::to_string(startIdx) + " - " + std::to_string(endIdx - 1) + "]", false, false, LogType::LOG);
-	m_cacheHits[threadIndex] = 0; // Reset cache hits for this thread
-	m_cacheMisses[threadIndex] = 0; // Reset cache misses for this thread
-	m_polyCacheHits[threadIndex] = 0; // Reset poly cache hits for this thread
-	m_polyCacheMisses[threadIndex] = 0; // Reset poly cache misses for this thread
+	ResetMyCacheCounters(threadIndex); // Reset cache counters for this thread
+	InitMaxScorePossibleForTimeLine(m_polyLen); // Initialize the maximum possible score for the time line based on the polynomial length
+
 	int estimatedItems = 20;
 	Logger& logger = Logger::getInstance();
 	resultNodesPerThread->reserve(estimatedItems);
-	int localScoreToAct = scoreToAct;
+	int localScoreToAct = totalScoreToAct;
 	ScoresResult maxLocalScore;
 	const int currTlSize = m_currentTL->size(), histTlSize = m_historyTL->size();
 	for (int i = startIdx; i < endIdx; i++) {
-		ScoresResult resScore = PatternGod_PolynomComparer::CompareOneMinNodesPeriods(i, threadIndex);
+		ScoresResult resScore = PatternGod_PolynomComparer::CompareOneMinNodesPeriods(i, threadIndex, totalScoreToAct);
 
 		if (resScore.totalScore.total > localScoreToAct) {
 			if (i + currTlSize < histTlSize) {

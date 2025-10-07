@@ -14,15 +14,17 @@ public:
 	{
 		InitComaprer(); // Reinitialize the comparer
 	}
+	virtual void ResetMyCacheCounters(int threadIdx) override;
 private:
 	std::vector<int> m_polyCacheHits; // Counter for polynomial cache hits per thread
 	std::vector<int> m_polyCacheMisses; // Counter for polynomial cache misses per thread
+	int m_polyLen = 5; // Length of the polynomial for comparison
 	void InitComaprer();
-
+	void InitMaxScorePossibleForTimeLine(int polyLen);
 	virtual void Set_ComparerType() { m_comparerType = PatternGodComparerType::PolynomComparer; } // Set the comparer type -- Pure virtual function
-	virtual ScoresResult CompareOneMinNodesPeriods(int startIdx, int threadIdx); // Compare one minute nodes periods in the history time line
+	virtual ScoresResult CompareOneMinNodesPeriods(int startIdx, int threadIdx, int totalScoreToAct); // Compare one minute nodes periods in the history time line
 	
-	virtual void ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct
+	virtual void ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int totalScoreToAct
 		, std::mutex* maxResultLock, ScoresResult* maxScore
 		, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread) override;
 };

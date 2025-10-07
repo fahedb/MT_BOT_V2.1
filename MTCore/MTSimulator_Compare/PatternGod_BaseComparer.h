@@ -27,11 +27,13 @@ protected:
 	PatternGod_BaseComparer(std::vector<ChangeNode*>* history);
 	PatternGod_BaseComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr);
 	int m_MaxScoreFound = 0;
+	int m_MaxScorePossibleForPolynom = 0;
 public:
 	~PatternGod_BaseComparer(); 
 
 	virtual void RefreshComparer() = 0;
-	
+	virtual void ResetMyCacheCounters(int threadIdx); // Reset cache counters for a specific thread
+
 	PatternGodComparerType Get_ComparerType() const { return m_comparerType; } // Get the comparer type
 	virtual int ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);
 
@@ -47,7 +49,7 @@ protected:
 	// Need to implement this function in derived classes
 	// This function compares one minute nodes periods in the history time line
 
-	virtual ScoresResult CompareOneMinNodesPeriods(int startIdx, int threadIdx) = 0; // Pure virtual function to be implemented by derived classes
+	virtual ScoresResult CompareOneMinNodesPeriods(int startIdx, int threadIdx, int totalScoreToAct) = 0; // Pure virtual function to be implemented by derived classes
 
 	virtual void Set_ComparerType() = 0; // Set the comparer type, to be implemented by derived classes (m_comparerType)
 

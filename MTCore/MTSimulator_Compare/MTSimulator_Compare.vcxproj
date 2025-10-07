@@ -179,6 +179,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Cache;..\MTSimulator_Configurations;..\MTSimulator_Logger;..\MTSimulator_Casts;..\MTSimulator_MTThreadPool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

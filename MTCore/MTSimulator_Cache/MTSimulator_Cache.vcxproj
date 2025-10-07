@@ -177,6 +177,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\MTSimulator_MTThreadPool;$(ProjectDir)\..\MTSimulator_Casts;$(ProjectDir)\..\MTSimulator_TimeLines;$(ProjectDir)\..\MTSimulator_Logger;$(ProjectDir)\..\MTSimulator_Configurations;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

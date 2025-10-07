@@ -26,7 +26,7 @@ double CalcSinglePolynomScore(const Polynom* hist, const Polynom* curr, PolynomC
 
 }
 
-ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histTL, std::vector<ChangeNode*>* currTL,int threadIdx, int& resCacheHits, int& resCacheMisses, int& polyCacheHits, int& polyCacheMisses)
+ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histTL, std::vector<ChangeNode*>* currTL,int threadIdx, int& resCacheHits, int& resCacheMisses, int& polyCacheHits, int& polyCacheMisses, int maxScorePossibleForPolynom,int totalScoreToAct)
 {
 	if (histTL->empty() || currTL->empty())
 		return ScoresResult(); // Return an empty ScoresResult if either vector is empty
@@ -51,10 +51,16 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histT
 	robin_hood::unordered_map<PolynomTimeLineKey, PolynomTimeLine> histPolyCache;
 	robin_hood::unordered_map<PolynomTimeLineKey, PolynomTimeLine> currPolyCache;
 
+	
+
 	for (int i = 0; i < histTL->size(); i++)
 	{
 		if (i + polyLen >= histTL->size() || i + polyLen >= currTL->size())
 			break; // Break if we exceed the size of either vector
+
+		int remainingCalcs = (histTL->size() - i) - polyLen + 1; // Calculate remaining calculations
+		if (IsEarlyExitAllowed(maxScorePossibleForPolynom, totalScore.totalScore.total, remainingCalcs, totalScoreToAct))
+			break; // Early exit if further calculations cannot affect the result
 
 		ScoresResult* foundRes = nullptr; // Initialize foundRes to nullptr
 		if (scoreCachePolicy->EnableScoreCaching)
@@ -135,6 +141,16 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histT
 	PolynomTimeLineCache::getInstance()->MergeIntoCache(currPolyCache, CacheType::CURRENT);
 
 	return totalScore; // Return the total score calculated from all polynomial comparisons
+}
+
+bool PolynomScoreCalcs::IsEarlyExitAllowed(int maxScorePossibleForPolynom,int currScore, int remainingCalcs, int totalScoreToAct)
+{
+	// logic for early stopping if remaining calculations can't affect the result
+	if (maxScorePossibleForPolynom <= 0 || remainingCalcs <= 0)
+		return false; // Cannot determine early exit if max score or remaining calculations are non-positive
+	if (currScore + (maxScorePossibleForPolynom * remainingCalcs) < totalScoreToAct )
+		return true; // Early exit allowed if even the maximum possible score from remaining calculations cannot reach the score to act
+	return false; // Otherwise, do not allow early exit
 }
 
 TimeLinePolynomScore PolynomScoreCalcs::CalcScore(PolynomChangeNodePackage* hist, PolynomChangeNodePackage* curr)

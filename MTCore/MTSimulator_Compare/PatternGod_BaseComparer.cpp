@@ -36,6 +36,15 @@ PatternGod_BaseComparer::~PatternGod_BaseComparer()
 	}
 }
 
+void PatternGod_BaseComparer::ResetMyCacheCounters(int threadIdx)
+{
+	if (threadIdx >= 0 && threadIdx < m_cacheHits.size())
+	{
+		m_cacheHits[threadIdx] = 0;
+		m_cacheMisses[threadIdx] = 0;
+	}
+}
+
 int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D) // Scan for patterns in the history time line compared to the current time line
 {
 	std::mutex resultMutex, local2DResultMutex;
@@ -98,22 +107,21 @@ int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std
 		m_scanCounter = 0;
 
 	m_MaxScoreFound = maxScore.totalScore.total;
-	m_ScoreToAct = static_cast<double>((m_MaxScoreFound - 200) > 0 ? (m_MaxScoreFound - 200) : 0); // Adjust the score to act based on the max score found
 	return static_cast<int>(resultNodes2D.size());
 }
 
-void PatternGod_BaseComparer::ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct, std::mutex* maxResultLock, ScoresResult* maxScore, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread)
+void PatternGod_BaseComparer::ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int totalScoreToAct, std::mutex* maxResultLock, ScoresResult* maxScore, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread)
 {
 	m_cacheHits[threadIndex] = 0; // Reset cache hits for this thread
 	m_cacheMisses[threadIndex] = 0; // Reset cache misses for this thread
 	int estimatedItems = 20;
 	Logger& logger = Logger::getInstance();
 	resultNodesPerThread->reserve(estimatedItems);
-	int localScoreToAct = scoreToAct;
+	int localScoreToAct = totalScoreToAct;
 	ScoresResult maxLocalScore;
 	const int currTlSize = m_currentTL->size(), histTlSize = m_historyTL->size();
 	for (int i = startIdx; i < endIdx; i++) {
-		ScoresResult resScore = CompareOneMinNodesPeriods(i, threadIndex);
+		ScoresResult resScore = CompareOneMinNodesPeriods(i, threadIndex, totalScoreToAct);
 
 		if (resScore.totalScore.total > localScoreToAct) {
 			if (i + currTlSize < histTlSize) {

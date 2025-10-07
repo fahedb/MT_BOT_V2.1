@@ -15,11 +15,14 @@ void PatternGod_ScoreComparer::InitComaprer()
 {
 	m_isEnabled = Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->EnableScoreScan; // Get the enabled status from the policy
 	m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
-	m_ScoreToAct = Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->ScoreToAct; // Get the score to act threshold from the policy
+	if (m_MaxScoreFound > 0)
+		m_ScoreToAct = static_cast<double>(m_MaxScoreFound) / static_cast<double>(m_currentTL->size()); // Set the score to act based on the max score found
+	else
+		m_ScoreToAct = Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->ScoreToAct; // Get the score to act threshold from the policy
 	Set_ComparerType(); // Initialize the comparer type
 }
 
-ScoresResult PatternGod_ScoreComparer::CompareOneMinNodesPeriods(int startIdx, int threadIdx) // compare between periods of time in the history time line and the whole current time line
+ScoresResult PatternGod_ScoreComparer::CompareOneMinNodesPeriods(int startIdx, int threadIdx, int totalScoreToAct) // compare between periods of time in the history time line and the whole current time line
 {
 	ScoreCachingPolicy* scoreCachePolicy = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
 	ConfigrationsPolicy* confPolicy = Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
@@ -102,18 +105,18 @@ ScoresResult PatternGod_ScoreComparer::CompareOneMinNodesPeriods(int startIdx, i
 	return periodScore;
 }
 
-void PatternGod_ScoreComparer::ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct, std::mutex* maxResultLock, ScoresResult* maxScore, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread)
+void PatternGod_ScoreComparer::ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int totalScoreToAct, std::mutex* maxResultLock, ScoresResult* maxScore, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread)
 {
 	m_cacheHits[threadIndex] = 0; // Reset cache hits for this thread
 	m_cacheMisses[threadIndex] = 0; // Reset cache misses for this thread
 	int estimatedItems = 20;
 	Logger& logger = Logger::getInstance();
 	resultNodesPerThread->reserve(estimatedItems);
-	int localScoreToAct = scoreToAct;
+	int localScoreToAct = totalScoreToAct;
 	ScoresResult maxLocalScore;
 	const int currTlSize = m_currentTL->size(), histTlSize = m_historyTL->size();
 	for (int i = startIdx; i < endIdx; i++) {
-		ScoresResult resScore = PatternGod_ScoreComparer::CompareOneMinNodesPeriods(i, threadIndex);
+		ScoresResult resScore = PatternGod_ScoreComparer::CompareOneMinNodesPeriods(i, threadIndex, totalScoreToAct);
 
 		if (resScore.totalScore.total > localScoreToAct) {
 			if (i + currTlSize < histTlSize) {

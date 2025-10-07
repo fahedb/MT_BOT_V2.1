@@ -183,6 +183,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\MTSimulator_Casts\;$(ProjectDir)\..\MTSimulator_Logger;$(ProjectDir)\..\MTSimulator_TimeLines;$(ProjectDir)\..\MTSimulator_MTThreadPool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

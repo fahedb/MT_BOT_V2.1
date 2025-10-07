@@ -183,6 +183,8 @@
       <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Configurations;..\MTSimulator_Statistics;..\MTSimulator_Tables;..\MTSimulator_DataBaseConnection;..\MTSimulator_Logger;..\MTSimulator_Compare;..\MTSimulator_Casts;..\MTSimulator_Cache;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -43,6 +43,12 @@
     <Filter Include="Calcs\Score">
       <UniqueIdentifier>{c040d905-c2ab-4f00-9c1f-36930fd04720}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PatternGod\Filters">
+      <UniqueIdentifier>{8c74ce40-6a9d-4b26-85f7-3c1eb3fe5ddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PatternGod\Filters\Polynom">
+      <UniqueIdentifier>{29a72ecf-6b42-4aa4-b039-f0394d8737d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PatternGod_BaseComparer.cpp">
@@ -74,6 +80,9 @@
     </ClCompile>
     <ClCompile Include="PolynomComparer.cpp">
       <Filter>Calcs\Polynom</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternGod_PolynomFilterEngine.cpp">
+      <Filter>PatternGod\Filters\Polynom</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="PolynomComparer.h">
       <Filter>Calcs\Polynom</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternGod_PolynomFilterEngine.h">
+      <Filter>PatternGod\Filters\Polynom</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

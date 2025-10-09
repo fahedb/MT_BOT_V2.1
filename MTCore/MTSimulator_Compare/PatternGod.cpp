@@ -1,6 +1,7 @@
 #include "PatternGod.h"
 #include "TimeLineBuilder.h"
 #include "LOGGER.H"
+#include "CONFIGRATIONS.H"
 
 PatternGod::PatternGod(std::vector<ChangeNode*>* historyTimeLine, std::vector<ChangeNode*>* currentTimeLine)
 {
@@ -29,7 +30,7 @@ void PatternGod::InitComparers() // Initialize the comparers with the history ti
 {
 	m_comparers.push_back(std::make_unique<PatternGod_PolynomComparer>(m_historyTL));
 	m_comparers.push_back(std::make_unique<PatternGod_ScoreComparer>(m_historyTL));
-	
+	m_polynomFilterEngine = new PatternGod_PolynomFilterEngine(m_historyTL);
 	// *** Add more comparers as needed ***
 
 	if (m_currentTL)
@@ -65,6 +66,7 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<Change
 
 	PatternGodComparerResultsMap resultPerComparer; // Map to hold results for each comparer
 	auto start = std::chrono::high_resolution_clock::now();
+	
 	for (const auto& comparer : m_comparers)
 	{
 		resultPerComparer[comparer->Get_ComparerType()] = std::vector<std::pair<ChangeNode*, ScoresResult>>(); // Initialize the result vector for each comparer
@@ -75,7 +77,20 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<Change
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 	Logger::getInstance().WriteLog("Performance: Total Scan Time: " + std::to_string(duration) + " ms", false, true, LogType::LOG);
 	// Need to merge results using ResultsFusion Engine...
-	resultNodes2D = PatternGod_ResultFusionEngine::FuseResults(resultPerComparer, m_historyDB_Map); // Fuse results from all comparers
+	//resultNodes2D = PatternGod_ResultFusionEngine::FuseResults(resultPerComparer, m_historyDB_Map); // Fuse results from all comparers
+	TradeManagerPolicy* tradeManPolicy = Configrations::getInstance()->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy);
+	for(auto& resVec : resultPerComparer)
+	{
+		std::vector<ChangeNode*>heads = TimeLineBuilder::SplitChangeNodeFromScores(&resultPerComparer[resVec.first]);
+		if (heads.size() == 0) continue;
 
+		auto tempVec = m_polynomFilterEngine->ProcessPatterns(
+			&heads,
+			m_currentTL->size());
+		PatternGodUtils::filterByThresholdScore(tempVec, tradeManPolicy->Pattern_TopScore_ThresholdRatio);
+		PatternGodUtils::filterByHighScores(tempVec, tradeManPolicy->Pattern_Max_Patterns_To_Find);
+		// Add to resultNodes2D
+		resultNodes2D.insert(resultNodes2D.end(), tempVec.begin(), tempVec.end());
+	}
 	return totalScans; // Return the total number of scans performed
 }

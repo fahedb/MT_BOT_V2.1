@@ -13,12 +13,13 @@
 
 void PatternGod_ScoreComparer::InitComaprer()
 {
-	m_isEnabled = Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->EnableScoreScan; // Get the enabled status from the policy
+	ScoreComparerPolicy* scoreCompPolicy = Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy);
+	m_isEnabled = scoreCompPolicy->EnableScoreScan; // Get the enabled status from the policy
 	m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
 	if (m_MaxScoreFound > 0)
-		m_ScoreToAct = static_cast<double>(m_MaxScoreFound) / static_cast<double>(m_currentTL->size()); // Set the score to act based on the max score found
+		m_ScoreToAct = static_cast<double>(m_MaxScoreFound - scoreCompPolicy->Diff_Between_Max_And_ScoreToAct) / static_cast<double>(m_currentTL->size()); // Set the score to act based on the max score found
 	else
-		m_ScoreToAct = Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->ScoreToAct; // Get the score to act threshold from the policy
+		m_ScoreToAct = scoreCompPolicy->ScoreToAct; // Get the score to act threshold from the policy
 	Set_ComparerType(); // Initialize the comparer type
 }
 
@@ -109,7 +110,7 @@ void PatternGod_ScoreComparer::ProccessScanChunk(int startIdx, int endIdx, int t
 {
 	m_cacheHits[threadIndex] = 0; // Reset cache hits for this thread
 	m_cacheMisses[threadIndex] = 0; // Reset cache misses for this thread
-	int estimatedItems = 20;
+	int estimatedItems = 100;
 	Logger& logger = Logger::getInstance();
 	resultNodesPerThread->reserve(estimatedItems);
 	int localScoreToAct = totalScoreToAct;

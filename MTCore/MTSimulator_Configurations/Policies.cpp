@@ -163,7 +163,9 @@ void PolynomComparerPolicy::InitPolicy()
         std::make_pair(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT_POLYNOM_COMPARER),
         std::make_pair(CONFIGS_POLYNOM_EVAL_WEIGHT),
         std::make_pair(CONFIGS_POLYNOM_RMSE_WEIGHT),
-        std::make_pair(CONFIGS_POLYNOM_COEFF_WEIGHT)
+        std::make_pair(CONFIGS_POLYNOM_COEFF_WEIGHT),
+        std::make_pair(CONFIGS_DEF_DIFF_BETWEEN_MAX_TO_SCORE_TO_ACT_POLYNOM_COMP)
+
     };
 	m_allConfigs = allConfigs;
 
@@ -173,6 +175,7 @@ void PolynomComparerPolicy::InitPolicy()
     weight_eval = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIGS_POLYNOM_EVAL_WEIGHT));
     weight_rmse = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIGS_POLYNOM_RMSE_WEIGHT));
     weight_coeff = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIGS_POLYNOM_COEFF_WEIGHT));
+	Diff_Between_Max_And_ScoreToAct = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIGS_DEF_DIFF_BETWEEN_MAX_TO_SCORE_TO_ACT_POLYNOM_COMP));
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -187,7 +190,8 @@ void ScoreComparerPolicy::InitPolicy()
     std::make_pair(CONFIG_DEF_ZLSMA_WIEGHT),
     std::make_pair(CONFIG_DEF_VOLUME_WIEGHT),
     std::make_pair(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT_SCORE_COMPARER),
-    std::make_pair(CONFIG_DEF_ENABLE_SCORE_SCAN)
+    std::make_pair(CONFIG_DEF_ENABLE_SCORE_SCAN),
+	std::make_pair(CONFIGS_DEF_DIFF_BETWEEN_MAX_TO_SCORE_TO_ACT_SCORE_COMP)
     };
 	m_allConfigs = allConfigs;
 
@@ -197,6 +201,7 @@ void ScoreComparerPolicy::InitPolicy()
     VOLUME_Wieght = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_VOLUME_WIEGHT));
 	EnableScoreScan = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_ENABLE_SCORE_SCAN)) > 0 ? true : false;
 	ScoreToAct = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT_SCORE_COMPARER));
+	Diff_Between_Max_And_ScoreToAct = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIGS_DEF_DIFF_BETWEEN_MAX_TO_SCORE_TO_ACT_SCORE_COMP));
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -257,11 +262,13 @@ void BaseComparerPolicy::InitPolicy()
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
         std::make_pair(CONFIGS_MIN_SIMILAR_RESULTS_TO_FUSION),
         std::make_pair(CONFIG_POLYNOM_FUSION_WEIGHT),
-        std::make_pair(CONFIG_SCORE_FUSION_WEIGHT)
+        std::make_pair(CONFIG_SCORE_FUSION_WEIGHT),
+		std::make_pair(CONFIG_NUM_OF_TOP_RESULTS_TO_FILTER_OUT)
     };
 	m_allConfigs = allConfigs;
 
     Min_Similar_Results_To_Fusion = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIGS_MIN_SIMILAR_RESULTS_TO_FUSION));
     PolynomComparerWeight = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_POLYNOM_FUSION_WEIGHT));
     ScoreComparerWeight = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_SCORE_FUSION_WEIGHT));
+	Num_Of_Top_Results_To_Filter_Out = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_NUM_OF_TOP_RESULTS_TO_FILTER_OUT));
 }

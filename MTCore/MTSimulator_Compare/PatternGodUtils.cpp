@@ -3,6 +3,17 @@
 // Include for unordered_set
 #include <unordered_set>
 
+TradeManagerPolicy* m_glob_tradeMngrPolicy_PatternGodUtils = nullptr;
+BaseComparerPolicy* m_glob_baseComparerPolicy_PatternGodUtils = nullptr;
+
+void InitGlobPolicies()
+{
+	if (!m_glob_tradeMngrPolicy_PatternGodUtils)
+		m_glob_tradeMngrPolicy_PatternGodUtils = Configrations::getInstance()->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy);
+	if (!m_glob_baseComparerPolicy_PatternGodUtils)
+		m_glob_baseComparerPolicy_PatternGodUtils = Configrations::getInstance()->Get_Policy<BaseComparerPolicy>(PolicyType::BaseComparerPolicy);
+}
+
 void PatternGodUtils::SortScores(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D) // Sort the scores from the high to the low, usuallu need to do this after filtering them
 {
 	if (nodesResults2D.size() <= 10) {
@@ -22,6 +33,7 @@ void PatternGodUtils::SortScores(std::vector<std::pair<ChangeNode*, ScoresResult
 
 void PatternGodUtils::FilterDuplicatesTimeLines(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D, DBMap* historyDB_Map) // Filter out all timePoints that is in the same 30minuts
 {
+
 	if (nodesResults2D.empty()) return;
 
 	std::vector<std::pair<ChangeNode*, ScoresResult>> filtered;
@@ -51,38 +63,38 @@ void PatternGodUtils::FilterDuplicatesTimeLines(std::vector<std::pair<ChangeNode
 	nodesResults2D = std::move(filtered);
 }
 
-void PatternGodUtils::filterByHighScores(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D)
+void PatternGodUtils::filterByHighScores(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D, int numOfTopResultToFilterOut)
 {
-	TradeManagerPolicy* policy = Configrations::getInstance()->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy);
-	if (nodesResults2D.size() <= policy->Pattern_Max_Patterns_To_Find) {
+	InitGlobPolicies(); // Ensure global policies are initialized
+
+	if (nodesResults2D.size() <= numOfTopResultToFilterOut) {
 		// If the vector has X or fewer elements, nothing needs to be done
 		return;
 	}
 
 	// Use partial_sort to sort the vector and get top X scores
-	std::partial_sort(nodesResults2D.begin(), nodesResults2D.begin() + policy->Pattern_Max_Patterns_To_Find, nodesResults2D.end(),
+	std::partial_sort(nodesResults2D.begin(), nodesResults2D.begin() + numOfTopResultToFilterOut, nodesResults2D.end(),
 		[](const std::pair<ChangeNode*, ScoresResult>& a, const std::pair<ChangeNode*, ScoresResult>& b) {
 			return a.second.totalScore.total > b.second.totalScore.total; // Sort by 'total' in descending order
 		});
 
-	// Resize the vector to keep only the top 10 elements
-	nodesResults2D.resize(policy->Pattern_Max_Patterns_To_Find);
+	// Resize the vector to keep only the top X scores
+	nodesResults2D.resize(numOfTopResultToFilterOut);
+}
 
-
+void PatternGodUtils::filterByThresholdScore(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D, double thresholdPercent)
+{
 	double maxScore = nodesResults2D.front().second.totalScore.total;
-	double thresholdRatio = policy->Pattern_TopScore_ThresholdRatio; // score that is at least 95% of the max score
+	double thresholdRatio = m_glob_tradeMngrPolicy_PatternGodUtils->Pattern_TopScore_ThresholdRatio; // score that is at least 95% of the max score
 
 	std::vector<std::pair<ChangeNode*, ScoresResult>> topResults;
 
 	for (const auto& result : nodesResults2D) { // Filter all scores less than X% threshold ratio from the maxScore found
 		if (result.second.totalScore.total >= maxScore * thresholdRatio)
 			topResults.push_back(result);
-		else
-			break;
 	}
 
 	nodesResults2D = std::move(topResults);
-
 }
 
 std::string PatternGodUtils::BuildScanResultLog(const std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D)

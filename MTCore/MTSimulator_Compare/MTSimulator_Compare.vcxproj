@@ -193,6 +193,7 @@
     <ClCompile Include="PatternGodUtils.cpp" />
     <ClCompile Include="PatternGod_BaseComparer.cpp" />
     <ClCompile Include="PatternGod_PolynomComparer.cpp" />
+    <ClCompile Include="PatternGod_PolynomFilterEngine.cpp" />
     <ClCompile Include="PatternGod_ResultFusionEngine.cpp" />
     <ClCompile Include="PatternGod_ScoreComparer.cpp" />
     <ClCompile Include="PolynomComparer.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="PatternGodUtils.h" />
     <ClInclude Include="PatternGod_BaseComparer.h" />
     <ClInclude Include="PatternGod_PolynomComparer.h" />
+    <ClInclude Include="PatternGod_PolynomFilterEngine.h" />
     <ClInclude Include="PatternGod_ResultFusionEngine.h" />
     <ClInclude Include="PatternGod_ScoreComparer.h" />
     <ClInclude Include="PolynomComparer.h" />

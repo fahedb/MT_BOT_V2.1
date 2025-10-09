@@ -21,7 +21,7 @@ void PatternGod_PolynomComparer::InitComaprer()
 	m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
 	Set_ComparerType(); // Initialize the comparer type
 	if (m_MaxScoreFound > 0)
-		m_ScoreToAct = static_cast<double>(m_MaxScoreFound - 250) / static_cast<double>(m_currentTL->size());
+		m_ScoreToAct = static_cast<double>(m_MaxScoreFound - polyCompPolicy->Diff_Between_Max_And_ScoreToAct) / static_cast<double>(m_currentTL->size());
 	else
 		m_ScoreToAct = polyCompPolicy->ScoreToAct; // Get the score to act threshold from the policy
 

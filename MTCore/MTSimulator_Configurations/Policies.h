@@ -86,6 +86,7 @@ public:
     int VOLUME_Wieght = 0;
     bool EnableScoreScan = 0;
     int ScoreToAct = 0;
+	int Diff_Between_Max_And_ScoreToAct = 250; // Difference between maximum score and score to act
 private:
     void InitPolicy();
 };
@@ -115,7 +116,7 @@ public:
     int PolynomLen_ForScan = 5; // Length of the polynomial to scan
 
     int ScoreToAct = 0;
-
+	int Diff_Between_Max_And_ScoreToAct = 250; // Difference between maximum score and score to act
 private:
     void InitPolicy();
 };
@@ -136,7 +137,7 @@ public:
 
     double PolynomComparerWeight = 0.7; // Weight for polynomial fusion
     double ScoreComparerWeight = 0.3; // Weight for score fusion
-
+	int Num_Of_Top_Results_To_Filter_Out = 100; // Number of top results to filter out
 private:
     void InitPolicy();
 };

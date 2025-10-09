@@ -1,14 +1,15 @@
 #pragma once
-
 #include "PatternGod_PolynomComparer.h"
 #include "PatternGod_ScoreComparer.h"
 #include "PatternGod_ResultFusionEngine.h"
+#include "PatternGod_PolynomFilterEngine.h"
 #include <chrono>
 
 class PatternGod
 {
 private:
 	std::vector<std::unique_ptr<PatternGod_BaseComparer>> m_comparers; // Vector to hold all comparers
+	PatternGod_PolynomFilterEngine* m_polynomFilterEngine = nullptr; // Polynom filter engine for pre-filtering patterns
 
 	std::vector<ChangeNode*>* m_historyTL;
 	DBMap* m_historyDB_Map = nullptr; // Database map for the history time line
@@ -31,6 +32,9 @@ public:
 	{
 		if (m_historyDB_Map != nullptr && m_historyDB_Owner)
 			delete m_historyDB_Map; // Free the history DB map
+		if (m_polynomFilterEngine != nullptr)
+			delete m_polynomFilterEngine; // Free the polynom filter engine
+		m_polynomFilterEngine = nullptr;
 	}
 	void RefreshComparers()
 	{

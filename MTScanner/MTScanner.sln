@@ -33,6 +33,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MTSimulator_DataExporter", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MTSimulator_ResourcesManager", "..\MTCore\MTSimulator_ResourcesManager\MTSimulator_ResourcesManager.vcxproj", "{93CE40DE-5C0F-4C93-933A-795BF58D3A74}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CUDA_UNIT", "..\MTCore\CUDA_UNIT\CUDA_UNIT.vcxproj", "{02E87210-D38D-1D4A-FDC8-DE3425F62891}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MTSimulator_CudaCalcs", "..\MTCore\MTSimulator_CudaCalcs\MTSimulator_CudaCalcs.vcxproj", "{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}"
 EndProject
 Global
@@ -225,6 +227,18 @@ Global
 		{93CE40DE-5C0F-4C93-933A-795BF58D3A74}.ReleaseWithChecks|x64.Build.0 = ReleaseWithChecks|x64
 		{93CE40DE-5C0F-4C93-933A-795BF58D3A74}.ReleaseWithChecks|x86.ActiveCfg = ReleaseWithChecks|Win32
 		{93CE40DE-5C0F-4C93-933A-795BF58D3A74}.ReleaseWithChecks|x86.Build.0 = ReleaseWithChecks|Win32
+		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.Debug|x64.ActiveCfg = Debug|x64
+		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.Debug|x64.Build.0 = Debug|x64
+		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.Debug|x86.ActiveCfg = Debug|x64
+		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.Debug|x86.Build.0 = Debug|x64
+		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.Release|x64.ActiveCfg = Release|x64
+		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.Release|x64.Build.0 = Release|x64
+		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.Release|x86.ActiveCfg = Release|x64
+		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.Release|x86.Build.0 = Release|x64
+		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.ReleaseWithChecks|x64.ActiveCfg = ReleaseWithChecks|x64
+		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.ReleaseWithChecks|x64.Build.0 = ReleaseWithChecks|x64
+		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.ReleaseWithChecks|x86.ActiveCfg = Release|x64
+		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.ReleaseWithChecks|x86.Build.0 = Release|x64
 		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Debug|x64.ActiveCfg = Debug|x64
 		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Debug|x64.Build.0 = Debug|x64
 		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Debug|x86.ActiveCfg = Debug|Win32
@@ -233,8 +247,8 @@ Global
 		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Release|x64.Build.0 = Release|x64
 		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Release|x86.ActiveCfg = Release|Win32
 		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Release|x86.Build.0 = Release|Win32
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.ReleaseWithChecks|x64.ActiveCfg = Release|x64
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.ReleaseWithChecks|x64.Build.0 = Release|x64
+		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.ReleaseWithChecks|x64.ActiveCfg = ReleaseWithChecks|x64
+		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.ReleaseWithChecks|x64.Build.0 = ReleaseWithChecks|x64
 		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.ReleaseWithChecks|x86.ActiveCfg = Release|Win32
 		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.ReleaseWithChecks|x86.Build.0 = Release|Win32
 	EndGlobalSection

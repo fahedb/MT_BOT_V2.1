@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="KernelEngine.cu">
+      <Filter>KernelEngine\Engines\TestEngine</Filter>
+    </CudaCompile>
+    <CudaCompile Include="KernelEngine_ScoreCalcs.cu">
+      <Filter>KernelEngine\Engines\ScoreCalcs</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CPP_To_Cuda_Tunnel">
+      <UniqueIdentifier>{705161b0-f3ca-4264-811c-aabd9f4c8cd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KernelEngine">
+      <UniqueIdentifier>{332b73b3-0b49-46c2-af72-b35a4eee7b3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KernelEngine\Engines">
+      <UniqueIdentifier>{3642169f-64e9-46d4-9fd0-85a4cad75404}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KernelEngine\Engines\ScoreCalcs">
+      <UniqueIdentifier>{e98e0e46-9f18-40bc-9d11-093d3ed4a2ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KernelEngine\Setter">
+      <UniqueIdentifier>{53106ccb-35c6-4b07-be9a-f47ca32b0268}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KernelEngine\Engines\TestEngine">
+      <UniqueIdentifier>{66b1ad43-ae5b-453f-8db1-e804e1a57bc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KernelEngine\StreamStruct">
+      <UniqueIdentifier>{76e0a99e-1bcb-4ee9-ae86-b9758212dbd8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CPP_To_Cuda_Tunnel.cpp">
+      <Filter>CPP_To_Cuda_Tunnel</Filter>
+    </ClCompile>
+    <ClCompile Include="StreamSetters.cpp">
+      <Filter>KernelEngine\Setter</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CPP_To_Cuda_Tunnel.h">
+      <Filter>CPP_To_Cuda_Tunnel</Filter>
+    </ClInclude>
+    <ClInclude Include="KernelEngine_ScoreCalcs.h">
+      <Filter>KernelEngine\Engines\ScoreCalcs</Filter>
+    </ClInclude>
+    <ClInclude Include="KernelEngine.h">
+      <Filter>KernelEngine\Engines\TestEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="StreamSetters.h">
+      <Filter>KernelEngine\Setter</Filter>
+    </ClInclude>
+    <ClInclude Include="MTStreamsStructs.h">
+      <Filter>KernelEngine\StreamStruct</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

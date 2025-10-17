@@ -43,7 +43,7 @@ void CPP_To_Cuda_Tunnel::Calc_TwoIndicatorsRatio_ScoreCalcs(float* h_outScores, 
 	TwoIndCalc(	histInd_X_values, histInd_X_slopes, currInd_X_values, currInd_X_slopes,
 				histInd_Y_values, histInd_Y_slopes, currInd_Y_values, currInd_Y_slopes,
 				d_results, currSize, histSize, weight);
-	cudaMemcpy(h_outScores, d_results, sizeof(float) * numOfResults, cudaMemcpyDeviceToHost); // Copy results back to host
+	cudaMemcpy(h_outScores, d_results, sizeof(float) * numOfResults, cudaMemcpyDeviceToHost); // Copy results back to hostk
 }
 
 void CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(float* h_outScores, int numOfResults, IndicatorType indT, IndicatorLen indL, BarPeriod barP, int weight)
@@ -93,7 +93,7 @@ void CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(float* h_outScores, int numOf
 
 void CPP_To_Cuda_Tunnel::Set_CurrDataTimeFreameStream(float* h_data, size_t h_dataSize, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT ,bool forceOverWrite)
 {
-	StreamSetters::CheckDataStreamTree(&g_CurrDataStream, indT, indL, barP, valT); // Ensure the data stream tree is properly initialized
+	StreamSetters::CheckDataStreamTree(g_CurrDataStream, indT, indL, barP, valT); // Ensure the data stream tree is properly initialized
 	int indTypeIndex = static_cast<int>(indT);
 	int indicatorLenIndex = static_cast<int>(indL);
 	int barPeriodIndex = static_cast<int>(barP);
@@ -120,7 +120,7 @@ void CPP_To_Cuda_Tunnel::Set_CurrDataTimeFreameStream(float* h_data, size_t h_da
 
 void CPP_To_Cuda_Tunnel::Set_HistDataTimeFreameStream(float* h_data, size_t h_dataSize, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT ,bool forceOverWrite)
 {
-	StreamSetters::CheckDataStreamTree(&g_HistDataStream, indT, indL, barP, valT); // Ensure the data stream tree is properly initialized
+	StreamSetters::CheckDataStreamTree(g_HistDataStream, indT, indL, barP, valT); // Ensure the data stream tree is properly initialized
 	int indTypeIndex = static_cast<int>(indT);
 	int indicatorLenIndex = static_cast<int>(indL);
 	int barPeriodIndex = static_cast<int>(barP);
@@ -143,11 +143,23 @@ void CPP_To_Cuda_Tunnel::Set_HistDataTimeFreameStream(float* h_data, size_t h_da
 	cudaMemcpy(g_HistDataStream->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[barPeriodIndex].m_valueTypes[valTypeIndex].m_d_data, h_data, sizeof(float) * h_dataSize, cudaMemcpyHostToDevice); // Copy data to device
 }
 
-
+void Reset_ResultsStream_To0(IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT)
+{
+	float* existingData = g_d_results->m_indicators[static_cast<int>(indT)]
+		.m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_d_data;
+	int numElements = g_d_results->m_indicators[static_cast<int>(indT)]
+		.m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_numElements;
+	if (!numElements || !existingData)
+		{
+		std::cout << "Reset_ResultsStream_To0: No elements to reset" << std::endl;
+		return; // No elements to reset
+	}
+	cudaMemset(existingData, 0, sizeof(float) * numElements);
+}
 
 void CPP_To_Cuda_Tunnel::Set_ResultsTimeFrameStream(size_t h_resultsSize, IndicatorType indT, IndicatorLen indL, BarPeriod barP,IndicatorValueType valT, bool reset)
 {
-	StreamSetters::CheckDataStreamTree(&g_d_results, indT, indL, barP,valT); // Ensure the data stream tree is properly initialized
+	StreamSetters::CheckDataStreamTree(g_d_results, indT, indL, barP,valT); // Ensure the data stream tree is properly initialized
 	
 	int indTypeIndex = static_cast<int>(indT);
 	int indicatorLenIndex = static_cast<int>(indL);

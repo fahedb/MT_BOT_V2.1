@@ -1,13 +1,53 @@
 #include "StreamSetters.h"
+#include <iostream>
 
+IndicatorTypeList glob_indType_StreamSetters;
+IndicatorLenList glob_indLen_StreamSetters;
+BarPeriodList glob_barP_StreamSetters;
+IndicatorValueTypeList glob_valType_StreamSetters;
 
-void StreamSetters::CheckDataStreamTree(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT)
+void StreamSetters::ResetDataStream_To0(dataStream_t* dataSt) // Reset all data streams to 0
 {
-	CheckDataStream(*dataSt); // Initialize if null
-	CheckIndicatorStream(*dataSt, indT); // Ensure indicator type exists
-	CheckLenStream(*dataSt, indT, indL); // Ensure indicator length exists
-	CheckTimeFrameStream(*dataSt, indT, indL, barP); // Ensure timeframe exists
-	CheckValueTypeStream(*dataSt, indT, indL, barP, valT); // Ensure value type exists
+	for(auto indT : glob_indType_StreamSetters.types)
+	{
+		for(auto indL : glob_indLen_StreamSetters.lengths)
+		{
+			for(auto barP : glob_barP_StreamSetters.periods)
+			{
+				for(auto valT : glob_valType_StreamSetters.valueTypes)
+				{
+					ResetDataStreamTree_To0(dataSt, indT, indL, barP, valT);
+				}
+			}
+		}
+	}
+}
+
+void StreamSetters::ResetDataStreamTree_To0(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT) {
+	
+	CheckDataStreamTree(dataSt, indT, indL, barP, valT); // Ensure the data stream tree is properly initialized
+	float*& existingData = dataSt->m_indicators[static_cast<int>(indT)]
+		.m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_d_data;
+	int numElements = dataSt->m_indicators[static_cast<int>(indT)]
+		.m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_numElements;
+	if(!numElements || !existingData)
+	{
+		std::cout << "ResetDataStreamTree_To0: No elements to reset" << std::endl;
+		return; // No elements to reset
+	}
+	
+	memset(existingData, 0,
+					sizeof(float) * dataSt->m_indicators[static_cast<int>(indT)]
+					.m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_numElements);
+}
+
+void StreamSetters::CheckDataStreamTree(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT)
+{
+	CheckDataStream(dataSt); // Initialize if null
+	CheckIndicatorStream(dataSt, indT); // Ensure indicator type exists
+	CheckLenStream(dataSt, indT, indL); // Ensure indicator length exists
+	CheckTimeFrameStream(dataSt, indT, indL, barP); // Ensure timeframe exists
+	CheckValueTypeStream(dataSt, indT, indL, barP, valT); // Ensure value type exists
 }
 
 void StreamSetters::CheckDataStream(dataStream_t* dataSt)

@@ -112,6 +112,7 @@ public:
 	BaseIndicator(IndicatorValues curr);
 	IndicatorValues& Get_IndicatorValues() { return m_curr_BarValues; }
 	IndicatorValues* Get_IndicatorValues_Pointer() { return &m_curr_BarValues; }
+	virtual IndicatorType Get_IndicatorType() const = 0; // Pure virtual function to get the indicator type
 
 protected:
 	// Indicator values in all periods for current minute
@@ -122,12 +123,14 @@ class Volume_Ind : public BaseIndicator
 {
 public:
 	Volume_Ind(IndicatorValues curr) : BaseIndicator(curr) {};
+	virtual IndicatorType Get_IndicatorType() const override { return IndicatorType::VOLUME; } // Return the indicator type
 };
 
 class RSI_Ind : public BaseIndicator
 {
 public:
 	RSI_Ind(IndicatorValues curr) : BaseIndicator(curr) {}
+	virtual IndicatorType Get_IndicatorType() const override { return IndicatorType::RSI; } // Return the indicator type
 
 };
 
@@ -135,12 +138,14 @@ class EMA_Ind :public BaseIndicator
 {
 public:
 	EMA_Ind(IndicatorValues curr) : BaseIndicator(curr) {}
+	virtual IndicatorType Get_IndicatorType() const override { return IndicatorType::EMA; } // Return the indicator type
 };
 
 class ZLSMA_Ind :public BaseIndicator
 {
 public:
 	ZLSMA_Ind(IndicatorValues curr) : BaseIndicator(curr) {}
+	virtual IndicatorType Get_IndicatorType() const override { return IndicatorType::ZLSMA; } // Return the indicator type
 };
 
 

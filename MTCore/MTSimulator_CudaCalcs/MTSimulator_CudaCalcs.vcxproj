@@ -27,10 +27,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CudaEngine_ScoreCalcs.cpp" />
     <ClCompile Include="CUDARunner.cpp" />
     <ClCompile Include="Run.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CudaEngine_ScoreCalcs.h" />
     <ClInclude Include="CUDARunner.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -188,7 +190,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\CUDA_UNIT;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_Configurations;..\CUDA_UNIT;..\MTSimulator_TimeLines;..\MTSimulator_Logger;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

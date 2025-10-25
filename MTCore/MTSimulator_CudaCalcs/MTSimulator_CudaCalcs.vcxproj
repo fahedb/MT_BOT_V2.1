@@ -27,12 +27,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CudaEngine_ScoreCalcs.cpp" />
     <ClCompile Include="CUDARunner.cpp" />
     <ClCompile Include="Run.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CudaEngine_ScoreCalcs.h" />
     <ClInclude Include="CUDARunner.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

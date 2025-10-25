@@ -1,0 +1,19 @@
+#include "MTStreamsStructs.h"
+
+#pragma once
+class CPP_To_Cuda_Tunnel
+{
+public:
+	////////////////////////////////////////////////////////////////////////////////////////
+	static void Calc_TwoIndicatorsRatio_ScoreCalcs(float* h_outScores, int numOfResults, IndicatorType indT, IndicatorLen indL1, BarPeriod barP1, IndicatorLen indL2, BarPeriod barP2, int weight);
+	static void Calc_Indicator_ScoreCalcs(float* h_outScores, int numOfResults ,IndicatorType indT, IndicatorLen indL, BarPeriod barP, int weight);
+	//////////////////// Setters ///////////////////////////////////////////////////////////
+	static void Set_HistDataTimeFreameStream(float* h_data, size_t h_dataSize, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT, bool forceOverWrite = false);
+	static void Set_CurrDataTimeFreameStream(float* h_data, size_t h_dataSize, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT, bool forceOverWrite = false);
+	static void Set_ResultsTimeFrameStream(size_t h_resultsSize, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT, bool reset = false);
+	static void Reset_ResultsStream_To0(IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT);
+	/////////////////////////////////////////////////////////////////////////////////////////
+	static bool IsCudaAvailable();
+
+};
+

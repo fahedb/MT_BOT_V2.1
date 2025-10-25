@@ -4,6 +4,12 @@
 #include <future>      // std::async, std::future
 #include "ThreadPool.h"
 #include "ProcessData.h"
+#include "ProccessFlags.h"
+#include "Converts.h"
+
+#define LIMIT_LAST_X_LINES 1000000 // Number of lines to skip in the begining of large files when multi threading read is enabled
+
+
 bool BTables::InsertIntoDB(const std::string& insertSQL)
 {
 	if (!m_DBConnectionHandler || !m_DBenvHandler)
@@ -131,6 +137,26 @@ void BTables::RemoveSelection()
 	UnloadFileMapping();
 }
 
+int BTables::GetBeginGap()
+{
+	int beginLineGap = 0;
+	std::string skipValue = ProccessFlags::GetSwitch(LIMIT_FILE_LINES_LOAD);
+	if (skipValue.length() || LIMIT_LAST_X_LINES)
+	{
+		int linesCount = GetFileLinesCount();
+		if (!skipValue.length())
+			skipValue = std::to_string(LIMIT_LAST_X_LINES);
+		int dataLimit = Converts::ToInt(skipValue);
+
+		if (dataLimit > 0 && dataLimit < linesCount)
+		{
+			// Calc what is the gap needed to skip till the last LIMIT param lines
+			beginLineGap = linesCount - dataLimit;
+		}
+	}
+	return beginLineGap;
+}
+
 
 
 bool BTables::InitFileMap()
@@ -173,8 +199,30 @@ bool BTables::InitFileMap()
 
 	m_hFile = hFile;
 	m_hMapping = hMapping;
+
 	m_startCharPtr = fileData;
 	m_endCharPtr = fileData + fileSize.QuadPart;
+
+	int beginGap = GetBeginGap();
+	
+	if (beginGap > 0)
+	{
+		int totalLineCount = GetFileLinesCount(); // Ensure we have the total lines count
+		if(beginGap >= totalLineCount)
+			beginGap = 0; // Reset gap if it exceeds total lines
+		// Move the fileData pointer to the begin gap
+		char* currPtr = fileData;
+		char* endPtr = fileData + fileSize.QuadPart;
+		int lineCount = 0;
+		while (currPtr < endPtr && lineCount < beginGap) {
+			if (*currPtr == '\n') lineCount++;
+			currPtr++;
+		}
+		fileData = currPtr;
+	}
+	m_totalFileLines = 0; // Reset total lines count to force recount
+
+	m_startCharPtr = fileData;
 	int threadsNum = MTThreadPool::getInstance()->Get_ThreadsNum();
 	for (int i = 0; i < threadsNum; i++)
 	{
@@ -184,6 +232,8 @@ bool BTables::InitFileMap()
 
 long BTables::GetFileLinesCount()
 {
+	if(m_totalFileLines > 0)
+		return m_totalFileLines;
 	// Count lines by iterating through file data
 	long lineCount = 0;
 	char* startPtr = m_startCharPtr;
@@ -195,7 +245,7 @@ long BTables::GetFileLinesCount()
 		if (*startPtr == '\n') lineCount++;
 		startPtr++;
 	}
-
+	m_totalFileLines = lineCount;
 	return lineCount;
 }
 

@@ -49,6 +49,12 @@
     <Filter Include="PatternGod\Filters\Polynom">
       <UniqueIdentifier>{29a72ecf-6b42-4aa4-b039-f0394d8737d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PatternGod\Comparers_CUDA">
+      <UniqueIdentifier>{82ea9a1e-6cc3-45cb-9683-d3fe7283b642}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PatternGod\Comparers_CUDA\Scoring">
+      <UniqueIdentifier>{fe26751b-f87c-4c8b-838c-701b3e30060f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PatternGod_BaseComparer.cpp">
@@ -83,6 +89,9 @@
     </ClCompile>
     <ClCompile Include="PatternGod_PolynomFilterEngine.cpp">
       <Filter>PatternGod\Filters\Polynom</Filter>
+    </ClCompile>
+    <ClCompile Include="CudaEngine_ScoreCalcs.cpp">
+      <Filter>PatternGod\Comparers_CUDA\Scoring</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="PatternGod_PolynomFilterEngine.h">
       <Filter>PatternGod\Filters\Polynom</Filter>
+    </ClInclude>
+    <ClInclude Include="CudaEngine_ScoreCalcs.h">
+      <Filter>PatternGod\Comparers_CUDA\Scoring</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

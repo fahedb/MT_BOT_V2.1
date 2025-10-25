@@ -33,16 +33,10 @@
     <ClCompile Include="CUDARunner.cpp">
       <Filter>CudaRunners\Dummy</Filter>
     </ClCompile>
-    <ClCompile Include="CudaEngine_ScoreCalcs.cpp">
-      <Filter>CudaRunners\PatternGodCalcs\ScoreCalcs</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CUDARunner.h">
       <Filter>CudaRunners\Dummy</Filter>
-    </ClInclude>
-    <ClInclude Include="CudaEngine_ScoreCalcs.h">
-      <Filter>CudaRunners\PatternGodCalcs\ScoreCalcs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -148,7 +148,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Configurations;..\MTSimulator_Statistics;..\MTSimulator_Tables;..\MTSimulator_DataBaseConnection;..\MTSimulator_Logger;..\MTSimulator_Compare;..\MTSimulator_Casts;..\MTSimulator_Cache;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Configurations;..\MTSimulator_Statistics;..\MTSimulator_Tables;..\MTSimulator_DataBaseConnection;..\MTSimulator_Logger;..\MTSimulator_Compare;..\MTSimulator_Casts;..\MTSimulator_Cache;..\CUDA_UNIT;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -163,7 +163,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Configurations;..\MTSimulator_Statistics;..\MTSimulator_Tables;..\MTSimulator_DataBaseConnection;..\MTSimulator_Logger;..\MTSimulator_Compare;..\MTSimulator_Casts;..\MTSimulator_Cache;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Configurations;..\MTSimulator_Statistics;..\MTSimulator_Tables;..\MTSimulator_DataBaseConnection;..\MTSimulator_Logger;..\MTSimulator_Compare;..\MTSimulator_Casts;..\MTSimulator_Cache;..\CUDA_UNIT;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -180,7 +180,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Configurations;..\MTSimulator_Statistics;..\MTSimulator_Tables;..\MTSimulator_DataBaseConnection;..\MTSimulator_Logger;..\MTSimulator_Compare;..\MTSimulator_Casts;..\MTSimulator_Cache;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Configurations;..\MTSimulator_Statistics;..\MTSimulator_Tables;..\MTSimulator_DataBaseConnection;..\MTSimulator_Logger;..\MTSimulator_Compare;..\MTSimulator_Casts;..\MTSimulator_Cache;..\CUDA_UNIT;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Disabled</Optimization>

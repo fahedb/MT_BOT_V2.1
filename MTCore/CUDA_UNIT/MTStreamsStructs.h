@@ -1,5 +1,6 @@
 #pragma once
 #include "..\MTSimulator_TimeLines\IndicatorEnums.h"
+#include <vector>
 
 struct ValueTypeStream_t
 {
@@ -11,28 +12,24 @@ struct ValueTypeStream_t
 struct TimeFrameStream_t
 {
 	BarPeriod m_barPeriod;
-	int m_numValueTypes;
-	ValueTypeStream_t* m_valueTypes; // Array of ValueTypeStream_t for each value type
+	std::vector<ValueTypeStream_t> m_valueTypes; // Array of ValueTypeStream_t for each value type
 
 };
 
 struct LenIndicatorStream_t
 {
 	IndicatorLen m_indicatorType;
-	int m_numTimeFrames;
-	TimeFrameStream_t* m_timeFrames; // Array of TimeFramesStream_t for each timeframe
+	std::vector<TimeFrameStream_t> m_timeFrames; // Array of TimeFramesStream_t for each timeframe
 };
 
 struct IndStream_t
 {
 	IndicatorType m_indicatorType;
-	int m_numLens;
-	LenIndicatorStream_t* m_lens; // Array of LenIndicatorStream_t for each length
+	std::vector<LenIndicatorStream_t> m_lens; // Array of LenIndicatorStream_t for each length
 };
 
 struct dataStream_t
 {
-	int m_numIndicators = 0;
-	IndStream_t* m_indicators; // Array of IndStream_t for each indicator
+	std::vector<IndStream_t> m_indicators; // Array of IndStream_t for each indicator
 
 };

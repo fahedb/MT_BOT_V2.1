@@ -3,15 +3,14 @@
 #include "CONFIGRATIONS.H"
 #include "DataBaseConnection.h"
 #include "ScoreResultsCachePolynom.h"
+#include "CPP_To_Cuda_Tunnel.h"
+
 void DefualtProgramStart();
 void LoadJson_Data_ToDBFile();
 
-#include "CUDARunner.h"
 
 int main(int argc, char* argv[])
 {
-	CUDARunner::RunRSITest();
-	//CUDARunner::RunTest();
 	ScoreResultsCachePolynom* scoreResultsCache = ScoreResultsCachePolynom::getInstance();
 	ProccessFlags::InitProccessFlags(argc, argv);
 	

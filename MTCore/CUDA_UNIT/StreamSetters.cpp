@@ -6,7 +6,7 @@ IndicatorLenList glob_indLen_StreamSetters;
 BarPeriodList glob_barP_StreamSetters;
 IndicatorValueTypeList glob_valType_StreamSetters;
 
-void StreamSetters::ResetDataStream_To0(dataStream_t* dataSt) // Reset all data streams to 0
+void StreamSetters::ResetDataStream_To0(dataStream_t** dataSt) // Reset all data streams to 0
 {
 	for(auto indT : glob_indType_StreamSetters.types)
 	{
@@ -23,12 +23,12 @@ void StreamSetters::ResetDataStream_To0(dataStream_t* dataSt) // Reset all data 
 	}
 }
 
-void StreamSetters::ResetDataStreamTree_To0(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT) {
+void StreamSetters::ResetDataStreamTree_To0(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT) {
 	
 	CheckDataStreamTree(dataSt, indT, indL, barP, valT); // Ensure the data stream tree is properly initialized
-	float*& existingData = dataSt->m_indicators[static_cast<int>(indT)]
+	float*& existingData = (*dataSt)->m_indicators[static_cast<int>(indT)]
 		.m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_d_data;
-	int numElements = dataSt->m_indicators[static_cast<int>(indT)]
+	int numElements = (*dataSt)->m_indicators[static_cast<int>(indT)]
 		.m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_numElements;
 	if(!numElements || !existingData)
 	{
@@ -37,11 +37,11 @@ void StreamSetters::ResetDataStreamTree_To0(dataStream_t* dataSt, IndicatorType 
 	}
 	
 	memset(existingData, 0,
-					sizeof(float) * dataSt->m_indicators[static_cast<int>(indT)]
+					sizeof(float) * (*dataSt)->m_indicators[static_cast<int>(indT)]
 					.m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_numElements);
 }
 
-void StreamSetters::CheckDataStreamTree(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT)
+void StreamSetters::CheckDataStreamTree(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT)
 {
 	CheckDataStream(dataSt); // Initialize if null
 	CheckIndicatorStream(dataSt, indT); // Ensure indicator type exists
@@ -50,107 +50,57 @@ void StreamSetters::CheckDataStreamTree(dataStream_t* dataSt, IndicatorType indT
 	CheckValueTypeStream(dataSt, indT, indL, barP, valT); // Ensure value type exists
 }
 
-void StreamSetters::CheckDataStream(dataStream_t* dataSt)
+void StreamSetters::CheckDataStream(dataStream_t** dataSt)
 {
-	if (dataSt == nullptr)
+	if (*dataSt == nullptr)
 	{
-		dataSt = new dataStream_t();
+		*dataSt = new dataStream_t();
 	}
 }
-void StreamSetters::CheckIndicatorStream(dataStream_t* dataSt, IndicatorType indT)
+void StreamSetters::CheckIndicatorStream(dataStream_t** dataSt, IndicatorType indT)
 {
 	int indTypeIndex = static_cast<int>(indT);
-	if (dataSt->m_numIndicators <= indTypeIndex)
+	if ((*dataSt)->m_indicators.size() <= indTypeIndex)
 	{
-		// Allocate new array with increased size
-		int newNumIndicators = indTypeIndex + 1;
-		IndStream_t* newIndicators = new IndStream_t[newNumIndicators];
-		// Copy existing data to the new array
-		for (int i = 0; i < dataSt->m_numIndicators; ++i)
-		{
-			newIndicators[i] = dataSt->m_indicators[i];
-		}
-		newIndicators[indTypeIndex].m_indicatorType = indT;
-
-		// Delete old array
-		delete[] dataSt->m_indicators;
-		// Update pointer and size
-		dataSt->m_indicators = newIndicators;
-		dataSt->m_numIndicators = newNumIndicators;
+		(*dataSt)->m_indicators.push_back(IndStream_t());
+		(*dataSt)->m_indicators[indTypeIndex].m_indicatorType = indT;
 	}
 }
 
-void StreamSetters::CheckLenStream(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL)
+void StreamSetters::CheckLenStream(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL)
 {
 
 	int indicatorLenIndex = static_cast<int>(indL);
 	int indTypeIndex = static_cast<int>(indT);
-	if (dataSt->m_indicators[indTypeIndex].m_numLens <= indicatorLenIndex)
+	if ((*dataSt)->m_indicators[indTypeIndex].m_lens.size() <= indicatorLenIndex)
 	{
-		// Allocate new array with increased size
-		int newNumLens = indicatorLenIndex + 1;
-		LenIndicatorStream_t* newLens = new LenIndicatorStream_t[newNumLens];
-		// Copy existing data to the new array
-		for (int i = 0; i < dataSt->m_indicators[indTypeIndex].m_numLens; ++i)
-		{
-			newLens[i] = dataSt->m_indicators[indTypeIndex].m_lens[i];
-		}
-		newLens[indicatorLenIndex].m_indicatorType = indL;
-		// Delete old array
-		delete[] dataSt->m_indicators[indTypeIndex].m_lens;
-		// Update pointer and size
-		dataSt->m_indicators[indTypeIndex].m_lens = newLens;
-		dataSt->m_indicators[indTypeIndex].m_numLens = newNumLens;
+		(*dataSt)->m_indicators[indTypeIndex].m_lens.push_back(LenIndicatorStream_t());
+		(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_indicatorType = indL;
 	}
 }
 
-void StreamSetters::CheckTimeFrameStream(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP)
+void StreamSetters::CheckTimeFrameStream(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP)
 {
 	int indTypeIndex = static_cast<int>(indT);
 	int indicatorLenIndex = static_cast<int>(indL);
 	int timeFrameIndex = static_cast<int>(barP);
-	if (dataSt->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_numTimeFrames <= timeFrameIndex)
+	if ((*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames.size() <= timeFrameIndex)
 	{
-		// Allocate new array with increased size
-		int newNumTimeFrames = timeFrameIndex + 1;
-		TimeFrameStream_t* newTimeFrames = new TimeFrameStream_t[newNumTimeFrames];
-		// Copy existing data to the new array
-		for (int i = 0; i < dataSt->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_numTimeFrames; ++i)
-		{
-			newTimeFrames[i] = dataSt->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[i];
-		}
-		newTimeFrames[timeFrameIndex].m_barPeriod = barP;
-
-		// Allocate device memory for the data
-		delete[] dataSt->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames;
-		// Update pointer and size
-		dataSt->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames = newTimeFrames;
-		dataSt->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_numTimeFrames = newNumTimeFrames;
+		(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames.push_back(TimeFrameStream_t());
+		(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_barPeriod = barP;
 	}
 }
 
-void StreamSetters::CheckValueTypeStream(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT)
+void StreamSetters::CheckValueTypeStream(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT)
 {
 	int indTypeIndex = static_cast<int>(indT);
 	int indicatorLenIndex = static_cast<int>(indL);
 	int timeFrameIndex = static_cast<int>(barP);
 	int valueTypeIndex = static_cast<int>(valT);
-	if (dataSt->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_numValueTypes <= valueTypeIndex)
+	if ((*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes.size() <= valueTypeIndex)
 	{
-		// Allocate new array with increased size
-		int newNumValueTypes = valueTypeIndex + 1;
-		ValueTypeStream_t* newValueTypes = new ValueTypeStream_t[newNumValueTypes];
-		// Copy existing data to the new array
-		for (int i = 0; i < dataSt->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_numValueTypes; ++i)
-		{
-			newValueTypes[i] = dataSt->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes[i];
-		}
-		newValueTypes[valueTypeIndex].m_valueType = valT;
-		// Allocate device memory for the data
-		delete[] dataSt->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes;
-		// Update pointer and size
-		dataSt->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes = newValueTypes;
-		dataSt->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_numValueTypes = newNumValueTypes;
+		(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes.push_back(ValueTypeStream_t());
+		(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes[valueTypeIndex].m_valueType = valT;
 	}
 }
 

@@ -45,7 +45,7 @@ void PatternGodUtils::FilterDuplicatesTimeLines(std::vector<std::pair<ChangeNode
 		bool isDuplicate = false;
 
 
-		for (int offset = -29; offset <= 29; ++offset)
+		for (int offset = -15; offset <= 15; ++offset)
 		{
 			if (usedIndices.find(currIdx + offset) != usedIndices.end()) {
 				isDuplicate = true;

@@ -3,6 +3,7 @@
 #include "DefinedTables.h"
 #include "CandleData.h"
 #include "ThreadPool.h"
+
 #pragma once
 
 #ifndef BaseHistoryPricesTable_HEADER
@@ -44,20 +45,7 @@ public:
 public:
 	void Set_DATA_DB_FileName(const std::string& fileName) { Set_DBFileName(fileName); }
 	void Set_MultiThreadedRead() { Set_AsMultiThread_Read(); }
-	int InitFileMapForRead() { // Init indexes and maps, and return chunk size
-		InitFileMap();
-		long linesCount = GetFileLinesCount();
-		int threadsNum = MTThreadPool::getInstance()->Get_ThreadsNum();
-		int chunkSize =  static_cast<long>(linesCount) / threadsNum;
-
-		for (int t = 0; t < threadsNum; t++)
-		{
-			int startIdx = t * chunkSize;
-			int endIdx = (t == threadsNum - 1) ? linesCount : (t + 1) * chunkSize;
-			InitLineIdx(startIdx, endIdx, t);
-		}
-		return chunkSize;
-	}
+	int InitFileMapForRead();
 protected:
 
 	void ClearAll();

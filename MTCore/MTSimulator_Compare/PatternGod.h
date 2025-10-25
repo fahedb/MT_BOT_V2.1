@@ -3,18 +3,23 @@
 #include "PatternGod_ScoreComparer.h"
 #include "PatternGod_ResultFusionEngine.h"
 #include "PatternGod_PolynomFilterEngine.h"
+#include "CudaEngine_ScoreCalcs.h"
 #include <chrono>
 
 class PatternGod
 {
 private:
 	std::vector<std::unique_ptr<PatternGod_BaseComparer>> m_comparers; // Vector to hold all comparers
+	CudaEngine_ScoreCalcs* m_cudaEngine = nullptr; // CUDA engine for score calculations
+	bool m_cudaEngineInitialized = false; // Flag to indicate if the CUDA engine is initialized
+
 	PatternGod_PolynomFilterEngine* m_polynomFilterEngine = nullptr; // Polynom filter engine for pre-filtering patterns
 
 	std::vector<ChangeNode*>* m_historyTL;
 	DBMap* m_historyDB_Map = nullptr; // Database map for the history time line
 	bool m_historyDB_Owner = true; // Flag to indicate ownership of the history DB map
 	std::vector<ChangeNode*>* m_currentTL;
+	void CudaInit();
 public:
 
 	PatternGod(std::vector<ChangeNode*>* historyTimeLine, std::vector<ChangeNode*>* currentTimeLine);
@@ -49,7 +54,7 @@ public:
 		m_currentTL = currentTimeLine; // Set the current time line for patternGod
 	}
 	bool ScanPreCondition() const;
-
+	bool CudaPreCondition() const;
 	// TODO: Implement the scanning logic for patterns through the comparers...
 
 	int ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);

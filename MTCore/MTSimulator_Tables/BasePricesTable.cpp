@@ -1,6 +1,23 @@
 #include "BasePricesTable.h"
 #include "Logger.h"
 #include "ChangeDataBuilder.h"
+#include "ProccessFlags.h"
+#include "Converts.h"
+
+int BasePricesTable::InitFileMapForRead() { // Init indexes and maps, and return chunk size
+	InitFileMap();
+	long linesCount = GetFileLinesCount();
+	int threadsNum = MTThreadPool::getInstance()->Get_ThreadsNum();
+	int chunkSize = static_cast<long>(linesCount) / threadsNum;
+
+	for (int t = 0; t < threadsNum; t++)
+	{
+		int startIdx = t * chunkSize; // Calculate start index with gap
+		int endIdx = (t == threadsNum - 1) ? linesCount : (t + 1) * chunkSize;
+		InitLineIdx(startIdx, endIdx, t);
+	}
+	return chunkSize;
+}
 
 void BasePricesTable::ClearAll()
 {

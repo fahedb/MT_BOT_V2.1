@@ -149,6 +149,9 @@ ScoresResult::ScoresResult() // Just a constructor :)
 // ------------------------------------------------------------------------------------------------------------
 
 void ScoresResult::calcTotalResult() { // Calc total score of every object
+	if(m_lockedResult) {
+		return; // If locked, do not recalculate
+	}
 	for(auto& indScore : indicatorScores) {
 		indScore.calcTotal(); // Calculate total for each IndicatorScore
 	}
@@ -228,6 +231,9 @@ ScoresResult ScoresResult::operator+(const ScoresResult& other) const {
 // ------------------------------------------------------------------------------------------------------------
 
 IndicatorScore ScoresResult::combineScores() const { // function to combine scores into totalScore
+	if(m_lockedResult) {
+		return totalScore; // If locked, return existing totalScore
+	}
 
 	IndicatorScore combined;
 	combined.Reset(); // Reset combined scores

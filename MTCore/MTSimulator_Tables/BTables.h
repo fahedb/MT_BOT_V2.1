@@ -22,6 +22,8 @@ private:
 	std::vector<int> m_jsonsThreadIdxsPlaces;
 	bool m_multiThreadedRead;
 
+	int m_totalFileLines = 0;
+
 	std::mutex queueMutex;
 	std::string m_fileName;
 
@@ -130,6 +132,7 @@ protected: // Function to control SQL DataBase
 
 	void Insert_NewBody_to_queue(JsonSelectionNode* node) { m_allSelectedJsonRows.push(node); }
 	void RemoveSelection();
+	int GetBeginGap();
 private:
 	// Remove json allocations per thread, this function will work in chunks, after finishing the chunk it will enqueue new task
 };

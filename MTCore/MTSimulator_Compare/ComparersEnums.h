@@ -8,7 +8,8 @@ enum class PatternGodComparerType
 	NONE = -1,
 	PolynomComparer,
 	ScoreComparer,
-	COUNT = 2 // Total number of comparer types -- this should be updated if more comparer types are added
+	CudaScoreComparer,
+	COUNT = 3 // Total number of comparer types -- this should be updated if more comparer types are added
 
 	// Add more comparer types as needed
 };

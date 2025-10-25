@@ -160,7 +160,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Cache;..\MTSimulator_Configurations;..\MTSimulator_Logger;..\MTSimulator_Casts;..\MTSimulator_MTThreadPool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Cache;..\MTSimulator_Configurations;..\MTSimulator_Logger;..\MTSimulator_Casts;..\MTSimulator_MTThreadPool;..\CUDA_UNIT;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -177,7 +177,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Cache;..\MTSimulator_Configurations;..\MTSimulator_Logger;..\MTSimulator_Casts;..\MTSimulator_MTThreadPool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Cache;..\MTSimulator_Configurations;..\MTSimulator_Logger;..\MTSimulator_Casts;..\MTSimulator_MTThreadPool;..\CUDA_UNIT;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -188,6 +188,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CudaEngine_ScoreCalcs.cpp" />
     <ClCompile Include="MTSimulatorUtils.cpp" />
     <ClCompile Include="PatternGod.cpp" />
     <ClCompile Include="PatternGodUtils.cpp" />
@@ -202,6 +203,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComparersEnums.h" />
+    <ClInclude Include="CudaEngine_ScoreCalcs.h" />
     <ClInclude Include="MTSimulatorUtils.h" />
     <ClInclude Include="PatternGod.h" />
     <ClInclude Include="PatternGodUtils.h" />

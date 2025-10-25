@@ -54,8 +54,10 @@ struct ScoresResult {
 	ScoresResult operator/(const ScoresResult& other) const;
 	std::vector<IndicatorScore> indicatorScores;
 	IndicatorScore totalScore;
+	void SetLockedResult(bool locked) { m_lockedResult = locked; }
 private:
 	// Helper function to combine scores into totalScore
+	bool m_lockedResult = false;	
 	IndicatorScore combineScores() const;
 };
 ScoresResult operator*(const ScoresResult& score, double factor); // External Multiply ScoresResult by a factor

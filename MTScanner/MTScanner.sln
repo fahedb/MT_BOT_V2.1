@@ -35,8 +35,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MTSimulator_ResourcesManage
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CUDA_UNIT", "..\MTCore\CUDA_UNIT\CUDA_UNIT.vcxproj", "{02E87210-D38D-1D4A-FDC8-DE3425F62891}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MTSimulator_CudaCalcs", "..\MTCore\MTSimulator_CudaCalcs\MTSimulator_CudaCalcs.vcxproj", "{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -239,18 +237,6 @@ Global
 		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.ReleaseWithChecks|x64.Build.0 = ReleaseWithChecks|x64
 		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.ReleaseWithChecks|x86.ActiveCfg = Release|x64
 		{02E87210-D38D-1D4A-FDC8-DE3425F62891}.ReleaseWithChecks|x86.Build.0 = Release|x64
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Debug|x64.ActiveCfg = Debug|x64
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Debug|x64.Build.0 = Debug|x64
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Debug|x86.ActiveCfg = Debug|Win32
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Debug|x86.Build.0 = Debug|Win32
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Release|x64.ActiveCfg = Release|x64
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Release|x64.Build.0 = Release|x64
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Release|x86.ActiveCfg = Release|Win32
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.Release|x86.Build.0 = Release|Win32
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.ReleaseWithChecks|x64.ActiveCfg = ReleaseWithChecks|x64
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.ReleaseWithChecks|x64.Build.0 = ReleaseWithChecks|x64
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.ReleaseWithChecks|x86.ActiveCfg = Release|Win32
-		{80B99DC1-F3A6-41CF-BEAD-04498A1C488B}.ReleaseWithChecks|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

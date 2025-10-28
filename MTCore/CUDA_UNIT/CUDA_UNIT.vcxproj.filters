@@ -1,12 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CudaCompile Include="kernel.cu" />
-    <CudaCompile Include="KernelEngine_ScoreCalcs.cu">
-      <Filter>KernelEngines\ScoreCalcs</Filter>
-    </CudaCompile>
     <CudaCompile Include="KernelEngine.cu">
       <Filter>KernelEngines\General</Filter>
+    </CudaCompile>
+    <CudaCompile Include="kernel.cu">
+      <Filter>Tunnel</Filter>
+    </CudaCompile>
+    <CudaCompile Include="KernelEngine_ScoreCalcs.cu">
+      <Filter>KernelEngines\ScoreCalcs\Interface</Filter>
+    </CudaCompile>
+    <CudaCompile Include="KernelEngine_ScoreCalcs_General.cu">
+      <Filter>KernelEngines\ScoreCalcs\Helpers</Filter>
+    </CudaCompile>
+    <CudaCompile Include="KernelEngine_ScoreCalcs_RSI.cu">
+      <Filter>KernelEngines\ScoreCalcs\RSI</Filter>
+    </CudaCompile>
+    <CudaCompile Include="KernelEngine_ScoreCalcs_MA.cu">
+      <Filter>KernelEngines\ScoreCalcs\MA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="KernelEngine_ScoreCalcs_TwoInd.cu">
+      <Filter>KernelEngines\ScoreCalcs\DOUBLE_IND</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
@@ -21,9 +35,6 @@
     <ClInclude Include="CPP_To_Cuda_Tunnel.h">
       <Filter>Tunnel</Filter>
     </ClInclude>
-    <ClInclude Include="KernelEngine_ScoreCalcs.h">
-      <Filter>KernelEngines\ScoreCalcs</Filter>
-    </ClInclude>
     <ClInclude Include="KernelEngine.h">
       <Filter>KernelEngines\General</Filter>
     </ClInclude>
@@ -35,6 +46,21 @@
     </ClInclude>
     <ClInclude Include="CudaMemoryController.h">
       <Filter>CudaMemory</Filter>
+    </ClInclude>
+    <ClInclude Include="KernelEngine_ScoreCalcs.h">
+      <Filter>KernelEngines\ScoreCalcs\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="KernelEngine_ScoreCalcs_General.h">
+      <Filter>KernelEngines\ScoreCalcs\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="KernelEngine_ScoreCalcs_RSI.h">
+      <Filter>KernelEngines\ScoreCalcs\RSI</Filter>
+    </ClInclude>
+    <ClInclude Include="KernelEngine_ScoreCalcs_MA.h">
+      <Filter>KernelEngines\ScoreCalcs\MA</Filter>
+    </ClInclude>
+    <ClInclude Include="KernelEngine_ScoreCalcs_TwoInd.h">
+      <Filter>KernelEngines\ScoreCalcs\DOUBLE_IND</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +87,21 @@
     </Filter>
     <Filter Include="MemoryStream\Setter">
       <UniqueIdentifier>{e727cbff-2634-4638-9050-27a70b842b06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KernelEngines\ScoreCalcs\Interface">
+      <UniqueIdentifier>{8fa390a7-9816-4a77-9e07-0228ef3bc21e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KernelEngines\ScoreCalcs\RSI">
+      <UniqueIdentifier>{64fc91f7-f4ec-4992-9dcf-31e154feba70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KernelEngines\ScoreCalcs\MA">
+      <UniqueIdentifier>{6364a129-77b0-429a-81f1-5f51cb4b60f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KernelEngines\ScoreCalcs\DOUBLE_IND">
+      <UniqueIdentifier>{cf5ad6c1-b962-4db2-8025-2b47d569bd00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KernelEngines\ScoreCalcs\Helpers">
+      <UniqueIdentifier>{d0c2961b-6587-47aa-bfd4-e28bf3d56c75}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

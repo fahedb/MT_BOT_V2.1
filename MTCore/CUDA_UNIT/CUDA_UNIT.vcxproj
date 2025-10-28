@@ -91,6 +91,7 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithChecks|x64'">
@@ -112,18 +113,31 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="kernel.cu" />
     <CudaCompile Include="KernelEngine.cu" />
     <CudaCompile Include="KernelEngine_ScoreCalcs.cu" />
+    <CudaCompile Include="KernelEngine_ScoreCalcs_General.cu" />
+    <CudaCompile Include="KernelEngine_ScoreCalcs_MA.cu" />
+    <CudaCompile Include="KernelEngine_ScoreCalcs_RSI.cu">
+      <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Release|x64'">compute_86,sm_86</CodeGeneration>
+      <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='ReleaseWithChecks|x64'">compute_52,sm_52</CodeGeneration>
+      <GenerateRelocatableDeviceCode Condition="'$(Configuration)|$(Platform)'=='ReleaseWithChecks|x64'">true</GenerateRelocatableDeviceCode>
+    </CudaCompile>
+    <CudaCompile Include="KernelEngine_ScoreCalcs_TwoInd.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPP_To_Cuda_Tunnel.h" />
     <ClInclude Include="CudaMemoryController.h" />
     <ClInclude Include="KernelEngine.h" />
     <ClInclude Include="KernelEngine_ScoreCalcs.h" />
+    <ClInclude Include="KernelEngine_ScoreCalcs_General.h" />
+    <ClInclude Include="KernelEngine_ScoreCalcs_MA.h" />
+    <ClInclude Include="KernelEngine_ScoreCalcs_RSI.h" />
+    <ClInclude Include="KernelEngine_ScoreCalcs_TwoInd.h" />
     <ClInclude Include="MTStreamsStructs.h" />
     <ClInclude Include="StreamSetters.h" />
   </ItemGroup>

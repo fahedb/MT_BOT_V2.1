@@ -26,7 +26,7 @@
 // #import
 //+------------------------------------------------------------------+
 
-#import "C:\\Users\\Administrator\\Documents\\GitHub\\MT_BOT_V2.1\\MTDll\\x64\\Debug\\MTDll.dll"
+#import "C:\\MTSOURCE\\MT_BOT_V2.1\\MTDll\\x64\\Debug\\MTDll.dll"
 // Dll Functions def
 double Get_MainTrade_Size();
 double Get_SupportTrade_Size();

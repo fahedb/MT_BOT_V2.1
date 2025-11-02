@@ -60,23 +60,22 @@ void StreamSetters::CheckDataStream(dataStream_t** dataSt)
 void StreamSetters::CheckIndicatorStream(dataStream_t** dataSt, IndicatorType indT)
 {
 	int indTypeIndex = static_cast<int>(indT);
-	if ((*dataSt)->m_indicators.size() <= indTypeIndex)
+	while ((*dataSt)->m_indicators.size() <= indTypeIndex)
 	{
 		(*dataSt)->m_indicators.push_back(IndStream_t());
-		(*dataSt)->m_indicators[indTypeIndex].m_indicatorType = indT;
 	}
+	(*dataSt)->m_indicators[indTypeIndex].m_indicatorType = indT;
 }
 
 void StreamSetters::CheckLenStream(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL)
 {
-
 	int indicatorLenIndex = static_cast<int>(indL);
 	int indTypeIndex = static_cast<int>(indT);
-	if ((*dataSt)->m_indicators[indTypeIndex].m_lens.size() <= indicatorLenIndex)
+	while ((*dataSt)->m_indicators[indTypeIndex].m_lens.size() <= indicatorLenIndex)
 	{
 		(*dataSt)->m_indicators[indTypeIndex].m_lens.push_back(LenIndicatorStream_t());
-		(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_indicatorType = indL;
 	}
+	(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_indicatorType = indL;
 }
 
 void StreamSetters::CheckTimeFrameStream(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP)
@@ -84,11 +83,12 @@ void StreamSetters::CheckTimeFrameStream(dataStream_t** dataSt, IndicatorType in
 	int indTypeIndex = static_cast<int>(indT);
 	int indicatorLenIndex = static_cast<int>(indL);
 	int timeFrameIndex = static_cast<int>(barP);
-	if ((*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames.size() <= timeFrameIndex)
+
+	while ((*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames.size() <= timeFrameIndex)
 	{
 		(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames.push_back(TimeFrameStream_t());
-		(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_barPeriod = barP;
 	}
+	(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_barPeriod = barP;
 }
 
 void StreamSetters::CheckValueTypeStream(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT)
@@ -97,10 +97,11 @@ void StreamSetters::CheckValueTypeStream(dataStream_t** dataSt, IndicatorType in
 	int indicatorLenIndex = static_cast<int>(indL);
 	int timeFrameIndex = static_cast<int>(barP);
 	int valueTypeIndex = static_cast<int>(valT);
-	if ((*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes.size() <= valueTypeIndex)
+	// Expand vector until it's large enough to safely access valueTypeIndex
+	while ((*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes.size() <= valueTypeIndex)
 	{
 		(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes.push_back(ValueTypeStream_t());
-		(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes[valueTypeIndex].m_valueType = valT;
 	}
+	(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes[valueTypeIndex].m_valueType = valT;
 }
 

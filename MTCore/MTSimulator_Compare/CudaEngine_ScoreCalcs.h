@@ -22,6 +22,8 @@ private:
 	DBMap* m_historyDB_Map = nullptr;
 	int m_scoreToAct = 0;
 	int m_maxScore = 0;
+	bool m_useFullScan = true;
+	int m_scanCounter = 0;
 public:
 	CudaEngine_ScoreCalcs(std::vector<ChangeNode*>* historicData, std::vector<ChangeNode*>* currentData);
 	void Set_NewCurrentTimeLine(std::vector<ChangeNode*>* currentData);

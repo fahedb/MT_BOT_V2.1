@@ -148,7 +148,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\MTSimulator_Casts\;$(ProjectDir)\..\MTSimulator_Logger;$(ProjectDir)\..\MTSimulator_TimeLines;$(ProjectDir)\..\MTSimulator_MTThreadPool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\MTSimulator_Casts\;$(ProjectDir)\..\MTSimulator_Logger;$(ProjectDir)\..\MTSimulator_TimeLines;$(ProjectDir)\..\MTSimulator_MTThreadPool;..\MTSimulator_ResourcesManager;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

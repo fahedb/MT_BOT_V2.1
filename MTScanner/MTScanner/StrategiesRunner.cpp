@@ -18,15 +18,21 @@ void StrategiesRunner::Run_PatternGod(TimeLine& historyTimeLine)
 	ConfigrationsPolicy* confPolicy = confs->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
 	scoreCachePolicy->ScoreResultsCacheSizePerThread = (historyTimeLine.Get_TimeLineLen() / confPolicy->ThreadsCount) * Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLineLen(); // Set the cache size per thread based on the history time line length and the number of threads
 	confs->RefreshPolicy(); // Refresh all policies
-
+	int scanNumber = 0;
 	while (true)
 	{
 		HttpServerSyncer::UpdateCurrentTimeLine(&table);
 		MTScannerUtils::ScoreResultsCacheCleanLogic(OneMinutePatternGodLogic(&patternScaner, &statisticsCalcucator, &historyTimeLine), m_scansCounter); // Start scanning
-		HttpServerSyncer::UpdateConfigs();
+		
+		scanNumber++;
+		if (scanNumber % 5 == 0) // Every 5 scans refresh the policies
+			HttpServerSyncer::UpdateConfigs();
+		else if(scanNumber >= MAXINT)
+			scanNumber = 0; // Reset scan number if exceeds max int
+		HttpServerSyncer::Notify_DoneScanning();
 		HttpServerSyncer::Set_IsScanning(false); // Set scanning to false after scan is done -- Set true in the precondition function
 
-		MTScannerUtils::GoToSleep(1);
+		HttpServerSyncer::Wait_ForNewBarM1(); // Wait until new M1 bar is available
 	}
 	tracer_thread.join();
 }

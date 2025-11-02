@@ -51,6 +51,190 @@ __device__ __forceinline__ float SingleCalc_Device_TwoInd(
 	return score;
 }
 
+__device__ void SlideWindowPatternScanCalc_Device_TwoInd(const float* __restrict__ d_histLenX_values /*array for  Ind1 hist values */
+	, const float* __restrict__ d_histLenX_slopes /*array for  Ind1 hist slopes */
+	, const float* __restrict__ currLenX_values_shared /*from shared memory*/
+	, const float* __restrict__ currLenX_slopes_shared /*from shared memory*/
+	, const float* __restrict__ d_histLenY_values /*array for  Ind2 hist values */
+	, const float* __restrict__ d_histLenY_slopes /*array for  Ind2 hist slopes */
+	, const float* __restrict__ currLenY_values_shared /*from shared memory*/
+	, const float* __restrict__ currLenY_slopes_shared /*from shared memory*/
+
+	, const float* __restrict__ currLow_HighValues_LenX_shared /*from shared memory*/
+	, const float* __restrict__ currLow_HighValues_LenY_shared /*from shared memory*/
+
+	, const float* __restrict__ histLow_HighValues_LenX /*from constant memory*/
+	, const float* __restrict__ histLow_HighValues_LenY /*from constant memory*/
+
+	, float* __restrict__ d_outResNew /*output scores, where Score(idx) is the score of currMAs(t)&&histMAs(idx + t), t is the index of the current candle */
+	, const float* __restrict__ d_outResOld /*previous output results S[t-1] */
+	, float* __restrict__ d_prevIdx0Score /*previous score for idx 0, used in sliding window*/
+	, const int K, const int outLen, int idx, const float weight)
+{
+
+	float histXv_K = d_histLenX_values[idx + K - 1];
+	float histXs_K = d_histLenX_slopes[idx + K - 1];
+	float histYv_K = d_histLenY_values[idx + K - 1];
+	float histYs_K = d_histLenY_slopes[idx + K - 1];
+
+	float currXv_K = currLenX_values_shared[K - 1];
+	float currXs_K = currLenX_slopes_shared[K - 1];
+	float currYv_K = currLenY_values_shared[K - 1];
+	float currYs_K = currLenY_slopes_shared[K - 1];
+
+
+	// Normalize values to [0, 1] range based on the lowest and highest values for MA LenX
+	const float currRange_LenX = currLow_HighValues_LenX_shared[1] - currLow_HighValues_LenX_shared[0];
+	const float histRange_LenX = histLow_HighValues_LenX[1] - histLow_HighValues_LenX[0];
+
+	const float currLowest_LenX = currLow_HighValues_LenX_shared[0]; // Get from constant memory
+	const float histLowest_LenX = histLow_HighValues_LenX[0]; // Get from constant memory
+
+	// Normalize values to [0, 1] range based on the lowest and highest values for MA LenY
+	const float currRange_LenY = currLow_HighValues_LenY_shared[1] - currLow_HighValues_LenY_shared[0];
+	const float histRange_LenY = histLow_HighValues_LenY[1] - histLow_HighValues_LenY[0];
+
+	const float currLowest_LenY = currLow_HighValues_LenY_shared[0]; // Get from constant memory
+	const float histLowest_LenY = histLow_HighValues_LenY[0]; // Get from constant memory
+
+
+	const float eps = 1e-8f;
+	const float invCurrRange_LenX = 1.0f / fmaxf(currRange_LenX, eps);
+	const float invHistRange_LenX = 1.0f / fmaxf(histRange_LenX, eps);
+
+	const float invCurrRange_LenY = 1.0f / fmaxf(currRange_LenY, eps);
+	const float invHistRange_LenY = 1.0f / fmaxf(histRange_LenY, eps);
+
+
+	float newIdxKScore = weight *
+		SingleCalc_Device_TwoInd(
+			histXv_K,
+			histXs_K,
+			currXv_K,
+			currXs_K,
+			histYv_K,
+			histYs_K,
+			currYv_K,
+			currYs_K,
+			currLowest_LenX,
+			currLowest_LenY,
+			invCurrRange_LenX,
+			invCurrRange_LenY,
+			histLow_HighValues_LenX[0],
+			histLow_HighValues_LenY[0],
+			invHistRange_LenX,
+			invHistRange_LenY
+		);
+
+	float prevIdx0Score = d_prevIdx0Score[idx - 1]; // pair_score(H[t], C[0]) for prev t
+	float resOld_t = d_outResOld[idx - 1];
+	d_outResNew[idx] = resOld_t - prevIdx0Score + newIdxKScore; // S[t] for new t
+
+	d_prevIdx0Score[idx] =
+		SingleCalc_Device_TwoInd(
+			d_histLenX_values[idx],
+			d_histLenX_slopes[idx],
+			currLenX_values_shared[0],
+			currLenX_slopes_shared[0],
+			d_histLenY_values[idx],
+			d_histLenY_slopes[idx],
+			currLenY_values_shared[0],
+			currLenY_slopes_shared[0],
+			currLowest_LenX,
+			currLowest_LenY,
+			invCurrRange_LenX,
+			invCurrRange_LenY,
+			histLow_HighValues_LenX[0],
+			histLow_HighValues_LenY[0],
+			invHistRange_LenX,
+			invHistRange_LenY
+		); // store for t+1 in next iteration
+}
+
+__device__ void FullPatternScanCalc_Device_TwoInd(const float* __restrict__ d_histLenX_values /*array for  Ind1 hist values */
+	, const float* __restrict__ d_histLenX_slopes /*array for  Ind1 hist slopes */
+	, const float* __restrict__ currLenX_values_shared /*from shared memory*/
+	, const float* __restrict__ currLenX_slopes_shared /*from shared memory*/
+	, const float* __restrict__ d_histLenY_values /*array for  Ind2 hist values */
+	, const float* __restrict__ d_histLenY_slopes /*array for  Ind2 hist slopes */
+	, const float* __restrict__ currLenY_values_shared /*from shared memory*/
+	, const float* __restrict__ currLenY_slopes_shared /*from shared memory*/
+	
+	, const float* __restrict__ currLow_HighValues_LenX_shared /*from shared memory*/
+	, const float* __restrict__ currLow_HighValues_LenY_shared /*from shared memory*/
+
+	, const float* __restrict__ histLow_HighValues_LenX /*from constant memory*/
+	, const float* __restrict__ histLow_HighValues_LenY /*from constant memory*/
+	
+	, float* __restrict__ d_scores /*output scores, where Score(idx) is the score of currMAs(t)&&histMAs(idx + t), t is the index of the current candle */
+	, float* __restrict__ d_prevIdx0Score /*previous score for idx 0, used in sliding window*/
+	, const int currPatternLen, const int outLen, int idx , const float weight)
+{
+	// Normalize values to [0, 1] range based on the lowest and highest values for MA LenX
+	const float currRange_LenX = currLow_HighValues_LenX_shared[1] - currLow_HighValues_LenX_shared[0];
+	const float histRange_LenX = histLow_HighValues_LenX[1] - histLow_HighValues_LenX[0];
+
+	const float currLowest_LenX = currLow_HighValues_LenX_shared[0]; // Get from constant memory
+	const float histLowest_LenX = histLow_HighValues_LenX[0]; // Get from constant memory
+
+	// Normalize values to [0, 1] range based on the lowest and highest values for MA LenY
+	const float currRange_LenY = currLow_HighValues_LenY_shared[1] - currLow_HighValues_LenY_shared[0];
+	const float histRange_LenY = histLow_HighValues_LenY[1] - histLow_HighValues_LenY[0];
+
+	const float currLowest_LenY = currLow_HighValues_LenY_shared[0]; // Get from constant memory
+	const float histLowest_LenY = histLow_HighValues_LenY[0]; // Get from constant memory
+
+	const float eps = 1e-8f;
+	const float invCurrRange_LenX = 1.0f / fmaxf(currRange_LenX, eps);
+	const float invHistRange_LenX = 1.0f / fmaxf(histRange_LenX, eps);
+
+	const float invCurrRange_LenY = 1.0f / fmaxf(currRange_LenY, eps);
+	const float invHistRange_LenY = 1.0f / fmaxf(histRange_LenY, eps);
+
+	float score = 0.0f;
+
+#pragma unroll 64 // assuming max pattern length is 30-64, adjust as needed
+	for (int i = 0; i < currPatternLen; i++)
+	{
+		// Len X inits
+		const float histValue_LenX = d_histLenX_values[idx + i];
+		const float histSlope_LenX = d_histLenX_slopes[idx + i];
+		const float currValue_LenX = currLenX_values_shared[i]; // from shared memory
+		const float currSlope_LenX = currLenX_slopes_shared[i]; // from shared memory
+
+		/////////////////////////////////////////////////////////////////////////////////
+		// len Y inits
+		const float histValue_LenY = d_histLenY_values[idx + i];
+		const float histSlope_LenY = d_histLenY_slopes[idx + i];
+		const float currValue_LenY = currLenY_values_shared[i]; // from shared memory
+		const float currSlope_LenY = currLenY_slopes_shared[i]; // from shared memory
+
+		score +=
+			SingleCalc_Device_TwoInd(
+				histValue_LenX,
+				histSlope_LenX,
+				currValue_LenX,
+				currSlope_LenX,
+				histValue_LenY,
+				histSlope_LenY,
+				currValue_LenY,
+				currSlope_LenY,
+				currLowest_LenX,
+				currLowest_LenY,
+				invCurrRange_LenX,
+				invCurrRange_LenY,
+				histLowest_LenX,
+				histLowest_LenY,
+				invHistRange_LenX,
+				invHistRange_LenY
+			);
+		if (i == 0)
+			d_prevIdx0Score[idx] = score * weight;
+	}
+
+	d_scores[idx] += score * weight; // final score for this position
+}
+
 // Full Scan two indicators kernel
 // Ind score calcs (for 2 Inds different lengths, e.g., 50 and 200)
 // Theory -- we compare the difference between the two Inds for hist and curr, both for value and slope
@@ -65,7 +249,7 @@ __global__ void FullScan_Kernel_TwoInd(const float* __restrict__ d_histLenX_valu
 	, const float* __restrict__ d_currLenY_slopes /* array for Ind2 curr slopes*/
 	, float* __restrict__ d_scores /*output scores, where Score(idx) is the score of currMAs(t)&&histMAs(idx + t), t is the index of the current candle */
 	, float* __restrict__ d_prevIdx0Score /*previous score for idx 0, used in sliding window*/
-	, const int currPatternLen, const int histDataSize, const float weight)
+	, const int currPatternLen, const int outLen, const float weight)
 {
 	extern __shared__ float sharedMem[]; // dynamically allocated shared memory
 	float* currLenX_values_shared = sharedMem; // size: currPatternLen
@@ -94,79 +278,37 @@ __global__ void FullScan_Kernel_TwoInd(const float* __restrict__ d_histLenX_valu
 
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-	int lastStart = histDataSize - currPatternLen;
-	if (idx > lastStart) return; // out of bounds check
+	int lastStart = outLen;
+	if (idx >= lastStart) return; // out of bounds check
 
 	float histLow_HighValues_LenX[2];
 	Find_MaxMinValues(d_histLenX_values + idx, currPatternLen, histLow_HighValues_LenX);
 
 	float histLow_HighValues_LenY[2];
 	Find_MaxMinValues(d_histLenY_values + idx, currPatternLen, histLow_HighValues_LenY);
-	float score = 0.0f;
 
+	FullPatternScanCalc_Device_TwoInd(
+		d_histLenX_values,
+		d_histLenX_slopes,
+		currLenX_values_shared,
+		currLenX_slopes_shared,
+		
+		d_histLenY_values,
+		d_histLenY_slopes,
+		currLenY_values_shared,
+		currLenY_slopes_shared,
 
-	// Normalize values to [0, 1] range based on the lowest and highest values for MA LenX
-	const float currRange_LenX = currLow_HighValues_LenX_shared[1] - currLow_HighValues_LenX_shared[0];
-	const float histRange_LenX = histLow_HighValues_LenX[1] - histLow_HighValues_LenX[0];
+		currLow_HighValues_LenX_shared,
+		currLow_HighValues_LenY_shared,
+		histLow_HighValues_LenX,
+		histLow_HighValues_LenY,
 
-	const float currLowest_LenX = currLow_HighValues_LenX_shared[0]; // Get from constant memory
-	const float histLowest_LenX = histLow_HighValues_LenX[0]; // Get from constant memory
-
-	// Normalize values to [0, 1] range based on the lowest and highest values for MA LenY
-	const float currRange_LenY = currLow_HighValues_LenY_shared[1] - currLow_HighValues_LenY_shared[0];
-	const float histRange_LenY = histLow_HighValues_LenY[1] - histLow_HighValues_LenY[0];
-
-	const float currLowest_LenY = currLow_HighValues_LenY_shared[0]; // Get from constant memory
-	const float histLowest_LenY = histLow_HighValues_LenY[0]; // Get from constant memory
-
-	const float eps = 1e-8f;
-	const float invCurrRange_LenX = 1.0f / fmaxf(currRange_LenX, eps);
-	const float invHistRange_LenX = 1.0f / fmaxf(histRange_LenX, eps);
-
-	const float invCurrRange_LenY = 1.0f / fmaxf(currRange_LenY, eps);
-	const float invHistRange_LenY = 1.0f / fmaxf(histRange_LenY, eps);
-
-
-#pragma unroll 64 // assuming max pattern length is 30-64, adjust as needed
-	for (int i = 0; i < currPatternLen; i++)
-	{
-		// Len X inits
-		const float histValue_LenX = d_histLenX_values[idx + i];
-		const float histSlope_LenX = d_histLenX_slopes[idx + i];
-		const float currValue_LenX = currLenX_values_shared[i]; // from shared memory
-		const float currSlope_LenX = currLenX_slopes_shared[i]; // from shared memory
-
-		/////////////////////////////////////////////////////////////////////////////////
-		// len Y inits
-		const float histValue_LenY = d_histLenY_values[idx + i];
-		const float histSlope_LenY = d_histLenY_slopes[idx + i];
-		const float currValue_LenY = currLenY_values_shared[i]; // from shared memory
-		const float currSlope_LenY = currLenY_slopes_shared[i]; // from shared memory
-
-		score += 
-			SingleCalc_Device_TwoInd(
-			histValue_LenX,
-			histSlope_LenX,
-			currValue_LenX,
-			currSlope_LenX,
-			histValue_LenY,
-			histSlope_LenY,
-			currValue_LenY,
-			currSlope_LenY,
-			currLowest_LenX,
-			currLowest_LenY,
-			invCurrRange_LenX,
-			invCurrRange_LenY,
-			histLowest_LenX,
-			histLowest_LenY,
-			invHistRange_LenX,
-			invHistRange_LenY
-		);
-		if (i == 0)
-			d_prevIdx0Score[idx] = score * weight;
-	}
-
-	d_scores[idx] += score * weight; // final score for this position
+		d_scores,
+		d_prevIdx0Score,
+		currPatternLen,
+		outLen,
+		idx,
+		weight);
 
 }
 
@@ -186,7 +328,7 @@ __global__ void TiledScan_Kernel_TwoInd(
 	float* __restrict__ d_scores,
 	float* __restrict__ d_prevIdx0Score, /*previous score for idx 0, used in sliding window*/
 
-	const int K, const int dataSize, const float weight, const int TILE)
+	const int K, const int outLen, const float weight, const int TILE)
 {
 	extern __shared__ float smem[];
 
@@ -209,7 +351,7 @@ __global__ void TiledScan_Kernel_TwoInd(
 	float* currX_LH = cY_slp + K;       // 2 (min,max)
 	float* currY_LH = currX_LH + 2;     // 2 (min,max)
 
-	const int starts = dataSize - K + 1;
+	const int starts = outLen;
 	const int base = blockIdx.x * TILE;
 	if (base >= starts) return;
 
@@ -330,9 +472,9 @@ __global__ void SlideCalc_Kernel_TwoInd(
 	, const float* __restrict__ d_currLenY_values /* array for Ind2 curr values*/
 	, const float* __restrict__ d_currLenY_slopes /* array for Ind2 curr slopes*/
 	, float* __restrict__ d_outResNew // Res2
-	, float* __restrict__ d_outResOld // Res1
+	, const float* __restrict__ d_outResOld // Res1
 	, float* __restrict__ d_prevIdx0Score // pair_score(H[t], C[0]) for prev t (Res1)
-	, int outLen, int K, float weight)
+	, int K, int outLen , float weight)
 {
 	extern __shared__ float sharedMem[]; // dynamically allocated shared memory
 	float* currLenX_values_shared = sharedMem; // size: currPatternLen
@@ -360,19 +502,7 @@ __global__ void SlideCalc_Kernel_TwoInd(
 	__syncthreads(); // Ensure all threads have loaded the data -- NOTE: you'll get intelisense error (undefined), but it compiles and works fine
 
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
-
-	if (idx > outLen) return; // out of bounds check
-
-
-	float histXv_K = d_histLenX_values[idx + K - 1];
-	float histXs_K = d_histLenX_slopes[idx + K - 1];
-	float histYv_K = d_histLenY_values[idx + K - 1];
-	float histYs_K = d_histLenY_slopes[idx + K - 1];
-
-	float currXv_K = currLenX_values_shared[K - 1];
-	float currXs_K = currLenX_slopes_shared[K - 1];
-	float currYv_K = currLenY_values_shared[K - 1];
-	float currYs_K = currLenY_slopes_shared[K - 1];
+	if (idx >= outLen) return; // out of bounds check
 
 	float histLow_HighValues_LenX[2];
 	Find_MaxMinValues(d_histLenX_values + idx, K, histLow_HighValues_LenX);
@@ -380,70 +510,48 @@ __global__ void SlideCalc_Kernel_TwoInd(
 	float histLow_HighValues_LenY[2];
 	Find_MaxMinValues(d_histLenY_values + idx, K, histLow_HighValues_LenY);
 
-	// Normalize values to [0, 1] range based on the lowest and highest values for MA LenX
-	const float currRange_LenX = currLow_HighValues_LenX_shared[1] - currLow_HighValues_LenX_shared[0];
-	const float histRange_LenX = histLow_HighValues_LenX[1] - histLow_HighValues_LenX[0];
+	if (idx == 0) {
+		FullPatternScanCalc_Device_TwoInd(
+			d_histLenX_values,
+			d_histLenX_slopes,
+			currLenX_values_shared,
+			currLenX_slopes_shared,
+			d_histLenY_values,
+			d_histLenY_slopes,
+			currLenY_values_shared,
+			currLenY_slopes_shared,
+			currLow_HighValues_LenX_shared,
+			currLow_HighValues_LenY_shared,
+			histLow_HighValues_LenX,
+			histLow_HighValues_LenY,
+			d_outResNew,
+			d_prevIdx0Score,
+			K,
+			outLen,
+			idx,
+			weight);
+	}
+	else {
+		SlideWindowPatternScanCalc_Device_TwoInd(
+			d_histLenX_values,
+			d_histLenX_slopes,
+			currLenX_values_shared,
+			currLenX_slopes_shared,
+			d_histLenY_values,
+			d_histLenY_slopes,
+			currLenY_values_shared,
+			currLenY_slopes_shared,
+			currLow_HighValues_LenX_shared,
+			currLow_HighValues_LenY_shared,
+			histLow_HighValues_LenX,
+			histLow_HighValues_LenY,
+			d_outResNew,
+			d_outResOld,
+			d_prevIdx0Score,
+			K,
+			outLen,
+			idx,
+			weight);
+	}
 
-	const float currLowest_LenX = currLow_HighValues_LenX_shared[0]; // Get from constant memory
-	const float histLowest_LenX = histLow_HighValues_LenX[0]; // Get from constant memory
-
-	// Normalize values to [0, 1] range based on the lowest and highest values for MA LenY
-	const float currRange_LenY = currLow_HighValues_LenY_shared[1] - currLow_HighValues_LenY_shared[0];
-	const float histRange_LenY = histLow_HighValues_LenY[1] - histLow_HighValues_LenY[0];
-
-	const float currLowest_LenY = currLow_HighValues_LenY_shared[0]; // Get from constant memory
-	const float histLowest_LenY = histLow_HighValues_LenY[0]; // Get from constant memory
-
-
-	const float eps = 1e-8f;
-	const float invCurrRange_LenX = 1.0f / fmaxf(currRange_LenX, eps);
-	const float invHistRange_LenX = 1.0f / fmaxf(histRange_LenX, eps);
-
-	const float invCurrRange_LenY = 1.0f / fmaxf(currRange_LenY, eps);
-	const float invHistRange_LenY = 1.0f / fmaxf(histRange_LenY, eps);
-	
-
-	float newIdxKScore = weight *
-		SingleCalc_Device_TwoInd(
-		histXv_K,
-		histXs_K,
-		currXv_K,
-		currXs_K,
-		histYv_K,
-		histYs_K,
-		currYv_K,
-		currYs_K,
-		currLowest_LenX,
-		currLowest_LenY,
-		invCurrRange_LenX,
-		invCurrRange_LenY,
-		histLow_HighValues_LenX[0],
-		histLow_HighValues_LenY[0],
-		invHistRange_LenX,
-		invHistRange_LenY
-		);
-
-	float prevIdx0Score = d_prevIdx0Score[idx - 1]; // pair_score(H[t], C[0]) for prev t
-	float resOld_t = d_outResOld[idx - 1];
-	d_outResNew[idx] = resOld_t - prevIdx0Score + newIdxKScore; // S[t] for new t
-
-	d_prevIdx0Score[idx] =
-		SingleCalc_Device_TwoInd(
-		d_histLenX_values[idx],
-		d_histLenX_slopes[idx],
-		currLenX_values_shared[0],
-		currLenX_slopes_shared[0],
-		d_histLenY_values[idx],
-		d_histLenY_slopes[idx],
-		currLenY_values_shared[0],
-		currLenY_slopes_shared[0],
-		currLowest_LenX,
-		currLowest_LenY,
-		invCurrRange_LenX,
-		invCurrRange_LenY,
-		histLow_HighValues_LenX[0],
-		histLow_HighValues_LenY[0],
-		invHistRange_LenX,
-		invHistRange_LenY
-		); // store for t+1 in next iteration
 }

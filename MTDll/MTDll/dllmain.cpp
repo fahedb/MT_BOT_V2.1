@@ -24,6 +24,7 @@ extern "C" __declspec(dllimport) int GetOrderDataBySeqNum(int seqNum, DLL_OrderS
 extern "C" __declspec(dllimport) bool InsertNewBar_HTTP_M1(char* timePoint, char* symbol, CandleStruct data);
 extern "C" __declspec(dllimport) bool InsertNewBar_HTTP_M1_JSON_DB(char* timePoint, char* symbol, CandleStruct data);
 extern "C" __declspec(dllimport) bool InsertNewBar_M1_JSON_DB(char* timePoint, char* symbol, CandleStruct data);
+extern "C" __declspec(dllimport) bool InsertNewBar_AndWaitForResult_HTTP_M1(char* timePoint, char* barSymbol, CandleStruct data, DLL_OrderStruct_P order);
 extern "C" __declspec(dllimport) double Get_MainTrade_Size();
 extern "C" __declspec(dllimport) double Get_SupportTrade_Size();
 extern "C" __declspec(dllimport) int GetFutureVision();
@@ -179,6 +180,44 @@ bool InsertNewBar_HTTP_M1(char* timePoint, char* symbol, CandleStruct data)
     if (res && res->status == 200)
         return true;
     return false;
+}
+
+bool InsertNewBar_AndWaitForResult_HTTP_M1(char* timePoint, char* barSymbol, CandleStruct data, DLL_OrderStruct_P order)
+{
+	Logger& logger = Logger::getInstance();
+
+    // TODO: insert new fresh record to current table
+    nlohmann::json j = JasonHandler::Build_Json_ForCandle(std::string(timePoint), *data);
+    std::string body = j.dump();
+    httplib::Result res = HTTPClient::getInstance().Send_Post(HTTP_SERVICE_Get_FutureVision, body);
+
+    if (!res)
+    {
+        Logger::getInstance().WriteLog("DLL Error while trying to send an HTTP request to server", false, true, LogType::SPECIAL_LOG);
+        return false;
+    }
+    logger.WriteToDebug("Received response from server, checking status");
+
+	std::string type = res->get_header_value(HTTP_PARAM_TradeType); // Check if there is a new order
+	order->type = DLL_OrderTypeUtils::Get_OrderType_FromString(type); // Check if there is a new order
+	if (order->type != DLL_ORDER_TYPE_LONG && order->type != DLL_ORDER_TYPE_SHORT)
+        return false; // No new order found
+
+    logger.WriteToDebug("Order type received: " + type);
+
+    std::string symbol = res->get_header_value(HTTP_PARAM_Symbol);
+    std::string seqNum = res->get_header_value(HTTP_PARAM_TradeSeqNum);
+    std::string stopLoss = res->get_header_value(HTTP_PARAM_OrderStopLoss);
+    std::string takeProfit = res->get_header_value(HTTP_PARAM_OrderTakeProfit);
+    logger.WriteToDebug("Symbol: " + symbol + ", SeqNum: " + seqNum + ", StopLoss: " + stopLoss + ", TakeProfit: " + takeProfit);
+
+    order->pair = DLL_CoinsPairUtils::Get_CoinsPair_FromString(symbol);
+    order->type = DLL_OrderTypeUtils::Get_OrderType_FromString(type);
+    order->seqNum = Converts::ToInt(seqNum);
+    order->status = DLL_OrderStatus::DLL_ORDER_STATUS_OPEN;
+    order->stopLoss = Converts::ToInt(stopLoss);
+    order->takeProfit = Converts::ToInt(takeProfit);
+	return true;
 }
 
 bool InsertNewBar_HTTP_M1_JSON_DB(char* timePoint, char* symbol, CandleStruct data)

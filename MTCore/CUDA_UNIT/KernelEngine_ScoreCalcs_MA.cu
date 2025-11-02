@@ -32,9 +32,9 @@ __device__ __forceinline__ void SlideCalc_Device_MA(
 	const float* __restrict__ d_currSlope,
 	const float* __restrict__ currLow_HightValues_shared, // from shared memory
 	float* __restrict__ d_outResNew, // S[t]
-	float* __restrict__ d_outResOld, // S[t] for prev t (Res1)
+	const float* __restrict__ d_outResOld, // S[t] for prev t (Res1)
 	float* __restrict__ d_prevIdx0Score, // pair_score(H[t], C[0]) for prev t (Res1)
-	int outLen, int K, int t, float weight)
+	int K, float weight, int t)
 {
 
 	float histLow_HightValues[2];
@@ -117,16 +117,14 @@ __device__ __forceinline__ void FullPatternScanCalc_Device_MA(
 	, const float* __restrict__ d_histMAs_slopes /*array for MAs hist slopes */
 	, const float* __restrict__ currMAs_values_shared /* array for MAs curr values in shared memory*/
 	, const float* __restrict__ currMAs_slopes_shared /* array for MAs curr slopes in shared memory*/
+
+	, const float* __restrict__ histLow_HightValues /* array for hist low/high values in shared memory*/
+	, const float* __restrict__ currLow_HightValues_shared /* array for curr low/high values in shared memory*/
+	
 	, float* d_scores /*output scores, where Score(idx) is the score of currMAs(t)&&histMAs(idx + t), t is the index of the current candle */
 	, float* __restrict__ d_prevIdx0Score /*previous score for idx 0, used in sliding window*/
-	, const int currPatternLen, const int idx, const float weight
-	, const float* __restrict__ currLow_HightValues_shared /* array for curr low/high values in shared memory*/
-)
+	, const int currPatternLen, const float weight, const int idx)
 {
-
-	float histLow_HightValues[2];
-	Find_MaxMinValues(d_histMAs_values + idx, currPatternLen, histLow_HightValues);
-
 	const float currRange = currLow_HightValues_shared[1] - currLow_HightValues_shared[0];
 	const float histRange = histLow_HightValues[1] - histLow_HightValues[0];
 
@@ -182,7 +180,7 @@ __global__ void TiledScan_Kernel_MA(const float* __restrict__ d_histVal,
 	const float* __restrict__ d_currSlope,
 	float* __restrict__ d_scores,
 	float* __restrict__ d_prevIdx0Score, /*previous score for idx 0, used in sliding window*/
-	const int K, const int dataSize,
+	const int K, const int outLen,
 	const float weight, const int TILE)
 {
 	extern __shared__ float smem[];
@@ -198,7 +196,7 @@ __global__ void TiledScan_Kernel_MA(const float* __restrict__ d_histVal,
 	float* currLowHigh = currSlope_sh + K;     // 2
 
 	// Compute tile geometry
-	const int starts = dataSize - K + 1;
+	const int starts = outLen;
 	const int base = blockIdx.x * TILE;       // first output index covered by this block
 	if (base >= starts) return;
 
@@ -294,7 +292,7 @@ __global__ void FullScan_Kernel_MA(const float* __restrict__ d_histMAs_values /*
 	, const float* __restrict__ d_currMAs_slopes /* array for MAs curr slopes*/
 	, float* __restrict__ d_scores /*output scores, where Score(idx) is the score of currMAs(t)&&histMAs(idx + t), t is the index of the current candle */
 	, float* __restrict__ d_prevIdx0Score /*previous score for idx 0, used in sliding window*/
-	, const int currPatternLen, const int dataSize, const float weight)
+	, const int currPatternLen, const int outLen, const float weight)
 {
 	extern __shared__ float sharedMem[]; // dynamically allocated shared memory
 	float* currMAs_values_shared = sharedMem; // size: currPatternLen
@@ -314,17 +312,21 @@ __global__ void FullScan_Kernel_MA(const float* __restrict__ d_histMAs_values /*
 
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-	int lastStart = dataSize - currPatternLen;
-	if (idx > lastStart) return; // out of bounds check
+	int lastStart = outLen;
+	if (idx >= lastStart) return; // out of bounds check
+
+	float histLow_HightValues[2];
+	Find_MaxMinValues(d_histMAs_values + idx, currPatternLen, histLow_HightValues);
 
 	FullPatternScanCalc_Device_MA(
 		d_histMAs_values,
 		d_histMAs_slopes,
 		currMAs_values_shared,
 		currMAs_slopes_shared,
+		histLow_HightValues,
+		currLow_HightValues_shared,
 		d_scores, d_prevIdx0Score,
-		currPatternLen, idx, weight,
-		currLow_HightValues_shared);
+		currPatternLen, weight, idx);
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -336,16 +338,16 @@ __global__ void SlideScan_Kernel_MA(const float* __restrict__ d_histMAs_values /
 	, const float* __restrict__ d_currMAs_values /* array for MAs curr values*/
 	, const float* __restrict__ d_currMAs_slopes /* array for MAs curr slopes*/
 	, float* __restrict__ d_outResNew // S[t]
-	, float* __restrict__ d_outResOld // S[t] for prev t (Res1)
+	, const float* __restrict__ d_outResOld // S[t] for prev t (Res1) (Need to be const to avoid accidental modification -- Pointer swaped in host)
 	, float* __restrict__ d_prevIdx0Score // pair_score(H[t], C[0]) for prev t (Res1)
-	, const int currPatternLen, const int dataSize, const float weight)
+	, const int K, const int outLen, const float weight)
 {
 	extern __shared__ float sharedMem[]; // dynamically allocated shared memory
 	float* currMAs_values_shared = sharedMem; // size: currPatternLen
-	float* currMAs_slopes_shared = &sharedMem[currPatternLen]; // size: currPatternLen
-	float* currLow_HightValues_shared = &sharedMem[2 * currPatternLen];
+	float* currMAs_slopes_shared = &sharedMem[K]; // size: currPatternLen
+	float* currLow_HightValues_shared = &sharedMem[2 * K];
 	// Load currMAs_values and currMAs_slopes into shared memory
-	for (int i = threadIdx.x; i < currPatternLen; i += blockDim.x) {
+	for (int i = threadIdx.x; i < K; i += blockDim.x) {
 		currMAs_values_shared[i] = d_currMAs_values[i];
 		currMAs_slopes_shared[i] = d_currMAs_slopes[i];
 	}
@@ -353,12 +355,15 @@ __global__ void SlideScan_Kernel_MA(const float* __restrict__ d_histMAs_values /
 	__syncthreads(); // Ensure all threads have loaded the data -- NOTE: you'll get intelisense error (undefined), but it compiles and works fine
 
 	if (threadIdx.x == 0)
-		Find_MaxMinValues(currMAs_values_shared, currPatternLen, currLow_HightValues_shared);
+		Find_MaxMinValues(currMAs_values_shared, K, currLow_HightValues_shared);
 	__syncthreads(); // Ensure all threads have loaded the data -- NOTE: you'll get intelisen
 
 	int t = blockIdx.x * blockDim.x + threadIdx.x;
-	int lastStart = dataSize - currPatternLen;
-	if (t > lastStart) return; // out of bounds check
+	int lastStart = outLen;
+	if (t >= lastStart) return; // out of bounds check
+
+	float histLow_HightValues[2];
+	Find_MaxMinValues(d_histMAs_values + t, K, histLow_HightValues);
 
 	if (t == 0)
 	{
@@ -367,9 +372,10 @@ __global__ void SlideScan_Kernel_MA(const float* __restrict__ d_histMAs_values /
 			d_histMAs_slopes,
 			currMAs_values_shared,
 			currMAs_slopes_shared,
+			histLow_HightValues,
+			currLow_HightValues_shared,
 			d_outResNew, d_prevIdx0Score,
-			currPatternLen, t, weight,
-			currLow_HightValues_shared); 
+			K, weight, t); 
 	}
 	else
 	{
@@ -382,6 +388,6 @@ __global__ void SlideScan_Kernel_MA(const float* __restrict__ d_histMAs_values /
 			d_outResNew,
 			d_outResOld,
 			d_prevIdx0Score,
-			dataSize, currPatternLen, t, weight);
+			K, weight,t);
 	}
 }

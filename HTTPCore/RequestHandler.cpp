@@ -3,6 +3,69 @@
 #include "Converts.h"
 #include "Logger.h"
 
+void RequestHandler::NewBar_M1_Wait() {
+	std::unique_lock<std::mutex> lock(newBar_M1_MTX);
+	newBar_M1_CV.wait(lock, [this] { return newBar_M1_Flag; }); // Wait till flag is true
+}
+
+void RequestHandler::NewBar_M1_NotifyAll() {
+	{
+		std::lock_guard<std::mutex> lock(newBar_M1_MTX);
+		newBar_M1_Flag = true;
+	}
+	newBar_M1_CV.notify_all();
+}
+
+void RequestHandler::NewBar_M1_NotifyOne() {
+	{
+		std::lock_guard<std::mutex> lock(newBar_M1_MTX);
+		newBar_M1_Flag = true;
+	}
+	newBar_M1_CV.notify_one();
+}
+
+void RequestHandler::NewBar_M1_ResetFlag() {
+	std::lock_guard<std::mutex> lock(newBar_M1_MTX);
+	newBar_M1_Flag = false;
+}
+
+void RequestHandler::Handle_FutureVisionScan(const httplib::Request& req, httplib::Response& res)
+{
+	FutureVisionScan_ResetFlag(); // Reset the flag to false before waiting
+	Handle_NewBar_M1(req.body); // Push new bar to queue and notify the scanner
+	FutureVisionScanWait(); // Wait till notified that scan is done
+	Handle_IsThereAnTrade(res); // Check if there is an trade to execute after the scan
+}
+
+void RequestHandler::FutureVisionScan_ResetFlag() {
+	std::lock_guard<std::mutex> lock(futureVisionScanMTX);
+	futureVisionScanFlag = false;
+}
+
+
+void RequestHandler::FutureVisionScan_NotifyAll() {
+
+	{
+		std::lock_guard<std::mutex> lock(futureVisionScanMTX);
+		futureVisionScanFlag = true;
+	}
+	futureVisionScanCV.notify_all();
+}
+
+void RequestHandler::FutureVisionScan_NotifyOne() {
+
+	{
+		std::lock_guard<std::mutex> lock(futureVisionScanMTX);
+		futureVisionScanFlag = true;
+	}
+	futureVisionScanCV.notify_one();
+}
+
+void RequestHandler::FutureVisionScanWait() {
+	std::unique_lock<std::mutex> lock(futureVisionScanMTX);
+	futureVisionScanCV.wait(lock, [this] { return futureVisionScanFlag; }); // Wait till flag is true
+}
+
 int RequestHandler::Get_ConfigIdx(std::string& config)
 {
 	for (int i = 0; i < m_confVec.size(); i++)
@@ -68,7 +131,8 @@ void RequestHandler::Handle_NewBar_M1(const std::string& body)
 	if (!body.length())
 		return;
 	std::lock_guard<std::mutex> lock(m_CurrQueue_locker);
-	m_candlesBodies.push(body);
+	m_candlesBodies.push(body); // Push new candle body to queue
+	NewBar_M1_NotifyOne(); // Notify one waiting thread
 }
 
 void RequestHandler::Handle_JSON_DB_NewBar_M1(const std::string& body)

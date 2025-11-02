@@ -16,7 +16,7 @@ BarPeriodList glob_barP_CudaEngine;
 IndicatorValueTypeList glob_valType_CudaEngine;
 
 #define COMAPRE_WEIGHT 10
-
+#define SCAN_NUMS_TO_FULL_SCAN 100
 
 
 void CudaEngine_ScoreCalcs::DataStreamSetup(std::vector<ChangeNode*>* tl, dataStream_t** dataSt, DataTimeType tT, bool forceOverWrite)
@@ -290,6 +290,7 @@ void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, Score
 	{
 		RunScan_TwoIndicatorsRatio(indT);
 	}
+	CPP_To_Cuda_Tunnel::Get_ResultsFromDevice(m_h_totalScores, static_cast<int>(m_currentData->size()));
 	// TODO: Collect results from m_h_totalScores and populate resultNodes2D
 	int limit = static_cast<int>(m_historicData->size() - m_currentData->size());
 	int maxScore = m_h_totalScores[0];
@@ -311,7 +312,16 @@ void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, Score
 	}
 	m_maxScore = maxScore;
 	m_scoreToAct = (maxScore - Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->Diff_Between_Max_And_ScoreToAct) / m_currentData->size();
+	
 
+	if (m_scanCounter % SCAN_NUMS_TO_FULL_SCAN == 0)
+	{
+		m_useFullScan = true; // Reset to full scan every SCAN_NUMS_TO_FULL_SCAN scans
+	}
+	else
+		m_useFullScan = false;
+
+	m_scanCounter++;
 }
 
 CudaEngine_ScoreCalcs::CudaEngine_ScoreCalcs(std::vector<ChangeNode*>* historicData, std::vector<ChangeNode*>* currentData)
@@ -397,11 +407,7 @@ void CudaEngine_ScoreCalcs::RunScan_PerIndicator(IndicatorType indT)
 {
 	for(auto indL : glob_indLen_CudaEngine.lengths)
 	{
-		auto start = std::chrono::high_resolution_clock::now();
 		RunScan_PerIndicator_IndLen(indT, indL);
-		auto end = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double, std::milli> duration = end - start;
-		Logger::getInstance().WriteLog("\t\tCUDA Single Indicator Scan for " + std::to_string(static_cast<int>(indT)) + " Len: " + std::to_string(static_cast<int>(indL)) + " Time: " + std::to_string(duration.count()) + " ms", false, false);
 	}
 }
 
@@ -410,11 +416,7 @@ void CudaEngine_ScoreCalcs::RunScan_PerIndicator_IndLen(IndicatorType indT, Indi
 	// Implementation for scanning per indicator and length
 	for(auto barP : glob_barP_CudaEngine.periods)
 	{
-		auto start = std::chrono::high_resolution_clock::now();
 		RunScan_PerIndicator_BarPeriod(indT, indL, barP);
-		auto end = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double, std::milli> duration = end - start;
-		Logger::getInstance().WriteLog("\t\t\tCUDA Single Indicator Scan for " + std::to_string(static_cast<int>(indT)) + " Len: " + std::to_string(static_cast<int>(indL)) + " BarP: " + std::to_string(static_cast<int>(barP)) + " Time: " + std::to_string(duration.count()) + " ms", false, false);
 	}
 }
 
@@ -424,7 +426,7 @@ void CudaEngine_ScoreCalcs::RunScan_PerIndicator_BarPeriod(IndicatorType indT, I
 	float* resData = m_h_totalScores;
 	int numResults = m_historicData->size();
 
-	CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(resData, numResults, indT, indL, barP, COMAPRE_WEIGHT);
+	CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(resData, numResults, indT, indL, barP, COMAPRE_WEIGHT, m_useFullScan);
 }
 
 void CudaEngine_ScoreCalcs::RunScan_TwoIndicatorsRatio(IndicatorType indT)
@@ -469,7 +471,7 @@ void CudaEngine_ScoreCalcs::RunScan_TwoIndicatorsRatio_BarPeriods(IndicatorType 
 	float* resData = m_h_totalScores;
 	int numResults = m_historicData->size();
 
-	CPP_To_Cuda_Tunnel::Calc_TwoIndicatorsRatio_ScoreCalcs(resData, numResults, indT, lenX, barPX, LenY, barPY, COMAPRE_WEIGHT);
+	CPP_To_Cuda_Tunnel::Calc_TwoIndicatorsRatio_ScoreCalcs(resData, numResults, indT, lenX, barPX, LenY, barPY, COMAPRE_WEIGHT / 2, m_useFullScan);
 }
 
 bool CudaEngine_ScoreCalcs::AreLenPairsScanned(const std::vector<std::pair<IndicatorLen, IndicatorLen>>& scannedLens, IndicatorLen lenX, IndicatorLen lenY)

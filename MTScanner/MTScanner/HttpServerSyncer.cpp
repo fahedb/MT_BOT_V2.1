@@ -1,6 +1,11 @@
 #include "HttpServerSyncer.h"
 #include "PolynomTimeLineCache.h"
 
+void HttpServerSyncer::Wait_ForNewBarM1() {
+	ExchangeData().WaitFor_NewBar_M1(); // Wait for new M1 bar
+	ExchangeData().Reset_NewBar_M1_Flag(); // Reset the flag after waiting
+}
+
 void HttpServerSyncer::UpdateCurrentTimeLine(BasePricesTable* table)
 {
 	ExchangeData exChData;

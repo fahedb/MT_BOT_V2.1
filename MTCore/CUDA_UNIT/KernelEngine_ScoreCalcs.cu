@@ -10,10 +10,34 @@
 
 #include "CudaMemoryController.h"
 
+//#define FULL_CUDA_SYNC_CHECKS
+
 #include <iostream>
 #define THREADS_NUM 256
 #define TILE_SIZE 512
 #include <string>
+
+void CheckCudaLanuchError(const std::string& kernelName, int blocks, int threads, int shBytes, int currPatternLen, int histSize ) {
+	cudaError_t launchErr = cudaGetLastError();
+	if (launchErr != cudaSuccess) {
+		std::cout << "Kernel: " << kernelName << "\n"
+			<< "Kernel launch error: " << cudaGetErrorString(launchErr) << "\n"
+			<< " blocks=" << blocks << "\n"
+			<< " threads=" << threads << "\n"
+			<< " shBytes=" << shBytes << "\n"
+			<< " patternLen=" << currPatternLen << "\n"
+			<< " histSize=" << histSize
+			<< std::endl;
+		return;
+	}
+#ifdef FULL_CUDA_SYNC_CHECKS
+	cudaError_t syncErr = cudaDeviceSynchronize();
+	if (syncErr != cudaSuccess) {
+		std::cout <<"Kernek Name: "<< kernelName << "\nKernel runtime error: " << cudaGetErrorString(syncErr) << std::endl;
+		return;
+	}
+#endif
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Two Ind lanunchers: /////////////////////////////////////////////////////////
@@ -46,7 +70,9 @@ void TwoIndCalc_tiled(const float* d_hist_LenX_Val, const float* d_hist_LenX_Slo
 		d_curr_LenX_Val, d_curr_LenX_Slope,
 		d_hist_LenY_Val, d_hist_LenY_Slope,
 		d_curr_LenY_Val, d_curr_LenY_Slope,
-		d_results, d_prevIdx0Score, K, histSize, weight, TILE);
+		d_results, d_prevIdx0Score, K, starts, weight, TILE);
+
+	CheckCudaLanuchError("TwoIndCalc_tiled", blocks, threads, shBytes, K, histSize);
 
 #ifndef NDEBUG
 	cudaError_t err = cudaGetLastError();
@@ -78,9 +104,10 @@ void TwoIndCalc(float* d_hist_LenX_Val, float* d_hist_LenX_Slope,
 		d_curr_LenY_Val, d_curr_LenY_Slope,
 		d_results, d_prevIdx0Score,
 		patternLen,
-		histSize,
+		starts,
 		weight
 		);
+	CheckCudaLanuchError("TwoIndCalc", blocks, threads, shBytes, patternLen, histSize);
 
 }
 
@@ -95,7 +122,7 @@ void TwoIndCalc_SlidingWindow(
 	const int starts = histSize - patternLen + 1;   // number of starting points in hist where pattern can fit
 	const int threads = THREADS_NUM;                         // 128/256, depending on GPU
 	const int blocks = (starts + threads - 1) / threads;
-	const size_t shBytes = sizeof(float) * (4 * patternLen); // curr values+slopes for LenX and LenY
+	const size_t shBytes = sizeof(float) * ((4 * patternLen) + 4); // curr values+slopes for LenX and LenY
 	SlideCalc_Kernel_TwoInd << <blocks, threads, shBytes >> > (
 		d_hist_LenX_Val, d_hist_LenX_Slope,
 		d_curr_LenX_Val, d_curr_LenX_Slope,
@@ -106,6 +133,8 @@ void TwoIndCalc_SlidingWindow(
 		starts,
 		weight
 		);
+	CheckCudaLanuchError("TwoIndCalc_SlidingWindow", blocks, threads, shBytes, patternLen, histSize);
+
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -146,7 +175,8 @@ void calcMA_tiled(const float* d_histMA_values,
 		d_histMA_values, d_histMA_slopes,
 		d_currMA_values, d_currMA_slopes,
 		d_results, d_prevIdx0Score,
-		K, histSize, weight, TILE);
+		K, starts, weight, TILE);
+	CheckCudaLanuchError("calcMA_tiled", blocks, threads, shBytes, patternLen, histSize);
 
 #ifndef NDEBUG
 	cudaError_t err = cudaGetLastError();
@@ -163,7 +193,7 @@ void calcMA_tiled(const float* d_histMA_values,
 // Full MA score kernel launcher
 void calcMA(float* d_histMA_values, float* d_histMA_slopes,
 			float* d_currMA_values, float* d_currMA_slopes, 
-			float* d_results, float* d_prevIdx0Score,
+			float* d_results, float* d_prevIdx0Score, const float* d_oldScores,
 			int patternLen, int histSize, float weight)
 {
 	const int starts = histSize - patternLen + 1;
@@ -175,11 +205,12 @@ void calcMA(float* d_histMA_values, float* d_histMA_slopes,
 		d_histMA_slopes,
 		d_currMA_values,
 		d_currMA_slopes,
-		d_results, d_prevIdx0Score,
+		d_results ,d_prevIdx0Score ,
 		patternLen,
-		histSize,
+		starts,
 		weight
 		);
+	CheckCudaLanuchError("calcMA", blocks, threads, shBytes, patternLen, histSize);
 }
 
 void calcMA_SlidingWindow(
@@ -202,6 +233,7 @@ void calcMA_SlidingWindow(
 		starts,
 		weight
 		);
+	CheckCudaLanuchError("calcMA_SlidingWindow", blocks, threads, shBytes, patternLen, histSize);
 }
 // ----------------------------------------------------------------------------------
 //////////////////////////////////////////////////////////////////
@@ -227,9 +259,10 @@ void calcRSI(
 		d_currRSI_slopes,
 		d_results, d_prevIdx0Score,
 		patternLen,
-		histSize,
+		starts,
 		weight
 		);
+	CheckCudaLanuchError("calcRSI", blocks, threads, shBytes, patternLen, histSize);
 
 	// Log any errors from launch if not in release mode
 #ifndef NDEBUG
@@ -263,6 +296,7 @@ void calcRSI_SlidingWindow(
 		starts,
 		weight
 		);
+	CheckCudaLanuchError("calcRSI_SlidingWindow", blocks, threads, shBytes, patternLen, histSize);
 			
 			// Log any errors from launch if not in release mode
 #ifndef NDEBUG
@@ -297,7 +331,8 @@ void calcRSI_tiled(const float* d_histVal, const float* d_histSlope,
 
 	TiledScan_Kernel_RSI << <blocks, threads, shBytes >> > (
 		d_histVal, d_histSlope, d_currVal, d_currSlope,
-		d_resOut, d_prevIdx0Score, starts, currPatternLen, weight, TILE);
+		d_resOut, d_prevIdx0Score, currPatternLen, starts, weight, TILE);
+	CheckCudaLanuchError("calcRSI_tiled", blocks, threads, shBytes, currPatternLen, histSize);
 
 #ifndef NDEBUG
 	cudaError_t err = cudaGetLastError();

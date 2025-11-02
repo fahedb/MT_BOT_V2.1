@@ -23,6 +23,11 @@ public:
 
 	bool IsScanningRunning() { return m_httpsrv->Get_RequestHandler()->Get_IsScanning(); }
 	void SetScanningRunning(bool status) { m_httpsrv->Get_RequestHandler()->Set_IsScanning(status); }
+	
+	void WaitFor_NewBar_M1() { m_httpsrv->Get_RequestHandler()->NewBar_M1_Wait(); }
+	void Reset_NewBar_M1_Flag() { m_httpsrv->Get_RequestHandler()->NewBar_M1_ResetFlag(); }
+
+	void Notify_DoneScanning() { m_httpsrv->Get_RequestHandler()->FutureVisionScan_NotifyOne(); }
 
 	void Push_NewConfig(std::vector<std::string> confvec) { m_httpsrv->Get_RequestHandler()->PushNewConfig(confvec); }
 	std::pair<std::string, std::string> Get_ConfToUpdate() { return m_httpsrv->Get_RequestHandler()->GetNextConfigToUpdate(); }

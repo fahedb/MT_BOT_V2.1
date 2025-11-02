@@ -40,11 +40,32 @@ private:
 	
 	std::mutex m_tradeQueueMutex;
 
+	bool futureVisionScanFlag = false;
+	std::mutex futureVisionScanMTX;
+	std::condition_variable futureVisionScanCV;
+
+	bool newBar_M1_Flag = false;
+	std::mutex newBar_M1_MTX;
+	std::condition_variable newBar_M1_CV;
+
 
 	bool m_runningStatus = true;
 	bool m_loadingDataStatus = true;
 	std::atomic<bool> m_isScanning = false;
+
 public:
+	void FutureVisionScanWait(); // Wait until notified
+	void FutureVisionScan_NotifyOne(); // Notify one waiting thread
+	void FutureVisionScan_NotifyAll(); // Notify all waiting threads
+	void FutureVisionScan_ResetFlag(); // Reset the flag to false
+
+	void Handle_NewBar_M1(const std::string& body);
+	void NewBar_M1_Wait(); // Wait until notified
+	void NewBar_M1_NotifyOne(); // Notify one waiting thread
+	void NewBar_M1_NotifyAll(); // Notify all waiting threads
+	void NewBar_M1_ResetFlag(); // Reset the flag to false
+
+
 	bool Set_IsScanning(bool status) { return m_isScanning.exchange(status); }
 	bool Get_IsScanning() { return m_isScanning.load(); }
 
@@ -63,12 +84,12 @@ public:
 	void Set_LoadingData(bool status) { m_loadingDataStatus = status; }
 	void Set_NewOrder(const std::string& symbol, int long_short,int seqNum, int stopLoss=0, int takeProfit=0);
 	
-	void Handle_NewBar_M1(const std::string& body);
 	void Handle_JSON_DB_NewBar_M1(const std::string& body);
 	void Handle_IsThereAnTrade(httplib::Response& res);
 	void Handle_CloseOrder(const httplib::Request& req, httplib::Response& res);
 	void Handle_GetOrderData(const httplib::Request& req, httplib::Response& res);
 	void Handle_IsScanOnGoing(httplib::Response& res);
+	void Handle_FutureVisionScan(const httplib::Request& req, httplib::Response& res);
 
 };
 

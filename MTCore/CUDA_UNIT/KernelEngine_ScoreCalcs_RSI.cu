@@ -14,7 +14,7 @@ __device__ __forceinline__ void SlideCalc_Device_RSI(
 	const float* __restrict__ d_currVal,
 	const float* __restrict__ d_currSlope,
 	float* __restrict__ d_outResNew, // S[t]
-	float* __restrict__ d_outResOld, // S[t] for prev t (Res1)
+	const float* __restrict__ d_outResOld, // S[t] for prev t (Res1)
 	float* __restrict__ d_prevIdx0Score, // pair_score(H[t], C[0]) for prev t (Res1)
 	int outLen, int K, int t, float weight)
 {
@@ -91,7 +91,7 @@ __global__ void SlideScan_Kernel_RSI(
 	float* __restrict__ d_outResNew, // S[t]
 	float* __restrict__ d_outResOld, // S[t] for prev t (Res1)
 	float* __restrict__ d_prevIdx0Score, // pair_score(H[t], C[0]) for prev t (Res1)
-	int outLen, int K, float weight)
+	int K, int outLen, float weight)
 {
 	int t = blockIdx.x * blockDim.x + threadIdx.x;
 	if (t >= outLen) return;
@@ -131,7 +131,7 @@ __global__ void TiledScan_Kernel_RSI(
 	const float* __restrict__ d_currSlope,
 	float* __restrict__ d_out, // S[t]
 	float* __restrict__ d_prevIdx0Score, /*previous score for idx 0, used in sliding window*/
-	int starts, int K, float weight, int TILE)
+	int K, int outLen, float weight, int TILE)
 {
 	extern __shared__ float sharedMem[];
 	float* cVal = sharedMem;           // K
@@ -141,8 +141,8 @@ __global__ void TiledScan_Kernel_RSI(
 	// calc hSlope pointer:
 	// calc base index
 	int base = blockIdx.x * TILE;
-	if (base >= starts) return;
-	int tileLen = TILE > starts - base ? starts - base : TILE;
+	if (base >= outLen) return;
+	int tileLen = TILE > outLen - base ? outLen - base : TILE;
 	int need = tileLen + K - 1;
 	float* hSlope = hVal + need;
 
@@ -190,7 +190,7 @@ __global__ void FullScan_Kernel_RSI(const float* __restrict__ d_histRSI_values /
 	, const float* __restrict__ d_currRSI_slopes /* array for rsi curr slopes*/
 	, float* d_scores /*output scores, where Score(idx) is the score of currRSI(t)&&histRSI(idx + t), t is the index of the current candle */
 	, float* __restrict__ d_prevIdx0Score /*previous score for idx 0, used in sliding window*/
-	, const int currPatternLen, const int dataSize, const float weight)
+	, const int currPatternLen, const int outLen, const float weight)
 {
 	extern __shared__ float sharedMem[]; // dynamically allocated shared memory
 	float* currRSI_values_shared = sharedMem; // size: currPatternLen
@@ -204,8 +204,8 @@ __global__ void FullScan_Kernel_RSI(const float* __restrict__ d_histRSI_values /
 
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-	int lastStart = dataSize - currPatternLen;
-	if (idx > lastStart) return; // out of bounds check
+	int lastStart = outLen;
+	if (idx >= lastStart) return; // out of bounds check
 
 	FullPatternScanCalc_Device_RSI(
 		d_histRSI_values,
@@ -213,6 +213,6 @@ __global__ void FullScan_Kernel_RSI(const float* __restrict__ d_histRSI_values /
 		currRSI_values_shared,
 		currRSI_slopes_shared,
 		d_scores, d_prevIdx0Score,
-		currPatternLen, dataSize, idx, weight);
+		currPatternLen, lastStart, idx, weight);
 }
 

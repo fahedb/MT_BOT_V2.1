@@ -14,5 +14,7 @@ public:
 	static void LoadAllConfigsToHttpCore(); // Send the configs values to the HTTPCores cache
 	static void Set_IsScanning(bool status) { ExchangeData().SetScanningRunning(status); }
 	static bool Get_IsScanning() { return ExchangeData().IsScanningRunning(); }
+	static void Wait_ForNewBarM1(); // Wait until new M1 bar is available
+	static void Notify_DoneScanning() { ExchangeData().Notify_DoneScanning(); }
 };
 

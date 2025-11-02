@@ -78,6 +78,8 @@ private:
         res.set_header("Status", "Success");
     }
 
+	void Handle_FutureVisionScan(const httplib::Request& req, httplib::Response& res) { m_requests.Handle_FutureVisionScan(req, res); }
+
 
 
     void Handle_Get_CSV_OrdersSummery(const httplib::Request& req, httplib::Response& res) { res.set_header("OrdersSummeryPath", "C:\\MTDB\\ordersSummery.csv"); }
@@ -121,6 +123,11 @@ public:
 
         m_srv.Post(HTTP_SERVICE_NewBar_JSON_DB_M1, [this](const httplib::Request& req, httplib::Response& res) {
             this->Handle_JSON_DB_NewBarM1(req, res); // Get new history time line bar
+            });
+
+        m_srv.Post(HTTP_SERVICE_Get_FutureVision, [this](const httplib::Request& req, httplib::Response& res)
+            {
+				this->Handle_FutureVisionScan(req, res);
             });
 
         m_srv.Get(HTTP_SERVICE_Get_OrdersSummey_CSV, [this](const httplib::Request& req, httplib::Response& res)

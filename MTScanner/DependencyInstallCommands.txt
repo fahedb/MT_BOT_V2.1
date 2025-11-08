@@ -1,0 +1,11 @@
+1. Cloning vcpkg:
+	git clone https://github.com/microsoft/vcpkg.git
+
+2. integrate install
+	.\vcpkg.exe integrate install
+
+3. install cairo:
+	.\vcpkg.exe install cairo:x64-windows
+
+4. install json
+	.\vcpkg.exe install nlohmann-json:x64-windows

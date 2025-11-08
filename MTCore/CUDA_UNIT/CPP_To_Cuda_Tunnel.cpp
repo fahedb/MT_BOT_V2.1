@@ -291,3 +291,8 @@ bool CPP_To_Cuda_Tunnel::IsCudaAvailable()
 	}
 
 }
+
+void CPP_To_Cuda_Tunnel::SyncDevice()
+{
+	cudaDeviceSynchronize();
+}

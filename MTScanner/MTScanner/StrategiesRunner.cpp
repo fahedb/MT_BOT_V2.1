@@ -24,11 +24,11 @@ void StrategiesRunner::Run_PatternGod(TimeLine& historyTimeLine)
 		HttpServerSyncer::UpdateCurrentTimeLine(&table);
 		MTScannerUtils::ScoreResultsCacheCleanLogic(OneMinutePatternGodLogic(&patternScaner, &statisticsCalcucator, &historyTimeLine), m_scansCounter); // Start scanning
 		
-		scanNumber++;
-		if (scanNumber % 5 == 0) // Every 5 scans refresh the policies
+		//scanNumber++;
+		//if (scanNumber % 5 == 0) // Every 5 scans refresh the policies
 			HttpServerSyncer::UpdateConfigs();
-		else if(scanNumber >= MAXINT)
-			scanNumber = 0; // Reset scan number if exceeds max int
+		//else if(scanNumber >= MAXINT)
+		//	scanNumber = 0; // Reset scan number if exceeds max int
 		HttpServerSyncer::Notify_DoneScanning();
 		HttpServerSyncer::Set_IsScanning(false); // Set scanning to false after scan is done -- Set true in the precondition function
 

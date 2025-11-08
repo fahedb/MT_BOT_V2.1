@@ -14,6 +14,7 @@
 #include "DLL_OrderStruct.h"
 #include "OrderType.h"
 #include "Converts.h"
+#include <chrono>
 
 std::string GetTableName(std::string symbol);
 
@@ -187,10 +188,16 @@ bool InsertNewBar_AndWaitForResult_HTTP_M1(char* timePoint, char* barSymbol, Can
 	Logger& logger = Logger::getInstance();
 
     // TODO: insert new fresh record to current table
+	auto startJsonBuild = std::chrono::high_resolution_clock::now();
     nlohmann::json j = JasonHandler::Build_Json_ForCandle(std::string(timePoint), *data);
     std::string body = j.dump();
-    httplib::Result res = HTTPClient::getInstance().Send_Post(HTTP_SERVICE_Get_FutureVision, body);
-
+	auto endJsonBuild = std::chrono::high_resolution_clock::now();
+	logger.WriteToDebug("JSON build time: " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(endJsonBuild - startJsonBuild).count()) + " ms");
+    HTTPClient& httpClient = HTTPClient::getInstance();
+	auto startHttpSend = std::chrono::high_resolution_clock::now();
+    httplib::Result res = httpClient.Send_Post(HTTP_SERVICE_Get_FutureVision, body);
+	auto endHttpSend = std::chrono::high_resolution_clock::now();
+	logger.WriteToDebug("HTTP send time: " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(endHttpSend - startHttpSend).count()) + " ms");
     if (!res)
     {
         Logger::getInstance().WriteLog("DLL Error while trying to send an HTTP request to server", false, true, LogType::SPECIAL_LOG);

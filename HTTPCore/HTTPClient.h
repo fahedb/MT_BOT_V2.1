@@ -7,12 +7,13 @@ class HTTPClient
 {
 private:
 
-    httplib::Client m_client = httplib::Client("localhost:8080");
+    httplib::Client m_client = httplib::Client("127.0.0.1:8080");
     int m_port =0;
     std::string m_host;
     HTTPClient()
     {
-        m_host = "localhost"; // Need to implement a logic for a cfg for this
+		OutputDebugStringA("HTTPClient Constructor called\n");
+        m_host = "127.0.0.1"; // Need to implement a logic for a cfg for this
         m_port = 8080; // Need to implement a logic for a cfg for this
         std::string srv = m_host + ":" + std::to_string(m_port);
         m_client.set_keep_alive(true);

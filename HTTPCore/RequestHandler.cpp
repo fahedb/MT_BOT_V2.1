@@ -31,9 +31,13 @@ void RequestHandler::NewBar_M1_ResetFlag() {
 
 void RequestHandler::Handle_FutureVisionScan(const httplib::Request& req, httplib::Response& res)
 {
+	OutputDebugStringA("ServerFlag: Future vision Resetting flag");
 	FutureVisionScan_ResetFlag(); // Reset the flag to false before waiting
+	OutputDebugStringA("ServerFlag: Handling new bar");
 	Handle_NewBar_M1(req.body); // Push new bar to queue and notify the scanner
+	OutputDebugStringA("ServerFlag: Waiting for scan to finish");
 	FutureVisionScanWait(); // Wait till notified that scan is done
+	OutputDebugStringA("ServerFlag: Checking results");
 	Handle_IsThereAnTrade(res); // Check if there is an trade to execute after the scan
 }
 

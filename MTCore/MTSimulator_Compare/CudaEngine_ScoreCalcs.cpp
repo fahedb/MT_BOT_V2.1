@@ -290,6 +290,7 @@ void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, Score
 	{
 		RunScan_TwoIndicatorsRatio(indT);
 	}
+	CPP_To_Cuda_Tunnel::SyncDevice(); // Wait for all CUDA calculations to complete
 	CPP_To_Cuda_Tunnel::Get_ResultsFromDevice(m_h_totalScores, static_cast<int>(m_currentData->size()));
 	// TODO: Collect results from m_h_totalScores and populate resultNodes2D
 	int limit = static_cast<int>(m_historicData->size() - m_currentData->size());
@@ -397,7 +398,7 @@ int CudaEngine_ScoreCalcs::ScanForOneMinPatterns_CUDA(std::vector<std::pair<Chan
 	auto cudaFinalFilterEnd = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> cudaFinalFilterDuration = cudaFinalFilterEnd - cudaFinalFilterStart;
 	logger.WriteLog("CUDA Final Filtering Time: " + std::to_string(cudaFinalFilterDuration.count()) + " ms", false, false);
-
+	logger.WriteLog(PatternGodUtils::BuildScanResultLog(resultNodes2D), false, true);
 	//logger.WriteLog(PatternGodUtils::BuildScanResultLog(resultNodes2D), false, true);
 	return static_cast<int>(resultNodes2D.size());
 

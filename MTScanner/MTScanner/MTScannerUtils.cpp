@@ -5,6 +5,10 @@
 #include "PolynomTimeLineCache.h"
 #include "ScoreResultsCachePolynom.h"
 #include "ScoreResultsCache.h"
+#include "InterfaceLayers_BKTSTExporter.h"
+#include "Policies.h"
+#include "HttpServerSyncer.h"
+
 
 
 void MTScannerUtils::GoToSleep(int seconds)
@@ -58,4 +62,39 @@ void MTScannerUtils::InitScanObjectsBeforeScan(PatternGod* patternScan, Statisti
 
 	if (currTimeLineRep->Get_CurrTimeLine()->Get_TimeLineLen()) // Getting the max score possible for 2 nodes match
 		Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->maxScorePossibleForChangeNodes = ProxyScoreCalcs::CalcMaxScorePossible(currTimeLineRep->Get_CurrTimeLine()->Get_TimeLine()->at(0)).totalScore.total;
+}
+
+void MTScannerUtils::InitPolicyExporters_BeforeScan()
+{
+	InterfaceLayers_BKTSTExporter& layerExporter = InterfaceLayers_BKTSTExporter::getInstance();
+	Configrations* confs = Configrations::getInstance();
+
+	// Layer 1 Policies initialization
+	layerExporter.SendPolicyData(confs->Get_Policy<ScoringLayerPolicy>(PolicyType::ScoringLayerPolicy), LayerType::ScoringLayer);
+	layerExporter.SendPolicyData(confs->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoringLayerPolicy), LayerType::ScoringLayer);
+
+	// Layer 2 Policies initialization
+	layerExporter.SendPolicyData(confs->Get_Policy<FilterLayerPolicy>(PolicyType::FilterLayerPolicy), LayerType::FilterLayer);
+	layerExporter.SendPolicyData(confs->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy), LayerType::FilterLayer);
+
+	// Layer 3 Policies initialization
+	layerExporter.SendPolicyData(confs->Get_Policy<PatternGodStatisticsPolicy>(PolicyType::PatternGodStatisticsPolicy), LayerType::StatisticsLayer);
+
+	// Layer 4 Policies initialization
+	layerExporter.SendPolicyData(confs->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy), LayerType::TradeManagementLayer);
+	layerExporter.SendPolicyData(confs->Get_Policy<OrdersPolicy>(PolicyType::OrdersPolicy), LayerType::TradeManagementLayer);
+
+
+}
+
+void MTScannerUtils::ResetLayerExportersIfNeeded()
+{
+	InterfaceLayers_BKTSTExporter& layerExporter = InterfaceLayers_BKTSTExporter::getInstance();
+	std::string bktstName = HttpServerSyncer::GetNewBKTSTName();
+
+	if (!bktstName.empty())
+	{
+		layerExporter.ResetExporters(bktstName); // Reset all exporters if a new backtest name is provided
+		InitPolicyExporters_BeforeScan();
+	}
 }

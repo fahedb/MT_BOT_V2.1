@@ -68,7 +68,7 @@ int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std
 	logger.WriteLog("Score to Act: " + std::to_string(scoreToAct), false, true);
 
 	std::vector<std::vector < std::pair< ChangeNode*, ScoresResult>>> resultNodesPerThread(threadCount);
-	BaseComparerPolicy* baseCompPolicy = Configrations::getInstance()->Get_Policy<BaseComparerPolicy>(PolicyType::BaseComparerPolicy);
+	ScoringLayerPolicy* scoringLayerPolicy = Configrations::getInstance()->Get_Policy<ScoringLayerPolicy>(PolicyType::ScoringLayerPolicy);
 	TradeManagerPolicy* tradeManPolicy = Configrations::getInstance()->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy);
 
 	MTThreadPool* tPool = MTThreadPool::getInstance();
@@ -102,7 +102,7 @@ int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std
 
 	PatternGodUtils::SortScores(resultNodes2D);
 	PatternGodUtils::FilterDuplicatesTimeLines(resultNodes2D, m_historyDB_Map);
-	PatternGodUtils::filterByHighScores(resultNodes2D, baseCompPolicy->Num_Of_Top_Results_To_Filter_Out);
+	PatternGodUtils::filterByHighScores(resultNodes2D, scoringLayerPolicy->Num_Of_Top_Results_To_Filter_Out);
 	logger.WriteLog(PatternGodUtils::BuildScanResultLog(resultNodes2D), false, true);
 	
 	m_scanCounter++;

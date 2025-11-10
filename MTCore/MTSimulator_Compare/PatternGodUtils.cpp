@@ -4,14 +4,11 @@
 #include <unordered_set>
 
 TradeManagerPolicy* m_glob_tradeMngrPolicy_PatternGodUtils = nullptr;
-BaseComparerPolicy* m_glob_baseComparerPolicy_PatternGodUtils = nullptr;
 
 void InitGlobPolicies()
 {
 	if (!m_glob_tradeMngrPolicy_PatternGodUtils)
 		m_glob_tradeMngrPolicy_PatternGodUtils = Configrations::getInstance()->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy);
-	if (!m_glob_baseComparerPolicy_PatternGodUtils)
-		m_glob_baseComparerPolicy_PatternGodUtils = Configrations::getInstance()->Get_Policy<BaseComparerPolicy>(PolicyType::BaseComparerPolicy);
 }
 
 void PatternGodUtils::SortScores(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D) // Sort the scores from the high to the low, usuallu need to do this after filtering them
@@ -85,7 +82,7 @@ void PatternGodUtils::filterByHighScores(std::vector<std::pair<ChangeNode*, Scor
 void PatternGodUtils::filterByThresholdScore(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D, double thresholdPercent)
 {
 	double maxScore = nodesResults2D.front().second.totalScore.total;
-	double thresholdRatio = m_glob_tradeMngrPolicy_PatternGodUtils->Pattern_TopScore_ThresholdRatio; // score that is at least 95% of the max score
+	double thresholdRatio = thresholdPercent; // score that is at least 95% of the max score
 
 	std::vector<std::pair<ChangeNode*, ScoresResult>> topResults;
 

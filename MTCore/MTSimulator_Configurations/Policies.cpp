@@ -25,22 +25,9 @@ std::vector<std::vector<std::string>> BasePolicy::Get_All()
 
 void ConfigrationsPolicy::InitPolicy()
 {
-    std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
-    std::make_pair(CONFIG_DEF_CURR_TIME_LINE_LEN),
-    std::make_pair(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT),
-    std::make_pair(CONFIG_DEF_TIME_BETWEEN_SCANS),
-    std::make_pair(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM),
-    std::make_pair(CONFG_DEF_ENABLE_PATTERNS_PNG_EXPORT),
-    };
+    std::vector<std::pair<std::string, std::string>> allConfigs;
 	m_allConfigs = allConfigs;
 
-    Pattern_CurrentTimeLineLen = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_CURR_TIME_LINE_LEN));
-
-    EMA_len_for_Pattern_Export = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT));
-
-    TimeBetweenScans = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_TIME_BETWEEN_SCANS));
-    Export_Patterns_PNG_To_Telegram = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM)) > 0 ? true : false;
-    Enable_Patterns_PNG_Export = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFG_DEF_ENABLE_PATTERNS_PNG_EXPORT)) > 0 ? true : false;
     ThreadsCount = MTThreadPool::getInstance()->Get_ThreadsNum();
 }
 
@@ -51,8 +38,6 @@ void TradeManagerPolicy::InitPolicy()
 {
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
         std::make_pair(CONFIG_DEF_PATTERN_MINIMUM_PATTERNS_TO_TAKE_ACTION),
-        std::make_pair(CONFG_DEF_PATTERN_MAX_PATTERNS_TO_FIND),
-        std::make_pair(CONFIG_DEF_PATTERN_THRESHOLD_RATIO_TOP_SCORES),
         std::make_pair(CONFIG_DEF_PATTERN_MINIMUM_PERCENT_TO_EXECUTE_ORDER),
         std::make_pair(CONFIG_DEF_PATTERN_DIFF_PERCENT_TO_EXECUTE_ORDER_ALTERNATIVE),
         std::make_pair(CONFIG_DEF_PATTERN_MAX_NOISE_PERCENT_TO_EXECUTE_ORDER_ALTERNATIVE),
@@ -64,13 +49,10 @@ void TradeManagerPolicy::InitPolicy()
 
     Pattern_Min_Patterns_ToTake_Action =
         Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MINIMUM_PATTERNS_TO_TAKE_ACTION));
-    Pattern_Max_Patterns_To_Find =
-        Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFG_DEF_PATTERN_MAX_PATTERNS_TO_FIND));
+    
     Pattern_Min_Percent_To_ExecuteOrder =
         Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MINIMUM_PERCENT_TO_EXECUTE_ORDER));
-    Pattern_TopScore_ThresholdRatio =
-        Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_THRESHOLD_RATIO_TOP_SCORES));
-
+    
     Pattern_Diff_Percent_To_ExecuteOrder_Alternative =
         Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_DIFF_PERCENT_TO_EXECUTE_ORDER_ALTERNATIVE));
     Pattern_Max_Noise_To_ExecuteOrder_Alternative =
@@ -92,15 +74,10 @@ void ScoreCachingPolicy::InitPolicy()
 {
 
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
-        std::make_pair(CONFIG_DEF_ENABLE_SCORE_CACHEING),
-        std::make_pair(CONFIG_DEF_PATTERN_MAX_ORDERS_INROW),
-        std::make_pair(CONFIG_DEF_PATTERN_SLEEP_MINUTS_AFTER_MAX_ORDERS_INROW)
-
+        std::make_pair(CONFIG_DEF_ENABLE_SCORE_CACHEING)
     };
 	m_allConfigs = allConfigs;
     EnableScoreCaching = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_ENABLE_SCORE_CACHEING)) > 0 ? true : false;
-    Max_Orders_InRow = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MAX_ORDERS_INROW));
-    Sleep_Minuts_after_Max_Orders_InRow = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_SLEEP_MINUTS_AFTER_MAX_ORDERS_INROW));
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -204,17 +181,6 @@ void ScoreComparerPolicy::InitPolicy()
 	Diff_Between_Max_And_ScoreToAct = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIGS_DEF_DIFF_BETWEEN_MAX_TO_SCORE_TO_ACT_SCORE_COMP));
 }
 
-// ------------------------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------------------------
-
-void FusionEnginePolicy::InitPolicy()
-{
-    std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
-    std::make_pair(CONFIGS_MIN_SIMILAR_RESULTS_TO_FUSION)
-    };
-
-    Min_Similar_Results_To_Fusuion = 2;
-}
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
@@ -257,18 +223,45 @@ void PatternGodStatisticsPolicy::InitPolicy()
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-void BaseComparerPolicy::InitPolicy()
+
+void FilterLayerPolicy::InitPolicy()
 {
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
-        std::make_pair(CONFIGS_MIN_SIMILAR_RESULTS_TO_FUSION),
-        std::make_pair(CONFIG_POLYNOM_FUSION_WEIGHT),
-        std::make_pair(CONFIG_SCORE_FUSION_WEIGHT),
-		std::make_pair(CONFIG_NUM_OF_TOP_RESULTS_TO_FILTER_OUT)
+        std::make_pair(CONFG_DEF_PATTERN_MAX_PATTERNS_TO_FIND),
+        std::make_pair(CONFIG_DEF_PATTERN_THRESHOLD_RATIO_TOP_SCORES)
     };
-	m_allConfigs = allConfigs;
 
-    Min_Similar_Results_To_Fusion = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIGS_MIN_SIMILAR_RESULTS_TO_FUSION));
-    PolynomComparerWeight = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_POLYNOM_FUSION_WEIGHT));
-    ScoreComparerWeight = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_SCORE_FUSION_WEIGHT));
-	Num_Of_Top_Results_To_Filter_Out = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_NUM_OF_TOP_RESULTS_TO_FILTER_OUT));
+    m_allConfigs = allConfigs;
+
+    Pattern_Max_Patterns_To_Find =
+        Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFG_DEF_PATTERN_MAX_PATTERNS_TO_FIND));
+    Pattern_TopScore_ThresholdRatio =
+        Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_THRESHOLD_RATIO_TOP_SCORES));
+}
+
+void ScoringLayerPolicy::InitPolicy()
+{
+    std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
+        std::make_pair(CONFIG_DEF_CURR_TIME_LINE_LEN),
+        std::make_pair(CONFIG_NUM_OF_TOP_RESULTS_TO_FILTER_OUT)
+    };
+    m_allConfigs = allConfigs;
+
+    Num_Of_Top_Results_To_Filter_Out = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_NUM_OF_TOP_RESULTS_TO_FILTER_OUT));
+    Pattern_CurrentTimeLineLen = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_CURR_TIME_LINE_LEN));
+
+}
+
+void ExportDataLayerPolicy::InitPolicy()
+{
+    std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
+        std::make_pair(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT),
+        std::make_pair(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM),
+        std::make_pair(CONFG_DEF_ENABLE_PATTERNS_PNG_EXPORT)
+    };
+    m_allConfigs = allConfigs;
+
+    EMA_len_for_Pattern_Export = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_EMA_LEN_FOR_PATTERN_EXPORT));
+    Export_Patterns_PNG_To_Telegram = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFG_DEF_EXPORT_PATTERNS_PNG_TO_TELEGRAM)) > 0 ? true : false;
+    Enable_Patterns_PNG_Export = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFG_DEF_ENABLE_PATTERNS_PNG_EXPORT)) > 0 ? true : false;
 }

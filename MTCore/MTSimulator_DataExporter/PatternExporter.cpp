@@ -21,11 +21,13 @@ void PatternExporter::Export_All_Pattens_ToPNG(std::vector<ChangeNode*>* currPat
 	Export_RelationalPatterns_EMA5_ToPNG(currPattern, similarPatterns, containerFolder);
 	Export_RelationalPatterns_EMA1_ToPNG(currPattern, similarPatterns, containerFolder);
 
-	if (Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy)->Export_Patterns_PNG_To_Telegram)
+	ExportDataLayerPolicy* exportPolicy = Configrations::getInstance()->Get_Policy<ExportDataLayerPolicy>(PolicyType::ExportDataLayerPolicy);
+
+	if (exportPolicy->Export_Patterns_PNG_To_Telegram)
 	{
-		Logger::getInstance().LogPatternPngs(m_m15_patternsPaths, "M15", "L" + std::to_string(Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy)->EMA_len_for_Pattern_Export));
-		Logger::getInstance().LogPatternPngs(m_m5_patternsPaths, "M5", "L" + std::to_string(Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy)->EMA_len_for_Pattern_Export));
-		Logger::getInstance().LogPatternPngs(m_m1_patternsPaths, "M1", "L" + std::to_string(Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy)->EMA_len_for_Pattern_Export));
+		Logger::getInstance().LogPatternPngs(m_m15_patternsPaths, "M15", "L" + std::to_string(exportPolicy->EMA_len_for_Pattern_Export));
+		Logger::getInstance().LogPatternPngs(m_m5_patternsPaths, "M5", "L" + std::to_string(exportPolicy->EMA_len_for_Pattern_Export));
+		Logger::getInstance().LogPatternPngs(m_m1_patternsPaths, "M1", "L" + std::to_string(exportPolicy->EMA_len_for_Pattern_Export));
 	}
 	m_m15_patternsPaths.clear();
 	m_m5_patternsPaths.clear();
@@ -210,9 +212,10 @@ void PatternExporter::Build_SinglePattern_PointsVector(std::vector<ChangeNode*>*
 {
 	// Need a config for indicatorLen
 	PatternGodStatisticsPolicy* statisticsPolicy = Configrations::getInstance()->Get_Policy<PatternGodStatisticsPolicy>(PolicyType::PatternGodStatisticsPolicy);
-	ConfigrationsPolicy* confPolicy = Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
+	ScoringLayerPolicy* scoreConfPolicy = Configrations::getInstance()->Get_Policy<ScoringLayerPolicy>(PolicyType::ScoringLayerPolicy);
+	ExportDataLayerPolicy* exportPolicy = Configrations::getInstance()->Get_Policy<ExportDataLayerPolicy>(PolicyType::ExportDataLayerPolicy);
 
-	IndicatorLen indL = Indicators_Utils::Get_IndicatorLenEnum(confPolicy->EMA_len_for_Pattern_Export);
+	IndicatorLen indL = Indicators_Utils::Get_IndicatorLenEnum(exportPolicy->EMA_len_for_Pattern_Export);
 	if (indL == IndicatorLen::NONE)
 		indL = IndicatorLen::L20;
 
@@ -225,7 +228,7 @@ void PatternExporter::Build_SinglePattern_PointsVector(std::vector<ChangeNode*>*
 	pointsVec.points.push_back(mxmn);
 	for (int i = 0; i < nodesCount; i++)
 	{
-		if (i == static_cast<int>(nodes->size()) - statisticsPolicy->Score_Future_Vision_Candles && confPolicy->Pattern_CurrentTimeLineLen < nodes->size())
+		if (i == static_cast<int>(nodes->size()) - statisticsPolicy->Score_Future_Vision_Candles && scoreConfPolicy->Pattern_CurrentTimeLineLen < nodes->size())
 		{
 			pointsVec.splitter = counter;
 		}

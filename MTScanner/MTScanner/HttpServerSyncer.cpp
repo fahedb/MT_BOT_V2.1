@@ -6,6 +6,13 @@ void HttpServerSyncer::Wait_ForNewBarM1() {
 	ExchangeData().Reset_NewBar_M1_Flag(); // Reset the flag after waiting
 }
 
+bool HttpServerSyncer::ShouldSubmitLayersExportersData()
+{
+	if(ExchangeData().Get_BKTST_SubmissionName().length())
+		return true;
+	return false;
+}
+
 void HttpServerSyncer::UpdateCurrentTimeLine(BasePricesTable* table)
 {
 	ExchangeData exChData;

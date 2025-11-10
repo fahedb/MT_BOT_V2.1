@@ -9,6 +9,8 @@
 class HttpServerSyncer
 {
 public:
+	static std::string GetNewBKTSTName() { return ExchangeData().Get_BKTST_StartExporters(); }
+	static bool ShouldSubmitLayersExportersData();
 	static void UpdateCurrentTimeLine(BasePricesTable* table); // Function to keep the current timeline
 	static void UpdateConfigs(); // Updating the config value in the DB through HTTP queue 
 	static void LoadAllConfigsToHttpCore(); // Send the configs values to the HTTPCores cache

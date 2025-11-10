@@ -5,16 +5,17 @@
 enum class PolicyType
 {
     InfraConfigrationsPolicy, // = 0
-    FusionEnginePolicy, // = 1
-    ScoreComparerPolicy, // = 2
-    PolynomComparerPolicy, // = 3
-	ConfigrationsPolicy, // = 4
-	OrderTracerPolicy, // = 5
-	OrdersPolicy, // = 6
-	TradeManagerPolicy, // = 7
-	ScoreCachingPolicy, // = 8
-	PatternGodStatisticsPolicy, // = 9
-	BaseComparerPolicy // = 10
+    ScoreComparerPolicy, // = 1
+    PolynomComparerPolicy, // = 2
+	ConfigrationsPolicy, // = 3
+	OrderTracerPolicy, // = 4
+	OrdersPolicy, // = 5
+	TradeManagerPolicy, // = 6
+	ScoreCachingPolicy, // = 7
+	PatternGodStatisticsPolicy, // = 8
+    FilterLayerPolicy, // = 10
+    ScoringLayerPolicy, // =11
+    ExportDataLayerPolicy
 };
 class PolicyTypeUtils
 {
@@ -23,8 +24,6 @@ public:
     {
         if (policyTypeStr == "InfraConfigrationsPolicy")
             return PolicyType::InfraConfigrationsPolicy;
-        else if (policyTypeStr == "FusionEnginePolicy")
-            return PolicyType::FusionEnginePolicy;
         else if (policyTypeStr == "ScoreComparerPolicy")
             return PolicyType::ScoreComparerPolicy;
         else if (policyTypeStr == "PolynomComparerPolicy")
@@ -41,8 +40,12 @@ public:
             return PolicyType::ScoreCachingPolicy;
         else if (policyTypeStr == "PatternGodStatisticsPolicy")
             return PolicyType::PatternGodStatisticsPolicy;
-        else if (policyTypeStr == "BaseComparerPolicy")
-            return PolicyType::BaseComparerPolicy;
+        else if (policyTypeStr == "FilterLayerPolicy")
+			return PolicyType::FilterLayerPolicy;
+		else if (policyTypeStr == "ScoringLayerPolicy")
+			return PolicyType::ScoringLayerPolicy;
+        else if (policyTypeStr == "ExportDataLayerPolicy")
+			return PolicyType::ExportDataLayerPolicy;
         else
             return static_cast<PolicyType>(-1); // Unknown policy type
 	}
@@ -53,9 +56,6 @@ public:
         {
         case PolicyType::InfraConfigrationsPolicy:
             return "InfraConfigrationsPolicy";
-            break;
-        case PolicyType::FusionEnginePolicy:
-            return "FusionEnginePolicy";
             break;
         case PolicyType::ScoreComparerPolicy:
             return "ScoreComparerPolicy";
@@ -81,9 +81,15 @@ public:
         case PolicyType::PatternGodStatisticsPolicy:
             return "PatternGodStatisticsPolicy";
             break;
-        case PolicyType::BaseComparerPolicy:
-            return "BaseComparerPolicy";
-            break;
+		case PolicyType::FilterLayerPolicy:
+			return "FilterLayerPolicy";
+			break;
+		case PolicyType::ScoringLayerPolicy:
+			return "ScoringLayerPolicy";
+			break;
+            case PolicyType::ExportDataLayerPolicy:
+            return "ExportDataLayerPolicy";
+			break;
         default:
             return "UnknownPolicyType";
             break;
@@ -105,7 +111,6 @@ struct PolicyTypeList
 {
     std::vector<PolicyType> types = {
         PolicyType::InfraConfigrationsPolicy,
-        PolicyType::FusionEnginePolicy,
         PolicyType::ScoreComparerPolicy,
         PolicyType::PolynomComparerPolicy,
         PolicyType::ConfigrationsPolicy,
@@ -114,8 +119,8 @@ struct PolicyTypeList
         PolicyType::TradeManagerPolicy,
         PolicyType::ScoreCachingPolicy,
         PolicyType::PatternGodStatisticsPolicy,
-        PolicyType::BaseComparerPolicy
-
-
+		PolicyType::FilterLayerPolicy,
+        PolicyType::ScoringLayerPolicy,
+		PolicyType::ExportDataLayerPolicy
     };
 };

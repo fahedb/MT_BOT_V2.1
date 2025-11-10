@@ -30,7 +30,6 @@ private:
 	CoinsPair m_pair;
 
 
-	VotedDirectionStats& GetGroupStats(StatsType type);
 
 public:
 	DirectionStats(DirectionStats&& other) noexcept;
@@ -60,6 +59,7 @@ public:
 	robin_hood::unordered_map<CommonDirection, double> Get_VotedPercentages(StatsType sType) { return GetGroupStats(sType).GetVotedPercentages(); }
 
 	TimeLine*							Get_CurrPattern() { return m_currPattern; }
+	VotedDirectionStats&				GetGroupStats(StatsType type);
 	VotedDirectionStats&				GetGroupStatsByName(const std::string& son);
 	StepsMean&							GetStepMeans(CommonDirection dir);
 	double								Get_Mean_For_CandleIdx(int candleIdx) { return stepsMean_General.GetMeanForCandleIdx(candleIdx); }

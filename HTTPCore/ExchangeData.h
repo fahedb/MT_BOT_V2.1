@@ -32,6 +32,9 @@ public:
 	void Push_NewConfig(std::vector<std::string> confvec) { m_httpsrv->Get_RequestHandler()->PushNewConfig(confvec); }
 	std::pair<std::string, std::string> Get_ConfToUpdate() { return m_httpsrv->Get_RequestHandler()->GetNextConfigToUpdate(); }
 
+	std::string Get_BKTST_SubmissionName() { m_httpsrv->Get_RequestHandler()->Get_BKTST_SubmitName(); }
+	std::string Get_BKTST_StartExporters() { m_httpsrv->Get_RequestHandler()->Get_BKTST_StartExporters(); }
+
 private:
 	static void RUN_HTTPSRV()
 	{

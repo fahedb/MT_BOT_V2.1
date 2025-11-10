@@ -25,6 +25,12 @@
     <Filter Include="HTTP_client">
       <UniqueIdentifier>{7a1d87c9-02b4-4a9c-85ea-ac1e80b32e00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Queues">
+      <UniqueIdentifier>{736c4119-4669-4a4a-99ff-cb9659e62059}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Queues\Enums">
+      <UniqueIdentifier>{3219ac72-c0c4-44c1-b5b1-35bbc1ebe4f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Run.cpp">
@@ -42,6 +48,9 @@
     <ClCompile Include="HTTPClient.cpp">
       <Filter>HTTP_client</Filter>
     </ClCompile>
+    <ClCompile Include="HTTPServicesQueues.cpp">
+      <Filter>Queues</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HTTPServer.h">
@@ -58,6 +67,12 @@
     </ClInclude>
     <ClInclude Include="HTTPClient.h">
       <Filter>HTTP_client</Filter>
+    </ClInclude>
+    <ClInclude Include="HTTPServicesQueues.h">
+      <Filter>Queues</Filter>
+    </ClInclude>
+    <ClInclude Include="HTTPQueuesEnums.h">
+      <Filter>Queues\Enums</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

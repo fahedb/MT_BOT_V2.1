@@ -35,7 +35,7 @@ private:
 	PatternGod* m_patternScanner;
 	StatisticsDecession* m_statisticsEngine;
 
-	ConfigrationsPolicy* m_confPolicy;
+	ScoringLayerPolicy* m_confPolicy;
 	PatternGodStatisticsPolicy* m_statsPolicy;
 	OrderTracerPolicy* m_tradeTracingPolicy;
 
@@ -46,7 +46,7 @@ private:
 
 	void TraceTrades(TimeLine* historyTL)
 	{
-		m_confPolicy = Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
+		m_confPolicy = Configrations::getInstance()->Get_Policy<ScoringLayerPolicy>(PolicyType::ScoringLayerPolicy);
 		m_statsPolicy = Configrations::getInstance()->Get_Policy<PatternGodStatisticsPolicy>(PolicyType::PatternGodStatisticsPolicy);
 		m_tradeTracingPolicy = Configrations::getInstance()->Get_Policy<OrderTracerPolicy>(PolicyType::OrderTracerPolicy);
 
@@ -57,7 +57,7 @@ private:
 
 		while (true)
 		{
-			Sleep(m_confPolicy->TimeBetweenScans * 1000);
+			Sleep(10 * 1000);
 			if (!m_tradeTracingPolicy->EnableTradeTracing)
 			{
 				Logger::getInstance().WriteLog("Trade tracing is disabled, sleeping for 3 minutes", false, true, LogType::TRADE_TRACE_LOG);

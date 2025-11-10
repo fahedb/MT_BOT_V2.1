@@ -49,7 +49,7 @@ DirectionStats* TradeTracer::DynamicTradeTracing(OrderEntity* order)
 
 	std::vector<std::pair< ChangeNode*, ScoresResult>> potentialMatches_WResults;
 	m_patternScanner->ScanForOneMinPatterns_MultiThreaded(potentialMatches_WResults);
-
+	m_patternScanner->PolynomEngineFilter(potentialMatches_WResults);
 
 	// Our stats should be until the end of the future len
 	int futureLen = (m_confPolicy->Pattern_CurrentTimeLineLen + m_statsPolicy->Score_Future_Vision_Candles) - toScanPeriod.size();

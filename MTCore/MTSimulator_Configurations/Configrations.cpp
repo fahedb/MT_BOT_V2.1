@@ -28,7 +28,6 @@ void Configrations::ResetPolicy()
 void Configrations::InitPolicyMap()
 {
     m_policies[PolicyType::InfraConfigrationsPolicy] = new InfraConfigrationsPolicy();
-    m_policies[PolicyType::FusionEnginePolicy] = new FusionEnginePolicy();
     m_policies[PolicyType::ScoreComparerPolicy] = new ScoreComparerPolicy();
     m_policies[PolicyType::PolynomComparerPolicy] = new PolynomComparerPolicy();
     m_policies[PolicyType::ConfigrationsPolicy] = new ConfigrationsPolicy();
@@ -37,7 +36,9 @@ void Configrations::InitPolicyMap()
     m_policies[PolicyType::TradeManagerPolicy] = new TradeManagerPolicy();
     m_policies[PolicyType::ScoreCachingPolicy] = new ScoreCachingPolicy();
     m_policies[PolicyType::PatternGodStatisticsPolicy] = new PatternGodStatisticsPolicy();
-    m_policies[PolicyType::BaseComparerPolicy] = new BaseComparerPolicy();
+	m_policies[PolicyType::FilterLayerPolicy] = new FilterLayerPolicy();
+    m_policies[PolicyType::ScoringLayerPolicy] = new ScoringLayerPolicy();
+	m_policies[PolicyType::ExportDataLayerPolicy] = new ExportDataLayerPolicy();
 }
 
 std::string Configrations::Get_Config_Main(const std::string& conf, const std::string& value) { return ConfigsTableStaticProxy::Get_ConfigValue(conf, value); }

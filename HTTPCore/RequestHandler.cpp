@@ -2,6 +2,43 @@
 #include "OrdersStructCache.h"
 #include "Converts.h"
 #include "Logger.h"
+#include "HTTPServicesQueues.h"
+
+void RequestHandler::Handle_StartLayerExporters(const httplib::Request& req, httplib::Response& res)
+{
+	std::string bktstName = req.get_header_value(HTTP_PARAM_BKTST_Name);
+	if (!bktstName.length())
+	{
+		res.status = 400; // Bad Request
+		res.set_content("Missing backtest name", "text/plain");
+		return;
+	}
+	HTTPServicesQueues::getInstance()->Push_ToStack(HTTPQueueType::NEW_BKTST_XAUUSD_M1_DATA, bktstName);
+	res.status = 200; // OK
+}
+std::string RequestHandler::Get_BKTST_SubmitName()
+{
+	std::string bktstName = HTTPServicesQueues::getInstance()->Pop_FromStack(HTTPQueueType::SUBMIT_BKTST_XAUUSD_M1_RESULTS);
+	return bktstName;
+}
+std::string RequestHandler::Get_BKTST_StartExporters()
+{
+	std::string bktstName = HTTPServicesQueues::getInstance()->Get_FromQueue(HTTPQueueType::NEW_BKTST_XAUUSD_M1_DATA);
+	return bktstName;
+}
+
+void RequestHandler::Handle_SubmitLayerExportersData(const httplib::Request& req, httplib::Response& res)
+{
+	std::string bktstName = req.get_header_value(HTTP_PARAM_BKTST_Name);
+	if (!bktstName.length())
+	{
+		res.status = 400; // Bad Request
+		res.set_content("Missing backtest name", "text/plain");
+		return;
+	}
+	HTTPServicesQueues::getInstance()->Push_ToQueue(HTTPQueueType::SUBMIT_BKTST_XAUUSD_M1_RESULTS, bktstName);
+	res.status = 200; // OK
+}
 
 void RequestHandler::NewBar_M1_Wait() {
 	std::unique_lock<std::mutex> lock(newBar_M1_MTX);

@@ -22,6 +22,9 @@
 
 #define HTTP_SERVICE_TruncateCurrTimeLine_M1 "/TruncateCurrTimeLine_M1" // TODO: Need to implement a logic for this
 
+#define HTTP_SERVICE_StartLayerExporters "/StartLayerExporters" // Service that should be called to start the layer exporters -- Need to contain the bktst name
+#define HTTP_SERVICE_SumbmitLayerExportersData "/SumbmitLayerExportersData" // Service that should be called to sumbmit the exporters data
+
 // Headers
 #define HTTP_PARAM_TradeType "TradeType"
 #define HTTP_PARAM_Symbol "Symbol"
@@ -37,7 +40,7 @@
 #define HTTP_PARAM_ConfigPolicyCategory "ConfigPolicyCategory"
 #define HTTP_PARAM_ConfigPermission "ConfigPermission"
 #define HTTP_PARAM_ConfigCatagory "ConfigCatagory"
-
+#define HTTP_PARAM_BKTST_Name "BKTST_Name"
 // Headers Values
 #define HTTP_PARAM_VALUE_TradeType_Long "Long"
 #define HTTP_PARAM_VALUE_TradeType_Short "Short"

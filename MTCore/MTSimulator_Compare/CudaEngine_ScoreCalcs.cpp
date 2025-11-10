@@ -379,7 +379,7 @@ int CudaEngine_ScoreCalcs::ScanForOneMinPatterns_CUDA(std::vector<std::pair<Chan
 
 	logger.WriteLog("CUDA Scan Results Before Filtering: " + std::to_string(resultNodes2D.size()), false, false);
 	
-	BaseComparerPolicy* baseCompPolicy = Configrations::getInstance()->Get_Policy<BaseComparerPolicy>(PolicyType::BaseComparerPolicy);
+	ScoringLayerPolicy* scoringCompPolicy = Configrations::getInstance()->Get_Policy<ScoringLayerPolicy>(PolicyType::ScoringLayerPolicy);
 
 	auto cudaFilterStart = std::chrono::high_resolution_clock::now();
 	PatternGodUtils::FilterDuplicatesTimeLines(resultNodes2D, m_historyDB_Map);
@@ -394,7 +394,7 @@ int CudaEngine_ScoreCalcs::ScanForOneMinPatterns_CUDA(std::vector<std::pair<Chan
 	logger.WriteLog("CUDA Score Sorting Time: " + std::to_string(cudaSortDuration.count()) + " ms", false, false);
 
 	auto cudaFinalFilterStart = std::chrono::high_resolution_clock::now();
-	PatternGodUtils::filterByHighScores(resultNodes2D, baseCompPolicy->Num_Of_Top_Results_To_Filter_Out);
+	PatternGodUtils::filterByHighScores(resultNodes2D, scoringCompPolicy->Num_Of_Top_Results_To_Filter_Out);
 	auto cudaFinalFilterEnd = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> cudaFinalFilterDuration = cudaFinalFilterEnd - cudaFinalFilterStart;
 	logger.WriteLog("CUDA Final Filtering Time: " + std::to_string(cudaFinalFilterDuration.count()) + " ms", false, false);

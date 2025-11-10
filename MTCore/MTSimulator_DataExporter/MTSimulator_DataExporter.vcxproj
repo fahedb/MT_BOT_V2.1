@@ -148,7 +148,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\MTSimulator_Casts;..\MTSimulator_Logger;..\MTSimulator_TimeLines;..\MTSimulator_Statistics;..\MTSimulator_Configurations;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_Casts;..\MTSimulator_Logger;..\MTSimulator_TimeLines;..\MTSimulator_Statistics;..\MTSimulator_Configurations;..\MTSimulator_TradeManager;..\MTSimulator_ResourcesManager;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -179,7 +179,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\MTSimulator_Casts;..\MTSimulator_Logger;..\MTSimulator_TimeLines;..\MTSimulator_Statistics;..\MTSimulator_Configurations;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_Casts;..\MTSimulator_Logger;..\MTSimulator_TimeLines;..\MTSimulator_Statistics;..\MTSimulator_Configurations;..\MTSimulator_TradeManager;..\MTSimulator_ResourcesManager;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -190,18 +190,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseLayerDataExporter.cpp" />
     <ClCompile Include="CSVExportData.cpp" />
     <ClCompile Include="DataExporter.cpp" />
+    <ClCompile Include="FilterLayerDataExporter.cpp" />
+    <ClCompile Include="InterfaceLayers_BKTSTExporter.cpp" />
     <ClCompile Include="JasonHandler.cpp" />
     <ClCompile Include="MTChart.cpp" />
     <ClCompile Include="PatternExporter.cpp" />
+    <ClCompile Include="ScoringLayerDataExporter.cpp" />
+    <ClCompile Include="StatisticsLayerDataExporter.cpp" />
+    <ClCompile Include="TradeLayerDataExporter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseLayerDataExporter.h" />
     <ClInclude Include="CSVExportData.h" />
     <ClInclude Include="DataExporter.h" />
+    <ClInclude Include="FilterLayerDataExporter.h" />
+    <ClInclude Include="InterfaceLayers_BKTSTExporter.h" />
     <ClInclude Include="JasonHandler.h" />
+    <ClInclude Include="LayersEnums.h" />
     <ClInclude Include="MTChart.h" />
     <ClInclude Include="PatternExporter.h" />
+    <ClInclude Include="ScoringLayerDataExporter.h" />
+    <ClInclude Include="StatisticsLayerDataExporter.h" />
+    <ClInclude Include="TradeLayerDataExporter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

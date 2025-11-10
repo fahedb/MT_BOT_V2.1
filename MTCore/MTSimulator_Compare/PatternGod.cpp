@@ -122,22 +122,33 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<Change
 	auto end = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 	Logger::getInstance().WriteLog("Performance: Total Scan Time: " + std::to_string(duration) + " ms", false, true, LogType::LOG);
-	// Need to merge results using ResultsFusion Engine...
-	//resultNodes2D = PatternGod_ResultFusionEngine::FuseResults(resultPerComparer, m_historyDB_Map); // Fuse results from all comparers
+
 	TradeManagerPolicy* tradeManPolicy = Configrations::getInstance()->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy);
 	
 	for(auto& resVec : resultPerComparer)
 	{
-		std::vector<ChangeNode*>heads = TimeLineBuilder::SplitChangeNodeFromScores(&resultPerComparer[resVec.first]);
-		if (heads.size() == 0) continue;
-
-		auto tempVec = m_polynomFilterEngine->ProcessPatterns(
-			&heads,
-			m_currentTL->size());
-		PatternGodUtils::filterByThresholdScore(tempVec, tradeManPolicy->Pattern_TopScore_ThresholdRatio);
-		PatternGodUtils::filterByHighScores(tempVec, tradeManPolicy->Pattern_Max_Patterns_To_Find);
+		auto& tempVec = resultPerComparer[resVec.first];
 		// Add to resultNodes2D
 		resultNodes2D.insert(resultNodes2D.end(), tempVec.begin(), tempVec.end());
 	}
 	return totalScans; // Return the total number of scans performed
+}
+
+int PatternGod::PolynomEngineFilter(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D)
+{
+	if (!resultNodes2D.size())
+	{
+		Logger::getInstance().WriteLog("Results vector is empty, No filter is applied.", false, true, LogType::ERR);
+		return 0;
+	}
+
+	std::vector<ChangeNode*>heads = TimeLineBuilder::SplitChangeNodeFromScores(&resultNodes2D);
+
+	auto tempVec = m_polynomFilterEngine->ProcessPatterns(
+		&heads,
+		m_currentTL->size());
+	FilterLayerPolicy* filterLayerPolicy = Configrations::getInstance()->Get_Policy<FilterLayerPolicy>(PolicyType::FilterLayerPolicy);
+	PatternGodUtils::filterByThresholdScore(tempVec, filterLayerPolicy->Pattern_TopScore_ThresholdRatio);
+	PatternGodUtils::filterByHighScores(tempVec, filterLayerPolicy->Pattern_Max_Patterns_To_Find);
+	resultNodes2D = tempVec;
 }

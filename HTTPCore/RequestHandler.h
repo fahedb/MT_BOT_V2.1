@@ -6,6 +6,7 @@
 #include <queue>
 #include <stack>
 
+
 struct Http_OrderStruct
 {
 	std::string symbol;
@@ -76,6 +77,8 @@ public:
 	std::string Get_NextCandle();
 	std::string Get_Next_DBCandle_M1();
 	std::string GetStatus_Scanning();
+	std::string Get_BKTST_SubmitName();
+	std::string Get_BKTST_StartExporters();
 
 	bool UpdateConfig(std::string& config, std::string& value);
 	void PushNewConfig(std::vector<std::string>& conf);
@@ -90,6 +93,8 @@ public:
 	void Handle_GetOrderData(const httplib::Request& req, httplib::Response& res);
 	void Handle_IsScanOnGoing(httplib::Response& res);
 	void Handle_FutureVisionScan(const httplib::Request& req, httplib::Response& res);
+	void Handle_StartLayerExporters(const httplib::Request& req, httplib::Response& res);
+	void Handle_SubmitLayerExportersData(const httplib::Request& req, httplib::Response& res);
 
 };
 

@@ -58,4 +58,5 @@ public:
 	// TODO: Implement the scanning logic for patterns through the comparers...
 
 	int ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);
+	int PolynomEngineFilter(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);
 };

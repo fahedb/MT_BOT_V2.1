@@ -150,6 +150,16 @@ public:
 				this->Handle_IsScanOnGoing(req, res);
             });
 
+        m_srv.Post(HTTP_SERVICE_StartLayerExporters, [this](const httplib::Request& req, httplib::Response& res)
+            {
+                m_requests.Handle_StartLayerExporters(req, res);
+			});
+
+        m_srv.Post(HTTP_SERVICE_SumbmitLayerExportersData, [this](const httplib::Request& req, httplib::Response& res)
+            {
+				m_requests.Handle_SubmitLayerExportersData(req, res);
+			});
+
         m_srv.listen("0.0.0.0", m_port);
     }
 

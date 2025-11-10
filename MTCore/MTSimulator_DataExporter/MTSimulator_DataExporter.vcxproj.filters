@@ -22,6 +22,30 @@
     <Filter Include="DataExporter\Pattern">
       <UniqueIdentifier>{d3b191b2-0777-4f89-89e7-08b2eb981b09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BackTestFileExporterLogic">
+      <UniqueIdentifier>{91667b89-9478-4749-9285-e4d685d716a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\ScoringLayer">
+      <UniqueIdentifier>{c732916f-4b72-47e3-98e0-66afda1e74d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\FilterLayer">
+      <UniqueIdentifier>{b34635c6-d3d6-4167-a0d4-47d3557bdb34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\StatisticsLayer">
+      <UniqueIdentifier>{6db22d70-16a0-4824-a33b-44ff08535be4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\TradeLayer">
+      <UniqueIdentifier>{8b7b6b8a-6813-42e1-aa64-d7f8a2b69b69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\Base">
+      <UniqueIdentifier>{ba09319e-a68e-4016-bbd8-bd797cc99043}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\Enums">
+      <UniqueIdentifier>{375be879-a15e-42c2-bfb6-26ea4565ea60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\Interface">
+      <UniqueIdentifier>{05a4c0ff-6a63-49aa-ba95-0877eb34b900}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JasonHandler.cpp">
@@ -39,6 +63,24 @@
     <ClCompile Include="PatternExporter.cpp">
       <Filter>DataExporter\Pattern</Filter>
     </ClCompile>
+    <ClCompile Include="ScoringLayerDataExporter.cpp">
+      <Filter>BackTestFileExporterLogic\ScoringLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseLayerDataExporter.cpp">
+      <Filter>BackTestFileExporterLogic\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="StatisticsLayerDataExporter.cpp">
+      <Filter>BackTestFileExporterLogic\StatisticsLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="TradeLayerDataExporter.cpp">
+      <Filter>BackTestFileExporterLogic\TradeLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterLayerDataExporter.cpp">
+      <Filter>BackTestFileExporterLogic\FilterLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="InterfaceLayers_BKTSTExporter.cpp">
+      <Filter>BackTestFileExporterLogic\Interface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="JasonHandler.h">
@@ -55,6 +97,27 @@
     </ClInclude>
     <ClInclude Include="PatternExporter.h">
       <Filter>DataExporter\Pattern</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoringLayerDataExporter.h">
+      <Filter>BackTestFileExporterLogic\ScoringLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseLayerDataExporter.h">
+      <Filter>BackTestFileExporterLogic\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="LayersEnums.h">
+      <Filter>BackTestFileExporterLogic\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="StatisticsLayerDataExporter.h">
+      <Filter>BackTestFileExporterLogic\StatisticsLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="TradeLayerDataExporter.h">
+      <Filter>BackTestFileExporterLogic\TradeLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterLayerDataExporter.h">
+      <Filter>BackTestFileExporterLogic\FilterLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="InterfaceLayers_BKTSTExporter.h">
+      <Filter>BackTestFileExporterLogic\Interface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -11,7 +11,7 @@ class BaseLayerDataExporter
 {
 protected:
 	std::string m_policiesData;
-	std::vector<nlohmann::json> m_dataSummery;
+	std::vector<nlohmann::json> m_dataSummary;
 	std::string m_filePath;
 	virtual LayerType GetLayerType() const = 0;
 public:

@@ -8,11 +8,11 @@ void DataExporter::Export_All_Statistics_Data(DirectionStats& stats, bool tradeD
 {
 	ExportDataLayerPolicy* policy = Configrations::getInstance()->Get_Policy<ExportDataLayerPolicy>(PolicyType::ExportDataLayerPolicy);
 	Logger& logger = Logger::getInstance();
-	std::vector<std::string> summery_logs = PrepareSummeryLogs(stats); // Prepare all summery logs in vector
+	std::vector<std::string> summery_logs = PrepareSummeryLogs(stats); // Prepare all summary logs in vector
 
 	for (int i = 0; i < summery_logs.size(); i++)
 	{
-		logger.WriteLog(summery_logs.at(i), false, true); // Send summery logs to logs
+		logger.WriteLog(summery_logs.at(i), false, true); // Send summary logs to logs
 		if (tradeDecRes)Logger::getInstance().WriteLog(summery_logs.at(i), false, true, LogType::SPECIAL_LOG); // if there is a trade, send also to SPECIAL log
 	}
 

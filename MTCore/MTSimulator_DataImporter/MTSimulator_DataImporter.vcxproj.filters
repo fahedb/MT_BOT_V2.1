@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="BackTestFileExporterLogic">
+      <UniqueIdentifier>{35a6267c-3926-4f69-8ba5-4561f81aebe1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\Base">
+      <UniqueIdentifier>{854707ba-6132-4eeb-be10-fa5cae337d4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\FilterLayer">
+      <UniqueIdentifier>{df1445cc-6d08-47c3-b8d3-02b2ae841fa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\Interface">
+      <UniqueIdentifier>{88d48963-248a-4b68-a3b2-aad7c86ac5ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\ScoringLayer">
+      <UniqueIdentifier>{ecf918b5-4f57-4b57-a48b-0fcc99ce15e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\StatisticsLayer">
+      <UniqueIdentifier>{290a8691-126b-4075-9c5c-6dad88088152}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\TradeLayer">
+      <UniqueIdentifier>{aefe92ea-9369-424b-9272-400ce0490c79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\QueueStruct">
+      <UniqueIdentifier>{de84564b-c3cc-4943-be33-0ab9583b26ff}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="QueueStruct.h">
+      <Filter>BackTestFileExporterLogic\QueueStruct</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoringLayerImporter.h">
+      <Filter>BackTestFileExporterLogic\ScoringLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseLayerImporter.h">
+      <Filter>BackTestFileExporterLogic\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterLayerDataImporter.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ScoringLayerImporter.cpp">
+      <Filter>BackTestFileExporterLogic\ScoringLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseLayerImporter.cpp">
+      <Filter>BackTestFileExporterLogic\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterLayerDataImporter.cpp" />
+  </ItemGroup>
+</Project>

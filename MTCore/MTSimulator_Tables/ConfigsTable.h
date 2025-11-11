@@ -1,6 +1,7 @@
 #pragma once
 #include "BTables.h"
 #include "DefinedTables.h"
+
 #define ConfigsTablesCols 6
 
 class ConfigsTable : BTables
@@ -18,6 +19,7 @@ public:
 	virtual std::string GetDB_PhysicalFileName_Json() override { return ""; }
 
 	virtual int tableCols() { return ConfigsTablesCols; }
+
 private:
 
 };

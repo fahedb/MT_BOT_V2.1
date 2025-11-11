@@ -28,3 +28,7 @@
 #define JsonKey_IsActive "IsActive"
 #define JsonKey_StopLoss_pips "StopLoss_pips"
 #define JsonKey_TakeProfit_pips "TakeProfit_pips"
+
+
+#define DataSummaryKey "Data Summary :"
+#define PoliciesDataKey "Policies Data :"

@@ -1,5 +1,6 @@
 #include "BaseLayerDataExporter.h"
 #include "LOGGER.H"
+#include "LayersJsonKeys.h"
 
 BaseLayerDataExporter::BaseLayerDataExporter(std::string name)
 {
@@ -34,12 +35,12 @@ void BaseLayerDataExporter::SubmitBackTestDataFile()
 		return;
 	}
 
-	outFile << "Policies Data:\n";
+	outFile << PoliciesDataKey << "\n";
 	outFile << m_policiesData << "\n\n";
-	outFile << "Data Summery:\n";
-	for (const auto& summery : m_dataSummery)
+	outFile << DataSummaryKey << "\n";
+	for (const auto& summary : m_dataSummary)
 	{
-		outFile << summery.dump() << "\n";
+		outFile << summary.dump() << "\n";
 	}
 
 }

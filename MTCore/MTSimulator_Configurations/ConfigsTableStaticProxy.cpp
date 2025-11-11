@@ -5,6 +5,11 @@
 
 std::string ConfigsTableStaticProxy::Get_ConfigValue_DB(const std::string& config, const std::string& defualt)
 {
+    std::string forceValue = Get_ForcedConfigValues(config);
+    if (!forceValue.empty())
+        return forceValue; // Return forced value if exists
+
+
     DataBaseConnection* db_conn = Static_DBConnection::getInstance()->GetConnection();
     if (!db_conn || !db_conn->IsConnected())
     {
@@ -16,7 +21,7 @@ std::string ConfigsTableStaticProxy::Get_ConfigValue_DB(const std::string& confi
 
     std::vector<std::string> row = confTable.GetConfigRow(config);
     if (row.size() > 2)
-        return confTable.GetConfigRow(config).at(1);
+        return row.at(1);
     return defualt;
 }
 
@@ -83,6 +88,11 @@ std::vector<std::string> ConfigsTableStaticProxy::Get_ConfigRow_DB(const std::st
 
     ConfigsTable confTable(dbConn->Get_EnvHandler(), dbConn->Get_DBConnection());
     auto conf = confTable.GetConfigRow(config);
+	std::string forceValue = Get_ForcedConfigValues(config);
+
+    if(!forceValue.empty()) {
+        conf[1] = forceValue; // Override with forced value
+	}
 
     if (!conf.empty()) {
         return conf; // Found in DB
@@ -98,6 +108,19 @@ std::vector<std::string> ConfigsTableStaticProxy::Get_ConfigRow_DB(const std::st
 
     // Not found in DB — return default row
     return createDefaultRow(confTable.tableCols());
+}
+
+void ConfigsTableStaticProxy::Insert_IntoForcedConfigs_DB(const std::string& config, std::string value)
+{
+    m_forcedConfigs[config] = value;
+}
+
+std::string ConfigsTableStaticProxy::Get_ForcedConfigValues(const std::string& config)
+{
+    auto it = m_forcedConfigs.find(config);
+    if (it != m_forcedConfigs.end())
+        return it->second;
+	return "";
 }
 
 std::string ConfigsTableStaticProxy::ReadConfigValue(const std::string& config)

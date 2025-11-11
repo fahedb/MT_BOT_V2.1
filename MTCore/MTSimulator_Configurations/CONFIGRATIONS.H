@@ -6,7 +6,6 @@
 #include "Policies.h"
 #include "robin_hood.h"
 
-
 class Configrations // SingleTon class for all configrations of the program
 {
 public:
@@ -39,6 +38,8 @@ public:
     }
 
 private:
+    //robin_hood::unordered_map<
+
     std::string m_connString;
     std::string m_filesDBDir;
    // ConfigsTable* m_confTable_DB;

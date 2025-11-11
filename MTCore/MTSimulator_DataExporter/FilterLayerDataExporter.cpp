@@ -11,5 +11,5 @@ void FilterLayerDataExporter::AddFilteredPatternData(std::string currTP, std::ve
 			{JsonKey_score, data[i].second.totalScore.total}
 			});
 	}
-	m_dataSummery.push_back(j);
+	m_dataSummary.push_back(j);
 }

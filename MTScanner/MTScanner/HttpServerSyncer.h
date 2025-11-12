@@ -1,3 +1,4 @@
+#pragma once
 #include "ExchangeData.h"
 #include "CONFIGRATIONS.H"
 #include "ChangeData.h"
@@ -5,7 +6,6 @@
 #include "XAUUSD_OneMinTable.h"
 #include "Static_CurrentTimeLineRep.h"
 
-#pragma once
 class HttpServerSyncer
 {
 public:

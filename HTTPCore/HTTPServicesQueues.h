@@ -33,10 +33,10 @@ private:
     HTTPServicesQueues();
 
     std::vector< std::queue<std::string>> m_queues;
-	std::vector<std::mutex> m_queueMutexes;
+	std::vector<std::unique_ptr<std::mutex>> m_queueMutexes;
 
 	std::vector<std::stack<std::string>> m_stacks;
-    std::vector<std::mutex> m_stackMutexes;
+    std::vector<std::unique_ptr<std::mutex>> m_stackMutexes;
 
 };
 

@@ -1,6 +1,6 @@
+#pragma once
 #include "PatternGod_BaseComparer.h"
 
-#pragma once
 #define NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN 3 // Number of skips for low score scan -- TODO: Make this configurable
 
 class PatternGod_PolynomComparer : public PatternGod_BaseComparer

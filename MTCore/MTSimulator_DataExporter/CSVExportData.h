@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <vector>
 #include <fstream>
@@ -5,7 +6,6 @@
 
 const std::string CONTAINER_FOLDER = "c:\\MTDB\\";
 
-#pragma once
 class CSVExportData
 {
 	std::string m_fileName;

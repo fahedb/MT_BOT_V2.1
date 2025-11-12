@@ -1,8 +1,8 @@
-﻿#include "IndicatorStructres.h"
+﻿#pragma once
+#include "IndicatorStructres.h"
 #include <mutex>
 #include "BTimeLineCache.h"
 
-#pragma once
 
 /// <summary>
 /// Static function for ScoreResulsCache,

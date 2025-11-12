@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 #include "PolynomChangeNodePackage.h"
 #include "PolynomScore.h"
@@ -5,7 +6,6 @@
 #include "PolynomTimeLine.h"
 #include "CacheEnums.h"
 
-#pragma once
 
 /// <summary>
 /// This class is responsible for calculating the score of polynomials based on their historical and current values.

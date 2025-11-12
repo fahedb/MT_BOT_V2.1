@@ -1,7 +1,7 @@
+#pragma once
 #include "TimeLine.h"
 //#include <string>
 
-#pragma once
 class PatternGodUtils
 {
 public:

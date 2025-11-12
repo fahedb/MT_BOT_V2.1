@@ -1,6 +1,6 @@
+#pragma once
 #include "Polynom.h"
 
-#pragma once
 
 // This class is responsible for comparing two polynomials
 // Based on Various criteria such as weighted coefficients, YValues, and RMSE (Root Mean Square Error).

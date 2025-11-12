@@ -1,3 +1,4 @@
+#pragma once
 #include "TimeLine.h"
 #include "CONFIGRATIONS.H"
 #include "PolynomTimeLine.h"
@@ -7,7 +8,6 @@
 #include "CacheEnums.h"
 #include "BTimeLineCache.h"
 
-#pragma once
 
 // <summary>
 /// This class is a Singleton that manages a cache of polynomial timelines.

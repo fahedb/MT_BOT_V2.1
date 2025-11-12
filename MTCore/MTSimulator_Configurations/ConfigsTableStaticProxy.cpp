@@ -2,6 +2,7 @@
 #include "ConfigsTable.h"
 #include "Static_DBConnection.h"
 
+robin_hood::unordered_map<std::string, std::string> ConfigsTableStaticProxy::m_forcedConfigs; // Definition of the static member
 
 std::string ConfigsTableStaticProxy::Get_ConfigValue_DB(const std::string& config, const std::string& defualt)
 {

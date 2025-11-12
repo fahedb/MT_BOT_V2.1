@@ -1,10 +1,10 @@
+#pragma once
 #include <cairo/cairo.h>
 #include <vector>
 #include <utility>
 #include <string>
 #include "GraphStructres.h"
 
-#pragma once
 /// <MTChart>
 /// MTChart class function, for drawing charts using x,y points
 /// <MTChart>

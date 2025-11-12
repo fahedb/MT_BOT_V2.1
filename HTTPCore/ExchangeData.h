@@ -1,7 +1,7 @@
+#pragma once
 #include "HTTPServer.h"
 #include <nlohmann/json.hpp>
 #include <string>
-#pragma once
 
 
 class ExchangeData

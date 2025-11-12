@@ -1,4 +1,5 @@
-﻿#include "ChangeData.h"
+﻿#pragma once
+#include "ChangeData.h"
 #include "XAUUSD_CurrentTable.h"
 #include "XAUUSD_OneMinTable.h"
 #include "ExchangeData.h"
@@ -15,7 +16,6 @@
 /// Author: Fahed Elbatash
 /// Date: 2025-07-12
 
-#pragma once
 class HistoryTimeLineLoader
 {
 public:

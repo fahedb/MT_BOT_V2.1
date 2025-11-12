@@ -1,4 +1,5 @@
-﻿#include "LOGGER.H"
+﻿#pragma once
+#include "LOGGER.H"
 #include "XAUUSD_OneMinTable.h"
 #include "XAUUSD_CurrentTable.h"
 #include "TimeLine.h"
@@ -23,7 +24,6 @@
 /// loading historical data, and executing the PatternGod strategy.
 
 
-#pragma once
 class StrategiesRunner
 {
 public:

@@ -1,7 +1,7 @@
+#pragma once
 #include <vector>
 #include "ChangeData.h"
 
-#pragma once
 class MTSimulatorUtils
 {
 public:

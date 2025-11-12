@@ -1,9 +1,9 @@
+#pragma once
 #include "TimeLineBuilder.h"
 #include "PolynomScoreCalcs.h"
 #include "LOGGER.H"
 #include "Static_CurrentTimeLineRep.h"
 
-#pragma once
 class PatternGod_PolynomFilterEngine
 {
 private:

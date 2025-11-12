@@ -1,8 +1,8 @@
+#pragma once
 #include <string>
 #include <vector>
 #include "FlagsDef.h"
 
-#pragma once
 
 class ProccessFlagsRep
 {

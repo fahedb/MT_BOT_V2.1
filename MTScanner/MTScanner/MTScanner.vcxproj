@@ -260,6 +260,9 @@
     <ProjectReference Include="..\..\MTCore\MTSimulator_DataExporter\MTSimulator_DataExporter.vcxproj">
       <Project>{96e28090-01d5-4275-9739-2c3f80482659}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_DataImporter\MTSimulator_DataImporter.vcxproj">
+      <Project>{b32c569a-e529-4f0a-88af-b3ecad29ed7b}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\MTCore\MTSimulator_Logger\MTSimulator_Logger.vcxproj">
       <Project>{00196295-8402-4a56-ac04-38ebb4b28cea}</Project>
     </ProjectReference>

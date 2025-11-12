@@ -1,5 +1,5 @@
-#include <future>
 #pragma once
+#include <future>
 #include "ChangeData.h"
 #include "PatternGodUtils.h"
 #include "ComparersEnums.h"

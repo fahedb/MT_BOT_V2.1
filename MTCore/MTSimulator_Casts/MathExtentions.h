@@ -1,6 +1,6 @@
+#pragma once
 #include <vector>
 
-#pragma once
 class MathExtentions
 {
 public:

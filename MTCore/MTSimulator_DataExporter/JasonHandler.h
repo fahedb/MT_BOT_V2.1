@@ -1,8 +1,8 @@
+#pragma once
 #include "nlohmann/json.hpp"
 #include "CandleData.h"
 #include "../../HTTPCore/ServicesDef.h"
 #include "DirectionStats.h"
-#pragma once
 class JasonHandler
 {
 public:

@@ -1,9 +1,9 @@
+#pragma once
 #include <string>
 
 // include for cout 
 #include <iostream>
 
-#pragma once
 class Converts
 {
 public:

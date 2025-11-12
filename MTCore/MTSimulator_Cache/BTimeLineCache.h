@@ -1,3 +1,4 @@
+#pragma once
 #include "CacheEnums.h"
 #include "..\MyRobinHoodMap\robin_hood.h"
 #include "..\MyRobinHoodMap\HashingStructs.h"
@@ -5,7 +6,6 @@
 
 // Not used yet
 
-#pragma once
 // This class will be the base class of all cache classes
 template <typename ObjectKey, typename ObjectType>
 class BaseTimeLineCache

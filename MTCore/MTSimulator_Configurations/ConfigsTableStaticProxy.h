@@ -1,8 +1,8 @@
+#pragma once
 #include <string>
 #include "ConfigsDefs.h"
 #include <vector>
 #include "..\MyRobinHoodMap\robin_hood.h"
-#pragma once
 class ConfigsTableStaticProxy
 {
 private:

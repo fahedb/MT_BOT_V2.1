@@ -1,6 +1,6 @@
+#pragma once
 #include "MTStreamsStructs.h"
 
-#pragma once
 class CPP_To_Cuda_Tunnel
 {
 public:

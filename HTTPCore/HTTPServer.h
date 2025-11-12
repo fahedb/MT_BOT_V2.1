@@ -1,10 +1,10 @@
+#pragma once
 
 #include "httplib.h"
 #include "ServicesDef.h"
 #include "RequestHandler.h"
 #include <codecvt>
 #include <cctype>
-#pragma once
 class HTTPServer
 {
 private:

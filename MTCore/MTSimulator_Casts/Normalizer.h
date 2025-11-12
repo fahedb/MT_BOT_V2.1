@@ -1,6 +1,6 @@
+#pragma once
 #include <utility>
 
-#pragma once
 
 template<typename T>
 struct Normalizer { 

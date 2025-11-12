@@ -22,6 +22,8 @@ class TradeTracer
 public:
 	static void RunTracer(TimeLine* historyTL)
 	{
+		return; // temp disable trade tracing
+
 		if (!historyTL)
 		{
 			Logger::getInstance().WriteLog("No valid history time line for TradeTracing", false, true, LogType::SPECIAL_LOG);

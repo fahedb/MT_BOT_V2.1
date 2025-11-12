@@ -1,6 +1,6 @@
+#pragma once
 #include "TimeLine.h"
 
-#pragma once
 
 /// <summary>
 /// Class to save current timeline 

@@ -1,3 +1,4 @@
+#pragma once
 #include <map>
 #include <vector>
 #include <string>
@@ -6,7 +7,6 @@
 
 #define SCORE_RESULTS_CACHE_SIZE_PER_THREAD "SCORE_RESULTS_CACHE_SIZE_PER_THREAD"
 #define THREADS_COUNT "THREADS_COUNT"
-#pragma once
 class ResourceManager // Singleton class for cache data -- No need to use currently -- for future usage
 {
 	std::unordered_map<std::string, std::string> m_cacheData; // Cache data storage, can be used for storing any kind of data

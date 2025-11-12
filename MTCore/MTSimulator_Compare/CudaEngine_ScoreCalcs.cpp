@@ -290,7 +290,7 @@ void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, Score
 	{
 		RunScan_TwoIndicatorsRatio(indT);
 	}
-	CPP_To_Cuda_Tunnel::SyncDevice(); // Wait for all CUDA calculations to complete
+	CPP_To_Cuda_Tunnel::SyncCUDADevice(); // Wait for all CUDA calculations to complete
 	CPP_To_Cuda_Tunnel::Get_ResultsFromDevice(m_h_totalScores, static_cast<int>(m_currentData->size()));
 	// TODO: Collect results from m_h_totalScores and populate resultNodes2D
 	int limit = static_cast<int>(m_historicData->size() - m_currentData->size());

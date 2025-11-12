@@ -116,7 +116,7 @@ bool StrategiesRunner::ScanPreCondition()
 	logger.WriteLog("current time line size: " + std::to_string(currentTimeLine->size()));
 	if (currentTimeLine->at(currentTimeLine->size() - 1)->point_DateTime == m_lastTimePoint) // If the last time point scanned == to the current time point (start of the current vector) don't continue
 	{
-		std::cout << "\n\nNo new data, Last point time: " << m_lastTimePoint << std::endl;
+		logger.WriteLog("No new data, Last point time : " + m_lastTimePoint);
 		return false;
 	}
 

@@ -47,3 +47,14 @@ void CudaMemoryCopyToDevice(T* deviceVar, T* hostVar, int varNum)
 		exit(EXIT_FAILURE);
 	}
 }
+
+
+void SyncDevice()
+{
+	
+	cudaError_t lastError = cudaDeviceSynchronize();
+	if (lastError != cudaSuccess) {
+		std::cout << "SyncDevice: Sync CUDA error: " << cudaGetErrorString(lastError) << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}

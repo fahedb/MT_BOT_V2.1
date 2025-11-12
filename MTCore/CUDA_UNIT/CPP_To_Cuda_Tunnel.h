@@ -16,6 +16,6 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	static void Get_ResultsFromDevice(float* h_outScores, int numOfResults);
 	static bool IsCudaAvailable();
-	static void SyncDevice();
+	static void SyncCUDADevice();
 };
 

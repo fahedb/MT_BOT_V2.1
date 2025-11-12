@@ -5,16 +5,19 @@
 
 
 // Layer 3 - Statistics Layer keys
-#define JsonKey_TotalVotes "TotalVotes"
-#define JsonKey_UP_Percent "UP_Percent"
-#define JsonKey_DOWN_Percent "DOWN_Percent"
-#define JsonKey_BLUR_Percent "BLUR_Percent"
-#define JsonKey_MeanPipsChange "MeanPipsChange"
-#define JsonKey_PureMeanPipsChange_UP "PureMeanPipsChange_UP"
-#define JsonKey_PureMeanPipsChange_DOWN "PureMeanPipsChange_DOWN"
-#define JsonKey_StdDevPipsChange "StdDevPipsChange"
-#define JsonKey_MeanIndexes "MeanIndexes"
 #define JsonKey_StepsMean_Suffix "_StepsMean"
+	// UP_StepsMean
+	// DOWN_StepsMean	
+#define JsonKey_VotedDirections		"VotedDirections"
+	#define JsonKey_TotalVotes				"TotalVotes"
+	#define JsonKey_UP_Percent				"UP_Percent"
+	#define JsonKey_DOWN_Percent			"DOWN_Percent"
+	#define JsonKey_BLUR_Percent			"BLUR_Percent"
+	#define JsonKey_MeanPipsChange			"MeanPipsChange"
+	#define JsonKey_PureMeanPipsChange_UP	"PureMeanPipsChange_UP"
+	#define JsonKey_PureMeanPipsChange_DOWN "PureMeanPipsChange_DOWN"
+	#define JsonKey_StdDevPipsChange		"StdDevPipsChange"
+	#define JsonKey_MeanIndexes				"MeanIndexes"
 
 
 

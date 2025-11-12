@@ -81,7 +81,7 @@ void DirectionStats::Add_CurrPattern(const TimeLine& currPatter, bool moveMemory
 
 VotedDirectionStats& DirectionStats::GetGroupStatsByName(const std::string& son)
 {
-	StatsType dir = StatusType_Utils::GetStatsTypeEnum(son);
+	StatsType dir = StatsType_Utils::GetStatsTypeEnum(son);
 	return GetGroupStats(dir); // Ensure general stats are initialized
 }
 

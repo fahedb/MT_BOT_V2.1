@@ -66,7 +66,19 @@ public:
 
 	void ActivateOrder(OrderType long_short, std::string timePoint, std::string statisticsTimePoint, CoinsPair pair);
 	OrderEntity(OrderType long_short, std::string timePoint, std::string statisticsTimePoint, CoinsPair pair) { ActivateOrder(long_short, timePoint, statisticsTimePoint, pair); }
-
+	OrderEntity(long seqNum, OrderType orderType, std::string timePoint, std::string statisticsTimePoint, CoinsPair pair, int tp, int sl) // Full constructor
+		: m_order_seqNum(seqNum),
+		m_orderType(orderType),
+		m_status(OrderStatus::NONE),
+		m_timePoint(timePoint),
+		m_statisticsTimePoint(statisticsTimePoint),
+		m_lastStatisticsCheckTimePoint(""),
+		m_pair(pair),
+		m_active(false),
+		m_tp_pips(tp),
+		m_sl_pips(sl)
+	{
+	}
 	long Get_OrderSeqNum() const { return m_order_seqNum; }
 	OrderType Get_OrderType() const { return m_orderType; }
 	
@@ -83,6 +95,8 @@ public:
 	OrderStatus Get_OrderStatus() { return m_status; }
 	std::string Get_OrderStatus_str() { return OrderStatusUtils::Get_OrderStatus_String(m_status); }
 
+	void Set_SeqNum(long seqNum) { m_order_seqNum = seqNum; }
+	void Set_OrderType(OrderType type) { m_orderType = type; }
 	void Set_StopLoss(int sl_pips) { m_sl_pips = sl_pips; }
 	void Set_TakeProfit(int tp_pips) { m_tp_pips = tp_pips; }
 	void Set_LastStatisticsCheckTimePoint(std::string timePoint) {

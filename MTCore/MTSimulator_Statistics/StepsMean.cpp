@@ -16,8 +16,16 @@ double StepsMean::GetMeanForCandleIdx(int candleIdx) const {
 		return 0.0;
 	return static_cast<double>(stepsSum[candleIdx]) / stepsCount[candleIdx];
 }
+void StepsMean::SetImportedMeans(const std::vector<double>& importedMeans)
+{
+	m_importedMeansFlag = true; // Set the flag to indicate means were imported
+	stepsMeans = importedMeans; // Directly set the means
+}
 
 std::vector<double> StepsMean::GetAllMeansUpTo(int maxIndex) const {
+	if(m_importedMeansFlag)
+		return stepsMeans; // If means were imported, return them directly
+
 	std::vector<double> result;
 	if (maxIndex < 0 || maxIndex >= stepsSum.size())
 		maxIndex = stepsSum.size() - 1;

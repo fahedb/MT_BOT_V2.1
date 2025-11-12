@@ -36,7 +36,13 @@
     <ClInclude Include="BaseLayerImporter.h">
       <Filter>BackTestFileExporterLogic\Base</Filter>
     </ClInclude>
-    <ClInclude Include="FilterLayerDataImporter.h" />
+    <ClInclude Include="FilterLayerDataImporter.h">
+      <Filter>BackTestFileExporterLogic\FilterLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="TradeLayerDataImporter.h">
+      <Filter>BackTestFileExporterLogic\TradeLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="StatisticsLayerDataImporter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ScoringLayerImporter.cpp">
@@ -45,6 +51,12 @@
     <ClCompile Include="BaseLayerImporter.cpp">
       <Filter>BackTestFileExporterLogic\Base</Filter>
     </ClCompile>
-    <ClCompile Include="FilterLayerDataImporter.cpp" />
+    <ClCompile Include="FilterLayerDataImporter.cpp">
+      <Filter>BackTestFileExporterLogic\FilterLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="TradeLayerDataImporter.cpp">
+      <Filter>BackTestFileExporterLogic\TradeLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="StatisticsLayerDataImporter.cpp" />
   </ItemGroup>
 </Project>

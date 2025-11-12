@@ -13,7 +13,7 @@ void StatisticsLayerDataExporter::AddStatisticsData(DirectionStats* stats)
 	BuildStepsMeanJson(statsJson, stats, CommonDirection::UP);
 	BuildStepsMeanJson(statsJson, stats, CommonDirection::DOWN);
 
-	m_dataSummery.push_back(statsJson);
+	m_dataSummary.push_back(statsJson);
 }
 
 void StatisticsLayerDataExporter::BuildVotedDirectionsJson(nlohmann::json& parentJson, DirectionStats* stats, StatsType sType)
@@ -23,7 +23,7 @@ void StatisticsLayerDataExporter::BuildVotedDirectionsJson(nlohmann::json& paren
 	VotedDirectionStats& dir = stats->GetGroupStats(sType);
 
 	auto votedPercentages = dir.GetVotedPercentages();
-	parentJson[stats->Get_TimePoint()][VOTED_DIRECTIONS_JSON_KEY][StatusType_Utils::GetStatsTypeStr(sType)] = {
+	parentJson[stats->Get_TimePoint()][JsonKey_VotedDirections][StatsType_Utils::GetStatsTypeStr(sType)] = {
 		{ JsonKey_TotalVotes,				dir.getTotal() },
 		{ JsonKey_UP_Percent,				static_cast<int>(votedPercentages[CommonDirection::UP]) },
 		{ JsonKey_DOWN_Percent,			static_cast<int>(votedPercentages[CommonDirection::DOWN]) },

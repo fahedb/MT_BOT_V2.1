@@ -1,6 +1,22 @@
 #include "VotingStruct.h"
 #include <cmath>
 
+void VotedDirectionStats::ImportStatsData(double upPercent, double downPercent, double blurPercent,
+	double meanIndexes, double meanPipsChange,
+	double pureMeanPipsChange_UP, double pureMeanPipsChange_DOWN,
+	double stdDevPipsChange, int totalVotes)
+{
+	Imported_UpPercentage = upPercent;
+	Imported_DownPercentage = downPercent;
+	Imported_BlurPercentage = blurPercent;
+	Imported_Mean_Indexes = meanIndexes;
+	Imported_Mean_PipsChange = meanPipsChange;
+	Imported_PureMeanPipsChange_UP = pureMeanPipsChange_UP;
+	Imported_PureMeanPipsChange_DOWN = pureMeanPipsChange_DOWN;
+	Imported_StdDevPipsChange = stdDevPipsChange;
+	Imported_TotalVotes = totalVotes;
+	importedData_Filled_Flag = true;
+}
 robin_hood::unordered_map<CommonDirection, double> VotedDirectionStats::GetVotedPercentages() // Return percentages for each direction based on weights
 {
 	// Calculate percentages by weights
@@ -13,6 +29,15 @@ robin_hood::unordered_map<CommonDirection, double> VotedDirectionStats::GetVoted
 	for (double w : BlurCounts) blurSum += w;
 	totalSum = upSum + downSum + blurSum;
 	robin_hood::unordered_map<CommonDirection, double> percentages;
+	
+	if(importedData_Filled_Flag)
+	{
+		percentages[CommonDirection::UP] = Imported_UpPercentage;
+		percentages[CommonDirection::DOWN] = Imported_DownPercentage;
+		percentages[CommonDirection::BLUR] = Imported_BlurPercentage;
+		return percentages;
+	}
+
 	if (totalSum > 0.0)
 	{
 		percentages[CommonDirection::UP] = (upSum / totalSum) * 100.0;
@@ -30,6 +55,17 @@ robin_hood::unordered_map<CommonDirection, double> VotedDirectionStats::GetVoted
 }
 
 double VotedDirectionStats::pure_mean(CommonDirection dir) const {
+	
+	if(importedData_Filled_Flag)
+	{
+		if (dir == CommonDirection::UP)
+			return Imported_PureMeanPipsChange_UP;
+		else if (dir == CommonDirection::DOWN)
+			return Imported_PureMeanPipsChange_DOWN;
+		else
+			return 0.0;
+	}
+
 	double total = Total;
 	double sum = 0.0;
 	switch (dir)
@@ -54,12 +90,21 @@ double VotedDirectionStats::pure_mean(CommonDirection dir) const {
 }
 
 double VotedDirectionStats::stddev() const {
+	if(importedData_Filled_Flag)
+	{
+		return Imported_StdDevPipsChange;
+	}
 	if (Total == 0) return 0.0;
 	double avg = mean();
 	return std::sqrt((SumSquaredPips / Total) - (avg * avg));
 }
 
 double VotedDirectionStats::meanIndexes() const {
+	if(importedData_Filled_Flag)
+	{
+		return Imported_Mean_Indexes;
+	}
+
 	int indexesSum = 0;
 
 	for (int i = 0; i < pipsChangeTillIndex.size(); i++)
@@ -105,4 +150,13 @@ void VotedDirectionStats::Add_Weights(CommonDirection dir, double weight)
 	default:
 		break;
 	}
+}
+
+double VotedDirectionStats::mean() const // Mean pips change for all votes
+{
+	if (importedData_Filled_Flag)
+	{
+		return Imported_Mean_PipsChange;
+	}
+	return (Total == 0) ? 0.0 : static_cast<double>(PipsChange_Total) / Total;
 }

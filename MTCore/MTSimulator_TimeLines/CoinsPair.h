@@ -12,6 +12,15 @@ enum class CoinsPair
 class CoinsPairUtils
 {
 public:
+	static CoinsPair Get_PairType(const std::string& pairStr)
+	{
+		if (pairStr == "XAUUSD")
+			return CoinsPair::XAUUSD;
+		else if (pairStr == "EURUSD")
+			return CoinsPair::EURUSD;
+		else
+			return CoinsPair::NONE;
+	}
 	static std::string Get_PairType_str(CoinsPair pair)
 	{
 		switch (pair)

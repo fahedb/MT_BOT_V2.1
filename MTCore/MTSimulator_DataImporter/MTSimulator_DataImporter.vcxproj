@@ -144,7 +144,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Logger;..\MTSimulator_Configurations;..\MTSimulator_MTThreadPool;..\MTSimulator_Casts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Logger;..\MTSimulator_Configurations;..\MTSimulator_MTThreadPool;..\MTSimulator_Casts;..\MTSimulator_TradeManager;..\MTSimulator_Statistics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -159,7 +159,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Logger;..\MTSimulator_Configurations;..\MTSimulator_MTThreadPool;..\MTSimulator_Casts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Logger;..\MTSimulator_Configurations;..\MTSimulator_MTThreadPool;..\MTSimulator_Casts;..\MTSimulator_TradeManager;..\MTSimulator_Statistics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -174,7 +174,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Logger;..\MTSimulator_Configurations;..\MTSimulator_MTThreadPool;..\MTSimulator_Casts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Logger;..\MTSimulator_Configurations;..\MTSimulator_MTThreadPool;..\MTSimulator_Casts;..\MTSimulator_TradeManager;..\MTSimulator_Statistics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -186,11 +186,15 @@
     <ClInclude Include="FilterLayerDataImporter.h" />
     <ClInclude Include="QueueStruct.h" />
     <ClInclude Include="ScoringLayerImporter.h" />
+    <ClInclude Include="StatisticsLayerDataImporter.h" />
+    <ClInclude Include="TradeLayerDataImporter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseLayerImporter.cpp" />
     <ClCompile Include="FilterLayerDataImporter.cpp" />
     <ClCompile Include="ScoringLayerImporter.cpp" />
+    <ClCompile Include="StatisticsLayerDataImporter.cpp" />
+    <ClCompile Include="TradeLayerDataImporter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

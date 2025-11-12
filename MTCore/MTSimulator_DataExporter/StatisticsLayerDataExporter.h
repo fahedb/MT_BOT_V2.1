@@ -2,7 +2,6 @@
 #include "BaseLayerDataExporter.h"
 #include "DirectionStats.h"
 
-#define VOTED_DIRECTIONS_JSON_KEY "VotedDirections"
 class StatisticsLayerDataExporter : public BaseLayerDataExporter
 {
 	protected:

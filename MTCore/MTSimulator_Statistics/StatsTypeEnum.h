@@ -7,7 +7,7 @@ enum class StatsType
 	Highest = 2
 };
 
-class StatusType_Utils
+class StatsType_Utils
 {
 public:
 	static std::string GetStatsTypeStr(StatsType type)

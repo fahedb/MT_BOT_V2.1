@@ -15,4 +15,5 @@ void TradeLayerDataExporter::AddTradeData(OrderEntity* order)
 		{ JsonKey_TakeProfit_pips		, order->Get_TakeProfit() }
 	};
 	m_dataSummary.push_back(orderJson);
+	AutoSubmitAction();
 }

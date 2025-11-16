@@ -92,8 +92,6 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<Change
 		InitComparers(); // Initialize comparers if not already done
 
 	int totalScans = 0;
-
-
 	PatternGodComparerResultsMap resultPerComparer; // Map to hold results for each comparer
 	auto start = std::chrono::high_resolution_clock::now();
 	if(!m_cudaEngine)

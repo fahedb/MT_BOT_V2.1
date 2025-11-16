@@ -13,6 +13,7 @@ QueueStruct<DirectionStats> StatisticsLayerDataImporter::Create_QueueItem(const 
 		throw std::runtime_error("StatisticsLayerDataImporter::Create_QueueItem : JSON parsing error at line " + std::to_string(lineIndex) + ": " + e.what());
 	}
 	DirectionStats dirStats;
+	dirStats.Activate();
 	auto it = jsonData.begin();
 	dirStats.Set_TimePoint(it.key());
 

@@ -10,6 +10,7 @@
 #include "BaseLayerImporter.h"
 
 // Outer: pair<timepoint, pair<history nodes, score>>
+#define ScoringLayer_QueueItemType std::pair<long long, std::vector<std::pair<ChangeNode*, ScoresResult>>>
 class ScoringLayerImporter : public BaseLayerImporter<std::pair<long long, std::vector<std::pair<ChangeNode*, ScoresResult>>>>
 {
 public:
@@ -17,6 +18,7 @@ public:
 	{
 	}
 	virtual QueueStruct<std::pair<long long, std::vector<std::pair<ChangeNode*, ScoresResult>>>> Create_QueueItem(const std::string& line, long lineIndex) override;
+	virtual long long Get_DataTime(const std::pair<long long, std::vector<std::pair<ChangeNode*, ScoresResult>>>& item) override { return item.first; }
 private:
 
 };

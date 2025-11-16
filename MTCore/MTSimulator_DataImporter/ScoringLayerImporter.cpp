@@ -7,7 +7,6 @@ QueueStruct<std::pair<long long, std::vector<std::pair<ChangeNode*, ScoresResult
 {
 	// Data example:
 	// {"20250602010000000":{"ScoredTimePoints":[{"datetime":"20241212183500000","score":35810},{"datetime":"20241212185100000","score":51235},{"datetime":"20241212191800000","score":37025}]}}
-
 	nlohmann::json jsonData;
 	try {
 

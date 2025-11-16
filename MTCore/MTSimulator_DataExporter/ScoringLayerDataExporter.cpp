@@ -12,4 +12,5 @@ void ScoringLayerDataExporter::AddScoringDataSummery(std::string currTP, std::ve
 			});
 	}
 	m_dataSummary.push_back(j);
+	AutoSubmitAction();
 }

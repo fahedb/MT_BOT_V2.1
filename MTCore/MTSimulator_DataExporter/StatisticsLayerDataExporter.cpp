@@ -14,6 +14,7 @@ void StatisticsLayerDataExporter::AddStatisticsData(DirectionStats* stats)
 	BuildStepsMeanJson(statsJson, stats, CommonDirection::DOWN);
 
 	m_dataSummary.push_back(statsJson);
+	AutoSubmitAction();
 }
 
 void StatisticsLayerDataExporter::BuildVotedDirectionsJson(nlohmann::json& parentJson, DirectionStats* stats, StatsType sType)

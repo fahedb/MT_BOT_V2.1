@@ -33,5 +33,5 @@
 #define JsonKey_TakeProfit_pips "TakeProfit_pips"
 
 
-#define DataSummaryKey "Data Summary :"
-#define PoliciesDataKey "Policies Data :"
+#define DataSummaryKey "Data Summary:"
+#define PoliciesDataKey "Policies Data:"

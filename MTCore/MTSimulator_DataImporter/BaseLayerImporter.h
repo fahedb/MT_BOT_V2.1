@@ -18,16 +18,16 @@ public:
 	~BaseLayerImporter();
 
 	void InitMyImporter(); // Need to call this before using the importer
+	void Init_bktstPolicies();
 	QueueStruct<QueueItemType> Get_NextItem(); // Get the next item from the loaded data queue
+	virtual long long Get_DataTime(const QueueItemType& item) = 0; // Pure virtual function to get the data time from the QueueItemType
 protected:
 	virtual QueueStruct<QueueItemType> Create_QueueItem(const std::string& line, long lineIndex) = 0; // Pure virtual function to create a QueueStruct item from a line
-
 	std::string GetNextPoliciesDataLine();
 	std::string GetNextDataSummaryLine();
 
 	void Init_DataSummaryChunk(std::queue<QueueStruct<QueueItemType>>& outData, int chunkSize);
 
-	void Init_bktstPolicies();
 	void Insert_LoadedData_ToQueue(const QueueStruct<QueueItemType>& item);
 	void Merge_LoadedData_FromQueue(std::queue<QueueStruct<QueueItemType>>& inData);
 
@@ -64,6 +64,8 @@ private:
 	HANDLE m_hFile = nullptr;
 	HANDLE m_hMapping = nullptr;
 
+	bool m_policiesInitialized = false;
+
 	bool MapMyFile(); // Map the file into memory
 	char* GetBeginGap(const std::string& endOfThisStr); // Get the pointer to the end of the specified string
 	long GetFileLinesCount(); // Get the total number of lines in the file
@@ -73,3 +75,5 @@ private:
 	}
 
 };
+
+#include "BaseLayerImporter.inl" // Include the template implementation file

@@ -26,7 +26,10 @@ public:
 	LayerType Get_InitializedLayerType() const { return m_initializedLayerType; }
 	template<typename QueueItemType>
 	QueueItemType Get_NextQueueItem(); // Get next queue item from the specified layer importer
-    
+	
+	template<typename QueueItemType>
+	void Insert_BackToFront(QueueItemType item);
+	
 	template<typename QueueItemType>
 	long long Get_MyQueuedItem_TimePoint(const QueueItemType& item) const; // Get next queue item time point from the specified layer importer
 
@@ -62,6 +65,39 @@ QueueItemType InterfaceLayers_BKTSTImporter::Get_NextQueueItem()
 		return QueueItemType();
 
 	return QueueItemType();
+}
+
+template<typename QueueItemType>
+inline void InterfaceLayers_BKTSTImporter::Insert_BackToFront(QueueItemType item)
+{
+	// Important Node: This generic implementation may not be used if specializations exist for specific QueueItemTypes.
+	// This function is just to provide a wide picture of how the logic should work for any QueueItemType :)
+	// In such cases, the specialized versions will be called instead.
+	// Please don't remove the specializations below, as the will cause a compile-time error if not present (Convertion errors, becuase multiple types in same function).
+	QueueStruct<QueueItemType> queueSt;
+	queueSt.item = std::move(item);
+	queueSt.lineIndex = 0;
+	// push into the specified importer
+	LayerType layerT = m_initializedLayerType;
+	if (!ActPreCondition(layerT))
+		return;
+	switch (layerT)
+	{
+	case LayerType::ScoringLayer:
+		m_scoringLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueSt));
+		break;
+	case LayerType::FilterLayer:
+		m_filterLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueSt));
+		break;
+	case LayerType::StatisticsLayer:
+		m_statisticsLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueSt));
+		break;
+	case LayerType::TradeManagementLayer:
+		m_tradeLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueSt));
+		break;
+	case LayerType::NONE:
+		Logger::getInstance().WriteLog("Insert_BackToFront:: Error in LayerType: NONE", false, true, LogType::ERR);
+	}
 }
 
 
@@ -128,6 +164,24 @@ inline long long InterfaceLayers_BKTSTImporter::Get_MyQueuedItem_TimePoint(const
 	return -1;
 }
 
+
+template<>
+inline void InterfaceLayers_BKTSTImporter::Insert_BackToFront(ScoringLayer_QueueItemType item)
+{
+	LayerType layerT = m_initializedLayerType;
+	QueueStruct<ScoringLayer_QueueItemType> queueStruct;
+	queueStruct.item = std::move(item);
+	queueStruct.lineIndex = 0;
+
+	if (layerT == LayerType::ScoringLayer)
+		m_scoringLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueStruct));
+	else if (layerT == LayerType::FilterLayer) // fixed: was checking ScoringLayer twice
+		m_filterLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueStruct));
+	else {
+		Logger::getInstance().WriteLog("Insert_BackToFront:: Error in LayerType: " + std::to_string(static_cast<int>(layerT)), false, true, LogType::ERR);
+	}
+}
+
 // ------------------ Statistics Layer Specialization ------------------
 
 template<>
@@ -148,6 +202,22 @@ inline long long InterfaceLayers_BKTSTImporter::Get_MyQueuedItem_TimePoint(const
 	return m_statisticsLayerImporter->Get_DataTime(item);
 }
 
+
+template<>
+inline void InterfaceLayers_BKTSTImporter::Insert_BackToFront<StatisticsLayer_QueueItemType>(StatisticsLayer_QueueItemType item)
+{
+	QueueStruct<StatisticsLayer_QueueItemType> queueSt;
+	queueSt.item = std::move(item);
+	queueSt.lineIndex = 0;
+
+	// push into statistics importer
+	if (m_initializedLayerType == LayerType::StatisticsLayer)
+		m_statisticsLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueSt));
+	else {
+		Logger::getInstance().WriteLog("Insert_BackToFront:: Error in LayerType for statistics: " + std::to_string(static_cast<int>(m_initializedLayerType)), false, true, LogType::ERR);
+	}
+}
+
 // ------------------ Trade Layer Specialization ------------------
 template<>
 TradeLayer_QueueItemType // This explicit specialization is for trade layer
@@ -166,4 +236,18 @@ inline long long InterfaceLayers_BKTSTImporter::Get_MyQueuedItem_TimePoint(const
 	if (!ActPreCondition(layerT))
 		return -1;
 	return m_tradeLayerImporter->Get_DataTime(item);
+}
+
+template<>
+inline void InterfaceLayers_BKTSTImporter::Insert_BackToFront<TradeLayer_QueueItemType>(TradeLayer_QueueItemType item)
+{
+	QueueStruct<TradeLayer_QueueItemType> queueSt;
+	queueSt.item = std::move(item);
+	queueSt.lineIndex = 0;
+	// push into trade importer
+	if (m_initializedLayerType == LayerType::TradeManagementLayer)
+		m_tradeLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueSt));
+	else {
+		Logger::getInstance().WriteLog("Insert_BackToFront:: Error in LayerType for trade: " + std::to_string(static_cast<int>(m_initializedLayerType)), false, true, LogType::ERR);
+	}
 }

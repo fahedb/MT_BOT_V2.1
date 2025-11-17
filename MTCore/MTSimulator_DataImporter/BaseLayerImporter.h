@@ -6,6 +6,7 @@
 #include <string>
 #include <windows.h>
 #include <mutex>
+#include <deque>
 #include <queue>
 
 #include "TimeLine.h"
@@ -21,6 +22,7 @@ public:
 	void Init_bktstPolicies();
 	QueueStruct<QueueItemType> Get_NextItem(); // Get the next item from the loaded data queue
 	virtual long long Get_DataTime(const QueueItemType& item) = 0; // Pure virtual function to get the data time from the QueueItemType
+	void Insert_LoadedData_ToQueue_Front(QueueStruct<QueueItemType> item) { m_loadedDataQueue.push_front(std::move(item)); }
 protected:
 	virtual QueueStruct<QueueItemType> Create_QueueItem(const std::string& line, long lineIndex) = 0; // Pure virtual function to create a QueueStruct item from a line
 	std::string GetNextPoliciesDataLine();
@@ -41,7 +43,7 @@ private:
 
 	std::mutex m_loadedDataQueue_mutex;
 	
-	std::queue<QueueStruct<QueueItemType>> m_loadedDataQueue; // Queue to hold loaded data items
+	std::deque<QueueStruct<QueueItemType>> m_loadedDataQueue; // Queue to hold loaded data items
 
 	std::mutex m_currentLine_mutex; // Mutex for thread-safe access to m_currentLine
 	long m_currentLine; // The current line index being processed

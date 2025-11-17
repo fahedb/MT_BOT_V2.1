@@ -274,7 +274,9 @@ QueueItemType StrategiesRunner::Get_MyQueuedItem()
 	}
 	else // If the data time is greater than the current time, log error and return empty
 	{
-		Logger::getInstance().WriteLog("StrategiesRunner::Get_ScoringLayer_ImporterData - Data time: " + std::to_string(dataTime) + " is greater than current time: " + std::to_string(currTime) + ", this should not happen!", true, false, LogType::ERR);
+		// Push back the item to the queue front !
+		importer.Insert_BackToFront(std::move(item));
+		Logger::getInstance().WriteLog("StrategiesRunner::Get_ScoringLayer_ImporterData - Data time: " + std::to_string(dataTime) + " is greater than current time: " + std::to_string(currTime) + ", The data inserted back to the front queue", true, false, LogType::ERR);
 		return QueueItemType();
 	}
 

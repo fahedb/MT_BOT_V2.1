@@ -28,7 +28,7 @@ QueueStruct<QueueItemType> BaseLayerImporter<QueueItemType>::Get_NextItem()
 		return QueueStruct<QueueItemType>(); // Return default constructed item if queue is empty
 	}
 	QueueStruct<QueueItemType> item = std::move(m_loadedDataQueue.front());
-	m_loadedDataQueue.pop();
+	m_loadedDataQueue.pop_front();
 	return std::move(item);
 }
 
@@ -173,7 +173,7 @@ template<typename QueueItemType>
 void BaseLayerImporter<QueueItemType>::Insert_LoadedData_ToQueue(const QueueStruct<QueueItemType>& item)
 {
 	std::lock_guard<std::mutex> lock(m_loadedDataQueue_mutex);
-	m_loadedDataQueue.push(std::move(item));
+	m_loadedDataQueue.push_back(std::move(item));
 }
 
 template<typename QueueItemType>
@@ -183,7 +183,7 @@ void BaseLayerImporter<QueueItemType>::Merge_LoadedData_FromQueue(std::queue<Que
 	int counter = 0;
 	while (inData.size())
 	{
-		m_loadedDataQueue.push(std::move(inData.front()));
+		m_loadedDataQueue.push_back(std::move(inData.front()));
 		inData.pop();
 		counter++;
 	}

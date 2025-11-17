@@ -5,11 +5,8 @@
     </LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithChecks|x64'">
+    <LocalDebuggerCommandArguments>-ImportBKTST C:\MTDB\BackTests\bktst1\BKTST_ScoringLayer_1April_To15November.bktst1</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-bktstName 1April_To15November -autoSubmitBKTST 100</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

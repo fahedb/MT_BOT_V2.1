@@ -32,3 +32,6 @@ x64/
 *.opendb
 *.VC.db
 *.session
+*.pyc
+/PYTH/Controller/venv
+/PYTH/Logger/venv

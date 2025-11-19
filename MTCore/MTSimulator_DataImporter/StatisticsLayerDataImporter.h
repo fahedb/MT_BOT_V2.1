@@ -1,12 +1,15 @@
 #pragma once
 #include "BaseLayerImporter.h"
 #include "DirectionStats.h"
+#include "Converts.h"
+#define StatisticsLayer_QueueItemType DirectionStats
 class StatisticsLayerDataImporter : public BaseLayerImporter<DirectionStats>
 {
 	public:
 	StatisticsLayerDataImporter(std::string filePath, std::vector<ChangeNode*>* historyTL, DBMap* historyDBMap) : BaseLayerImporter(filePath, historyTL, historyDBMap)
 	{
 	}
+	virtual long long Get_DataTime(const DirectionStats& item) override { return Converts::ToLongLong(item.Get_TimePoint()); }
 protected:
 	virtual QueueStruct<DirectionStats> Create_QueueItem(const std::string& line, long lineIndex) override;
 

@@ -6,6 +6,8 @@
 #include "ScoreResultsCachePolynom.h"
 #include "ScoreResultsCache.h"
 #include "InterfaceLayers_BKTSTExporter.h"
+#include "InterfaceLayers_BKTSTImporter.h"
+
 #include "Policies.h"
 #include "HttpServerSyncer.h"
 
@@ -71,7 +73,7 @@ void MTScannerUtils::InitPolicyExporters_BeforeScan()
 
 	// Layer 1 Policies initialization
 	layerExporter.SendPolicyData(confs->Get_Policy<ScoringLayerPolicy>(PolicyType::ScoringLayerPolicy), LayerType::ScoringLayer);
-	layerExporter.SendPolicyData(confs->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoringLayerPolicy), LayerType::ScoringLayer);
+	layerExporter.SendPolicyData(confs->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy), LayerType::ScoringLayer);
 
 	// Layer 2 Policies initialization
 	layerExporter.SendPolicyData(confs->Get_Policy<FilterLayerPolicy>(PolicyType::FilterLayerPolicy), LayerType::FilterLayer);
@@ -85,6 +87,15 @@ void MTScannerUtils::InitPolicyExporters_BeforeScan()
 	layerExporter.SendPolicyData(confs->Get_Policy<OrdersPolicy>(PolicyType::OrdersPolicy), LayerType::TradeManagementLayer);
 
 
+}
+
+void MTScannerUtils::InitLayersImporters_BeforeScan(std::vector<ChangeNode*>* hisyoryTl, DBMap* histDBMap)
+{
+	InterfaceLayers_BKTSTImporter& layerImporter = InterfaceLayers_BKTSTImporter::getInstance();
+	layerImporter.Set_HisyoryTL(hisyoryTl, histDBMap);
+	layerImporter.InitImporters();
+	bool isDataAvailable = layerImporter.IsImportedDataAvailable();
+	Logger::getInstance().WriteLog("MTScannerUtils::InitLayersImporters_BeforeScan - Importers initialized. Is data available: " + std::string(isDataAvailable ? "Yes" : "No"), false, true, LogType::LOG);
 }
 
 void MTScannerUtils::ResetLayerExportersIfNeeded()

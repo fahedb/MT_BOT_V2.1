@@ -32,11 +32,12 @@ private:
 
 
 public:
-	DirectionStats(DirectionStats&& other) noexcept;
+	DirectionStats(DirectionStats&& other) noexcept; // Move constructor
 
-	DirectionStats(const DirectionStats& other);
+	DirectionStats(const DirectionStats& other); // Copy constructor
 
-	DirectionStats();
+	DirectionStats(); // Default constructor
+
 
 	~DirectionStats()
 	{
@@ -47,6 +48,7 @@ public:
 		}
 	}
 
+	DirectionStats& operator=(DirectionStats&& other) noexcept; // Move assignment operator
 	DirectionStats& operator=(const DirectionStats&) = delete; // Delete copy assignment operator 
 
 	void								Activate() { m_active = true; }
@@ -68,7 +70,7 @@ public:
 	std::vector<double>					GetAllMeansUpTo(CommonDirection dir, int maxIndex = -1) { return GetStepMeans(dir).GetAllMeansUpTo(maxIndex); }// Ensure the means are calculated for the specified direction
 	std::vector<TimeLineScored>*		Get_SimilarPatterns() { return &m_patterns_wScores; }
 	std::vector < std::pair<int, int>>	Get_Indexes_and_changePips(StatsType sType) { return GetGroupStats(sType).get_Indexes_and_changePips(); }
-	std::string							Get_TimePoint() { return m_timePoint; }
+	std::string							Get_TimePoint() const { return m_timePoint; }
 	CoinsPair							Get_PairCoint(CoinsPair& pair) { return m_pair; }
 	
 	double								stddev(StatsType sType) { return GetGroupStats(sType).stddev(); }

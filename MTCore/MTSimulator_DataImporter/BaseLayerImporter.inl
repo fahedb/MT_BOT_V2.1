@@ -1,3 +1,4 @@
+#pragma once
 #include "BaseLayerImporter.h"
 #include "ConfigsTableStaticProxy.h"
 #include "ThreadPool.h"
@@ -26,9 +27,9 @@ QueueStruct<QueueItemType> BaseLayerImporter<QueueItemType>::Get_NextItem()
 	{
 		return QueueStruct<QueueItemType>(); // Return default constructed item if queue is empty
 	}
-	QueueStruct<QueueItemType> item = m_loadedDataQueue.front();
-	m_loadedDataQueue.pop();
-	return item;
+	QueueStruct<QueueItemType> item = std::move(m_loadedDataQueue.front());
+	m_loadedDataQueue.pop_front();
+	return std::move(item);
 }
 
 template<typename QueueItemType>
@@ -72,6 +73,13 @@ std::string BaseLayerImporter<QueueItemType>::GetNextDataSummaryLine()
 	char* currPtr = m_fileCurrPosition;
 	std::string line;
 	while (currPtr < endPtr) {
+		
+		if(*currPtr == '\r') // Handle Windows line endings
+		{
+			currPtr++; // Move past the carriage return
+			continue;
+		}
+
 		if (*currPtr == '\n') {
 			UpdateCurrLine(m_currentLine + 1); // Update current line index
 			currPtr++; // Move past the newline character
@@ -96,6 +104,12 @@ std::string BaseLayerImporter<QueueItemType>::GetNextPoliciesDataLine()
 	char* currPtr = m_fileCurrPosition;
 	std::string line;
 	while (currPtr < endPtr) {
+		if(*currPtr == '\r') // Handle Windows line endings
+		{
+			currPtr++; // Move past the carriage return
+			continue;
+		}
+
 		if (*currPtr == '\n') {
 			currPtr++; // Move past the newline character
 			break;
@@ -112,10 +126,16 @@ void BaseLayerImporter<QueueItemType>::Init_DataSummaryChunk(std::queue<QueueStr
 {
 	int counter = 0;
 	std::string line = GetNextDataSummaryLine();
+	
+	if(line.empty())
+	{
+		line = GetNextDataSummaryLine(); // Try to get the next line if the first is empty
+	}
+
 	while(!line.empty() && counter < chunkSize)
 	{
 		QueueStruct<QueueItemType> item = Create_QueueItem(line, m_currentLine);
-		outData.push(item); // Add item to output queue
+		outData.push(std::move(item)); // Add item to output queue
 		counter++; // Increment counter
 		line = GetNextDataSummaryLine();
 	}
@@ -124,7 +144,14 @@ void BaseLayerImporter<QueueItemType>::Init_DataSummaryChunk(std::queue<QueueStr
 template<typename QueueItemType>
 void BaseLayerImporter<QueueItemType>::Init_bktstPolicies()
 {
+	if(m_policiesInitialized)
+		return; // Already initialized
+	
 	std::string line = GetNextPoliciesDataLine();
+	if (line.empty())
+	{
+		line = GetNextPoliciesDataLine(); // Try to get the next line if the first is empty
+	}
 	// Example for config in bktst file: SOFTMAX_T_PARAM_FOR_VOTING=0.5
 	// Need to break the line into key and value
 	while (!line.empty())
@@ -138,13 +165,15 @@ void BaseLayerImporter<QueueItemType>::Init_bktstPolicies()
 		}
 		line = GetNextPoliciesDataLine();
 	}
+	m_policiesInitialized = true;
+	m_fileCurrPosition = m_dataSummaryStartPtr; // Reset position to start of data summary
 }
 
 template<typename QueueItemType>
 void BaseLayerImporter<QueueItemType>::Insert_LoadedData_ToQueue(const QueueStruct<QueueItemType>& item)
 {
 	std::lock_guard<std::mutex> lock(m_loadedDataQueue_mutex);
-	m_loadedDataQueue.push(item);
+	m_loadedDataQueue.push_back(std::move(item));
 }
 
 template<typename QueueItemType>
@@ -154,7 +183,7 @@ void BaseLayerImporter<QueueItemType>::Merge_LoadedData_FromQueue(std::queue<Que
 	int counter = 0;
 	while (inData.size())
 	{
-		m_loadedDataQueue.push(inData.front());
+		m_loadedDataQueue.push_back(std::move(inData.front()));
 		inData.pop();
 		counter++;
 	}

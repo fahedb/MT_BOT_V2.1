@@ -10,7 +10,8 @@
 #include "HttpServerSyncer.h"
 #include <future>
 #include "PatternGod.h"
-
+#include "StatisticsDecession.h"
+#include "LayersEnums.h"
 
 /// <summary>	
 /// StrategiesRunner class for running
@@ -50,5 +51,20 @@ private:
 	void Run_PatternGod(TimeLine& historyTimeLine);
 	bool OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator, TimeLine* history);
 	bool ScanPreCondition(); // Precondition function before start scanning
-};
 
+private: // Get data from importers functions 
+	std::vector<std::pair<ChangeNode*, ScoresResult>> ScoringLayerRun(PatternGod* patternScan);
+	std::vector<std::pair<ChangeNode*, ScoresResult>> FilterLayerRun(PatternGod* patternScan, std::vector<std::pair<ChangeNode*, ScoresResult>>& results);
+	DirectionStats StatisticsLayerRun(StatisticsDecession* statisticsCalcucator, std::vector<std::pair<ChangeNode*, ScoresResult>> results, TimeLine* historyTL, std::vector<ChangeNode*>* currTL);
+	std::unique_ptr<OrderEntity> TradeLayerRun(DirectionStats&);
+
+	std::vector<std::pair<ChangeNode*, ScoresResult>> Get_ScoringLayer_ImporterData_NextItem();
+	std::vector<std::pair<ChangeNode*, ScoresResult>> Get_FilterLayer_ImporterData_NextItem();
+	DirectionStats Get_StatisticsLayer_ImporterData_NextItem();
+	std::unique_ptr<OrderEntity> Get_TradeLayer_ImporterData_NextItem();
+
+	template<typename QueueItemType>
+	QueueItemType Get_MyQueuedItem();
+
+	LayerType GetInitializedImporterLayerType();
+};

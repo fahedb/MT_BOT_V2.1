@@ -82,6 +82,7 @@ void PatternGodUtils::filterByHighScores(std::vector<std::pair<ChangeNode*, Scor
 void PatternGodUtils::filterByThresholdScore(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D, double thresholdPercent)
 {
 	if (nodesResults2D.empty()) return;
+
 	double maxScore = nodesResults2D.front().second.totalScore.total;
 	double thresholdRatio = thresholdPercent; // score that is at least 95% of the max score
 

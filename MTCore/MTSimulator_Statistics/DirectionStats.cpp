@@ -1,5 +1,34 @@
 #include "DirectionStats.h"
 #include "Logger.h"
+DirectionStats& DirectionStats::operator=(DirectionStats&& other) noexcept
+{
+	if (this != &other)
+	{
+		if (m_currPattern)
+		{
+			delete m_currPattern;
+			m_currPattern = nullptr;
+		}
+
+		general = std::move(other.general);
+		first = std::move(other.first);
+		highest = std::move(other.highest);
+
+		stepsMean_General = std::move(other.stepsMean_General);
+		stepsMean_PurePositive = std::move(other.stepsMean_PurePositive);
+		stepsMean_PureNegative = std::move(other.stepsMean_PureNegative);
+
+		m_patterns_wScores = std::move(other.m_patterns_wScores);
+		m_currPattern = other.m_currPattern;
+		other.m_currPattern = nullptr;
+
+		m_tradeRes = other.m_tradeRes;
+		m_active = other.m_active;
+		m_timePoint = std::move(other.m_timePoint);
+		m_pair = std::move(other.m_pair);
+	}
+	return *this;
+}
 
 DirectionStats::DirectionStats(DirectionStats&& other) noexcept
 	: m_patterns_wScores(std::move(other.m_patterns_wScores)),

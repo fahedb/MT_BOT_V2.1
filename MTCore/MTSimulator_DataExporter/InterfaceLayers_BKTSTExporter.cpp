@@ -33,7 +33,10 @@ InterfaceLayers_BKTSTExporter::InterfaceLayers_BKTSTExporter()
 {
     std::string bktstName = ProccessFlags::GetSwitch("-bktstName");
     if (!bktstName.empty())
+    {
         InitExporters(bktstName);
+        m_bktstName = bktstName;
+    }
 }
 
 void InterfaceLayers_BKTSTExporter::InitExporters(std::string bktstName)
@@ -69,6 +72,9 @@ void InterfaceLayers_BKTSTExporter::ResetExporters(std::string newbktstName)
 
 void InterfaceLayers_BKTSTExporter::SendPolicyData(BasePolicy* policy, LayerType layerT)
 {
+    if(!policy)
+		return;
+
     if(!ActPreCondition())
         return;
     switch (layerT)

@@ -14,6 +14,11 @@ protected:
 	std::vector<nlohmann::json> m_dataSummary;
 	std::string m_filePath;
 	virtual LayerType GetLayerType() const = 0;
+	int m_autoSubmit = 0;
+	int m_autoSubmitCounter = 0;
+	bool m_firstSubmitDone = false;
+
+	void AutoSubmitAction();
 public:
 	BaseLayerDataExporter(std::string name = "");
 	virtual void AddPolicyData(BasePolicy* policy);

@@ -1,8 +1,9 @@
 #include "StrategiesRunner.h"
 #include "MTScannerUtils.h"
 #include "TimeLineBuilder.h"
-
+#include "Converts.h"
 #include "InterfaceLayers_BKTSTExporter.h"
+#include "InterfaceLayers_BKTSTImporter.h"
 
 void StrategiesRunner::Run_PatternGod(TimeLine& historyTimeLine)
 {
@@ -23,12 +24,17 @@ void StrategiesRunner::Run_PatternGod(TimeLine& historyTimeLine)
 	int scanNumber = 0;
 	
 	MTScannerUtils::InitPolicyExporters_BeforeScan(); // Init all exporters policies before starting the scan loop
-	
+	MTScannerUtils::InitLayersImporters_BeforeScan(historyTimeLine.Get_TimeLine(), historyTimeLine.Get_DBMap()); // Init all importers before starting the scan loop if needed
+
 	while (true)
 	{
 		HttpServerSyncer::UpdateCurrentTimeLine(&table);
+		std::chrono::steady_clock::time_point scanStartTime = std::chrono::steady_clock::now();
 		MTScannerUtils::ScoreResultsCacheCleanLogic(OneMinutePatternGodLogic(&patternScaner, &statisticsCalcucator, &historyTimeLine), m_scansCounter); // Start scanning
-		
+		std::chrono::steady_clock::time_point scanEndTime = std::chrono::steady_clock::now();
+		auto scanDuration = std::chrono::duration_cast<std::chrono::milliseconds>(scanEndTime - scanStartTime).count();
+		logger.WriteLog("Total Scan Duration: " + std::to_string(scanDuration) + " ms", false, true, LogType::LOG);
+
 		scanNumber++;
 		//if (scanNumber % 5 == 0) // Every 5 scans refresh the policies
 			HttpServerSyncer::UpdateConfigs();
@@ -59,41 +65,23 @@ bool StrategiesRunner::OneMinutePatternGodLogic(PatternGod* patternScan, Statist
 	Logger& logger = Logger::getInstance();
 
 	// Layer 1, This layer should score patterns from the history and get top X patterns
-	if (patternScan->ScanForOneMinPatterns_MultiThreaded(results)) // Scan for patterns
-	{
-		InterfaceLayers_BKTSTExporter::getInstance().SendSummeryData_ScoringLayer(m_lastTimePoint, results); // Export the scoring data
+	results = ScoringLayerRun(patternScan);
 
 		// Layer 2, This layer should filter out unwanted results
-		patternScan->PolynomEngineFilter(results);
-		InterfaceLayers_BKTSTExporter::getInstance().SendFilteredData_FilterLayer(m_lastTimePoint, results); // Export the filtered scoring data
+	results = FilterLayerRun(patternScan, results);
 
-		// Start building stats 
-		logger.WriteLog("Start detecting common direction...", false, false);
+	// Layer 3, This layer should build the statistics data and export it
+	logger.WriteLog("Start detecting common direction...", false, false);
+	DirectionStats stats = StatisticsLayerRun(statisticsCalcucator, results, history, currentTimeLine);
+	logger.WriteLog("Done detecting common direction.", false, false);
 
-		DirectionStats stats = statisticsCalcucator->DetectCommonDirection(&results);
-		InterfaceLayers_BKTSTExporter::getInstance().SendStatisticsData_StatisticsLayer(&stats); // Export the direction stats data
-		logger.WriteLog("Done detecting common direction.", false, false);
-		// -----------------------------------------------------------------------------------------------------
-		// -----------------------------------------------------------------------------------------------------
-
-		// Layer 3, This layer should build the statistics data and export it
-		std::vector<TimeLineScored> similarPatterns = TimeLineBuilder::Build_TimeLineScored_Patterns(history, &results, currentTimeLine->size(), Configrations::getInstance()->Get_Policy<PatternGodStatisticsPolicy>(PolicyType::PatternGodStatisticsPolicy)->Score_Future_Vision_Candles);
-		stats.Add_Patterns(&similarPatterns, true);
-		stats.Add_CurrPattern(TimeLine(new std::vector<ChangeNode*>(*currentTimeLine), true));
-
-		// Start checking for petential trade through stats
-		logger.WriteLog("Start Checking for a potentail trade...", false, false);
-		// Layer 4, This layer should check for a potentail trade based on the stats generated
-		OrderEntity* tradeRes = tradeMngr->CheckForTrade_PatternGod(stats);
-		if (tradeRes && tradeRes->IsActive())
-			InterfaceLayers_BKTSTExporter::getInstance().SendTradeData_TradeLayer(tradeRes); // Export the trade decession data
-
-		DataExporter::Export_All_Statistics_Data(stats, tradeRes ? tradeRes->IsActive() : false);
-		DirectionStatsCache::getInstance()->Add_NewStat(stats, true);
-	}
-	else
-		logger.WriteLog("Didn't find any patterns with min score !!", false, true);
-
+	// Start checking for petential trade through stats
+	logger.WriteLog("Start Checking for a potentail trade...", false, false);
+	// Layer 4, This layer should check for a potentail trade based on the stats generated
+	std::unique_ptr<OrderEntity> tradeRes = TradeLayerRun(stats);
+		
+	DataExporter::Export_All_Statistics_Data(stats, tradeRes ? tradeRes->IsActive() : false);
+	DirectionStatsCache::getInstance()->Add_NewStat(stats, true);
 	logger.WriteLog("Done scanning and exporting data.");
 	return true;
 
@@ -132,4 +120,164 @@ bool StrategiesRunner::ScanPreCondition()
 	HttpServerSyncer::Set_IsScanning(true);
 	
 	return true;
+}
+
+std::vector<std::pair<ChangeNode*, ScoresResult>> StrategiesRunner::ScoringLayerRun(PatternGod* patternScan)
+{
+
+	std::vector<std::pair<ChangeNode*, ScoresResult>> results; // Vector for the End of every time period
+
+	LayerType initializedLayer = GetInitializedImporterLayerType();
+	if (static_cast<int>(initializedLayer) > static_cast<int>(LayerType::ScoringLayer))
+		return results; // If the importer is initialized to a layer after this one, return empty results
+	
+	if (initializedLayer == LayerType::ScoringLayer)
+	{
+		results = Get_FilterLayer_ImporterData_NextItem(); // Clear the filter layer data from the importer queue
+		return results; // If data is available from the importer, return it directly
+	}
+	
+	// Layer 1, This layer should score patterns from the history and get top X patterns
+	if (patternScan->ScanForOneMinPatterns_MultiThreaded(results)) // Scan for patterns
+	{
+		InterfaceLayers_BKTSTExporter::getInstance().SendSummeryData_ScoringLayer(m_lastTimePoint, results); // Export the scoring data
+	}
+	return results;
+}
+
+std::vector<std::pair<ChangeNode*, ScoresResult>> StrategiesRunner::FilterLayerRun(PatternGod* patternScan,std::vector<std::pair<ChangeNode*, ScoresResult>>& results)
+{
+	std::vector<std::pair<ChangeNode*, ScoresResult>> importedResults;
+	LayerType initializedLayer = GetInitializedImporterLayerType();
+	if (static_cast<int>(initializedLayer) > static_cast<int>(LayerType::FilterLayer))
+		return importedResults; // If the importer is initialized to a layer after this one, return empty results
+	
+	if (initializedLayer == LayerType::FilterLayer)
+	{
+		importedResults = Get_FilterLayer_ImporterData_NextItem(); // Clear the filter layer data from the importer queue
+		return importedResults; // If data is available from the importer, return it directly
+	}
+
+	// Layer 2, This layer should filter out unwanted results
+	if (patternScan->PolynomEngineFilter(results))
+	{
+		InterfaceLayers_BKTSTExporter::getInstance().SendFilteredData_FilterLayer(m_lastTimePoint, results); // Export the filtered scoring data
+	}
+	return results;
+}
+
+DirectionStats StrategiesRunner::StatisticsLayerRun(StatisticsDecession* statisticsCalcucator, std::vector<std::pair<ChangeNode*, ScoresResult>> results, TimeLine* historyTL, std::vector<ChangeNode*>* currTL)
+{ // Layer 3, This layer should build the statistics data and export it
+	LayerType initializedLayer = GetInitializedImporterLayerType();
+	
+	if (static_cast<int>(initializedLayer) > static_cast<int>(LayerType::StatisticsLayer))
+		return DirectionStats(); // If the importer is initialized to a layer after this one, return empty results
+	if(initializedLayer == LayerType::StatisticsLayer)
+	{
+		DirectionStats importedStats = Get_StatisticsLayer_ImporterData_NextItem(); // Clear the statistics layer data from the importer queue
+		return importedStats; // If data is available from the importer, return it directly
+	}
+	
+	DirectionStats stats = statisticsCalcucator->DetectCommonDirection(&results);
+	InterfaceLayers_BKTSTExporter::getInstance().SendStatisticsData_StatisticsLayer(&stats); // Export the direction stats data
+	// Layer 3, This layer should build the statistics data and export it
+	std::vector<TimeLineScored> similarPatterns = TimeLineBuilder::Build_TimeLineScored_Patterns(historyTL, &results, currTL->size(), Configrations::getInstance()->Get_Policy<PatternGodStatisticsPolicy>(PolicyType::PatternGodStatisticsPolicy)->Score_Future_Vision_Candles);
+	stats.Add_Patterns(&similarPatterns, true);
+	stats.Add_CurrPattern(TimeLine(new std::vector<ChangeNode*>(*currTL), true));
+
+	return stats;
+}
+
+std::unique_ptr<OrderEntity> StrategiesRunner::TradeLayerRun(DirectionStats& stats)
+{
+	// Layer 4, This layer should check for a potentail trade based on the stats generated
+	TradesManager* tradeMngr = TradesManager::getInstance();
+	LayerType initializedLayer = GetInitializedImporterLayerType();
+	OrderEntity* tradeRes = nullptr;
+
+	if (initializedLayer == LayerType::TradeManagementLayer)
+		tradeRes = tradeMngr->CheckForTrade_PatternGod(stats);
+
+	if (tradeRes && tradeRes->IsActive())
+		InterfaceLayers_BKTSTExporter::getInstance().SendTradeData_TradeLayer(tradeRes); // Export the trade decession data
+	if(!tradeRes)
+		return nullptr;
+	return std::make_unique<OrderEntity>(*tradeRes);
+}
+
+std::vector<std::pair<ChangeNode*, ScoresResult>> StrategiesRunner::Get_ScoringLayer_ImporterData_NextItem()
+{
+	ScoringLayer_QueueItemType item = Get_MyQueuedItem<ScoringLayer_QueueItemType>();
+	return item.second;
+}
+
+std::vector<std::pair<ChangeNode*, ScoresResult>> StrategiesRunner::Get_FilterLayer_ImporterData_NextItem()
+{
+	FilterLayer_QueueItemType item = Get_MyQueuedItem<FilterLayer_QueueItemType>();
+	return item.second;
+}
+
+DirectionStats StrategiesRunner::Get_StatisticsLayer_ImporterData_NextItem()
+{
+	StatisticsLayer_QueueItemType item = Get_MyQueuedItem<StatisticsLayer_QueueItemType>();
+	return item;
+}
+
+std::unique_ptr<OrderEntity> StrategiesRunner::Get_TradeLayer_ImporterData_NextItem()
+{
+	TradeLayer_QueueItemType item = Get_MyQueuedItem<TradeLayer_QueueItemType>();
+	return std::move(item);
+}
+
+LayerType StrategiesRunner::GetInitializedImporterLayerType()
+{
+	InterfaceLayers_BKTSTImporter& importer = InterfaceLayers_BKTSTImporter::getInstance();
+	return importer.Get_InitializedLayerType();
+}
+
+
+template<typename QueueItemType>
+QueueItemType StrategiesRunner::Get_MyQueuedItem()
+{
+	InterfaceLayers_BKTSTImporter& importer = InterfaceLayers_BKTSTImporter::getInstance();
+	if (!importer.IsImportedDataAvailable())
+	{
+		Logger::getInstance().WriteLog("StrategiesRunner::Get_ScoringLayer_ImporterData - Imported data is not available!", true, false, LogType::ERR);
+		return {};
+	}
+	auto item(std::move(importer.Get_NextQueueItem<QueueItemType>()));
+	long long dataTime = importer.Get_MyQueuedItem_TimePoint(item);
+	long long currTime = Converts::ToLongLong(m_lastTimePoint);
+
+	if (dataTime == currTime) // 20250602010000000 -- YYYYMMDDHHMMSSMMM
+		return item;
+
+	if (currTime > dataTime) // If the data time is less than the current time by 1 hour, loop till you get the right data
+	{
+		if (currTime - dataTime < 6000000)
+		{
+
+			while (dataTime < currTime)
+			{
+				Logger::getInstance().WriteLog("StrategiesRunner::Get_ScoringLayer_ImporterData - Skipping old data time: " + std::to_string(dataTime) + " Current time: " + std::to_string(currTime), true, false, LogType::ERR);
+				item = std::move(importer.Get_NextQueueItem<QueueItemType>());
+				dataTime = importer.Get_MyQueuedItem_TimePoint(item);
+			}
+			if (dataTime == currTime)
+				return item;
+		}
+		else
+		{
+			Logger::getInstance().WriteLog("StrategiesRunner::Get_ScoringLayer_ImporterData - Data time: " + std::to_string(dataTime) + " is too old compared to current time: " + std::to_string(currTime) + ", skipping all old data.", true, false, LogType::ERR);
+			return QueueItemType();
+		}
+	}
+	else // If the data time is greater than the current time, log error and return empty
+	{
+		// Push back the item to the queue front !
+		importer.Insert_BackToFront(std::move(item));
+		Logger::getInstance().WriteLog("StrategiesRunner::Get_ScoringLayer_ImporterData - Data time: " + std::to_string(dataTime) + " is greater than current time: " + std::to_string(currTime) + ", The data inserted back to the front queue", true, false, LogType::ERR);
+		return QueueItemType();
+	}
+
 }

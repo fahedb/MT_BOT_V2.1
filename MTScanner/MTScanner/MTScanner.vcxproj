@@ -154,7 +154,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Fahed\Documents\GitHub\MT_BOT_V2.1\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator\;$(SolutionDir)..\HTTPCore;C:\Users\Fahed\Documents\GitHub\MT_BOT_V2.1\vcpkg\installed\x64-windows\include;C:\Users\Fahed\Documents\GitHub\MT_BOT_V2.1\vcpkg\installed\x64-windows\include\nlohmann;C:\Users\Fahed\Documents\GitHub\MT_BOT_V2.1\vcpkg\installed\x64-windows\include\nlohmann</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Casts;..\..\MTCore\MTSimulator_CudaCalcs;..\..\MTCore\MTSimulator_DataBaseConnection;..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager;..\..\MTCore\CUDA_UNIT;..\..\MTCore\MTSimulator_DataImporter</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <Optimization>Disabled</Optimization>
@@ -176,7 +176,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_DataBaseConnection;..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager;..\..\MTCore\CUDA_UNIT</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Casts;..\..\MTCore\MTSimulator_CudaCalcs;..\..\MTCore\MTSimulator_DataBaseConnection;..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager;..\..\MTCore\CUDA_UNIT;..\..\MTCore\MTSimulator_DataImporter</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>MaxSpeed</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -201,7 +201,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_CudaCalcs;..\..\MTCore\MTSimulator_DataBaseConnection;..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager;..\..\MTCore\CUDA_UNIT</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Casts;..\..\MTCore\MTSimulator_CudaCalcs;..\..\MTCore\MTSimulator_DataBaseConnection;..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager;..\..\MTCore\CUDA_UNIT;..\..\MTCore\MTSimulator_DataImporter</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>

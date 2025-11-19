@@ -233,7 +233,8 @@ void CudaEngine_ScoreCalcs::ResultStreamSetup(float** dataSt, int resSize, bool 
 void CudaEngine_ScoreCalcs::ResetResultStreamsToZero()
 {
 	CPP_To_Cuda_Tunnel::Reset_TotalScores_D_To0(); // Reset total scores in CUDA tunnel
-	memset(m_h_totalScores, 0, sizeof(float) * m_currentData->size());
+	int totalScoreSize = (m_historicData->size() - m_currentData->size());
+	memset(m_h_totalScores, 0, sizeof(float) * totalScoreSize);
 
 }
 
@@ -291,9 +292,9 @@ void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, Score
 		RunScan_TwoIndicatorsRatio(indT);
 	}
 	CPP_To_Cuda_Tunnel::SyncCUDADevice(); // Wait for all CUDA calculations to complete
-	CPP_To_Cuda_Tunnel::Get_ResultsFromDevice(m_h_totalScores, static_cast<int>(m_currentData->size()));
-	// TODO: Collect results from m_h_totalScores and populate resultNodes2D
 	int limit = static_cast<int>(m_historicData->size() - m_currentData->size());
+	CPP_To_Cuda_Tunnel::Get_ResultsFromDevice(m_h_totalScores, limit);
+	// TODO: Collect results from m_h_totalScores and populate resultNodes2D
 	int maxScore = m_h_totalScores[0];
 	
 	for (size_t i = 0; i < limit; i++)

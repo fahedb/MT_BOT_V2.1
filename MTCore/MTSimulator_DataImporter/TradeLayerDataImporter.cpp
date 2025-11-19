@@ -2,6 +2,8 @@
 #include "Converts.h"
 #include "nlohmann\json.hpp"
 
+long long TradeLayerDataImporter::Get_DataTime(const std::unique_ptr<OrderEntity>& item) { return Converts::ToLongLong(item->Get_TimePoint()); }
+
 QueueStruct<std::unique_ptr<OrderEntity>> TradeLayerDataImporter::Create_QueueItem(const std::string& line, long lineIndex)
 {
 	// Direct sons: 
@@ -38,5 +40,5 @@ QueueStruct<std::unique_ptr<OrderEntity>> TradeLayerDataImporter::Create_QueueIt
 	QueueStruct<std::unique_ptr<OrderEntity>> queueItem;
 	queueItem.item = std::make_unique<OrderEntity>(std::move(order));
 	queueItem.lineIndex = lineIndex;
-
+	return queueItem;
 }

@@ -90,6 +90,11 @@ void OnTick()
          if(m_backTestBarCounter < 90)
             {
                m_backTestBarCounter++;
+               if(current_min >0)
+                  m_minSwitch= true;
+               else
+                  m_minSwitch= false;
+               last_min=current_min;
                return;
             }
           if(m_backTestBarCounter == 90)

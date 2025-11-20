@@ -17,5 +17,9 @@ public:
 	static void Get_ResultsFromDevice(float* h_outScores, int numOfResults);
 	static bool IsCudaAvailable();
 	static void SyncCUDADevice();
+
+	////////////////// Testing Functions /////////////////////////////////////////////////
+	static void Get_newPrevIdx0Scores_FromDevice(float* h_outScores, int numOfResults);
+	static void Get_oldPrevIdx0Scores_FromDevice(float* h_outScores, int numOfResults);
 };
 

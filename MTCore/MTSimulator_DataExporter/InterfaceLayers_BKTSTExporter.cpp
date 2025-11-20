@@ -31,7 +31,7 @@ T* InterfaceLayers_BKTSTExporter::GetLayerExporter(LayerType layerT)
 
 InterfaceLayers_BKTSTExporter::InterfaceLayers_BKTSTExporter()
 {
-    std::string bktstName = ProccessFlags::GetSwitch("-bktstName");
+    std::string bktstName = ProccessFlags::GetSwitch("-ExportbktstName");
     if (!bktstName.empty())
     {
         InitExporters(bktstName);

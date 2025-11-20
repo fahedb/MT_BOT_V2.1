@@ -280,6 +280,16 @@ void CudaEngine_ScoreCalcs::Initialize()
 
 void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D, int scoreToAct)
 {
+	///////////////// Need to delete this after done testing //////////////////////////////////////
+	if(!m_h_newPrevIdx0Scores)
+		m_h_newPrevIdx0Scores = new float[m_historicData->size() - m_currentData->size()];
+	if(!m_h_oldPrevIdx0Scores)
+		m_h_oldPrevIdx0Scores = new float[m_historicData->size() - m_currentData->size()];
+	memset(m_h_newPrevIdx0Scores, 0, sizeof(float) * (m_historicData->size() - m_currentData->size()));
+	memset(m_h_oldPrevIdx0Scores, 0, sizeof(float) * (m_historicData->size() - m_currentData->size()));
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 	ResetResultStreamsToZero();
 
 	for (auto indT : glob_indType_CudaEngine.types)
@@ -294,6 +304,10 @@ void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, Score
 	CPP_To_Cuda_Tunnel::SyncCUDADevice(); // Wait for all CUDA calculations to complete
 	int limit = static_cast<int>(m_historicData->size() - m_currentData->size());
 	CPP_To_Cuda_Tunnel::Get_ResultsFromDevice(m_h_totalScores, limit);
+
+	CPP_To_Cuda_Tunnel::Get_newPrevIdx0Scores_FromDevice(m_h_newPrevIdx0Scores, limit); // Just for testing
+	CPP_To_Cuda_Tunnel::Get_oldPrevIdx0Scores_FromDevice(m_h_oldPrevIdx0Scores, limit); // Just for testing
+
 	// TODO: Collect results from m_h_totalScores and populate resultNodes2D
 	int maxScore = m_h_totalScores[0];
 	
@@ -308,6 +322,8 @@ void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, Score
 
 			ScoresResult scoreResult;//= CombineAllResults_ForIdx(i, m_h_results);
 			scoreResult.totalScore.total = static_cast<int>(m_h_totalScores[i]);
+			scoreResult.totalScore.m_scores[0] = m_h_newPrevIdx0Scores[i]; // Just for testing
+			scoreResult.totalScore.m_scores[1] = m_h_oldPrevIdx0Scores[i]; // Just for testing
 			scoreResult.SetLockedResult(true);
 			resultNodes2D.push_back(std::make_pair(m_historicData->at(i + m_currentData->size() - 1), scoreResult));
 		}
@@ -321,7 +337,7 @@ void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, Score
 		m_useFullScan = true; // Reset to full scan every SCAN_NUMS_TO_FULL_SCAN scans
 	}
 	else
-		m_useFullScan = false;
+		m_useFullScan = true; // TEMPORARY: Always use full scan for now
 
 	m_scanCounter++;
 }

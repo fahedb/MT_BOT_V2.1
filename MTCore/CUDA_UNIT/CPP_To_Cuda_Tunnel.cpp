@@ -8,13 +8,14 @@
 
 #include <iostream>
 
-#define USE_TILED_CALCS_SCORECALCS 0
+#define USE_TILED_CALCS_SCORECALCS 1
 
 dataStream_t* g_HistDataStream = nullptr;
 dataStream_t* g_CurrDataStream = nullptr;
 
-float* g_prevIdx0Scores_D = nullptr;
-int g_prevIdx0ScoresSize_D = 0;
+float* g_newPrevIdx0Scores_D = nullptr;
+float* g_oldPrevIdx0Scores_D = nullptr;
+int g_prevIdx0ScoresSize_D = 0; // size for both old and new arrays
 
 float* g_prevScanTotalScores_D = nullptr;
 int g_prevScanTotalScoresSize_D = 0;
@@ -26,15 +27,17 @@ void CPP_To_Cuda_Tunnel::Set_TotalScore_D_Memory(size_t size)
 {
 	CudaMemoryAllocation(&g_totalScores_D, size);
 	CudaMemoryAllocation(&g_prevScanTotalScores_D, size);
-	CudaMemoryAllocation(&g_prevIdx0Scores_D, size);
+	CudaMemoryAllocation(&g_newPrevIdx0Scores_D, size);
+	CudaMemoryAllocation(&g_oldPrevIdx0Scores_D, size);
 
 	g_totalScoresSize_D = size;
 	g_prevScanTotalScoresSize_D = size;
 	g_prevIdx0ScoresSize_D = size;
 
-	cudaMemset(g_prevScanTotalScores_D, 0, sizeof(float) * size);
-	cudaMemset(g_prevIdx0Scores_D, 0, sizeof(float) * size);
 	cudaMemset(g_totalScores_D, 0, sizeof(float) * size);
+	cudaMemset(g_prevScanTotalScores_D, 0, sizeof(float) * size);
+	cudaMemset(g_newPrevIdx0Scores_D, 0, sizeof(float) * size);
+	cudaMemset(g_oldPrevIdx0Scores_D, 0, sizeof(float) * size);
 }
 void CPP_To_Cuda_Tunnel::Reset_TotalScores_D_To0()
 {
@@ -43,9 +46,18 @@ void CPP_To_Cuda_Tunnel::Reset_TotalScores_D_To0()
 	g_prevScanTotalScores_D = g_totalScores_D; // Now prev has the current total scores
 	g_totalScores_D = temp; // Now current has the previous total scores -- Need to reset to 0
 
+	// Need to swap pointer between old and new prev idx0 scores -- Doing this way to avoid memory copy (faster)
+	temp = g_oldPrevIdx0Scores_D;
+	g_oldPrevIdx0Scores_D = g_newPrevIdx0Scores_D;
+	g_newPrevIdx0Scores_D = temp;
+
 	if (g_totalScores_D && g_totalScoresSize_D > 0) // Reset current total scores to 0
 	{
 		cudaMemset(g_totalScores_D, 0, sizeof(float) * g_totalScoresSize_D);
+	}
+	if (g_newPrevIdx0Scores_D && g_prevIdx0ScoresSize_D > 0) // Reset new prev idx0 scores to 0
+	{
+		cudaMemset(g_newPrevIdx0Scores_D, 0, sizeof(float) * g_prevIdx0ScoresSize_D);
 	}
 }
 
@@ -83,23 +95,23 @@ void CPP_To_Cuda_Tunnel::Calc_TwoIndicatorsRatio_ScoreCalcs(float* h_outScores, 
 		{
 			TwoIndCalc_tiled(histInd_X_values, histInd_X_slopes, currInd_X_values, currInd_X_slopes,
 				histInd_Y_values, histInd_Y_slopes, currInd_Y_values, currInd_Y_slopes,
-				d_results, g_prevIdx0Scores_D, currSize, histSize, weight);
+				d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
 		}
 		else
 		{
 			TwoIndCalc(histInd_X_values, histInd_X_slopes, currInd_X_values, currInd_X_slopes,
 				histInd_Y_values, histInd_Y_slopes, currInd_Y_values, currInd_Y_slopes,
-				d_results, g_prevIdx0Scores_D, currSize, histSize, weight);
+				d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
 		}
 	}
 	else {
 		TwoIndCalc_SlidingWindow(histInd_X_values, histInd_X_slopes, currInd_X_values, currInd_X_slopes,
 			histInd_Y_values, histInd_Y_slopes, currInd_Y_values, currInd_Y_slopes,
-			d_results, g_prevScanTotalScores_D, g_prevIdx0Scores_D,
+			d_results, g_prevScanTotalScores_D, g_newPrevIdx0Scores_D, g_oldPrevIdx0Scores_D,
 			currSize, histSize, weight);
 	}
-	
-	//CudaMemoryCopyToHost<float>(h_outScores, d_results, numOfResults);
+	// Need to sync device to ensure calculations are done before launching next kernel
+	SyncCUDADevice();
 }
 
 void CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(float* h_outScores, int numOfResults, IndicatorType indT, IndicatorLen indL, BarPeriod barP, int weight, bool fullScan)
@@ -130,12 +142,12 @@ void CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(float* h_outScores, int numOf
 		{
 
 			if (USE_TILED_CALCS_SCORECALCS)
-				calcMA_tiled(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevIdx0Scores_D, currSize, histSize, weight);
+				calcMA_tiled(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
 			else
-				calcMA(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevIdx0Scores_D, g_prevScanTotalScores_D, currSize, histSize, weight);
+				calcMA(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
 		}
 		else {
-			calcMA_SlidingWindow(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevScanTotalScores_D, g_prevIdx0Scores_D, currSize, histSize, weight);
+			calcMA_SlidingWindow(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevScanTotalScores_D, g_newPrevIdx0Scores_D, g_oldPrevIdx0Scores_D, currSize, histSize, weight);
 		}
 	}
 	else if(indT == IndicatorType::RSI)
@@ -145,30 +157,31 @@ void CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(float* h_outScores, int numOf
 
 			// Call RSI scoring function
 			if (USE_TILED_CALCS_SCORECALCS)
-				calcRSI_tiled(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevIdx0Scores_D, currSize, histSize, weight);
+				calcRSI_tiled(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
 			else
-				calcRSI(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevIdx0Scores_D, currSize, histSize, weight);
+				calcRSI(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
 		}
 		else {
-			calcRSI_SlidingWindow(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevScanTotalScores_D, g_prevIdx0Scores_D, currSize, histSize, weight);
+			calcRSI_SlidingWindow(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevScanTotalScores_D,g_newPrevIdx0Scores_D, g_oldPrevIdx0Scores_D, currSize, histSize, weight);
 		}
 	}
-	else if(indT == IndicatorType::ZLSMA)
+	else if (indT == IndicatorType::ZLSMA)
 	{
 		if (fullScan)
 		{
 
-		// Call ZLSMA scoring function
-		if (USE_TILED_CALCS_SCORECALCS)
-			calcMA_tiled(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevIdx0Scores_D , currSize, histSize, weight);
-		else
-			calcMA(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results , g_prevIdx0Scores_D, g_prevScanTotalScores_D, currSize, histSize, weight);
+			// Call ZLSMA scoring function
+			if (USE_TILED_CALCS_SCORECALCS)
+				calcMA_tiled(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
+			else
+				calcMA(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
 		}
 		else {
-			calcMA_SlidingWindow(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevScanTotalScores_D, g_prevIdx0Scores_D, currSize, histSize, weight);
+			calcMA_SlidingWindow(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevScanTotalScores_D, g_newPrevIdx0Scores_D, g_oldPrevIdx0Scores_D, currSize, histSize, weight);
 		}
 	}
-	CudaMemoryCopyToHost<float>(h_outScores, d_results, numOfResults);
+	// Need to sync device to ensure calculations are done before launching next kernel
+	SyncCUDADevice();
 }
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
@@ -295,4 +308,14 @@ bool CPP_To_Cuda_Tunnel::IsCudaAvailable()
 void CPP_To_Cuda_Tunnel::SyncCUDADevice()
 {
 	SyncDevice();
+}
+
+void CPP_To_Cuda_Tunnel::Get_newPrevIdx0Scores_FromDevice(float* h_outScores, int numOfResults)
+{
+	CudaMemoryCopyToHost<float>(h_outScores, g_newPrevIdx0Scores_D, numOfResults);
+}
+
+void CPP_To_Cuda_Tunnel::Get_oldPrevIdx0Scores_FromDevice(float* h_outScores, int numOfResults)
+{
+	CudaMemoryCopyToHost<float>(h_outScores, g_oldPrevIdx0Scores_D, numOfResults);
 }

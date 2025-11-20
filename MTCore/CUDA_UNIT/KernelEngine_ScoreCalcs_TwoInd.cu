@@ -68,7 +68,8 @@ __device__ void SlideWindowPatternScanCalc_Device_TwoInd(const float* __restrict
 
 	, float* __restrict__ d_outResNew /*output scores, where Score(idx) is the score of currMAs(t)&&histMAs(idx + t), t is the index of the current candle */
 	, const float* __restrict__ d_outResOld /*previous output results S[t-1] */
-	, float* __restrict__ d_prevIdx0Score /*previous score for idx 0, used in sliding window*/
+	, float* __restrict__ d_newPrevIdx0Score /*new score for idx 0, used in sliding window*/
+	, const float* __restrict__ d_oldPrevIdx0Score /*previous score for idx 0, used in sliding window*/
 	, const int K, const int outLen, int idx, const float weight)
 {
 
@@ -126,11 +127,11 @@ __device__ void SlideWindowPatternScanCalc_Device_TwoInd(const float* __restrict
 			invHistRange_LenY
 		);
 
-	float prevIdx0Score = d_prevIdx0Score[idx - 1]; // pair_score(H[t], C[0]) for prev t
+	float prevIdx0Score = d_oldPrevIdx0Score[idx - 1]; // pair_score(H[t], C[0]) for prev t
 	float resOld_t = d_outResOld[idx - 1];
 	d_outResNew[idx] = resOld_t - prevIdx0Score + newIdxKScore; // S[t] for new t
 
-	d_prevIdx0Score[idx] =
+	d_newPrevIdx0Score[idx] += weight *
 		SingleCalc_Device_TwoInd(
 			d_histLenX_values[idx],
 			d_histLenX_slopes[idx],
@@ -167,7 +168,7 @@ __device__ void FullPatternScanCalc_Device_TwoInd(const float* __restrict__ d_hi
 	, const float* __restrict__ histLow_HighValues_LenY /*from constant memory*/
 	
 	, float* __restrict__ d_scores /*output scores, where Score(idx) is the score of currMAs(t)&&histMAs(idx + t), t is the index of the current candle */
-	, float* __restrict__ d_prevIdx0Score /*previous score for idx 0, used in sliding window*/
+	, float* __restrict__ d_newPrevIdx0Score /*previous score for idx 0, used in sliding window*/
 	, const int currPatternLen, const int outLen, int idx , const float weight)
 {
 	// Normalize values to [0, 1] range based on the lowest and highest values for MA LenX
@@ -229,7 +230,7 @@ __device__ void FullPatternScanCalc_Device_TwoInd(const float* __restrict__ d_hi
 				invHistRange_LenY
 			);
 		if (i == 0)
-			d_prevIdx0Score[idx] = score * weight;
+			d_newPrevIdx0Score[idx] += score * weight;
 	}
 
 	d_scores[idx] += score * weight; // final score for this position
@@ -450,7 +451,7 @@ __global__ void TiledScan_Kernel_TwoInd(
 				invHY
 			);
 			if(k ==0)
-				d_prevIdx0Score[base + tLocal] = sum * weight;
+				d_prevIdx0Score[base + tLocal] += sum * weight;
 		}
 
 		d_scores[base + tLocal] += sum * weight;  // use '=' if this buffer is only for TwoInd
@@ -473,7 +474,8 @@ __global__ void SlideCalc_Kernel_TwoInd(
 	, const float* __restrict__ d_currLenY_slopes /* array for Ind2 curr slopes*/
 	, float* __restrict__ d_outResNew // Res2
 	, const float* __restrict__ d_outResOld // Res1
-	, float* __restrict__ d_prevIdx0Score // pair_score(H[t], C[0]) for prev t (Res1)
+	, float* __restrict__ d_newPrevIdx0Score // pair_score(H[t], C[0]) for new t (Res2)
+	, const float* __restrict__ d_oldPrevIdx0Score // pair_score(H[t], C[0]) for prev t (Res1)
 	, int K, int outLen , float weight)
 {
 	extern __shared__ float sharedMem[]; // dynamically allocated shared memory
@@ -525,7 +527,7 @@ __global__ void SlideCalc_Kernel_TwoInd(
 			histLow_HighValues_LenX,
 			histLow_HighValues_LenY,
 			d_outResNew,
-			d_prevIdx0Score,
+			d_newPrevIdx0Score,
 			K,
 			outLen,
 			idx,
@@ -547,7 +549,8 @@ __global__ void SlideCalc_Kernel_TwoInd(
 			histLow_HighValues_LenY,
 			d_outResNew,
 			d_outResOld,
-			d_prevIdx0Score,
+			d_newPrevIdx0Score,
+			d_oldPrevIdx0Score,
 			K,
 			outLen,
 			idx,

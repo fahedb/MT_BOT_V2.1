@@ -24,5 +24,6 @@ __global__ void SlideScan_Kernel_MA(
 	const float* __restrict__ d_currSlope,
 	float* __restrict__ d_outResNew, // S[t]
 	const float* __restrict__ d_outResOld, // S[t] for prev t (Res1)
-	float* __restrict__ d_prevIdx0Score, // pair_score(H[t], C[0]) for prev t (Res1)
+	float* __restrict__ d_newPrevIdx0Score, // pair_score(H[t], C[0]) for current t (Res2)
+	const float* __restrict__ d_oldPrevIdx0Score, // pair_score(H[t], C[0]) for prev t (Res1)
 	int K, int outLen, float weight);

@@ -33,7 +33,8 @@ __device__ __forceinline__ void SlideCalc_Device_MA(
 	const float* __restrict__ currLow_HightValues_shared, // from shared memory
 	float* __restrict__ d_outResNew, // S[t]
 	const float* __restrict__ d_outResOld, // S[t] for prev t (Res1)
-	float* __restrict__ d_prevIdx0Score, // pair_score(H[t], C[0]) for prev t (Res1)
+	float* __restrict__ d_newPrevIdx0Score, // pair_score(H[t], C[0]) for current t (to be used in next iteration)
+	const float* __restrict__ d_oldPrevIdx0Score, // pair_score(H[t], C[0]) for prev t (Res1) (Need to be const to avoid accidental modification -- Pointer swaped in host)
 	int K, float weight, int t)
 {
 
@@ -84,7 +85,7 @@ __device__ __forceinline__ void SlideCalc_Device_MA(
 
 	// Calc ResNew[t] based on ResOld[t-1]
 	float resOld_t = d_outResOld[t - 1]; // ResOld[t-1]
-	float prevIdx0Score = d_prevIdx0Score[t - 1]; // pair_score(H[t], C[0]) for prev t-1 (Res1)
+	float prevIdx0Score = d_oldPrevIdx0Score[t - 1]; // pair_score(H[t], C[0]) for prev t-1 (Res1)
 	d_outResNew[t] = resOld_t - prevIdx0Score + score_K; // calc ResNew[t]
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +108,7 @@ __device__ __forceinline__ void SlideCalc_Device_MA(
 		invHistRange,
 		invCurrRange);
 
-	d_prevIdx0Score[t] = score_0 * weight; // store for t+1 in next iteration
+	d_newPrevIdx0Score[t] += score_0 * weight; // store for t+1 in next iteration
 	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
 }
@@ -149,7 +150,7 @@ __device__ __forceinline__ void FullPatternScanCalc_Device_MA(
 		const float currValue = currMAs_values_shared[i]; // from shared memory
 		const float currSlope = currMAs_slopes_shared[i]; // from shared memory
 		
-		score = CalcSingleMAScore(
+		score += CalcSingleMAScore(
 			histValue,
 			histSlope,
 			currValue,
@@ -160,7 +161,7 @@ __device__ __forceinline__ void FullPatternScanCalc_Device_MA(
 			invCurrRange);
 
 		if(i==0)
-			d_prevIdx0Score[idx] = score * weight; // store for sliding window
+			d_prevIdx0Score[idx] += score * weight; // store for sliding window
 	}
 	d_scores[idx] += score * weight; // final score for this position
 }
@@ -272,8 +273,8 @@ __global__ void TiledScan_Kernel_MA(const float* __restrict__ d_histVal,
 				currLowest,
 				invHistRange,
 				invCurrRange);
-			if(k==0)
-				d_prevIdx0Score[base + tLocal] = sum * weight; // store for sliding window
+			if (k == 0)
+				d_prevIdx0Score[base + tLocal] += sum * weight; // store for sliding window
 		}
 
 		// Write result: if d_scores accumulates multiple indicators use +=, else use '='.
@@ -339,7 +340,8 @@ __global__ void SlideScan_Kernel_MA(const float* __restrict__ d_histMAs_values /
 	, const float* __restrict__ d_currMAs_slopes /* array for MAs curr slopes*/
 	, float* __restrict__ d_outResNew // S[t]
 	, const float* __restrict__ d_outResOld // S[t] for prev t (Res1) (Need to be const to avoid accidental modification -- Pointer swaped in host)
-	, float* __restrict__ d_prevIdx0Score // pair_score(H[t], C[0]) for prev t (Res1)
+	, float* __restrict__ d_newPrevIdx0Score // previous score for idx 0, used in sliding window (to be updated)
+	, const float* __restrict__ d_oldPrevIdx0Score // pair_score(H[t], C[0]) for prev t (Res1)
 	, const int K, const int outLen, const float weight)
 {
 	extern __shared__ float sharedMem[]; // dynamically allocated shared memory
@@ -374,7 +376,7 @@ __global__ void SlideScan_Kernel_MA(const float* __restrict__ d_histMAs_values /
 			currMAs_slopes_shared,
 			histLow_HightValues,
 			currLow_HightValues_shared,
-			d_outResNew, d_prevIdx0Score,
+			d_outResNew, d_newPrevIdx0Score,
 			K, weight, t); 
 	}
 	else
@@ -387,7 +389,7 @@ __global__ void SlideScan_Kernel_MA(const float* __restrict__ d_histMAs_values /
 			currLow_HightValues_shared,
 			d_outResNew,
 			d_outResOld,
-			d_prevIdx0Score,
+			d_newPrevIdx0Score, d_oldPrevIdx0Score,
 			K, weight,t);
 	}
 }

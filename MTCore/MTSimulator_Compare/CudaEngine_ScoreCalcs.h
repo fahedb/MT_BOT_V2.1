@@ -16,6 +16,10 @@ private:
 	std::vector<ChangeNode*>* m_currentData = nullptr;
 	
 	float* m_h_totalScores = nullptr;
+
+	float* m_h_newPrevIdx0Scores = nullptr; // just for testing -- No need to bring to host
+	float* m_h_oldPrevIdx0Scores = nullptr; // just for testing -- No need to bring to host
+
 	dataStream_t* m_h_histDataStream = nullptr;
 	dataStream_t* m_h_currDataStream = nullptr;
 

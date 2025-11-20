@@ -256,15 +256,12 @@ bool InsertNewBar_M1_JSON_DB(char* timePoint, char* symbol, CandleStruct data)
         return false;
 	}
 
-    logger.WriteToDebug("InsertNewBar_M1_JSON_DB: Building a json for candle data");
     nlohmann::json j = JasonHandler::Build_Json_ForCandle(std::string(timePoint), *data);
-	logger.WriteToDebug("InsertNewBar_M1_JSON_DB: JSON built successfully");
 
     std::string body = j.dump();
     file << body << "\n";
     file.close();
 
-	logger.WriteToDebug("InsertNewBar_M1_JSON_DB: Data written to file successfully");
     return true;
 
 }

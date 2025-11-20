@@ -39,5 +39,6 @@ __global__ void SlideCalc_Kernel_TwoInd(
 	, const float* __restrict__ d_currLenY_slopes /* array for Ind2 curr slopes*/
 	, float* __restrict__ d_outResNew // Res2
 	, const float* __restrict__ d_outResOld // Res1
-	, float* __restrict__ d_prevIdx0Score // pair_score(H[t], C[0]) for prev t (Res1)
+	, float* __restrict__ d_newPrevIdx0Score // pair_score(H[t], C[0]) for new t (Res2) (to be filled for next iteration)
+	, const float* __restrict__ d_oldPrevIdx0Score // pair_score(H[t], C[0]) for prev t (Res1)
 	, int K , int outLen, float weight);

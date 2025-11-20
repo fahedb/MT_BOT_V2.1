@@ -15,10 +15,11 @@ __device__ __forceinline__ void SlideCalc_Device_RSI(
 	const float* __restrict__ d_currSlope,
 	float* __restrict__ d_outResNew, // S[t]
 	const float* __restrict__ d_outResOld, // S[t] for prev t (Res1)
-	float* __restrict__ d_prevIdx0Score, // pair_score(H[t], C[0]) for prev t (Res1)
+	float* __restrict__ d_newPrevIdx0Score, // pair_score(H[t], C[0]) for new t (Res2) (to be filled for next iteration)
+	const float* __restrict__ d_oldPrevIdx0Score, // pair_score(H[t], C[0]) for prev t (Res1)
 	int outLen, int K, int t, float weight)
 {
-	float prevIdx0Score = d_prevIdx0Score[t - 1];
+	float prevIdx0Score = d_oldPrevIdx0Score[t - 1];
 
 	float histVal_K = d_histVal[t + K - 1];
 	float histSlope_K = d_histSlope[t + K - 1];
@@ -37,7 +38,7 @@ __device__ __forceinline__ void SlideCalc_Device_RSI(
 
 	d_outResNew[t] = resOld_t - prevIdx0Score + newIdxKScore; // S[t] for new t
 
-	d_prevIdx0Score[t] = pair_score(histVal_0, currVal_0, histSlope_0, currSlope_0) * weight; // store for t+1 in next iteration
+	d_newPrevIdx0Score[t] += pair_score(histVal_0, currVal_0, histSlope_0, currSlope_0) * weight; // store for t+1 in next iteration
 
 }
 
@@ -68,7 +69,7 @@ void FullPatternScanCalc_Device_RSI(
 		if(i==0)
 		{
 			// store the idx 0 score for sliding window use
-			d_prevIdx0Score[t] = score * weight;
+			d_prevIdx0Score[t] += score * weight;
 		}
 	}
 	d_scores[t] += score * weight; // final score for this position
@@ -90,7 +91,8 @@ __global__ void SlideScan_Kernel_RSI(
 	const float* __restrict__ d_currSlope,
 	float* __restrict__ d_outResNew, // S[t]
 	float* __restrict__ d_outResOld, // S[t] for prev t (Res1)
-	float* __restrict__ d_prevIdx0Score, // pair_score(H[t], C[0]) for prev t (Res1)
+	float* __restrict__ d_newPrevIdx0Score, // pair_score(H[t], C[0]) for new t (Res2) (to be filled for next iteration)
+	const float* __restrict__ d_oldPrevIdx0Score, // pair_score(H[t], C[0]) for prev t (Res1)
 	int K, int outLen, float weight)
 {
 	int t = blockIdx.x * blockDim.x + threadIdx.x;
@@ -103,7 +105,7 @@ __global__ void SlideScan_Kernel_RSI(
 			d_histSlope,
 			d_currVal,
 			d_currSlope,
-			d_outResNew, d_prevIdx0Score,
+			d_outResNew, d_newPrevIdx0Score,
 			K, outLen, t, weight);
 	}
 	else {
@@ -115,7 +117,7 @@ __global__ void SlideScan_Kernel_RSI(
 			d_currSlope,
 			d_outResNew,
 			d_outResOld,
-			d_prevIdx0Score,
+			d_newPrevIdx0Score, d_oldPrevIdx0Score,
 			outLen, K, t, weight);
 	}
 }
@@ -170,7 +172,7 @@ __global__ void TiledScan_Kernel_RSI(
 			if(k==0)
 			{
 				// we can store d_prevIdx0Score if needed for sliding window later
-				d_prevIdx0Score[base + tLocal] = sum * weight;
+				d_prevIdx0Score[base + tLocal] += sum * weight;
 			}
 		}
 		d_out[base + tLocal] += sum * weight;

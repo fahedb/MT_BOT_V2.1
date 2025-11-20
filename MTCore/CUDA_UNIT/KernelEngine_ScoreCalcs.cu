@@ -116,7 +116,7 @@ void TwoIndCalc_SlidingWindow(
 	const float* d_curr_LenX_Val, const float* d_curr_LenX_Slope,
 	const float* d_hist_LenY_Val, const float* d_hist_LenY_Slope,
 	const float* d_curr_LenY_Val, const float* d_curr_LenY_Slope,
-	float* d_newResults, float* d_oldResults, float* d_prevIdx0Score,
+	float* d_newResults, float* d_oldResults, float* d_newPrevIdx0Score, float* d_oldPrevIdx0Score, 
 	int patternLen, int histSize, float weight)
 {
 	const int starts = histSize - patternLen + 1;   // number of starting points in hist where pattern can fit
@@ -128,7 +128,7 @@ void TwoIndCalc_SlidingWindow(
 		d_curr_LenX_Val, d_curr_LenX_Slope,
 		d_hist_LenY_Val, d_hist_LenY_Slope,
 		d_curr_LenY_Val, d_curr_LenY_Slope,
-		d_newResults, d_oldResults, d_prevIdx0Score,
+		d_newResults, d_oldResults, d_newPrevIdx0Score, d_oldPrevIdx0Score,
 		patternLen,
 		starts,
 		weight
@@ -193,7 +193,7 @@ void calcMA_tiled(const float* d_histMA_values,
 // Full MA score kernel launcher
 void calcMA(float* d_histMA_values, float* d_histMA_slopes,
 			float* d_currMA_values, float* d_currMA_slopes, 
-			float* d_results, float* d_prevIdx0Score, const float* d_oldScores,
+			float* d_results, float* d_prevIdx0Score,
 			int patternLen, int histSize, float weight)
 {
 	const int starts = histSize - patternLen + 1;
@@ -216,7 +216,7 @@ void calcMA(float* d_histMA_values, float* d_histMA_slopes,
 void calcMA_SlidingWindow(
 	const float* d_histMA_values, const float* d_histMA_slopes,
 	const float* d_currMA_values, const float* d_currMA_slopes,
-	float* d_newResults, float* d_oldResults, float* d_prevIdx0Score,
+	float* d_newResults, float* d_oldResults, float* d_newPrevIdx0Score, float* d_oldPrevIdx0Score,
 	int patternLen, int histSize, float weight)
 {
 	const int starts = histSize - patternLen + 1;   // number of starting points in hist where pattern can fit
@@ -228,7 +228,7 @@ void calcMA_SlidingWindow(
 		d_histMA_slopes,
 		d_currMA_values,
 		d_currMA_slopes,
-		d_newResults, d_oldResults, d_prevIdx0Score,
+		d_newResults, d_oldResults, d_newPrevIdx0Score, d_oldPrevIdx0Score,
 		patternLen,
 		starts,
 		weight
@@ -278,7 +278,7 @@ void calcRSI(
 void calcRSI_SlidingWindow(
 	const float* d_histRSI_values, const float* d_histRSI_slopes,
 	const float* d_currRSI_values, const float* d_currRSI_slopes,
-	float* d_newResults, float* d_oldResults, float* d_prevIdx0Score,
+	float* d_newResults, float* d_oldResults, float* d_newPrevIdx0Score, float* d_oldPrevIdx0Score,
 	int patternLen, int histSize, float weight)
 {
 	const int starts = histSize - patternLen + 1;   // number of starting points in hist where pattern can fit
@@ -291,7 +291,7 @@ void calcRSI_SlidingWindow(
 		d_histRSI_slopes,
 		d_currRSI_values,
 		d_currRSI_slopes,
-		d_newResults, d_oldResults, d_prevIdx0Score,
+		d_newResults, d_oldResults, d_newPrevIdx0Score ,d_oldPrevIdx0Score,
 		patternLen,
 		starts,
 		weight

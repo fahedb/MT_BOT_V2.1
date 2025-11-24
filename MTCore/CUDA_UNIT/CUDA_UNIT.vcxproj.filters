@@ -30,6 +30,7 @@
     <ClCompile Include="StreamSetters.cpp">
       <Filter>MemoryStream\Setter</Filter>
     </ClCompile>
+    <ClCompile Include="KernelExecutionContext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPP_To_Cuda_Tunnel.h">
@@ -62,6 +63,7 @@
     <ClInclude Include="KernelEngine_ScoreCalcs_TwoInd.h">
       <Filter>KernelEngines\ScoreCalcs\DOUBLE_IND</Filter>
     </ClInclude>
+    <ClInclude Include="KernelExecutionContext.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CudaMemory">

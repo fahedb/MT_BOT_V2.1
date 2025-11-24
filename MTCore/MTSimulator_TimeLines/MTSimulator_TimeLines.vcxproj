@@ -148,7 +148,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\MTSimulator_Logger;$(ProjectDir)\..\MTSimulator_Casts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\MTSimulator_Logger;$(ProjectDir)\..\MTSimulator_Casts;..\MTSimulator_MTThreadPool;..\CUDA_UNIT;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -163,7 +163,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\MTSimulator_Logger;$(ProjectDir)\..\MTSimulator_Casts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\MTSimulator_Logger;$(ProjectDir)\..\MTSimulator_Casts;..\MTSimulator_MTThreadPool;..\CUDA_UNIT;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -180,7 +180,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\MTSimulator_Logger;$(ProjectDir)\..\MTSimulator_Casts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\MTSimulator_Logger;$(ProjectDir)\..\MTSimulator_Casts;..\MTSimulator_MTThreadPool;..\CUDA_UNIT;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
@@ -207,6 +207,7 @@
     <ClCompile Include="PolynomTimeLine.cpp" />
     <ClCompile Include="SelectionNodes.cpp" />
     <ClCompile Include="TimeLine.cpp" />
+    <ClCompile Include="TimeLineArrayBuilder.cpp" />
     <ClCompile Include="TimeLineBuilder.cpp" />
     <ClCompile Include="TimeLineScored.cpp" />
   </ItemGroup>
@@ -229,6 +230,7 @@
     <ClInclude Include="PolynomTimeLine.h" />
     <ClInclude Include="SelectionNodes.h" />
     <ClInclude Include="TimeLine.h" />
+    <ClInclude Include="TimeLineArrayBuilder.h" />
     <ClInclude Include="TimeLineBuilder.h" />
     <ClInclude Include="TimeLineScored.h" />
   </ItemGroup>

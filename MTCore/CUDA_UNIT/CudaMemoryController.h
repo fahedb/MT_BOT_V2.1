@@ -4,6 +4,20 @@
 #include <cuda_runtime_api.h>
 
 #include <iostream>
+template<typename T>
+void CudaMemoryFree(T* myVar)
+{
+    cudaError_t lastError = cudaGetLastError();
+    if (lastError != cudaSuccess) {
+        std::cout << "\nPrevious CUDA error: " << cudaGetErrorString(lastError) << std::endl;
+    }
+    cudaError_t cudaFreeError = cudaFree(myVar);
+    if (cudaFreeError != cudaSuccess)
+    {
+        std::cerr << "CUDA free failed: " << cudaGetErrorString(cudaFreeError) << std::endl;
+        exit(EXIT_FAILURE);
+    }
+}
 
 template<typename T>
 void CudaMemoryAllocation(T** myVar, int varNum)
@@ -36,6 +50,12 @@ void CudaMemoryCopyToHost(T* hostVar, T* deviceVar, int varNum)
 template<typename T>
 void CudaMemoryCopyToDevice(T* deviceVar, T* hostVar, int varNum)
 {
+    if(deviceVar == nullptr || hostVar == nullptr || varNum <= 0)
+    {
+        std::cerr << "CudaMemoryCopyToDevice: Invalid input parameters." << std::endl;
+        exit(EXIT_FAILURE);
+	}
+
     cudaError_t lastError = cudaGetLastError();
     if (lastError != cudaSuccess) {
         std::cout << "\nPrevious CUDA error: " << cudaGetErrorString(lastError) << std::endl;
@@ -44,6 +64,21 @@ void CudaMemoryCopyToDevice(T* deviceVar, T* hostVar, int varNum)
     if (cudaMemcpyError != cudaSuccess)
     {
         std::cerr << "CUDA memcpy to device failed: " << cudaGetErrorString(cudaMemcpyError) << std::endl;
+        exit(EXIT_FAILURE);
+    }
+}
+
+template<typename T>
+void CudaMemorySet(T* deviceVar, unsigned char value, int varNum)
+{
+    cudaError_t lastError = cudaGetLastError();
+    if (lastError != cudaSuccess) {
+        std::cout << "\nPrevious CUDA error: " << cudaGetErrorString(lastError) << std::endl;
+    }
+    cudaError_t cudaMemsetError = cudaMemset(deviceVar, value, varNum * sizeof(T));
+    if (cudaMemsetError != cudaSuccess)
+    {
+        std::cerr << "CUDA memset failed: " << cudaGetErrorString(cudaMemsetError) << std::endl;
         exit(EXIT_FAILURE);
     }
 }

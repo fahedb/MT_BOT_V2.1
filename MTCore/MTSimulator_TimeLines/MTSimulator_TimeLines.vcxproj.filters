@@ -126,6 +126,7 @@
     <ClCompile Include="SelectionNodes.cpp">
       <Filter>Change Data\SelectionNode</Filter>
     </ClCompile>
+    <ClCompile Include="TimeLineArrayBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DBMap.h">
@@ -188,5 +189,6 @@
     <ClInclude Include="CoinsPair.h">
       <Filter>Change Data\Enums</Filter>
     </ClInclude>
+    <ClInclude Include="TimeLineArrayBuilder.h" />
   </ItemGroup>
 </Project>

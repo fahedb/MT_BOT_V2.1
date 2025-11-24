@@ -138,11 +138,13 @@
     <ClInclude Include="KernelEngine_ScoreCalcs_MA.h" />
     <ClInclude Include="KernelEngine_ScoreCalcs_RSI.h" />
     <ClInclude Include="KernelEngine_ScoreCalcs_TwoInd.h" />
+    <ClInclude Include="KernelExecutionContext.h" />
     <ClInclude Include="MTStreamsStructs.h" />
     <ClInclude Include="StreamSetters.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CPP_To_Cuda_Tunnel.cpp" />
+    <ClCompile Include="KernelExecutionContext.cpp" />
     <ClCompile Include="StreamSetters.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

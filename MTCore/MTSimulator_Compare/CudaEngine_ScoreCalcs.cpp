@@ -8,6 +8,7 @@
 #include <chrono>
 #include "ThreadPool.h"
 #include <future>
+#include "TimeLineArrayBuilder.h"
 
 
 IndicatorTypeList glob_indType_CudaEngine;
@@ -19,251 +20,6 @@ IndicatorValueTypeList glob_valType_CudaEngine;
 #define SCAN_NUMS_TO_FULL_SCAN 100
 
 
-void CudaEngine_ScoreCalcs::DataStreamSetup(std::vector<ChangeNode*>* tl, dataStream_t** dataSt, DataTimeType tT, bool forceOverWrite)
-{
-	if (!tl)
-	{
-		Logger::getInstance().WriteLog("CudaEngine_ScoreCalcs::DataStreamSetup - Invalid data pointer", false, true, LogType::ERR);
-		return;
-	}
-	MTThreadPool* threadPool = MTThreadPool::getInstance();
-	std::vector<std::future<void>> futuresPromisses;
-	threadPool->Set_PauseLowPriorityTasks(true); // Pause low priority tasks to prioritize this setup
-
-	for (auto indT : glob_indType_CudaEngine.types)
-	{
-		for (auto indL : glob_indLen_CudaEngine.lengths)
-		{
-			for (auto barP : glob_barP_CudaEngine.periods)
-			{
-				for (auto valT : glob_valType_CudaEngine.valueTypes)
-				{
-					StreamSetters::CheckDataStreamTree(dataSt, indT, indL, barP, valT); // Ensure the data stream tree is properly initialized
-					ValueTypeStream_t* valStream = &(*dataSt)->m_indicators[static_cast<int>(indT)].m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)];
-					if(valStream->m_d_data && !forceOverWrite)
-					{
-						continue; // Data already exists, do not overwrite
-					}
-					if(valStream->m_d_data && forceOverWrite)
-					{
-						delete[] valStream->m_d_data; // Free existing memory before overwriting
-						valStream->m_d_data = nullptr;
-						valStream->m_numElements = 0;
-					}
-
-					float* dataArray = new float[tl->size()]; // Allocate array for indicator values
-					
-					
-					auto prom = std::make_shared<std::promise<void>>(); // Create a promise to signal completion
-					futuresPromisses.push_back(prom->get_future()); // Store the future for later synchronization
-
-					threadPool->enqueueTask([tl,prom, dataArray, indT, indL, barP, valT]() {
-						CudaEngine_ScoreCalcs::InitTimeLineDataIntoArray(tl, dataArray, indT, indL, barP, valT);
-						prom->set_value();
-						}, TaskPriority::High);
-
-					// Set the data into the appropriate stream
-					valStream->m_numElements = tl->size();
-					valStream->m_d_data = dataArray;
-					
-				}
-			}
-		}
-	}
-	// Wait for all tasks to complete
-	for (auto& f : futuresPromisses)
-	{
-		f.wait();
-	}
-	threadPool->Set_PauseLowPriorityTasks(false); // Resume low priority tasks
-
-	// After all data is prepared, set it in the CUDA tunnel
-	for(auto indT : glob_indType_CudaEngine.types)
-	{
-		for(auto indL : glob_indLen_CudaEngine.lengths)
-		{
-			for(auto barP : glob_barP_CudaEngine.periods)
-			{
-				for(auto valT : glob_valType_CudaEngine.valueTypes)
-				{
-					if (tT == DataTimeType::HISTORIC)
-					{
-						CPP_To_Cuda_Tunnel::Set_HistDataTimeFreameStream((*dataSt)->m_indicators[static_cast<int>(indT)].m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_d_data,
-							(*dataSt)->m_indicators[static_cast<int>(indT)].m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_numElements,
-							indT, indL, barP, valT, forceOverWrite);
-					}
-					else if (tT == DataTimeType::CURRENT)
-					{
-						CPP_To_Cuda_Tunnel::Set_CurrDataTimeFreameStream((*dataSt)->m_indicators[static_cast<int>(indT)].m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_d_data,
-							(*dataSt)->m_indicators[static_cast<int>(indT)].m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_numElements,
-							indT, indL, barP, valT, forceOverWrite);
-					}
-				}
-			}
-		}
-	}
-}
-
-void CudaEngine_ScoreCalcs::DataStreamSetup_Sync(std::vector<ChangeNode*>* tl, dataStream_t** dataSt, DataTimeType tT, bool forceOverWrite)
-{
-
-	for (auto indT : glob_indType_CudaEngine.types)
-	{
-		for (auto indL : glob_indLen_CudaEngine.lengths)
-		{
-			for (auto barP : glob_barP_CudaEngine.periods)
-			{
-				for (auto valT : glob_valType_CudaEngine.valueTypes)
-				{
-					StreamSetters::CheckDataStreamTree(dataSt, indT, indL, barP, valT); // Ensure the data stream tree is properly initialized
-					ValueTypeStream_t* valStream = &(*dataSt)->m_indicators[static_cast<int>(indT)].m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)];
-					if (valStream->m_d_data && !forceOverWrite)
-					{
-						continue; // Data already exists, do not overwrite
-					}
-					if (valStream->m_d_data && forceOverWrite)
-					{
-						delete[] valStream->m_d_data; // Free existing memory before overwriting
-						valStream->m_d_data = nullptr;
-						valStream->m_numElements = 0;
-					}
-
-					float* dataArray = new float[tl->size()]; // Allocate array for indicator values
-
-					// Set the data into the appropriate stream
-					valStream->m_numElements = tl->size();
-					valStream->m_d_data = dataArray;
-
-				}
-			}
-		}
-	}
-
-	for (int i = 0; i < tl->size(); i++)
-	{
-		ChangeNode* node = tl->at(i);
-		if (!node)
-			continue;
-		DataStreamSetup_Sync_ChangeNodeSet(node, i, dataSt, tT, forceOverWrite);
-	}
-
-	// After all data is prepared, set it in the CUDA tunnel
-	for (auto indT : glob_indType_CudaEngine.types)
-	{
-		for (auto indL : glob_indLen_CudaEngine.lengths)
-		{
-			for (auto barP : glob_barP_CudaEngine.periods)
-			{
-				for (auto valT : glob_valType_CudaEngine.valueTypes)
-				{
-					if (tT == DataTimeType::HISTORIC)
-					{
-						CPP_To_Cuda_Tunnel::Set_HistDataTimeFreameStream((*dataSt)->m_indicators[static_cast<int>(indT)].m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_d_data,
-							(*dataSt)->m_indicators[static_cast<int>(indT)].m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_numElements,
-							indT, indL, barP, valT, forceOverWrite);
-					}
-					else if (tT == DataTimeType::CURRENT)
-					{
-						CPP_To_Cuda_Tunnel::Set_CurrDataTimeFreameStream((*dataSt)->m_indicators[static_cast<int>(indT)].m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_d_data,
-							(*dataSt)->m_indicators[static_cast<int>(indT)].m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_numElements,
-							indT, indL, barP, valT, forceOverWrite);
-					}
-				}
-			}
-		}
-	}
-}
-
-void CudaEngine_ScoreCalcs::DataStreamSetup_Sync_ChangeNodeSet(ChangeNode* node,int idx, dataStream_t** dataSt, DataTimeType tT, bool forceOverWrite)
-{
-	for (auto indT : glob_indType_CudaEngine.types)
-	{
-		for (auto indL : glob_indLen_CudaEngine.lengths)
-		{
-			IndicatorValues* indVals = node->Get_Indicator_Pointer(indT, indL)->Get_IndicatorValues_Pointer();
-			if (!indVals)
-				continue;
-		
-			LenIndicatorStream_t* lenStream = &(*dataSt)->m_indicators[static_cast<int>(indT)].m_lens[static_cast<int>(indL)];
-			
-			for (auto barP : glob_barP_CudaEngine.periods)
-			{
-				TimeFrameStream_t* timeFrameStream = &lenStream->m_timeFrames[static_cast<int>(barP)];
-				for (auto valT : glob_valType_CudaEngine.valueTypes)
-				{
-					ValueTypeStream_t* valStream = &timeFrameStream->m_valueTypes[static_cast<int>(valT)];
-					float* dataArray = valStream->m_d_data;
-					if (node)
-					{
-						if (indVals)
-						{
-							double value = indVals->Get_Value(valT, barP);
-							dataArray[idx] = static_cast<float>(value);
-						}
-						else
-						{
-							dataArray[idx] = -1.0f; // Default value if indicator is missing
-						}
-					}
-					else
-					{
-						dataArray[idx] = -1.0f; // Default value if node is null
-					}
-				}
-			}
-		}
-	}
-}
-
-void CudaEngine_ScoreCalcs::ResultStreamSetup(float** dataSt, int resSize, bool forceOverWrite)
-{
-	if(!(*dataSt) || forceOverWrite)
-	{
-		if (*dataSt)
-		{
-			delete[] *dataSt; // Free existing memory before overwriting
-			*dataSt = nullptr;
-		}
-		*dataSt = new float[resSize]; // Allocate results stream
-	}
-	memset(*dataSt, 0, sizeof(float) * resSize); // Initialize to zero
-	CPP_To_Cuda_Tunnel::Set_TotalScore_D_Memory(resSize); // Reset results stream in CUDA tunnel
-}
-
-void CudaEngine_ScoreCalcs::ResetResultStreamsToZero()
-{
-	CPP_To_Cuda_Tunnel::Reset_TotalScores_D_To0(); // Reset total scores in CUDA tunnel
-	int totalScoreSize = (m_historicData->size() - m_currentData->size());
-	memset(m_h_totalScores, 0, sizeof(float) * totalScoreSize);
-
-}
-
-
-void CudaEngine_ScoreCalcs::InitTimeLineDataIntoArray(std::vector<ChangeNode*>* tl, float* dataArray, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT)
-{
-	for (size_t i = 0; i < tl->size(); i++)
-	{
-		ChangeNode* node = tl->at(i);
-		if (node)
-		{
-			IndicatorValues* indicatorVals = node->Get_Indicator_Pointer(indT, indL)->Get_IndicatorValues_Pointer();
-			if (indicatorVals)
-			{
-				double value = indicatorVals->Get_Value(valT, barP);
-				dataArray[i] = static_cast<float>(value);
-			}
-			else
-			{
-				dataArray[i] = -1.0f; // Default value if indicator is missing
-			}
-		}
-		else
-		{
-			dataArray[i] = -1.0f; // Default value if node is null
-		}
-	}
-}
-
 void CudaEngine_ScoreCalcs::Initialize()
 {
 	if (!m_currentData || !m_historicData)
@@ -271,26 +27,17 @@ void CudaEngine_ScoreCalcs::Initialize()
 		Logger::getInstance().WriteLog("CudaEngine_ScoreCalcs::Initialize - Invalid data pointers", false, true, LogType::ERR);
 		return;
 	}
-	ResultStreamSetup(&m_h_totalScores, m_historicData->size(), false); // Setup results stream without overwriting existing data
-	DataStreamSetup_Sync(m_historicData, &m_h_histDataStream, DataTimeType::HISTORIC , false); // Setup historic data stream without overwriting existing data
-	DataStreamSetup(m_currentData, &m_h_currDataStream,DataTimeType::CURRENT ,true); // Setup current data stream with overwriting existing data
+	m_kernelMemoryContext = new KernelExecutionContext_PatternGod(m_historicData->size(), m_currentData->size());
+	Set_NewHistoricTimeLine(m_historicData); // Set historic data to device
+	Set_NewCurrentTimeLine(m_currentData); // Set current data to device
+
 	m_initialized = true;
 }
 
 
 void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D, int scoreToAct)
 {
-	///////////////// Need to delete this after done testing //////////////////////////////////////
-	if(!m_h_newPrevIdx0Scores)
-		m_h_newPrevIdx0Scores = new float[m_historicData->size() - m_currentData->size()];
-	if(!m_h_oldPrevIdx0Scores)
-		m_h_oldPrevIdx0Scores = new float[m_historicData->size() - m_currentData->size()];
-	memset(m_h_newPrevIdx0Scores, 0, sizeof(float) * (m_historicData->size() - m_currentData->size()));
-	memset(m_h_oldPrevIdx0Scores, 0, sizeof(float) * (m_historicData->size() - m_currentData->size()));
-	////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-	ResetResultStreamsToZero();
+	m_kernelMemoryContext->PrepareForNewScan(); // Prepare the kernel context for a new scan
 
 	for (auto indT : glob_indType_CudaEngine.types)
 	{
@@ -301,29 +48,27 @@ void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, Score
 	{
 		RunScan_TwoIndicatorsRatio(indT);
 	}
+
 	CPP_To_Cuda_Tunnel::SyncCUDADevice(); // Wait for all CUDA calculations to complete
 	int limit = static_cast<int>(m_historicData->size() - m_currentData->size());
-	CPP_To_Cuda_Tunnel::Get_ResultsFromDevice(m_h_totalScores, limit);
 
-	CPP_To_Cuda_Tunnel::Get_newPrevIdx0Scores_FromDevice(m_h_newPrevIdx0Scores, limit); // Just for testing
-	CPP_To_Cuda_Tunnel::Get_oldPrevIdx0Scores_FromDevice(m_h_oldPrevIdx0Scores, limit); // Just for testing
+	m_kernelMemoryContext->SyncResultsToHost(); // Sync results back to host
+	float* totalScores = m_kernelMemoryContext->Get_HostTotalScoresPtr();
+	TimeLineArrayBuilder::BuildTotalScoreArray(m_kernelMemoryContext->Get_ResultsDataStreamPtr(MemoryLocation::HOST), totalScores, limit);
 
-	// TODO: Collect results from m_h_totalScores and populate resultNodes2D
-	int maxScore = m_h_totalScores[0];
+	int maxScore = totalScores[0];
 	
 	for (size_t i = 0; i < limit; i++)
 	{
-		if (m_h_totalScores[i] >= scoreToAct)
+		if (totalScores[i] >= scoreToAct)
 		{
-			if(m_h_totalScores[i] > maxScore)
+			if(totalScores[i] > maxScore)
 			{
-				maxScore = static_cast<int>(m_h_totalScores[i]);
+				maxScore = static_cast<int>(totalScores[i]);
 			}
 
 			ScoresResult scoreResult;//= CombineAllResults_ForIdx(i, m_h_results);
-			scoreResult.totalScore.total = static_cast<int>(m_h_totalScores[i]);
-			scoreResult.totalScore.m_scores[0] = m_h_newPrevIdx0Scores[i]; // Just for testing
-			scoreResult.totalScore.m_scores[1] = m_h_oldPrevIdx0Scores[i]; // Just for testing
+			scoreResult.totalScore.total = static_cast<int>(totalScores[i]);
 			scoreResult.SetLockedResult(true);
 			resultNodes2D.push_back(std::make_pair(m_historicData->at(i + m_currentData->size() - 1), scoreResult));
 		}
@@ -337,7 +82,7 @@ void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, Score
 		m_useFullScan = true; // Reset to full scan every SCAN_NUMS_TO_FULL_SCAN scans
 	}
 	else
-		m_useFullScan = true; // TEMPORARY: Always use full scan for now
+		m_useFullScan = true; // TEMPORARY: Always use full scan for now -- There is a bug in slide scan that needs to be fixed
 
 	m_scanCounter++;
 }
@@ -356,14 +101,28 @@ CudaEngine_ScoreCalcs::CudaEngine_ScoreCalcs(std::vector<ChangeNode*>* historicD
 void CudaEngine_ScoreCalcs::Set_NewCurrentTimeLine(std::vector<ChangeNode*>* currentData)
 {
 	m_currentData = currentData;
-	DataStreamSetup(m_currentData, &m_h_currDataStream,DataTimeType::CURRENT, true); // Setup current data stream with overwriting existing data
+	dataStream_t* currDataSt = m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::HOST);
+	TimeLineArrayBuilder::BuildTimeLineArrays(currDataSt, m_currentData); // Build current data stream arrays
+	
+	dataStream_t* currMinSt = m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::HOST);
+	dataStream_t* currMaxSt = m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::HOST);
+	int limit = 1; // For current data, limit is always 1
+	TimeLineArrayBuilder::BuildMinMaxArrays(currDataSt, currMinSt, currMaxSt, limit, m_currentData->size());
 
+	m_kernelMemoryContext->SyncCurrentDataToDevice(true); // Sync current data to device
 }
 
 void CudaEngine_ScoreCalcs::Set_NewHistoricTimeLine(std::vector<ChangeNode*>* historicData)
 {
 	m_historicData = historicData;
-	DataStreamSetup(m_historicData, &m_h_histDataStream, DataTimeType::HISTORIC, true); // Setup historic data stream with overwriting existing data
+	dataStream_t* histDataSt = m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::HOST);
+	TimeLineArrayBuilder::BuildTimeLineArrays(histDataSt, m_historicData); // Build historic data stream arrays
+
+	dataStream_t* histMinSt = m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::HOST);
+	dataStream_t* histMaxSt = m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::HOST);
+	int limit = static_cast<int>(m_historicData->size() - m_currentData->size()) + 1;
+	TimeLineArrayBuilder::BuildMinMaxArrays(histDataSt, histMinSt, histMaxSt, limit, m_currentData->size());
+	m_kernelMemoryContext->SyncHistoryDataToDevice(true); // Sync historic data to device
 }
 
 bool CudaEngine_ScoreCalcs::IsCudaDeviceAvailable() const
@@ -441,10 +200,40 @@ void CudaEngine_ScoreCalcs::RunScan_PerIndicator_IndLen(IndicatorType indT, Indi
 void CudaEngine_ScoreCalcs::RunScan_PerIndicator_BarPeriod(IndicatorType indT, IndicatorLen indL, BarPeriod barP)
 {
 	// Implementation for scanning per indicator, length, and bar period
-	float* resData = m_h_totalScores;
-	int numResults = m_historicData->size();
+	float* d_resData = Get_DataPointer(m_kernelMemoryContext->Get_ResultsDataStreamPtr(MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
+	
+	const float* d_histValues = Get_DataPointer(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
+	const float* d_histSlopes = Get_DataPointer(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Slope);
 
-	CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(resData, numResults, indT, indL, barP, COMAPRE_WEIGHT, m_useFullScan);
+	const float* d_histMinValues = Get_DataPointer(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
+	const float* d_histMaxValues = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
+
+	const float* d_histMinSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Slope);
+	const float* d_histMaxSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Slope);
+
+	const float* d_currValues = Get_DataPointer(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
+	const float* d_currSlopes = Get_DataPointer(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Slope);
+
+	const float* d_currMinValues = Get_DataPointer(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
+	const float* d_currMaxValues = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
+
+	const float* d_currMinSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Slope);
+	const float* d_currMaxSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Slope);
+
+
+	int numResults = m_historicData->size();
+	int currTimeLineLen = m_currentData->size();
+	CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(
+		d_resData,
+		d_histValues, d_histSlopes,
+		d_histMinValues, d_histMaxValues,
+		d_histMinSlopes, d_histMaxSlopes,
+
+		d_currValues, d_currSlopes,
+		d_currMinValues, d_currMaxValues,
+		d_currMinSlopes, d_currMaxSlopes,
+		currTimeLineLen, numResults, indT, COMAPRE_WEIGHT / 2);
+
 }
 
 void CudaEngine_ScoreCalcs::RunScan_TwoIndicatorsRatio(IndicatorType indT)
@@ -486,10 +275,74 @@ void CudaEngine_ScoreCalcs::RunScan_TwoIndicatorsRatio_BarPeriods(IndicatorType 
 	{
 		return; // Skip same length and same bar period
 	}
-	float* resData = m_h_totalScores;
-	int numResults = m_historicData->size();
+	float* d_resData = Get_DataPointer(m_kernelMemoryContext->Get_ResultsDataStreamPtr(MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
+	
+	////////////// Get IndX data //////////////////	
+	const float* d_histIndX_Values = Get_DataPointer(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC,MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
+	const float* d_histIndX_Slopes = Get_DataPointer(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC,MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Slope);
 
-	CPP_To_Cuda_Tunnel::Calc_TwoIndicatorsRatio_ScoreCalcs(resData, numResults, indT, lenX, barPX, LenY, barPY, COMAPRE_WEIGHT / 2, m_useFullScan);
+	const float* d_histIndX_MinValues = Get_DataPointer(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
+	const float* d_histIndX_MaxValues = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
+	const float* d_histIndX_MinSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Slope);
+	const float* d_histIndX_MaxSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Slope);
+	////////////////////////////////////////////////
+
+	////////////// Get curr IndX data //////////////////
+	const float* d_currIndX_Values = Get_DataPointer(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT,MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
+	const float* d_currIndX_Slopes = Get_DataPointer(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT,MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Slope);
+
+	const float* d_currIndX_MinValues = Get_DataPointer(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
+	const float* d_currIndX_MaxValues = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
+	const float* d_currIndX_MinSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Slope);
+	const float* d_currIndX_MaxSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Slope);
+	////////////////////////////////////////////////
+
+	////////////// Get hist IndY data //////////////////
+	const float* d_histIndY_Values = Get_DataPointer(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
+	const float* d_histIndY_Slopes = Get_DataPointer(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
+
+	const float* d_histIndY_MinValues = Get_DataPointer(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
+	const float* d_histIndY_MaxValues = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
+	const float* d_histIndY_MinSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
+	const float* d_histIndY_MaxSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
+	/////////////////////////////////////////////////
+
+	////////////// Get curr IndY data //////////////////
+	const float* d_currIndY_Values = Get_DataPointer(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
+	const float* d_currIndY_Slopes = Get_DataPointer(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
+	
+	const float* d_currIndY_MinValues = Get_DataPointer(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
+	const float* d_currIndY_MaxValues = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
+	const float* d_currIndY_MinSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
+	const float* d_currIndY_MaxSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
+	/////////////////////////////////////////////////
+
+	int numResults = m_historicData->size();
+	int currTimeLineLen = m_currentData->size();
+
+	CPP_To_Cuda_Tunnel::Calc_TwoIndicatorsRatio_ScoreCalcs(
+		d_resData,
+		///////////////////// Hist len X arrays ////////////////////////////////////////////
+		d_histIndX_Values, d_histIndX_Slopes,
+		d_histIndX_MinValues, d_histIndX_MaxValues,
+		d_histIndX_MinSlopes, d_histIndX_MaxSlopes,
+		////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////// Current len X arrays //////////////////////////////////////
+		d_currIndX_Values, d_currIndX_Slopes,
+		d_currIndX_MinValues, d_currIndX_MaxValues,
+		d_currIndX_MinSlopes, d_currIndX_MaxSlopes,
+		///////////////////////////////////////////////////////////////////////////////////
+		////////////////////// Hist len Y arrays //////////////////////////////////////////
+		d_histIndY_Values, d_histIndY_Slopes,
+		d_histIndY_MinValues, d_histIndY_MaxValues,
+		d_histIndY_MinSlopes, d_histIndY_MaxSlopes,
+		///////////////////////////////////////////////////////////////////////////////////
+		///////////////////// Current len Y arrays ////////////////////////////////////////
+		d_currIndY_Values, d_currIndY_Slopes,
+		d_currIndY_MinValues, d_currIndY_MaxValues,
+		d_currIndY_MinSlopes, d_currIndY_MaxSlopes,
+		currTimeLineLen, numResults, COMAPRE_WEIGHT / 2);
+
 }
 
 bool CudaEngine_ScoreCalcs::AreLenPairsScanned(const std::vector<std::pair<IndicatorLen, IndicatorLen>>& scannedLens, IndicatorLen lenX, IndicatorLen lenY)
@@ -504,6 +357,14 @@ bool CudaEngine_ScoreCalcs::AreLenPairsScanned(const std::vector<std::pair<Indic
 	return false;
 }
 
+float* CudaEngine_ScoreCalcs::Get_DataPointer(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType val)
+{
+	return dataSt->m_indicators.at(static_cast<int>(indT))
+		.m_lens.at(static_cast<int>(indL))
+		.m_timeFrames.at(static_cast<int>(barP))
+		.m_valueTypes.at(static_cast<int>(val)).m_d_data;
+}
+
 bool CudaEngine_ScoreCalcs::AreBarPeriodPairsScanned(const std::vector<std::pair<BarPeriod, BarPeriod>>& scannedBarPs, BarPeriod barPX, BarPeriod barPY)
 {
 	for(const auto& pair : scannedBarPs)
@@ -516,24 +377,21 @@ bool CudaEngine_ScoreCalcs::AreBarPeriodPairsScanned(const std::vector<std::pair
 	return false;
 }
 
-ScoresResult CudaEngine_ScoreCalcs::CombineAllResults_ForIdx(int resIdx,dataStream_t* streamResults)
+int CudaEngine_ScoreCalcs::CalcTotalResultsForIdx(int resIdx,dataStream_t* streamResults)
 {
-	ScoresResult combinedResult;
+	int totalScore = 0;
 	for(auto indT : glob_indType_CudaEngine.types)
 	{
-		IndStream_t streamIndTRes = streamResults->m_indicators[static_cast<int>(indT)];
+		IndStream_t& streamIndTRes = streamResults->m_indicators.at(static_cast<int>(indT));
 		for(auto indL : glob_indLen_CudaEngine.lengths)
 		{
-			LenIndicatorStream_t streamIndT_LenRes = streamIndTRes.m_lens[static_cast<int>(indL)];
+			LenIndicatorStream_t& streamIndT_LenRes = streamIndTRes.m_lens.at(static_cast<int>(indL));
 			for(auto barP : glob_barP_CudaEngine.periods)
 			{
-				float* resData = streamIndT_LenRes
-					.m_timeFrames[static_cast<int>(barP)]
-					.m_valueTypes[static_cast<int>(IndicatorValueType::Value)].m_d_data;
-				combinedResult.indicatorScores[static_cast<int>(indT)].m_scores[static_cast<int>(barP)] = resData[resIdx];
+				totalScore += streamIndT_LenRes.m_timeFrames.at(static_cast<int>(barP))
+					.m_valueTypes.at(static_cast<int>(IndicatorValueType::Value)).m_d_data[resIdx];
 			}
 		}
 	}
-	combinedResult.calcTotalResult();
-	return combinedResult;
+	return totalScore;
 }

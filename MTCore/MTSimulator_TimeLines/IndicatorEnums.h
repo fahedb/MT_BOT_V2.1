@@ -43,6 +43,7 @@ enum struct IndicatorValueType
 };
 // <IndicatorValueTypeList>
 // This struct contains a list of available indicator value types.
+#define INDICATOR_VALUE_TYPES_COUNT 2 // Number of defined indicator value types excluding NONE -- Need to be updated if new types are added
 struct IndicatorValueTypeList
 {
 	std::vector<IndicatorValueType> valueTypes = { IndicatorValueType::Value, IndicatorValueType::Slope };
@@ -85,6 +86,7 @@ enum struct IndicatorLen
 
 // <IndicatorLenList>
 // This struct contains a list of available indicator lengths.
+#define INDICATOR_LENGTHS_COUNT 5 // Number of defined indicator lengths excluding NONE -- Need to be updated if new lengths are added
 struct IndicatorLenList
 {
 	std::vector<IndicatorLen> lengths = { IndicatorLen::L10, IndicatorLen::L15, IndicatorLen::L20, IndicatorLen::L25, IndicatorLen::L30 };

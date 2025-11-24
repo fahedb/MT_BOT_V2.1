@@ -1,4 +1,6 @@
 #include "StreamSetters.h"
+#include "CudaMemoryController.h"
+
 #include <iostream>
 
 IndicatorTypeList glob_indType_StreamSetters;
@@ -6,7 +8,36 @@ IndicatorLenList glob_indLen_StreamSetters;
 BarPeriodList glob_barP_StreamSetters;
 IndicatorValueTypeList glob_valType_StreamSetters;
 
-void StreamSetters::ResetDataStream_To0(dataStream_t** dataSt) // Reset all data streams to 0
+
+void StreamSetters::ResetDataStreamTree_To0(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT, MemoryLocation memLocation) {
+
+	int indTypeIndex = static_cast<int>(indT);
+	int indLenIndex = static_cast<int>(indL);
+	int barPeriodIndex = static_cast<int>(barP);
+	int valTypeIndex = static_cast<int>(valT);
+
+	float*& existingData = dataSt->m_indicators.at(indTypeIndex).m_lens.at(indLenIndex).m_timeFrames.at(barPeriodIndex).m_valueTypes.at(valTypeIndex).m_d_data;
+	int numElements = dataSt->m_indicators.at(indTypeIndex).m_lens.at(indLenIndex).m_timeFrames.at(barPeriodIndex).m_valueTypes.at(valTypeIndex).m_numElements;
+
+	if(!numElements || !existingData)
+	{
+		std::cout << "ResetDataStreamTree_To0: No elements to reset" << std::endl;
+		return; // No elements to reset
+	}
+	switch (memLocation)
+	{
+	case MemoryLocation::HOST:
+		memset(existingData, 0, sizeof(float) * numElements);
+		break;
+	case MemoryLocation::DEVICE:
+		CudaMemorySet(existingData, 0, numElements);
+		break;
+	default:
+		break;
+	}
+}
+
+void StreamSetters::ResetDataStream_To0(dataStream_t* dataSt, MemoryLocation memLocation) // Reset all data streams to 0
 {
 	for(auto indT : glob_indType_StreamSetters.types)
 	{
@@ -16,92 +47,144 @@ void StreamSetters::ResetDataStream_To0(dataStream_t** dataSt) // Reset all data
 			{
 				for(auto valT : glob_valType_StreamSetters.valueTypes)
 				{
-					ResetDataStreamTree_To0(dataSt, indT, indL, barP, valT);
+					ResetDataStreamTree_To0(dataSt, indT, indL, barP, valT, memLocation);
 				}
 			}
 		}
 	}
 }
 
-void StreamSetters::ResetDataStreamTree_To0(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT) {
-	
-	CheckDataStreamTree(dataSt, indT, indL, barP, valT); // Ensure the data stream tree is properly initialized
-	float*& existingData = (*dataSt)->m_indicators[static_cast<int>(indT)]
-		.m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_d_data;
-	int numElements = (*dataSt)->m_indicators[static_cast<int>(indT)]
-		.m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_numElements;
-	if(!numElements || !existingData)
-	{
-		std::cout << "ResetDataStreamTree_To0: No elements to reset" << std::endl;
-		return; // No elements to reset
-	}
-	
-	memset(existingData, 0,
-					sizeof(float) * (*dataSt)->m_indicators[static_cast<int>(indT)]
-					.m_lens[static_cast<int>(indL)].m_timeFrames[static_cast<int>(barP)].m_valueTypes[static_cast<int>(valT)].m_numElements);
-}
-
-void StreamSetters::CheckDataStreamTree(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT)
+void StreamSetters::AllocateDataStream(dataStream_t* dataSt, int numElements, MemoryLocation memLocation)
 {
-	CheckDataStream(dataSt); // Initialize if null
-	CheckIndicatorStream(dataSt, indT); // Ensure indicator type exists
-	CheckLenStream(dataSt, indT, indL); // Ensure indicator length exists
-	CheckTimeFrameStream(dataSt, indT, indL, barP); // Ensure timeframe exists
-	CheckValueTypeStream(dataSt, indT, indL, barP, valT); // Ensure value type exists
-}
-
-void StreamSetters::CheckDataStream(dataStream_t** dataSt)
-{
-	if (*dataSt == nullptr)
+	for(auto indT : glob_indType_StreamSetters.types)
 	{
-		*dataSt = new dataStream_t();
+		for(auto indL : glob_indLen_StreamSetters.lengths)
+		{
+			for(auto barP : glob_barP_StreamSetters.periods)
+			{
+				for(auto valT : glob_valType_StreamSetters.valueTypes)
+				{
+					AllocateDataStreamTree(dataSt, indT, indL, barP, valT, numElements, memLocation);
+				}
+			}
+		}
 	}
 }
-void StreamSetters::CheckIndicatorStream(dataStream_t** dataSt, IndicatorType indT)
+
+void StreamSetters::AllocateDataStreamTree(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT, int numElements, MemoryLocation memLocation)
 {
 	int indTypeIndex = static_cast<int>(indT);
-	while ((*dataSt)->m_indicators.size() <= indTypeIndex)
+	int indLenIndex = static_cast<int>(indL);
+	int barPeriodIndex = static_cast<int>(barP);
+	int valTypeIndex = static_cast<int>(valT);
+
+	auto& inds = dataSt->m_indicators.at(indTypeIndex);
+	auto& lens = inds.m_lens.at(indLenIndex);
+	auto& timeFrames = lens.m_timeFrames.at(barPeriodIndex);
+	float** existingData = &timeFrames.m_valueTypes.at(valTypeIndex).m_d_data;
+	dataSt->m_indicators.at(indTypeIndex).m_lens.at(indLenIndex).m_timeFrames.at(barPeriodIndex).m_valueTypes.at(valTypeIndex).m_numElements = numElements;
+
+	switch (memLocation)
 	{
-		(*dataSt)->m_indicators.push_back(IndStream_t());
+	case MemoryLocation::HOST:
+		*existingData = new float[numElements]; // Allocate array for indicator values --HOST MEMORY
+		break;
+	case MemoryLocation::DEVICE:
+		CudaMemoryAllocation(existingData, numElements); // Allocate array for indicator values --DEVICE MEMORY
+		break;
+	default:
+		break;
 	}
-	(*dataSt)->m_indicators[indTypeIndex].m_indicatorType = indT;
 }
 
-void StreamSetters::CheckLenStream(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL)
+void StreamSetters::MemoryFreeDataStream(dataStream_t* dataSt, MemoryLocation memLocation)
 {
-	int indicatorLenIndex = static_cast<int>(indL);
-	int indTypeIndex = static_cast<int>(indT);
-	while ((*dataSt)->m_indicators[indTypeIndex].m_lens.size() <= indicatorLenIndex)
+	for(auto indT : glob_indType_StreamSetters.types)
 	{
-		(*dataSt)->m_indicators[indTypeIndex].m_lens.push_back(LenIndicatorStream_t());
+		for(auto indL : glob_indLen_StreamSetters.lengths)
+		{
+			for(auto barP : glob_barP_StreamSetters.periods)
+			{
+				for(auto valT : glob_valType_StreamSetters.valueTypes)
+				{
+					MemoryFreeDataStreamTree(dataSt, indT, indL, barP, valT, memLocation);
+				}
+			}
+		}
 	}
-	(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_indicatorType = indL;
 }
 
-void StreamSetters::CheckTimeFrameStream(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP)
+void StreamSetters::MemoryFreeDataStreamTree(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT, MemoryLocation memLocation)
 {
 	int indTypeIndex = static_cast<int>(indT);
-	int indicatorLenIndex = static_cast<int>(indL);
-	int timeFrameIndex = static_cast<int>(barP);
-
-	while ((*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames.size() <= timeFrameIndex)
+	int indLenIndex = static_cast<int>(indL);
+	int barPeriodIndex = static_cast<int>(barP);
+	int valTypeIndex = static_cast<int>(valT);
+	float*& existingData = dataSt->m_indicators.at(indTypeIndex).m_lens.at(indLenIndex).m_timeFrames.at(barPeriodIndex).m_valueTypes.at(valTypeIndex).m_d_data;
+	if(!existingData)
 	{
-		(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames.push_back(TimeFrameStream_t());
+		return; // No data to free
 	}
-	(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_barPeriod = barP;
+
+	switch (memLocation)
+	{
+	case MemoryLocation::HOST:
+		delete[] existingData;
+		existingData = nullptr;
+		break;
+	case MemoryLocation::DEVICE:
+		CudaMemoryFree(existingData);
+		existingData = nullptr;
+		break;
+	default:
+		break;
+	}
 }
 
-void StreamSetters::CheckValueTypeStream(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT)
+void StreamSetters::MoveDataToDevice(dataStream_t* hostDataSt, dataStream_t* deviceDataSt)
 {
-	int indTypeIndex = static_cast<int>(indT);
-	int indicatorLenIndex = static_cast<int>(indL);
-	int timeFrameIndex = static_cast<int>(barP);
-	int valueTypeIndex = static_cast<int>(valT);
-	// Expand vector until it's large enough to safely access valueTypeIndex
-	while ((*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes.size() <= valueTypeIndex)
+	for(auto indT : glob_indType_StreamSetters.types)
 	{
-		(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes.push_back(ValueTypeStream_t());
+		for(auto indL : glob_indLen_StreamSetters.lengths)
+		{
+			for(auto barP : glob_barP_StreamSetters.periods)
+			{
+				for(auto valT : glob_valType_StreamSetters.valueTypes)
+				{
+					int indTypeIndex = static_cast<int>(indT);
+					int indLenIndex = static_cast<int>(indL);
+					int barPeriodIndex = static_cast<int>(barP);
+					int valTypeIndex = static_cast<int>(valT);
+					float* hostData = hostDataSt->m_indicators.at(indTypeIndex).m_lens.at(indLenIndex).m_timeFrames.at(barPeriodIndex).m_valueTypes.at(valTypeIndex).m_d_data;
+					int numElements = hostDataSt->m_indicators.at(indTypeIndex).m_lens.at(indLenIndex).m_timeFrames.at(barPeriodIndex).m_valueTypes.at(valTypeIndex).m_numElements;
+					float* deviceDataPtr = deviceDataSt->m_indicators.at(indTypeIndex).m_lens.at(indLenIndex).m_timeFrames.at(barPeriodIndex).m_valueTypes.at(valTypeIndex).m_d_data;
+					CudaMemoryCopyToDevice<float>(deviceDataPtr, hostData, numElements);
+				}
+			}
+		}
 	}
-	(*dataSt)->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[timeFrameIndex].m_valueTypes[valueTypeIndex].m_valueType = valT;
 }
 
+void StreamSetters::MoveDataToHost(dataStream_t* deviceDataSt, dataStream_t* hostDataSt)
+{
+	for(auto indT : glob_indType_StreamSetters.types)
+	{
+		for(auto indL : glob_indLen_StreamSetters.lengths)
+		{
+			for(auto barP : glob_barP_StreamSetters.periods)
+			{
+				for(auto valT : glob_valType_StreamSetters.valueTypes)
+				{
+					int indTypeIndex = static_cast<int>(indT);
+					int indLenIndex = static_cast<int>(indL);
+					int barPeriodIndex = static_cast<int>(barP);
+					int valTypeIndex = static_cast<int>(valT);
+					float* deviceData = deviceDataSt->m_indicators.at(indTypeIndex).m_lens.at(indLenIndex).m_timeFrames.at(barPeriodIndex).m_valueTypes.at(valTypeIndex).m_d_data;
+					int numElements = deviceDataSt->m_indicators.at(indTypeIndex).m_lens.at(indLenIndex).m_timeFrames.at(barPeriodIndex).m_valueTypes.at(valTypeIndex).m_numElements;
+					float* hostDataPtr = hostDataSt->m_indicators.at(indTypeIndex).m_lens.at(indLenIndex).m_timeFrames.at(barPeriodIndex).m_valueTypes.at(valTypeIndex).m_d_data;
+					CudaMemoryCopyToHost<float>(hostDataPtr, deviceData, numElements);
+				}
+			}
+		}
+	}
+}

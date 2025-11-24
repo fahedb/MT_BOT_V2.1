@@ -4,14 +4,16 @@
 class StreamSetters
 {
 public:
-	static void CheckDataStreamTree(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT);
-	static void CheckDataStream(dataStream_t** dataSt);
-	static void CheckIndicatorStream(dataStream_t** dataSt, IndicatorType indT);
-	static void CheckLenStream(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL);
-	static void CheckTimeFrameStream(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP);
-	static void CheckValueTypeStream(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT);
+	static void ResetDataStreamTree_To0(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT, MemoryLocation memLocation);
+	static void ResetDataStream_To0(dataStream_t* dataSt, MemoryLocation memLocation);
 
-	static void ResetDataStreamTree_To0(dataStream_t** dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT);
-	static void ResetDataStream_To0(dataStream_t** dataSt);
+	static void AllocateDataStream(dataStream_t* dataSt, int numElements, MemoryLocation memLocation);
+	static void AllocateDataStreamTree(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT, int numElements, MemoryLocation memLocation);
+
+	static void MemoryFreeDataStream(dataStream_t* dataSt, MemoryLocation memLocation);
+	static void MemoryFreeDataStreamTree(dataStream_t* dataSt, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT, MemoryLocation memLocation);
+
+	static void MoveDataToDevice(dataStream_t* hostDataSt, dataStream_t* deviceDataSt);
+	static void MoveDataToHost(dataStream_t* deviceDataSt, dataStream_t* hostDataSt);
 };
 

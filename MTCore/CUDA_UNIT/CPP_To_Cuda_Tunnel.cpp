@@ -8,274 +8,117 @@
 
 #include <iostream>
 
-#define USE_TILED_CALCS_SCORECALCS 1
 
-dataStream_t* g_HistDataStream = nullptr;
-dataStream_t* g_CurrDataStream = nullptr;
+void CPP_To_Cuda_Tunnel::Calc_TwoIndicatorsRatio_ScoreCalcs(float* d_results
 
-float* g_newPrevIdx0Scores_D = nullptr;
-float* g_oldPrevIdx0Scores_D = nullptr;
-int g_prevIdx0ScoresSize_D = 0; // size for both old and new arrays
+	///////////////////// Hist len X arrays ////////////////////////////////////////////
+	, const float* d_histIndX_Values, const float* d_histIndX_Slopes				////
+	, const float* d_histIndX_MinValues, const float* d_histIndX_MaxValues			////
+	, const float* d_histIndX_MinSlopes, const float* d_histIndX_MaxSlopes			////
+	////////////////////////////////////////////////////////////////////////////////////
 
-float* g_prevScanTotalScores_D = nullptr;
-int g_prevScanTotalScoresSize_D = 0;
+	/////////////////////// Current len X arrays //////////////////////////////////////
+	, const float* d_currIndX_Values, const float* d_currIndX_Slopes				///
+	, const float* d_currIndX_MinValues, const float* d_currIndX_MaxValues			///
+	, const float* d_currIndX_MinSlopes, const float* d_currIndX_MaxSlopes			///
+	///////////////////////////////////////////////////////////////////////////////////
 
-float* g_totalScores_D = nullptr;
-int g_totalScoresSize_D = 0;
+	////////////////////// Hist len Y arrays //////////////////////////////////////////
+	, const float* d_histIndY_Values, const float* d_histIndY_Slopes				///				
+	, const float* d_histIndY_MinValues, const float* d_histIndY_MaxValues			///
+	, const float* d_histIndY_MinSlopes, const float* d_histIndY_MaxSlopes			///
+	///////////////////////////////////////////////////////////////////////////////////
 
-void CPP_To_Cuda_Tunnel::Set_TotalScore_D_Memory(size_t size)
+	///////////////////// Current len Y arrays ////////////////////////////////////////
+	, const float* d_currIndY_Values, const float* d_currIndY_Slopes				///			
+	, const float* d_currIndY_MinValues, const float* d_currIndY_MaxValues			///
+	, const float* d_currIndY_MinSlopes, const float* d_currIndY_MaxSlopes			///
+	///////////////////////////////////////////////////////////////////////////////////
+
+	, int currTimeLineLen, int numOfResults, int weight)
 {
-	CudaMemoryAllocation(&g_totalScores_D, size);
-	CudaMemoryAllocation(&g_prevScanTotalScores_D, size);
-	CudaMemoryAllocation(&g_newPrevIdx0Scores_D, size);
-	CudaMemoryAllocation(&g_oldPrevIdx0Scores_D, size);
-
-	g_totalScoresSize_D = size;
-	g_prevScanTotalScoresSize_D = size;
-	g_prevIdx0ScoresSize_D = size;
-
-	cudaMemset(g_totalScores_D, 0, sizeof(float) * size);
-	cudaMemset(g_prevScanTotalScores_D, 0, sizeof(float) * size);
-	cudaMemset(g_newPrevIdx0Scores_D, 0, sizeof(float) * size);
-	cudaMemset(g_oldPrevIdx0Scores_D, 0, sizeof(float) * size);
-}
-void CPP_To_Cuda_Tunnel::Reset_TotalScores_D_To0()
-{
-	// Need to swap pointers between prev and current total scores -- Doing this way to avoid memory copy (faster)
-	float* temp = g_prevScanTotalScores_D;
-	g_prevScanTotalScores_D = g_totalScores_D; // Now prev has the current total scores
-	g_totalScores_D = temp; // Now current has the previous total scores -- Need to reset to 0
-
-	// Need to swap pointer between old and new prev idx0 scores -- Doing this way to avoid memory copy (faster)
-	temp = g_oldPrevIdx0Scores_D;
-	g_oldPrevIdx0Scores_D = g_newPrevIdx0Scores_D;
-	g_newPrevIdx0Scores_D = temp;
-
-	if (g_totalScores_D && g_totalScoresSize_D > 0) // Reset current total scores to 0
-	{
-		cudaMemset(g_totalScores_D, 0, sizeof(float) * g_totalScoresSize_D);
-	}
-	if (g_newPrevIdx0Scores_D && g_prevIdx0ScoresSize_D > 0) // Reset new prev idx0 scores to 0
-	{
-		cudaMemset(g_newPrevIdx0Scores_D, 0, sizeof(float) * g_prevIdx0ScoresSize_D);
-	}
-}
-
-
-void CPP_To_Cuda_Tunnel::Calc_TwoIndicatorsRatio_ScoreCalcs(float* h_outScores, int numOfResults, IndicatorType indT, IndicatorLen indL1, BarPeriod barP1, IndicatorLen indL2, BarPeriod barP2, int weight, bool fullScan)
-{
-	if(h_outScores == nullptr || numOfResults <= 0 || !g_HistDataStream || !g_CurrDataStream)
+	if (!d_results
+		|| !d_histIndX_Values || !d_histIndX_Slopes || !d_currIndX_Values || !d_currIndX_Slopes
+		|| !d_histIndY_Values || !d_histIndY_Slopes || !d_currIndY_Values || !d_currIndY_Slopes)
 	{
 		std::cout << "Invalid input to Calc_TwoIndicatorsRatio_ScoreCalcs" << std::endl;
 		return;
 	}
-	int indTIdx = static_cast<int>(indT);
-	
-	int indL_X_Idx = static_cast<int>(indL1);
-	int barP_X_Idx = static_cast<int>(barP1);
-	float* histInd_X_values = g_HistDataStream->m_indicators[indTIdx].m_lens[indL_X_Idx].m_timeFrames[barP_X_Idx].m_valueTypes[static_cast<int>(IndicatorValueType::Value)].m_d_data;
-	float* histInd_X_slopes = g_HistDataStream->m_indicators[indTIdx].m_lens[indL_X_Idx].m_timeFrames[barP_X_Idx].m_valueTypes[static_cast<int>(IndicatorValueType::Slope)].m_d_data;
-	float* currInd_X_values = g_CurrDataStream->m_indicators[indTIdx].m_lens[indL_X_Idx].m_timeFrames[barP_X_Idx].m_valueTypes[static_cast<int>(IndicatorValueType::Value)].m_d_data;
-	float* currInd_X_slopes = g_CurrDataStream->m_indicators[indTIdx].m_lens[indL_X_Idx].m_timeFrames[barP_X_Idx].m_valueTypes[static_cast<int>(IndicatorValueType::Slope)].m_d_data;
 
-	int indL_Y_Idx = static_cast<int>(indL2);
-	int barP_Y_Idx = static_cast<int>(barP2);
-	float* histInd_Y_values = g_HistDataStream->m_indicators[indTIdx].m_lens[indL_Y_Idx].m_timeFrames[barP_Y_Idx].m_valueTypes[static_cast<int>(IndicatorValueType::Value)].m_d_data;
-	float* histInd_Y_slopes = g_HistDataStream->m_indicators[indTIdx].m_lens[indL_Y_Idx].m_timeFrames[barP_Y_Idx].m_valueTypes[static_cast<int>(IndicatorValueType::Slope)].m_d_data;
-	float* currInd_Y_values = g_CurrDataStream->m_indicators[indTIdx].m_lens[indL_Y_Idx].m_timeFrames[barP_Y_Idx].m_valueTypes[static_cast<int>(IndicatorValueType::Value)].m_d_data;
-	float* currInd_Y_slopes = g_CurrDataStream->m_indicators[indTIdx].m_lens[indL_Y_Idx].m_timeFrames[barP_Y_Idx].m_valueTypes[static_cast<int>(IndicatorValueType::Slope)].m_d_data;
-	float* d_results = g_totalScores_D;
+	TwoIndCalc(d_histIndX_Values, d_histIndX_Slopes,
+		d_histIndX_MinValues, d_histIndX_MaxValues,
+		d_histIndX_MinSlopes, d_histIndX_MaxSlopes,
 
-	int histSize = g_HistDataStream->m_indicators[indTIdx].m_lens[indL_X_Idx].m_timeFrames[barP_X_Idx].m_valueTypes[static_cast<int>(IndicatorValueType::Value)].m_numElements;
-	int currSize = g_CurrDataStream->m_indicators[indTIdx].m_lens[indL_X_Idx].m_timeFrames[barP_X_Idx].m_valueTypes[static_cast<int>(IndicatorValueType::Value)].m_numElements;
-	if (fullScan)
-	{
+		d_currIndX_Values, d_currIndX_Slopes,
+		d_currIndX_MinValues, d_currIndX_MaxValues,
+		d_currIndX_MinSlopes, d_currIndX_MaxSlopes,
 
-		if (USE_TILED_CALCS_SCORECALCS)
-		{
-			TwoIndCalc_tiled(histInd_X_values, histInd_X_slopes, currInd_X_values, currInd_X_slopes,
-				histInd_Y_values, histInd_Y_slopes, currInd_Y_values, currInd_Y_slopes,
-				d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
-		}
-		else
-		{
-			TwoIndCalc(histInd_X_values, histInd_X_slopes, currInd_X_values, currInd_X_slopes,
-				histInd_Y_values, histInd_Y_slopes, currInd_Y_values, currInd_Y_slopes,
-				d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
-		}
-	}
-	else {
-		TwoIndCalc_SlidingWindow(histInd_X_values, histInd_X_slopes, currInd_X_values, currInd_X_slopes,
-			histInd_Y_values, histInd_Y_slopes, currInd_Y_values, currInd_Y_slopes,
-			d_results, g_prevScanTotalScores_D, g_newPrevIdx0Scores_D, g_oldPrevIdx0Scores_D,
-			currSize, histSize, weight);
-	}
-	// Need to sync device to ensure calculations are done before launching next kernel
-	SyncCUDADevice();
+		d_histIndY_Values, d_histIndY_Slopes,
+		d_histIndY_MinValues, d_histIndY_MaxValues,
+		d_histIndY_MinSlopes, d_histIndY_MaxSlopes,
+
+		d_currIndY_Values, d_currIndY_Slopes,
+		d_currIndY_MinValues, d_currIndY_MaxValues,
+		d_currIndY_MinSlopes, d_currIndY_MaxSlopes,
+		d_results,
+		currTimeLineLen, numOfResults, weight
+	);
 }
 
-void CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(float* h_outScores, int numOfResults, IndicatorType indT, IndicatorLen indL, BarPeriod barP, int weight, bool fullScan)
+void CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(float* d_results
+	//////////////////////////////////// Hist arrays //////////////////////////////////////////////////
+	, const float* d_histValues, const float* d_histSlopes											///
+	, const float* d_hist_MinValues, const float* d_hist_MaxValues									///
+	, const float* d_hist_MinSlopes, const float* d_hist_MaxSlopes									///
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//////////////////////////////////// Current arrays ///////////////////////////////////////////////
+	, const float* d_currValues, const float* d_currSlopes											///
+	, const float* d_curr_MinValues, const float* d_curr_MaxValues									///
+	, const float* d_curr_MinSlopes, const float* d_curr_MaxSlopes									///
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	, int currTimeLineLen, int numOfResults, IndicatorType indT, int weight)
 {
-	if (!h_outScores || numOfResults <= 0 || !g_totalScores_D|| !g_HistDataStream || !g_CurrDataStream)
+	if (!d_results || numOfResults <= 0)
 	{
 		std::cout << "Invalid input to Calc_Indicator_ScoreCalcs" << std::endl;
 		return;
 	}
-	int indTIdx = static_cast<int>(indT);
-	int indLIdx = static_cast<int>(indL);
-	int barPIdx = static_cast<int>(barP);
-	float* histInd_values = g_HistDataStream->m_indicators[indTIdx].m_lens[indLIdx].m_timeFrames[barPIdx].m_valueTypes[static_cast<int>(IndicatorValueType::Value)].m_d_data;
-	float* histInd_slopes = g_HistDataStream->m_indicators[indTIdx].m_lens[indLIdx].m_timeFrames[barPIdx].m_valueTypes[static_cast<int>(IndicatorValueType::Slope)].m_d_data;
-	
-	float* currInd_values = g_CurrDataStream->m_indicators[indTIdx].m_lens[indLIdx].m_timeFrames[barPIdx].m_valueTypes[static_cast<int>(IndicatorValueType::Value)].m_d_data;
-	float* currInd_slopes = g_CurrDataStream->m_indicators[indTIdx].m_lens[indLIdx].m_timeFrames[barPIdx].m_valueTypes[static_cast<int>(IndicatorValueType::Slope)].m_d_data;
-	
-	float* d_results = g_totalScores_D;
-
-	int histSize = g_HistDataStream->m_indicators[indTIdx].m_lens[indLIdx].m_timeFrames[barPIdx].m_valueTypes[static_cast<int>(IndicatorValueType::Value)].m_numElements;
-	int currSize = g_CurrDataStream->m_indicators[indTIdx].m_lens[indLIdx].m_timeFrames[barPIdx].m_valueTypes[static_cast<int>(IndicatorValueType::Value)].m_numElements;
 
 	if(indT == IndicatorType::EMA)
 	{
 		// Call EMA scoring function
-		if (fullScan)
-		{
+		calcMA(d_histValues, d_histSlopes,
+			d_hist_MinValues, d_hist_MaxValues,
+			d_hist_MinSlopes, d_hist_MaxSlopes,
 
-			if (USE_TILED_CALCS_SCORECALCS)
-				calcMA_tiled(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
-			else
-				calcMA(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
-		}
-		else {
-			calcMA_SlidingWindow(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevScanTotalScores_D, g_newPrevIdx0Scores_D, g_oldPrevIdx0Scores_D, currSize, histSize, weight);
-		}
+			d_currValues, d_currSlopes,
+			d_curr_MinValues, d_curr_MaxValues,
+			d_curr_MinSlopes, d_curr_MaxSlopes,
+			d_results, currTimeLineLen, numOfResults, weight);
+
 	}
 	else if(indT == IndicatorType::RSI)
 	{
-		if (fullScan)
-		{
-
-			// Call RSI scoring function
-			if (USE_TILED_CALCS_SCORECALCS)
-				calcRSI_tiled(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
-			else
-				calcRSI(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
-		}
-		else {
-			calcRSI_SlidingWindow(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevScanTotalScores_D,g_newPrevIdx0Scores_D, g_oldPrevIdx0Scores_D, currSize, histSize, weight);
-		}
+		calcRSI(d_histValues, d_histSlopes,
+			d_currValues, d_currSlopes,
+			d_results, currTimeLineLen, numOfResults, weight);
+		
 	}
 	else if (indT == IndicatorType::ZLSMA)
 	{
-		if (fullScan)
-		{
+		calcMA(d_histValues, d_histSlopes,
+			d_hist_MinValues, d_hist_MaxValues,
+			d_hist_MinSlopes, d_hist_MaxSlopes,
 
-			// Call ZLSMA scoring function
-			if (USE_TILED_CALCS_SCORECALCS)
-				calcMA_tiled(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
-			else
-				calcMA(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_newPrevIdx0Scores_D, currSize, histSize, weight);
-		}
-		else {
-			calcMA_SlidingWindow(histInd_values, histInd_slopes, currInd_values, currInd_slopes, d_results, g_prevScanTotalScores_D, g_newPrevIdx0Scores_D, g_oldPrevIdx0Scores_D, currSize, histSize, weight);
-		}
-	}
-	// Need to sync device to ensure calculations are done before launching next kernel
-	SyncCUDADevice();
-}
-// ------------------------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------------------------
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Setter function to set data for a specific indicator, length, and timeframe in the current data stream for the GPU device /////////
-// If data already exists for the specified combination, it will not be overwritten unless forceOverWrite/////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			d_currValues, d_currSlopes,
+			d_curr_MinValues, d_curr_MaxValues,
+			d_curr_MinSlopes, d_curr_MaxSlopes,
 
-void CPP_To_Cuda_Tunnel::Set_CurrDataTimeFreameStream(float* h_data, size_t h_dataSize, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT ,bool forceOverWrite)
-{
-	StreamSetters::CheckDataStreamTree(&g_CurrDataStream, indT, indL, barP, valT); // Ensure the data stream tree is properly initialized
-	
-	if (!g_CurrDataStream) {
-		std::cout << "Set_CurrDataTimeFreameStream: g_CurrDataStream is null!" << std::endl;
-		exit(EXIT_FAILURE);
+			d_results, currTimeLineLen, numOfResults, weight);
 	}
-	
-	int indTypeIndex = static_cast<int>(indT);
-	int indicatorLenIndex = static_cast<int>(indL);
-	int barPeriodIndex = static_cast<int>(barP);
-	int valTypeIndex = static_cast<int>(valT);
-	
-	// Safety checks for bounds
-	if (indTypeIndex < 0 || indTypeIndex >= g_CurrDataStream->m_indicators.size()) {
-		std::cout << "Set_CurrDataTimeFreameStream: Invalid indTypeIndex: " << indTypeIndex << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	if (indicatorLenIndex < 0 || indicatorLenIndex >= g_CurrDataStream->m_indicators[indTypeIndex].m_lens.size()) {
-		std::cout << "Set_CurrDataTimeFreameStream: Invalid indicatorLenIndex: " << indicatorLenIndex << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	if (barPeriodIndex < 0 || barPeriodIndex >= g_CurrDataStream->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames.size()) {
-		std::cout << "Set_CurrDataTimeFreameStream: Invalid barPeriodIndex: " << barPeriodIndex << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	if (valTypeIndex < 0 || valTypeIndex >= g_CurrDataStream->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[barPeriodIndex].m_valueTypes.size()) {
-		std::cout << "Set_CurrDataTimeFreameStream: Invalid valTypeIndex: " << valTypeIndex << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	
-	ValueTypeStream_t* valTStream = &g_CurrDataStream->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[barPeriodIndex].m_valueTypes[valTypeIndex];
-
-	float* existingData = valTStream->m_d_data;
-
-	if(existingData != nullptr && !forceOverWrite)
-	{
-		// Data already exists, do not overwrite
-		return;
-	}
-	else if(existingData != nullptr && forceOverWrite)
-	{
-		// Free existing device memory before overwriting
-		cudaFree(existingData);
-		valTStream->m_d_data = nullptr;
-	}
-
-	valTStream->m_valueType = valT;
-	valTStream->m_numElements = static_cast<int>(h_dataSize);
-	CudaMemoryAllocation(&(valTStream->m_d_data), h_dataSize);
-	CudaMemoryCopyToDevice<float>(valTStream->m_d_data, h_data, h_dataSize);
 }
 
-void CPP_To_Cuda_Tunnel::Set_HistDataTimeFreameStream(float* h_data, size_t h_dataSize, IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType valT ,bool forceOverWrite)
-{
-	StreamSetters::CheckDataStreamTree(&g_HistDataStream, indT, indL, barP, valT); // Ensure the data stream tree is properly initialized
-	int indTypeIndex = static_cast<int>(indT);
-	int indicatorLenIndex = static_cast<int>(indL);
-	int barPeriodIndex = static_cast<int>(barP);
-	int valTypeIndex = static_cast<int>(valT);
-	ValueTypeStream_t* valTStream = &g_HistDataStream->m_indicators[indTypeIndex].m_lens[indicatorLenIndex].m_timeFrames[barPeriodIndex].m_valueTypes[valTypeIndex];
-	float* existingData = valTStream->m_d_data;
-	if (existingData != nullptr && !forceOverWrite)
-	{
-		// Data already exists, do not overwrite
-		return;
-	}
-	else if (existingData != nullptr && forceOverWrite)
-	{
-		// Free existing device memory before overwriting
-		cudaFree(existingData);
-		valTStream->m_d_data = nullptr;
-	}
-	valTStream->m_valueType = valT;
-
-	valTStream->m_numElements = static_cast<int>(h_dataSize);
-	CudaMemoryAllocation(&(valTStream->m_d_data), h_dataSize);
-	CudaMemoryCopyToDevice<float>(valTStream->m_d_data, h_data, h_dataSize);
-}
-
-
-void CPP_To_Cuda_Tunnel::Get_ResultsFromDevice(float* h_outScores, int numOfResults)
-{
-	CudaMemoryCopyToHost<float>(h_outScores, g_totalScores_D, numOfResults);
-}
 
 bool CPP_To_Cuda_Tunnel::IsCudaAvailable()
 {
@@ -308,14 +151,4 @@ bool CPP_To_Cuda_Tunnel::IsCudaAvailable()
 void CPP_To_Cuda_Tunnel::SyncCUDADevice()
 {
 	SyncDevice();
-}
-
-void CPP_To_Cuda_Tunnel::Get_newPrevIdx0Scores_FromDevice(float* h_outScores, int numOfResults)
-{
-	CudaMemoryCopyToHost<float>(h_outScores, g_newPrevIdx0Scores_D, numOfResults);
-}
-
-void CPP_To_Cuda_Tunnel::Get_oldPrevIdx0Scores_FromDevice(float* h_outScores, int numOfResults)
-{
-	CudaMemoryCopyToHost<float>(h_outScores, g_oldPrevIdx0Scores_D, numOfResults);
 }

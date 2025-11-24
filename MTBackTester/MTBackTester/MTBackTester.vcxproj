@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseWithChecks|Win32">
+      <Configuration>ReleaseWithChecks</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseWithChecks|x64">
+      <Configuration>ReleaseWithChecks</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{d1351a07-9054-453d-bfbe-cfad6ab596d8}</ProjectGuid>
+    <RootNamespace>MTBackTester</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithChecks|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithChecks|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithChecks|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithChecks|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithChecks|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Logger;..\..\MTCore\TradeSimulator;..\..\MTCore\MTSimulator_Cache;..\..\MTCore\MTSimulator_Scanner;..\..\MTCore\MTSimulator_DataExporter;..\..\MTCore\MTSimulator_TradeManager;..\..\MTCore\MTSimulator_ResourcesManager;..\..\HTTPCore;..\..\MTCore\MTSimulator_TimeLines;..\..\MTCore\MTSimulator_Tables;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Configurations;..\..\MTCore\MTSimulator_Compare;..\..\MTCore\MTSimulator_DataLoader;..\..\MTCore\CUDA_UNIT</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\lib\x64\cudart_static.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\lib\x64\cudadevrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Logger;..\..\MTCore\TradeSimulator;..\..\MTCore\MTSimulator_Cache;..\..\MTCore\MTSimulator_Scanner;..\..\MTCore\MTSimulator_DataExporter;..\..\MTCore\MTSimulator_TradeManager;..\..\MTCore\MTSimulator_ResourcesManager;..\..\HTTPCore;..\..\MTCore\MTSimulator_TimeLines;..\..\MTCore\MTSimulator_Tables;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Configurations;..\..\MTCore\MTSimulator_Compare;..\..\MTCore\MTSimulator_DataLoader;..\..\MTCore\CUDA_UNIT</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\lib\x64\cudart_static.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\lib\x64\cudadevrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithChecks|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Logger;..\..\MTCore\TradeSimulator;..\..\MTCore\MTSimulator_Cache;..\..\MTCore\MTSimulator_Scanner;..\..\MTCore\MTSimulator_DataExporter;..\..\MTCore\MTSimulator_TradeManager;..\..\MTCore\MTSimulator_ResourcesManager;..\..\HTTPCore;..\..\MTCore\MTSimulator_TimeLines;..\..\MTCore\MTSimulator_Tables;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Configurations;..\..\MTCore\MTSimulator_Compare;..\..\MTCore\MTSimulator_DataLoader;..\..\MTCore\CUDA_UNIT</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\lib\x64\cudart_static.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\lib\x64\cudadevrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="BackTestDataLoader.cpp" />
+    <ClCompile Include="BackTestingTimer.cpp" />
+    <ClCompile Include="MTBackTester.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\HTTPCore\HTTPCore.vcxproj">
+      <Project>{795c2df4-ee54-4683-a658-ec0881eec905}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\CUDA_UNIT\CUDA_UNIT.vcxproj">
+      <Project>{02e87210-d38d-1d4a-fdc8-de3425f62891}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Cache\MTSimulator_Cache.vcxproj">
+      <Project>{98afafd3-5a1d-496d-95b1-1aca99e3b752}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Casts\MTSimulator_Casts.vcxproj">
+      <Project>{3e62cd3b-c447-43e0-8dd5-b053c53cefb2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Compare\MTSimulator_Compare.vcxproj">
+      <Project>{88590916-6249-48bb-93fd-150e4e84f16d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Configurations\MTSimulator_Configurations.vcxproj">
+      <Project>{cd63cc16-213c-427f-add8-082d87bdd52a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_DataBaseConnection\MTSimulator_DataBaseConnection.vcxproj">
+      <Project>{0f67c953-62c4-45f9-91fc-94e22a9bbcf9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_DataExporter\MTSimulator_DataExporter.vcxproj">
+      <Project>{96e28090-01d5-4275-9739-2c3f80482659}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_DataImporter\MTSimulator_DataImporter.vcxproj">
+      <Project>{b32c569a-e529-4f0a-88af-b3ecad29ed7b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_DataLoader\MTSimulator_DataLoader.vcxproj">
+      <Project>{db71feb3-b69b-404f-837b-fdd756c10a09}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Logger\MTSimulator_Logger.vcxproj">
+      <Project>{00196295-8402-4a56-ac04-38ebb4b28cea}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_MTThreadPool\MTSimulator_MTThreadPool.vcxproj">
+      <Project>{1baf2f58-4ee0-4d76-88ff-8a3900f208ac}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_ResourcesManager\MTSimulator_ResourcesManager.vcxproj">
+      <Project>{93ce40de-5c0f-4c93-933a-795bf58d3a74}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Scanner\MTSimulator_Scanner.vcxproj">
+      <Project>{aa3bdc34-5831-4946-a100-d921612cd4eb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Statistics\MTSimulator_Statistics.vcxproj">
+      <Project>{2414419e-9dac-42fb-8316-7455abd3b8fe}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Tables\MTSimulator_Tables.vcxproj">
+      <Project>{d8912637-4cc5-4764-bb4c-1abb56523bc7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_TimeLines\MTSimulator_TimeLines.vcxproj">
+      <Project>{c8453010-93d3-40ae-abc3-581108bbbc5b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_TradeManager\MTSimulator_TradeManager.vcxproj">
+      <Project>{62826318-b85a-4ea9-a3fe-53d8809dd28e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\TradeSimulator\TradeSimulator.vcxproj">
+      <Project>{eaa1ba5a-3af8-448b-9e8c-ee57ac3e0de7}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BackTestDataLoader.h" />
+    <ClInclude Include="BackTestingTimer.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

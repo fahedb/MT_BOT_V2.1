@@ -33,6 +33,7 @@ public:
 		index = 0;
 	}
 	_Points GetPointPlace() { return _Points::Points_XAUUSD; }
+	std::string Get_Symbol() override { return "XAUUSD"; }
 	virtual std::string GetDB_PhysicalFileName() override { return	CURR_XAUUSD_DB_FILE; }
 	virtual int tableCols() {
 		return XAUUSDCurrPricesTablesCols;

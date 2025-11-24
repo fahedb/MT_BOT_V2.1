@@ -6,6 +6,7 @@
 #include "ProcessData.h"
 #include "ProccessFlags.h"
 #include "Converts.h"
+#include "Logger.h"
 
 #define LIMIT_LAST_X_LINES 1000000 // Number of lines to skip in the begining of large files when multi threading read is enabled
 

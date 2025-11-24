@@ -3,10 +3,8 @@
 #include "XAUUSD_CurrentTable.h"
 #include "XAUUSD_OneMinTable.h"
 #include "ExchangeData.h"
-#include "ThreadPool.h"
 #include <future>
 #include "PolynomTimeLine.h"
-#include "PolynomTimeLineCache.h"
 
 // <summary>
 /// HistoryTimeLineLoader class for loading
@@ -26,18 +24,10 @@ public:
 		m_chunkSize = 0;
 	}
 
-	void Run()
-	{
-		if (!m_table)
-			m_table = new XAUUSD_OneMinTable(Configrations::getInstance()->Get_DB_FileDir());
-
-		LoadHistoryToVector_MultiThreaded(m_table);
-		m_table->RemoveSelect();
-		int polysBuilt = PolynomTimeLineCacheManager::Build_PoylnomTimeLines_MultiThreaded(m_hitoryTimeLine,CacheType::HISTORICAL); // Build polynomial timelines from the loaded ChangeNodes and cache them
-		Logger::getInstance().WriteLog("Built " + std::to_string(polysBuilt) + " polynomial timelines from the history loaded ChangeNodes.", true, true, LogType::SPECIAL_LOG);
-	}
+	void Run(const std::string& dbFileName = ""); // Main function to run the loader
 
 private:
+	std::string m_dbFileName;
 	std::vector<ChangeNode*>& m_hitoryTimeLine;
 	BasePricesTable* m_table = nullptr; // Pointer to the table, can be used for other purposes if needed
 	int m_chunkSize;

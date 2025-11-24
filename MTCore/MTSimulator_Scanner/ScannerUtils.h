@@ -2,7 +2,7 @@
 #include "StatisticsDecession.h"
 
 #pragma once
-class MTScannerUtils
+class ScannerUtils
 {
 public:
 	static void GoToSleep(int seconds);
@@ -11,6 +11,5 @@ public:
 	static void InitPolicyExporters_BeforeScan();
 	static void InitLayersImporters_BeforeScan(std::vector<ChangeNode*>* hisyoryTl, DBMap* histDBMap );
 	static void ResetLayerExportersIfNeeded();
-
 };
 

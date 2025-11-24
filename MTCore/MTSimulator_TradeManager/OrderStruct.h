@@ -103,8 +103,8 @@ public:
 		std::lock_guard<std::mutex> lock(m_orderLocker);
 		m_lastStatisticsCheckTimePoint = timePoint;
 	}
-	int Get_StopLoss() { return m_sl_pips; }
-	int Get_TakeProfit() { return m_tp_pips; }
+	int Get_StopLoss() const { return m_sl_pips; }
+	int Get_TakeProfit() const { return m_tp_pips; }
 
 
 	void CloseOrder() {

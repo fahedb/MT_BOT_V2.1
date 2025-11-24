@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 
 // <summary>
 // This file contains enumerations and structures related to indicators used in Indicator types, lens and barPeriods
@@ -98,4 +99,18 @@ enum struct _Points {
 	_Points_DEFUALT = 0,
 	Points_EURUSD = 4,
 	Points_XAUUSD = 2
+};
+
+class _PointsUtils
+{
+public:
+	static _Points GetPointPlaceFromSymbol(const std::string& symbol)
+	{
+		if (symbol == "XAUUSD")
+			return _Points::Points_XAUUSD;
+		else if (symbol == "EURUSD")
+			return _Points::Points_EURUSD;
+		else
+			return _Points::_Points_DEFUALT;
+	}
 };

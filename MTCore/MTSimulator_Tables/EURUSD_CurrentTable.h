@@ -14,5 +14,6 @@ public:
 		index = 0;
 	}
 	_Points GetPointPlace() { return _Points::Points_EURUSD; }
+	std::string Get_Symbol() override { return "EURUSD"; }
 
 };

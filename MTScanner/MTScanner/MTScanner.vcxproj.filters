@@ -13,53 +13,37 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="MTScannerUtils">
-      <UniqueIdentifier>{76eefaf7-12f6-4b6e-9754-dd3afb3b8b9a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MTScannerUtils\Inc">
-      <UniqueIdentifier>{abae0d5e-956b-4ef0-9e34-6430c4ab0257}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MTScannerUtils\Src">
-      <UniqueIdentifier>{a2e5c888-4bf5-45a6-a4ce-19f33f090ff7}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MTScanner.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HttpServerSyncer.cpp">
-      <Filter>MTScannerUtils\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="HistoryTimeLineLoader.cpp">
-      <Filter>MTScannerUtils\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="MTScannerUtils.cpp">
-      <Filter>MTScannerUtils\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="StrategiesRunner.cpp">
-      <Filter>MTScannerUtils\Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HttpServerSyncer.h">
-      <Filter>MTScannerUtils\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="HistoryTimeLineLoader.h">
-      <Filter>MTScannerUtils\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="MTScannerUtils.h">
-      <Filter>MTScannerUtils\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="StrategiesRunner.h">
-      <Filter>MTScannerUtils\Inc</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MTScanner.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icon2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icon3.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

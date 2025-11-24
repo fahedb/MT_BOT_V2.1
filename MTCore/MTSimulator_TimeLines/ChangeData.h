@@ -12,6 +12,9 @@
 
 class ChangeNode
 {
+private:
+	_Points m_PointPlace;
+
 public:
 	double m_openPrice;
 	double m_closePrice;
@@ -20,7 +23,6 @@ public:
 
 	long long point_DateTimeLong = 0; // For fast access
 	int	Pip_Change=0;
-	_Points m_PointPlace;
 
 	bool Increase_Decrease = false;
 	bool activePoint=false;

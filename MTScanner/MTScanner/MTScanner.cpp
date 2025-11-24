@@ -1,10 +1,9 @@
-﻿#include "StrategiesRunner.h"
-#include "ProccessFlags.h"
+﻿#include "ProccessFlags.h"
 #include "CONFIGRATIONS.H"
 #include "DataBaseConnection.h"
 #include "ScoreResultsCachePolynom.h"
-#include "CPP_To_Cuda_Tunnel.h"
 
+#include "PatternGodScanner.h"
 void DefualtProgramStart();
 void LoadJson_Data_ToDBFile();
 
@@ -35,8 +34,8 @@ void Init()
 void DefualtProgramStart()
 {
 	Init();
-	StrategiesRunner runner;
-	runner.Run();
+	PatternGodScanner scanner;
+	scanner.Run();
 }
 
 

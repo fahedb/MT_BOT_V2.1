@@ -37,6 +37,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CUDA_UNIT", "..\MTCore\CUDA
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MTSimulator_DataImporter", "..\MTCore\MTSimulator_DataImporter\MTSimulator_DataImporter.vcxproj", "{B32C569A-E529-4F0A-88AF-B3ECAD29ED7B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MTSimulator_DataLoader", "..\MTCore\MTSimulator_DataLoader\MTSimulator_DataLoader.vcxproj", "{DB71FEB3-B69B-404F-837B-FDD756C10A09}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MTSimulator_Scanner", "..\MTCore\MTSimulator_Scanner\MTSimulator_Scanner.vcxproj", "{AA3BDC34-5831-4946-A100-D921612CD4EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -251,6 +255,30 @@ Global
 		{B32C569A-E529-4F0A-88AF-B3ECAD29ED7B}.ReleaseWithChecks|x64.Build.0 = ReleaseWithChecks|x64
 		{B32C569A-E529-4F0A-88AF-B3ECAD29ED7B}.ReleaseWithChecks|x86.ActiveCfg = Release|Win32
 		{B32C569A-E529-4F0A-88AF-B3ECAD29ED7B}.ReleaseWithChecks|x86.Build.0 = Release|Win32
+		{DB71FEB3-B69B-404F-837B-FDD756C10A09}.Debug|x64.ActiveCfg = Debug|x64
+		{DB71FEB3-B69B-404F-837B-FDD756C10A09}.Debug|x64.Build.0 = Debug|x64
+		{DB71FEB3-B69B-404F-837B-FDD756C10A09}.Debug|x86.ActiveCfg = Debug|Win32
+		{DB71FEB3-B69B-404F-837B-FDD756C10A09}.Debug|x86.Build.0 = Debug|Win32
+		{DB71FEB3-B69B-404F-837B-FDD756C10A09}.Release|x64.ActiveCfg = Release|x64
+		{DB71FEB3-B69B-404F-837B-FDD756C10A09}.Release|x64.Build.0 = Release|x64
+		{DB71FEB3-B69B-404F-837B-FDD756C10A09}.Release|x86.ActiveCfg = Release|Win32
+		{DB71FEB3-B69B-404F-837B-FDD756C10A09}.Release|x86.Build.0 = Release|Win32
+		{DB71FEB3-B69B-404F-837B-FDD756C10A09}.ReleaseWithChecks|x64.ActiveCfg = ReleaseWithChecks|x64
+		{DB71FEB3-B69B-404F-837B-FDD756C10A09}.ReleaseWithChecks|x64.Build.0 = ReleaseWithChecks|x64
+		{DB71FEB3-B69B-404F-837B-FDD756C10A09}.ReleaseWithChecks|x86.ActiveCfg = Release|Win32
+		{DB71FEB3-B69B-404F-837B-FDD756C10A09}.ReleaseWithChecks|x86.Build.0 = Release|Win32
+		{AA3BDC34-5831-4946-A100-D921612CD4EB}.Debug|x64.ActiveCfg = Debug|x64
+		{AA3BDC34-5831-4946-A100-D921612CD4EB}.Debug|x64.Build.0 = Debug|x64
+		{AA3BDC34-5831-4946-A100-D921612CD4EB}.Debug|x86.ActiveCfg = Debug|Win32
+		{AA3BDC34-5831-4946-A100-D921612CD4EB}.Debug|x86.Build.0 = Debug|Win32
+		{AA3BDC34-5831-4946-A100-D921612CD4EB}.Release|x64.ActiveCfg = Release|x64
+		{AA3BDC34-5831-4946-A100-D921612CD4EB}.Release|x64.Build.0 = Release|x64
+		{AA3BDC34-5831-4946-A100-D921612CD4EB}.Release|x86.ActiveCfg = Release|Win32
+		{AA3BDC34-5831-4946-A100-D921612CD4EB}.Release|x86.Build.0 = Release|Win32
+		{AA3BDC34-5831-4946-A100-D921612CD4EB}.ReleaseWithChecks|x64.ActiveCfg = ReleaseWithChecks|x64
+		{AA3BDC34-5831-4946-A100-D921612CD4EB}.ReleaseWithChecks|x64.Build.0 = ReleaseWithChecks|x64
+		{AA3BDC34-5831-4946-A100-D921612CD4EB}.ReleaseWithChecks|x86.ActiveCfg = Release|Win32
+		{AA3BDC34-5831-4946-A100-D921612CD4EB}.ReleaseWithChecks|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

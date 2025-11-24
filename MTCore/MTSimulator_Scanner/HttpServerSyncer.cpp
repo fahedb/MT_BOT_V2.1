@@ -1,5 +1,9 @@
 #include "HttpServerSyncer.h"
 #include "PolynomTimeLineCache.h"
+#include "CONFIGRATIONS.H"
+#include "ChangeData.h"
+#include "Static_CurrentTimeLineRep.h"
+#include "LOGGER.H"
 
 void HttpServerSyncer::Wait_ForNewBarM1() {
 	ExchangeData().WaitFor_NewBar_M1(); // Wait for new M1 bar

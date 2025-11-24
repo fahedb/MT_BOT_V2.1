@@ -6,7 +6,7 @@
 class ChangeDataBuilder
 {
 public:
-	static ChangeNode* BuildChangeNode(JsonSelectionNode* selectionJ);
+	static ChangeNode* BuildChangeNode(JsonSelectionNode* selectionJ, const std::string& symbol);
 	int ExtractMonth(long long tp);
 };
 

@@ -3,6 +3,7 @@
 #include "ChangeDataBuilder.h"
 #include "ProccessFlags.h"
 #include "Converts.h"
+#include "ThreadPool.h"
 
 int BasePricesTable::InitFileMapForRead() { // Init indexes and maps, and return chunk size
 	InitFileMap();
@@ -64,10 +65,12 @@ FileSelectionNode* BasePricesTable::GetNextFileEnt()
 
 ChangeNode* BasePricesTable::GetNextChangeNode_MultiThreaded(int threadIdx)
 {
+	if (m_symbol.empty())
+		m_symbol = Get_Symbol();
 	JsonSelectionNode* j = GetNextSelection_newLogic(threadIdx);
 	if (j)
 	{
-		ChangeNode* node = ChangeDataBuilder::BuildChangeNode(j);
+		ChangeNode* node = ChangeDataBuilder::BuildChangeNode(j, m_symbol);
 		delete j;
 		return node;
 	}
@@ -77,10 +80,12 @@ ChangeNode* BasePricesTable::GetNextChangeNode_MultiThreaded(int threadIdx)
 
 ChangeNode* BasePricesTable::GetNextChangeNode()
 {
+	if (m_symbol.empty())
+		m_symbol = Get_Symbol();
 	JsonSelectionNode* j = GetNextJsonEntity();
 	if (j)
 	{
-		ChangeNode* chN = ChangeDataBuilder::BuildChangeNode(j);
+		ChangeNode* chN = ChangeDataBuilder::BuildChangeNode(j, m_symbol);
 		delete j;
 		j = nullptr;
 		return chN;

@@ -1,4 +1,4 @@
-#include "MTScannerUtils.h"
+#include "ScannerUtils.h"
 #include "ScoreCalcs.h"
 #include "LOGGER.H"
 
@@ -13,13 +13,13 @@
 
 
 
-void MTScannerUtils::GoToSleep(int seconds)
+void ScannerUtils::GoToSleep(int seconds)
 {
 	Logger::getInstance().WriteLog("Sleep for " + std::to_string(seconds) + " seconds...", false, false);
 	Sleep(seconds * 1000); // Sleep for 5 seconds before start a new scan
 }
 
-void MTScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scansNum)
+void ScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scansNum)
 {
 	
 	ScoreResultsCache* scoreResultsCache = ScoreResultsCache::getInstance();
@@ -47,7 +47,7 @@ void MTScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scan
 	}
 }
 
-void MTScannerUtils::InitScanObjectsBeforeScan(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator, const std::string& lastTimePoint)
+void ScannerUtils::InitScanObjectsBeforeScan(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator, const std::string& lastTimePoint)
 {
 	Static_CurrentTimeLineRep* currTimeLineRep = Static_CurrentTimeLineRep::getInstance();
 	std::vector<ChangeNode*>* currentTimeLine = currTimeLineRep->Get_CurrTimeLine()->Get_TimeLine();
@@ -66,7 +66,7 @@ void MTScannerUtils::InitScanObjectsBeforeScan(PatternGod* patternScan, Statisti
 		Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->maxScorePossibleForChangeNodes = ProxyScoreCalcs::CalcMaxScorePossible(currTimeLineRep->Get_CurrTimeLine()->Get_TimeLine()->at(0)).totalScore.total;
 }
 
-void MTScannerUtils::InitPolicyExporters_BeforeScan()
+void ScannerUtils::InitPolicyExporters_BeforeScan()
 {
 	InterfaceLayers_BKTSTExporter& layerExporter = InterfaceLayers_BKTSTExporter::getInstance();
 	Configrations* confs = Configrations::getInstance();
@@ -89,16 +89,16 @@ void MTScannerUtils::InitPolicyExporters_BeforeScan()
 
 }
 
-void MTScannerUtils::InitLayersImporters_BeforeScan(std::vector<ChangeNode*>* hisyoryTl, DBMap* histDBMap)
+void ScannerUtils::InitLayersImporters_BeforeScan(std::vector<ChangeNode*>* hisyoryTl, DBMap* histDBMap)
 {
 	InterfaceLayers_BKTSTImporter& layerImporter = InterfaceLayers_BKTSTImporter::getInstance();
 	layerImporter.Set_HisyoryTL(hisyoryTl, histDBMap);
 	layerImporter.InitImporters();
 	bool isDataAvailable = layerImporter.IsImportedDataAvailable();
-	Logger::getInstance().WriteLog("MTScannerUtils::InitLayersImporters_BeforeScan - Importers initialized. Is data available: " + std::string(isDataAvailable ? "Yes" : "No"), false, true, LogType::LOG);
+	Logger::getInstance().WriteLog("ScannerUtils::InitLayersImporters_BeforeScan - Importers initialized. Is data available: " + std::string(isDataAvailable ? "Yes" : "No"), false, true, LogType::LOG);
 }
 
-void MTScannerUtils::ResetLayerExportersIfNeeded()
+void ScannerUtils::ResetLayerExportersIfNeeded()
 {
 	InterfaceLayers_BKTSTExporter& layerExporter = InterfaceLayers_BKTSTExporter::getInstance();
 	std::string bktstName = HttpServerSyncer::GetNewBKTSTName();

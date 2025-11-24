@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Simulator">
+      <UniqueIdentifier>{e8befbca-b62d-428e-a79b-2e2f4baaefbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructs">
+      <UniqueIdentifier>{3b4be95c-bbd1-41f2-a0f9-ce067945fd8e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MetaTraderSimulator.h">
+      <Filter>Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="DealStruct.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="SimulatorActiveOrder.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MetaTraderSimulator.cpp">
+      <Filter>Simulator</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

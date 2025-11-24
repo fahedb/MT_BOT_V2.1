@@ -154,7 +154,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Casts;..\..\MTCore\MTSimulator_CudaCalcs;..\..\MTCore\MTSimulator_DataBaseConnection;..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager;..\..\MTCore\CUDA_UNIT;..\..\MTCore\MTSimulator_DataImporter</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Scanner;..\..\MTCore\MTSimulator_Casts;..\..\MTCore\MTSimulator_CudaCalcs;..\..\MTCore\MTSimulator_DataBaseConnection;..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager;..\..\MTCore\CUDA_UNIT;..\..\MTCore\MTSimulator_DataImporter;;..\..\MTCore\MTSimulator_DataLoader</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <Optimization>Disabled</Optimization>
@@ -176,7 +176,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Casts;..\..\MTCore\MTSimulator_CudaCalcs;..\..\MTCore\MTSimulator_DataBaseConnection;..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager;..\..\MTCore\CUDA_UNIT;..\..\MTCore\MTSimulator_DataImporter</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Scanner;..\..\MTCore\MTSimulator_Casts;..\..\MTCore\MTSimulator_CudaCalcs;..\..\MTCore\MTSimulator_DataBaseConnection;..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager;..\..\MTCore\CUDA_UNIT;..\..\MTCore\MTSimulator_DataImporter;;..\..\MTCore\MTSimulator_DataLoader</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>MaxSpeed</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -201,7 +201,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Casts;..\..\MTCore\MTSimulator_CudaCalcs;..\..\MTCore\MTSimulator_DataBaseConnection;..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager;..\..\MTCore\CUDA_UNIT;..\..\MTCore\MTSimulator_DataImporter</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Scanner;..\..\MTCore\MTSimulator_Casts;..\..\MTCore\MTSimulator_CudaCalcs;..\..\MTCore\MTSimulator_DataBaseConnection;..\..\MTCore\MTSimulator_MTThreadPool;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Compare;$(SolutionDir)..\MTCore\MTSimulator_Cache;$(SolutionDir)..\MTCore\MTSimulator_Tables;$(SolutionDir)..\MTCore\MTSimulator_DataExporter;..\vcpkg\installed\x64-windows\include\nlohmann;$(SolutionDir)..\MTCore\MTSimulator_ResourcesManager;$(SolutionDir)..\MTCore\MTSimulator_TimeLines;$(SolutionDir)..\HTTPCore\;$(SolutionDir)..\MTCore\MTSimulator_Logger;$(SolutionDir)..\MTCore\MTSimulator_Configurations;$(SolutionDir)..\MTCore\MTSimulator_TradeManager;..\..\MTCore\CUDA_UNIT;..\..\MTCore\MTSimulator_DataImporter;..\..\MTCore\MTSimulator_DataLoader;..\..\MTCore\MTSimulator_DataLoader</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -219,18 +219,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="HttpServerSyncer.cpp" />
-    <ClCompile Include="HistoryTimeLineLoader.cpp" />
     <ClCompile Include="MTScanner.cpp" />
-    <ClCompile Include="MTScannerUtils.cpp" />
-    <ClCompile Include="StrategiesRunner.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HttpServerSyncer.h" />
-    <ClInclude Include="HistoryTimeLineLoader.h" />
-    <ClInclude Include="MTScannerUtils.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="StrategiesRunner.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MTScanner.rc" />
@@ -263,6 +255,9 @@
     <ProjectReference Include="..\..\MTCore\MTSimulator_DataImporter\MTSimulator_DataImporter.vcxproj">
       <Project>{b32c569a-e529-4f0a-88af-b3ecad29ed7b}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_DataLoader\MTSimulator_DataLoader.vcxproj">
+      <Project>{db71feb3-b69b-404f-837b-fdd756c10a09}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\MTCore\MTSimulator_Logger\MTSimulator_Logger.vcxproj">
       <Project>{00196295-8402-4a56-ac04-38ebb4b28cea}</Project>
     </ProjectReference>
@@ -271,6 +266,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\MTCore\MTSimulator_ResourcesManager\MTSimulator_ResourcesManager.vcxproj">
       <Project>{93ce40de-5c0f-4c93-933a-795bf58d3a74}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MTCore\MTSimulator_Scanner\MTSimulator_Scanner.vcxproj">
+      <Project>{aa3bdc34-5831-4946-a100-d921612cd4eb}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\MTCore\MTSimulator_Statistics\MTSimulator_Statistics.vcxproj">
       <Project>{2414419e-9dac-42fb-8316-7455abd3b8fe}</Project>
@@ -284,6 +282,13 @@
     <ProjectReference Include="..\..\MTCore\MTSimulator_TradeManager\MTSimulator_TradeManager.vcxproj">
       <Project>{62826318-b85a-4ea9-a3fe-53d8809dd28e}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.ico" />
+    <Image Include="icon.png" />
+    <Image Include="icon1.ico" />
+    <Image Include="icon2.ico" />
+    <Image Include="icon3.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

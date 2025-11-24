@@ -2,7 +2,6 @@
 #include "ChangeData.h"
 #include "DefinedTables.h"
 #include "CandleData.h"
-#include "ThreadPool.h"
 
 #pragma once
 
@@ -31,7 +30,7 @@ protected:
 	{
 		m_tableName = tableName;
 	}
-
+	virtual std::string Get_Symbol() = 0; // To get the symbol of the table
 public: 
 	///////////////////////////////////////////////////
 	////// All functions to get selected counts////////
@@ -98,6 +97,7 @@ public:
 private:
 	virtual _Points GetPointPlace() { return _Points::_Points_DEFUALT; } // Point place for the Price, every pair is diffrent
 	virtual int GetColsNum() { return DEF_COLUMN_NUM_DEFUALT; } // Virtual function to return the columns number, need to overloaded by the derived class
+	std::string m_symbol;
 };
 
 #endif

@@ -28,7 +28,8 @@ public:
 	_Points GetPointPlace() { return _Points::Points_XAUUSD; }
 	virtual std::string GetDB_PhysicalFileName() { return	XAUUSD_ONE_MIN_DB_FILE; }
 	virtual std::string GetDB_PhysicalFileName_Json() {return	XAUUSD_ONE_MIN_DB_FILE;}
-	
+protected:
+	std::string Get_Symbol() override { return "XAUUSD"; }
 private:
 	virtual int GetColsNum() override { return DEF_COLUMN_NUM_XAUUSD_M1; }
 };

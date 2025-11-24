@@ -3,7 +3,7 @@
 #include "ProcessData.h"
 #include "Converts.h"
 
-ChangeNode* ChangeDataBuilder::BuildChangeNode(JsonSelectionNode* selectionJ)
+ChangeNode* ChangeDataBuilder::BuildChangeNode(JsonSelectionNode* selectionJ, const std::string& symbol)
 {
 	Logger& logger = Logger::getInstance();
 	ChangeNode* chN = new ChangeNode();
@@ -59,6 +59,8 @@ ChangeNode* ChangeDataBuilder::BuildChangeNode(JsonSelectionNode* selectionJ)
 	chN->m_closePrice = chN->Get_Entity(HTTP_BODY_MEMBER_ClosePrice);
 	chN->m_highPrice = chN->Get_Entity(HTTP_BODY_MEMBER_HighPrice);
 	chN->m_lowPrice = chN->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
+	chN->symbol = symbol;
+	chN->SetPoints(_PointsUtils::GetPointPlaceFromSymbol(symbol));
 	return chN;
 }
 

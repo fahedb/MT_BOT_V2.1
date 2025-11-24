@@ -2,6 +2,7 @@
 #include "TimeLineBuilder.h"
 #include "LOGGER.H"
 #include "CONFIGRATIONS.H"
+#include "CPP_To_Cuda_Tunnel.h"
 
 void PatternGod::CudaInit()
 {
@@ -11,7 +12,7 @@ void PatternGod::CudaInit()
 		return;
 	}
 
-	if (!m_cudaEngine)
+	if (!m_cudaEngine && CPP_To_Cuda_Tunnel::IsCudaAvailable())
 	{
 		m_cudaEngine = new CudaEngine_ScoreCalcs(m_historyTL, m_currentTL); // Initialize the CUDA engine with history and current time lines
 		m_cudaEngineInitialized = true;

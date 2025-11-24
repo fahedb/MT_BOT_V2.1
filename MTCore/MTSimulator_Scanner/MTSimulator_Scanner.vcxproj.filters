@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{429245c3-040b-4b4a-a2f5-b63f168de697}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Syncer">
+      <UniqueIdentifier>{19dce4fe-b34a-4f93-bae2-7e76cd732e61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scanner">
+      <UniqueIdentifier>{f16f7663-4914-4894-8b37-8ebd35098b8d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PatternGodScanner.h">
+      <Filter>Scanner</Filter>
+    </ClInclude>
+    <ClInclude Include="ScannerUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="HttpServerSyncer.h">
+      <Filter>Syncer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="PatternGodScanner.cpp">
+      <Filter>Scanner</Filter>
+    </ClCompile>
+    <ClCompile Include="ScannerUtils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="HttpServerSyncer.cpp">
+      <Filter>Syncer</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

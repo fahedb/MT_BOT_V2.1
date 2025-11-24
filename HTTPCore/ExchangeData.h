@@ -35,6 +35,9 @@ public:
 	std::string Get_BKTST_SubmissionName() { return m_httpsrv->Get_RequestHandler()->Get_BKTST_SubmitName(); }
 	std::string Get_BKTST_StartExporters() { return m_httpsrv->Get_RequestHandler()->Get_BKTST_StartExporters(); }
 
+	void FutureVisionScan_ResetNewBarFlag() { m_httpsrv->Get_RequestHandler()->FutureVisionScan_ResetFlag(); }
+	void Wait_ForScanToComplete() { m_httpsrv->Get_RequestHandler()->FutureVisionScanWait(); }
+	void Notify_NewBar_M1() { m_httpsrv->Get_RequestHandler()->NewBar_M1_NotifyOne(); }
 private:
 	static void RUN_HTTPSRV()
 	{

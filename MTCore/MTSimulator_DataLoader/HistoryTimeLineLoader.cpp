@@ -1,4 +1,7 @@
 #include "HistoryTimeLineLoader.h"
+#include "Logger.h"
+#include "ThreadPool.h"
+#include "PolynomTimeLineCache.h"
 
 std::vector<ChangeNode*> HistoryTimeLineLoader::LoadChangeNodesForThread(int threadIdx, int chunkSize, BasePricesTable* tb)
 {
@@ -20,7 +23,9 @@ void HistoryTimeLineLoader::InitHistoryToVectorLoader(BasePricesTable* tb)
 {
 	Logger& logger = Logger::getInstance();
 	logger.WriteLog("Pulling data from DB...", false, true);
-	tb->Set_DATA_DB_FileName(Configrations::getInstance()->Get_DB_FileDir() + tb->GetDB_PhysicalFileName_Json());
+	if (m_dbFileName.empty())
+		m_dbFileName = Configrations::getInstance()->Get_DB_FileDir() + tb->GetDB_PhysicalFileName_Json();
+	tb->Set_DATA_DB_FileName(m_dbFileName);
 	tb->Set_MultiThreadedRead();
 	m_chunkSize = tb->InitFileMapForRead();
 
@@ -86,7 +91,18 @@ void HistoryTimeLineLoader::LoadHistoryToVector_MultiThreaded(BasePricesTable* t
 
 	ChangeNodeLoader(&reads2D, tb); // Load ChangeNodes into a 2D vector, each thread gets its own vector
 	ChangeNodeThreadsLoadsMerger(reads2D, m_hitoryTimeLine); // Merge the results from all threads into a single vector
+	
+	ExchangeData().DoneLoadingData(); // Notify that data loading is done
+}
 
-	ExchangeData exh;
-	exh.DoneLoadingData(); // Notify that data loading is done
+
+void HistoryTimeLineLoader::Run(const std::string& dbFileName)
+{
+	if (!m_table) // If no table is provided, create a default one
+		m_table = new XAUUSD_OneMinTable(Configrations::getInstance()->Get_DB_FileDir());
+	m_dbFileName = dbFileName;
+	LoadHistoryToVector_MultiThreaded(m_table);
+	m_table->RemoveSelect();
+	int polysBuilt = PolynomTimeLineCacheManager::Build_PoylnomTimeLines_MultiThreaded(m_hitoryTimeLine, CacheType::HISTORICAL); // Build polynomial timelines from the loaded ChangeNodes and cache them
+	Logger::getInstance().WriteLog("Built " + std::to_string(polysBuilt) + " polynomial timelines from the history loaded ChangeNodes.", true, true, LogType::SPECIAL_LOG);
 }

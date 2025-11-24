@@ -1,6 +1,7 @@
 #include "ConfigsTableStaticProxy.h"
 #include "ConfigsTable.h"
 #include "Static_DBConnection.h"
+#include "Logger.h"
 
 robin_hood::unordered_map<std::string, std::string> ConfigsTableStaticProxy::m_forcedConfigs; // Definition of the static member
 

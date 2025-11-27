@@ -188,3 +188,38 @@ void StreamSetters::MoveDataToHost(dataStream_t* deviceDataSt, dataStream_t* hos
 		}
 	}
 }
+
+void StreamSetters::MoveDataToDevice(int* hostData, int** deviceData, int numElements)
+{
+	CudaMemoryCopyToDevice<int>(*deviceData, hostData, numElements);
+}
+
+void StreamSetters::MemoryAllocate(int** existingData, int numElements, MemoryLocation memLoc)
+{
+	switch (memLoc)
+	{
+	case MemoryLocation::HOST:
+		*existingData = new int[numElements]; // Allocate array --HOST MEMORY
+		break;
+	case MemoryLocation::DEVICE:
+		CudaMemoryAllocation(existingData, numElements); // Allocate array --DEVICE MEMORY
+		break;
+	default:
+		break;
+	}
+}
+
+void StreamSetters::MemoryReset(int* array, int count, MemoryLocation memLoc)
+{
+	switch (memLoc)
+	{
+	case MemoryLocation::HOST:
+		memset(array, 0, sizeof(int) * count);
+		break;
+	case MemoryLocation::DEVICE:
+		CudaMemorySet(array, 0, count);
+		break;
+	default:
+		break;
+	}
+}

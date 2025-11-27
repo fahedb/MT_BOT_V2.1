@@ -9,6 +9,7 @@
 #include "ThreadPool.h"
 #include <future>
 #include "TimeLineArrayBuilder.h"
+#include "GPU_LaunchesParameters.h"
 
 
 IndicatorTypeList glob_indType_CudaEngine;
@@ -38,52 +39,57 @@ void CudaEngine_ScoreCalcs::Initialize()
 void CudaEngine_ScoreCalcs::RunCudaScan(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D, int scoreToAct)
 {
 	m_kernelMemoryContext->PrepareForNewScan(); // Prepare the kernel context for a new scan
-
+	
 	for (auto indT : glob_indType_CudaEngine.types)
 	{
 		RunScan_PerIndicator(indT);
 	}
+	CPP_To_Cuda_Tunnel::SyncCUDADevice(); // Wait for all CUDA calculations to complete
+
+	m_kernelMemoryContext->SyncResultsToHost(); // Sync results back to host
+	int limit = static_cast<int>(m_historicData->size() - m_currentData->size());
+	float* totalScores = m_kernelMemoryContext->Get_HostTotalScoresPtr();
+	
+	TimeLineArrayBuilder::BuildTotalScoreArray(m_kernelMemoryContext->Get_ResultsDataStreamPtr(MemoryLocation::HOST), totalScores, limit);
+	
+	std::vector<int> topKScoresIndices = Get_TopKScoresIndices(
+		m_kernelMemoryContext->Get_HostTotalScoresPtr(),
+		limit,
+		(GPU_THREADS_NUM * GPU_BLOCKS_AFTER_FILTER) /* 8 blocks */);
+
+	m_kernelMemoryContext->Import_AfterFilterIndices(topKScoresIndices); // Import top K indices to device for two indicators ratio scan
+
 
 	for (auto indT : glob_indType_CudaEngine.types)
 	{
 		RunScan_TwoIndicatorsRatio(indT);
 	}
-
 	CPP_To_Cuda_Tunnel::SyncCUDADevice(); // Wait for all CUDA calculations to complete
-	int limit = static_cast<int>(m_historicData->size() - m_currentData->size());
-
+	
 	m_kernelMemoryContext->SyncResultsToHost(); // Sync results back to host
-	float* totalScores = m_kernelMemoryContext->Get_HostTotalScoresPtr();
 	TimeLineArrayBuilder::BuildTotalScoreArray(m_kernelMemoryContext->Get_ResultsDataStreamPtr(MemoryLocation::HOST), totalScores, limit);
 
-	int maxScore = totalScores[0];
-	
-	for (size_t i = 0; i < limit; i++)
-	{
-		if (totalScores[i] >= scoreToAct)
-		{
-			if(totalScores[i] > maxScore)
-			{
-				maxScore = static_cast<int>(totalScores[i]);
-			}
+	std::vector<int> top100ScoresIndices = Get_TopKScoresIndices(
+		m_kernelMemoryContext->Get_HostTotalScoresPtr(),
+		limit,
+		100);
 
-			ScoresResult scoreResult;//= CombineAllResults_ForIdx(i, m_h_results);
-			scoreResult.totalScore.total = static_cast<int>(totalScores[i]);
-			scoreResult.SetLockedResult(true);
-			resultNodes2D.push_back(std::make_pair(m_historicData->at(i + m_currentData->size() - 1), scoreResult));
+	int maxScore = totalScores[0];
+	for(int idx : top100ScoresIndices)
+	{
+		if(totalScores[idx] > maxScore)
+		{
+			maxScore = static_cast<int>(totalScores[idx]);
 		}
+		ScoresResult scoreResult;//= CombineAllResults_ForIdx(i, m_h_results);
+		scoreResult.totalScore.total = static_cast<int>(totalScores[idx]);
+		scoreResult.SetLockedResult(true);
+		resultNodes2D.push_back(std::make_pair(m_historicData->at(idx + m_currentData->size() - 1), scoreResult));
 	}
+
 	m_maxScore = maxScore;
 	m_scoreToAct = (maxScore - Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy)->Diff_Between_Max_And_ScoreToAct) / m_currentData->size();
 	
-
-	if (m_scanCounter % SCAN_NUMS_TO_FULL_SCAN == 0)
-	{
-		m_useFullScan = true; // Reset to full scan every SCAN_NUMS_TO_FULL_SCAN scans
-	}
-	else
-		m_useFullScan = true; // TEMPORARY: Always use full scan for now -- There is a bug in slide scan that needs to be fixed
-
 	m_scanCounter++;
 }
 
@@ -103,13 +109,14 @@ void CudaEngine_ScoreCalcs::Set_NewCurrentTimeLine(std::vector<ChangeNode*>* cur
 	m_currentData = currentData;
 	dataStream_t* currDataSt = m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::HOST);
 	TimeLineArrayBuilder::BuildTimeLineArrays(currDataSt, m_currentData); // Build current data stream arrays
-	
+
 	dataStream_t* currMinSt = m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::HOST);
 	dataStream_t* currMaxSt = m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::HOST);
 	int limit = 1; // For current data, limit is always 1
 	TimeLineArrayBuilder::BuildMinMaxArrays(currDataSt, currMinSt, currMaxSt, limit, m_currentData->size());
 
 	m_kernelMemoryContext->SyncCurrentDataToDevice(true); // Sync current data to device
+
 }
 
 void CudaEngine_ScoreCalcs::Set_NewHistoricTimeLine(std::vector<ChangeNode*>* historicData)
@@ -232,7 +239,8 @@ void CudaEngine_ScoreCalcs::RunScan_PerIndicator_BarPeriod(IndicatorType indT, I
 		d_currValues, d_currSlopes,
 		d_currMinValues, d_currMaxValues,
 		d_currMinSlopes, d_currMaxSlopes,
-		currTimeLineLen, numResults, indT, COMAPRE_WEIGHT / 2);
+		currTimeLineLen, numResults, indT, COMAPRE_WEIGHT);
+	m_singleKernelsLaunched++;
 
 }
 
@@ -317,10 +325,15 @@ void CudaEngine_ScoreCalcs::RunScan_TwoIndicatorsRatio_BarPeriods(IndicatorType 
 	const float* d_currIndY_MaxSlopes = Get_DataPointer(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
 	/////////////////////////////////////////////////
 
+	const int* d_afterFilterIndices = m_kernelMemoryContext->Get_AfterFilterIndicesPtr(MemoryLocation::DEVICE);
+	const int afterFilterCount = m_kernelMemoryContext->Get_AfterFilterIndicesCount();
+
 	int numResults = m_historicData->size();
 	int currTimeLineLen = m_currentData->size();
 
-	CPP_To_Cuda_Tunnel::Calc_TwoIndicatorsRatio_ScoreCalcs(
+	CPP_To_Cuda_Tunnel::Calc_CandidateTwoIndicatorRatio_ScoreCalcs(
+		d_afterFilterIndices,
+		afterFilterCount,
 		d_resData,
 		///////////////////// Hist len X arrays ////////////////////////////////////////////
 		d_histIndX_Values, d_histIndX_Slopes,
@@ -342,7 +355,7 @@ void CudaEngine_ScoreCalcs::RunScan_TwoIndicatorsRatio_BarPeriods(IndicatorType 
 		d_currIndY_MinValues, d_currIndY_MaxValues,
 		d_currIndY_MinSlopes, d_currIndY_MaxSlopes,
 		currTimeLineLen, numResults, COMAPRE_WEIGHT / 2);
-
+	m_twoIndicatorKernelsLaunched++;
 }
 
 bool CudaEngine_ScoreCalcs::AreLenPairsScanned(const std::vector<std::pair<IndicatorLen, IndicatorLen>>& scannedLens, IndicatorLen lenX, IndicatorLen lenY)
@@ -364,6 +377,31 @@ float* CudaEngine_ScoreCalcs::Get_DataPointer(dataStream_t* dataSt, IndicatorTyp
 		.m_timeFrames.at(static_cast<int>(barP))
 		.m_valueTypes.at(static_cast<int>(val)).m_d_data;
 }
+
+std::vector<int> CudaEngine_ScoreCalcs::Get_TopKScoresIndices(float* totalScores, int numOfResults, int topKNum)
+{
+	// Stage 1: Build indices
+	std::vector<int> idx(numOfResults);
+	for (int i = 0; i < numOfResults; i++)
+		idx[i] = i;
+
+	// Stage 2: nth_element – O(N)
+	std::nth_element(
+		idx.begin(), idx.begin() + topKNum, idx.end(),
+		[&](int a, int b) { return totalScores[a] > totalScores[b]; }
+	);
+
+	// Stage 3: sort only the top K – O(K log K)
+	std::sort(
+		idx.begin(), idx.begin() + topKNum,
+		[&](int a, int b) { return totalScores[a] > totalScores[b]; }
+	);
+
+	// shrink to topK
+	idx.resize(topKNum);
+	return idx;
+}
+
 
 bool CudaEngine_ScoreCalcs::AreBarPeriodPairsScanned(const std::vector<std::pair<BarPeriod, BarPeriod>>& scannedBarPs, BarPeriod barPX, BarPeriod barPY)
 {

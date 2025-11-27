@@ -15,5 +15,16 @@ public:
 
 	static void MoveDataToDevice(dataStream_t* hostDataSt, dataStream_t* deviceDataSt);
 	static void MoveDataToHost(dataStream_t* deviceDataSt, dataStream_t* hostDataSt);
+
+	static void MoveDataToDevice(int* hostData, int** deviceData, int numElements);
+
+	static void MemoryAllocate(int** existingData, int numElements, MemoryLocation memLoc);
+
+	static void MemoryReset(int* array, int count, MemoryLocation memLoc);
 };
+
+// --------------------------------------------------------------------------------------------------------------	
+// --------------------------------------------------------------------------------------------------------------	
+
+
 

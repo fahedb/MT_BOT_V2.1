@@ -9,12 +9,11 @@
 #include <math.h>
 
 #include "CudaMemoryController.h"
+#include "GPU_LaunchesParameters.h"
 
 //#define FULL_CUDA_SYNC_CHECKS
 
 #include <iostream>
-#define THREADS_NUM 256
-#define TILE_SIZE 512
 #include <string>
 
 void CheckCudaLanuchError(const std::string& kernelName, int blocks, int threads, int shBytes, int currPatternLen, int histSize ) {
@@ -72,9 +71,12 @@ void TwoIndCalc(
 	int patternLen, int histSize, float weight)
 {
 	const int starts = histSize - patternLen + 1;
-	const int threads = THREADS_NUM;
+	const int threads = GPU_THREADS_NUM;
 	const int blocks = (starts + threads - 1) / threads;
-	const size_t shBytes = sizeof(float) * ((4 * patternLen) + 4);
+	size_t shBytes = sizeof(float) * (4 * patternLen); // for curr vals and slopes caching
+	int histTileLen = threads + patternLen - 1;
+	shBytes += sizeof(float) * (histTileLen) * 4; // for hist vals and slopes caching
+	shBytes += 4 * sizeof(float); // for min/max caching
 
 	FullScan_Kernel_TwoInd << <blocks, threads, shBytes >> > (
 		d_histIndX_values, d_histIndX_slopes,
@@ -99,7 +101,70 @@ void TwoIndCalc(
 		weight
 		);
 	CheckCudaLanuchError("TwoIndCalc", blocks, threads, shBytes, patternLen, histSize);
+}
 
+// Candidate Two Ind score kernel launcher
+void CandidateTwoIndCalc(
+	const int* d_candidateIndices,
+	const int candidateCount,
+	//////////////////////////////////// Hist len X arrays /////////////////////////////////////////////
+	const float* d_histIndX_values, const float* d_histIndX_slopes							////
+	, const float* d_histIndX_MinValues, const float* d_histIndX_MaxValues						////
+	, const float* d_histIndX_MinSlopes, const float* d_histIndX_MaxSlopes						////
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//////////////////////////////////// Current len X arrays //////////////////////////////////////////
+	, const float* d_currIndX_values, const float* d_currIndX_slopes							////
+	, const float* d_currIndX_MinValues, const float* d_currIndX_MaxValues						////
+	, const float* d_currIndX_MinSlopes, const float* d_currIndX_MaxSlopes						////
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//////////////////////////////////// Hist len Y arrays /////////////////////////////////////////////
+	, const float* d_histIndY_values, const float* d_histIndY_slopes								////
+	, const float* d_histIndY_MinValues, const float* d_histIndY_MaxValues						////
+	, const float* d_histIndY_MinSlopes, const float* d_histIndY_MaxSlopes						////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//////////////////////////////////// Current len Y arrays //////////////////////////////////////////
+	, const float* d_currIndY_values, const float* d_currIndY_slopes								////
+	, const float* d_currIndY_MinValues, const float* d_currIndY_MaxValues						////
+	, const float* d_currIndY_MinSlopes, const float* d_currIndY_MaxSlopes						////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	, float* d_results,
+	int patternLen, int histSize, float weight)
+{
+	const int starts = histSize - patternLen + 1;
+	const int threads = GPU_THREADS_NUM;
+	const int blocks = (starts + threads - 1) / threads;
+	size_t shBytes = sizeof(float) * (4 * patternLen); // for curr vals and slopes caching
+	int histTileLen = threads + patternLen - 1;
+	shBytes += sizeof(float) * (histTileLen) * 4; // for hist vals and slopes caching
+	shBytes += 4 * sizeof(float); // for min/max caching
+
+	CandidateScan_Kernel_TwoInd << <blocks, threads, shBytes >> > (
+		d_candidateIndices, candidateCount,
+		d_histIndX_values, d_histIndX_slopes,
+		d_histIndX_MinValues, d_histIndX_MaxValues,
+		d_histIndX_MinSlopes, d_histIndX_MaxSlopes,
+
+		d_currIndX_values, d_currIndX_slopes,
+		d_currIndX_MinValues, d_currIndX_MaxValues,
+		d_currIndX_MinSlopes, d_currIndX_MaxSlopes,
+
+		d_histIndY_values, d_histIndY_slopes,
+		d_histIndY_MinValues, d_histIndY_MaxValues,
+		d_histIndY_MinSlopes, d_histIndY_MaxSlopes,
+
+		d_currIndY_values, d_currIndY_slopes,
+		d_currIndY_MinValues, d_currIndY_MaxValues,
+		d_currIndY_MinSlopes, d_currIndY_MaxSlopes,
+
+		d_results,
+		patternLen,
+		starts,
+		weight
+		);
+	CheckCudaLanuchError("TwoIndCalc", blocks, threads, shBytes, patternLen, histSize);
 }
 
 
@@ -126,9 +191,12 @@ void calcMA(
 	int patternLen, int histSize, float weight)
 {
 	const int starts = histSize - patternLen + 1;
-	const int threads = THREADS_NUM;
+	const int threads = GPU_THREADS_NUM;
 	const int blocks = (starts + threads - 1) / threads;
-	const size_t shBytes = sizeof(float) * ((2 * patternLen) + 2);
+	size_t shBytes = sizeof(float) * (2 * patternLen); // curr values+slopes
+	shBytes += sizeof(float) * (threads + patternLen - 1) * 2; // hist values+slopes
+	shBytes += 2 * sizeof(float); // min/max caching
+
 	FullScan_Kernel_MA << <blocks, threads, shBytes >> > (
 		d_histMA_values, d_histMA_slopes,
 		d_histMA_MinValues, d_histMA_MaxValues,
@@ -157,9 +225,11 @@ void calcRSI(
 	int patternLen, int histSize, float weight)
 {
 	const int starts = histSize - patternLen + 1;   // number of starting points in hist where pattern can fit
-	const int threads = THREADS_NUM;                         // 128/256, depending on GPU
+	const int threads = GPU_THREADS_NUM;                         // 128/256, depending on GPU
 	const int blocks = (starts + threads - 1) / threads;
-	const size_t shBytes = sizeof(float) * (2 * patternLen); // curr values+slopes
+	size_t shBytes = sizeof(float) * (2 * patternLen); // curr values+slopes
+	int histTileLen = threads + patternLen - 1;
+	shBytes += sizeof(float) * (histTileLen) * 2; // hist values+slopes
 
 	FullScan_Kernel_RSI << <blocks, threads, shBytes >> > (
 		d_histRSI_values,

@@ -1,5 +1,8 @@
 #include "KernelExecutionContext.h"
 #include "StreamSetters.h"
+#include "GPU_LaunchesParameters.h"
+#include <iostream>
+#include <chrono>
 
 dataStream_t* KernelExecutionContext_PatternGod::Get_IndicatorsStreamDataPtr(DataTimeType timeType, MemoryLocation memLoc)
 {
@@ -17,6 +20,20 @@ dataStream_t* KernelExecutionContext_PatternGod::Get_IndicatorsStreamDataPtr(Dat
 		else // CURRENT
 			return &d_currentData;
 	}
+}
+
+void KernelExecutionContext_PatternGod::Import_AfterFilterIndices(std::vector<int> inIndices)
+{
+	if(inIndices.size() != afterFilterIndicesCount)
+	{
+		std::cout << "KernelExecutionContext_PatternGod::Import_AfterFilterIndices - Mismatched size: " << inIndices.size() << " vs " << afterFilterIndicesCount << std::endl;
+		exit(-1);
+	}
+	// Copy the incoming indices to the host after filter indices
+	memcpy(h_afterFilterIndices, inIndices.data(), sizeof(int) * inIndices.size());
+	// Move to device
+	StreamSetters::MoveDataToDevice(h_afterFilterIndices, &d_afterFilterIndices, afterFilterIndicesCount);
+
 }
 
 dataStream_t* KernelExecutionContext_PatternGod::Get_ResultsDataStreamPtr(MemoryLocation memLoc)
@@ -72,6 +89,8 @@ KernelExecutionContext_PatternGod::KernelExecutionContext_PatternGod(int history
 void KernelExecutionContext_PatternGod::Allocate()
 {
 	h_totalScores = new float[m_historySize]; // Total scores size is based on history size
+	h_afterFilterIndices = new int[GPU_THREADS_NUM * GPU_BLOCKS_AFTER_FILTER]; // After filter indices size is based on history size
+
 	StreamSetters::AllocateDataStream(&h_results, m_historySize, MemoryLocation::HOST); // Results size is based on history size
 	
 	StreamSetters::AllocateDataStream(&h_historyData, m_historySize, MemoryLocation::HOST); // History allocation -- Host side
@@ -92,6 +111,15 @@ void KernelExecutionContext_PatternGod::Allocate()
 	StreamSetters::AllocateDataStream(&d_currMaxValues, 1 /* Need only one max for pattern */, MemoryLocation::DEVICE); // Current max values allocation -- Device side
 
 	StreamSetters::AllocateDataStream(&d_results, m_historySize, MemoryLocation::DEVICE); // Results size is based on history size
+	
+	StreamSetters::MemoryAllocate(&d_afterFilterIndices, GPU_THREADS_NUM * GPU_BLOCKS_AFTER_FILTER, MemoryLocation::DEVICE);
+}
+int* KernelExecutionContext_PatternGod::Get_AfterFilterIndicesPtr(MemoryLocation memLoc)
+{
+	if (memLoc == MemoryLocation::HOST)
+		return h_afterFilterIndices;
+	else // DEVICE
+		return d_afterFilterIndices;
 }
 
 void KernelExecutionContext_PatternGod::PrepareForNewScan()
@@ -100,6 +128,10 @@ void KernelExecutionContext_PatternGod::PrepareForNewScan()
 	StreamSetters::ResetDataStream_To0(&h_results, MemoryLocation::HOST);
 	// 2. Reset host total results array to 0
 	memset(h_totalScores, 0, sizeof(float) * m_historySize);
+	// 2. Reset host after filter indices array to 0
+	afterFilterIndicesCount = GPU_BLOCKS_AFTER_FILTER * GPU_THREADS_NUM;
+	memset(h_afterFilterIndices, 0, sizeof(int) * (afterFilterIndicesCount));
+	StreamSetters::MemoryReset(d_afterFilterIndices, afterFilterIndicesCount, MemoryLocation::DEVICE);
 
 	// 3. Reset device results stream to 0
 	StreamSetters::ResetDataStream_To0(&d_results, MemoryLocation::DEVICE);

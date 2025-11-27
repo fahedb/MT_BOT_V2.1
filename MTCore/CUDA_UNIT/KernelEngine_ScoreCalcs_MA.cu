@@ -19,8 +19,8 @@ __device__ __forceinline__ float CalcSingleMAScore(
 }
 
 __device__ __forceinline__ void FullPatternScanCalc_Device_MA(
-	const float* __restrict__ d_histMAs_values /*array for MAs hist values */
-	, const float* __restrict__ d_histMAs_slopes /*array for MAs hist slopes */
+	const float* __restrict__ histMAs_values_shared /*array for MAs hist values */
+	, const float* __restrict__ histMAs_slopes_shared /*array for MAs hist slopes */
 	, const float* __restrict__ currMAs_values_shared /* array for MAs curr values in shared memory*/
 	, const float* __restrict__ currMAs_slopes_shared /* array for MAs curr slopes in shared memory*/
 
@@ -46,11 +46,12 @@ __device__ __forceinline__ void FullPatternScanCalc_Device_MA(
 	const float histLowest = histLow_HightValues[0]; // Get from constant memory
 
 	float score = 0.0f;
+	int histBaseIdx = threadIdx.x;
 #pragma unroll 64 // assuming max pattern length is 30-64, adjust as needed
 	for (int i = 0; i < currPatternLen; i++)
 	{
-		const float histValue = d_histMAs_values[idx + i];
-		const float histSlope = d_histMAs_slopes[idx + i];
+		const float histValue = histMAs_values_shared[histBaseIdx + i];
+		const float histSlope = histMAs_slopes_shared[histBaseIdx + i];
 		const float currValue = currMAs_values_shared[i]; // from shared memory
 		const float currSlope = currMAs_slopes_shared[i]; // from shared memory
 
@@ -89,14 +90,28 @@ __global__ void FullScan_Kernel_MA(
 	, float* __restrict__ d_scores /*output scores, where Score(idx) is the score of currMAs(t)&&histMAs(idx + t), t is the index of the current candle */
 	, const int currPatternLen, const int outLen, const float weight)
 {
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
+	if (idx >= outLen) return; // out of bounds check
+
 	extern __shared__ float sharedMem[]; // dynamically allocated shared memory
 	float* currMAs_values_shared = sharedMem; // size: currPatternLen
 	float* currMAs_slopes_shared = &sharedMem[currPatternLen]; // size: currPatternLen
-	float* currLow_HightValues_shared = &sharedMem[2 * currPatternLen];
+	float* currLow_HightValues_shared = &sharedMem[2 * currPatternLen]; // size: 2
+
+	int histTileLen = blockDim.x + currPatternLen - 1;
+	float* histMAs_values_shared = &sharedMem[2 * currPatternLen + 2]; // size: histTileLen
+	float* histMAs_slopes_shared = &sharedMem[2 * currPatternLen + 2 + histTileLen]; // size: histTileLen
+
 	// Load currMAs_values and currMAs_slopes into shared memory
 	for (int i = threadIdx.x; i < currPatternLen; i += blockDim.x) {
 		currMAs_values_shared[i] = d_currMAs_values[i];
 		currMAs_slopes_shared[i] = d_currMAs_slopes[i];
+	}
+
+	for(int i = threadIdx.x; i < histTileLen; i += blockDim.x) {
+		int histIdx = blockIdx.x * blockDim.x + i;
+		histMAs_values_shared[i] = d_histMAs_values[histIdx];
+		histMAs_slopes_shared[i] = d_histMAs_slopes[histIdx];
 	}
 
 	__syncthreads(); // Ensure all threads have loaded the data -- NOTE: you'll get intelisense error (undefined), but it compiles and works fine
@@ -109,18 +124,14 @@ __global__ void FullScan_Kernel_MA(
 
 	__syncthreads(); // Ensure all threads have loaded the data -- NOTE: you'll get intelisense error (undefined), but it compiles and works fine
 
-	int idx = blockIdx.x * blockDim.x + threadIdx.x;
-
-	int lastStart = outLen;
-	if (idx >= lastStart) return; // out of bounds check
-
+	
 	float histLow_HightValues[2];
 	histLow_HightValues[0] = d_histMAs_MinValues[idx];
 	histLow_HightValues[1] = d_histMAs_MaxValues[idx];
 
 	FullPatternScanCalc_Device_MA(
-		d_histMAs_values,
-		d_histMAs_slopes,
+		histMAs_values_shared,
+		histMAs_slopes_shared,
 		currMAs_values_shared,
 		currMAs_slopes_shared,
 		histLow_HightValues,

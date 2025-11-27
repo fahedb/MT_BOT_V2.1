@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="CPP_To_Cuda_Tunnel.h" />
     <ClInclude Include="CudaMemoryController.h" />
+    <ClInclude Include="GPU_LaunchesParameters.h" />
     <ClInclude Include="KernelEngine.h" />
     <ClInclude Include="KernelEngine_ScoreCalcs.h" />
     <ClInclude Include="KernelEngine_ScoreCalcs_General.h" />

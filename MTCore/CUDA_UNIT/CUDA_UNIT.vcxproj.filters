@@ -64,6 +64,7 @@
       <Filter>KernelEngines\ScoreCalcs\DOUBLE_IND</Filter>
     </ClInclude>
     <ClInclude Include="KernelExecutionContext.h" />
+    <ClInclude Include="GPU_LaunchesParameters.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CudaMemory">

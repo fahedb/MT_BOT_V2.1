@@ -18,6 +18,9 @@ private:
 	int m_maxScore = 0;
 	bool m_useFullScan = true;
 	int m_scanCounter = 0;
+
+	int m_singleKernelsLaunched = 0;
+	int m_twoIndicatorKernelsLaunched = 0;
 public:
 	CudaEngine_ScoreCalcs(std::vector<ChangeNode*>* historicData, std::vector<ChangeNode*>* currentData);
 	void Set_NewCurrentTimeLine(std::vector<ChangeNode*>* currentData);
@@ -51,6 +54,7 @@ private:
 	static bool AreBarPeriodPairsScanned(const std::vector<std::pair<BarPeriod, BarPeriod>>& scannedBarPs, BarPeriod barPX, BarPeriod barPY);
 	static bool AreLenPairsScanned(const std::vector<std::pair<IndicatorLen, IndicatorLen>>& scannedLens, IndicatorLen lenX, IndicatorLen lenY);
 	static float* Get_DataPointer(dataStream_t* dataSt,IndicatorType indT, IndicatorLen indL, BarPeriod barP, IndicatorValueType val);
+	static std::vector<int> Get_TopKScoresIndices(float* h_results, int numOfResults, int topKNum);
 	// --------------------------------------------------------------------------------------------------------------
 	/////////////////////////////////////////////////////////
 	////////// Stream Initialization //////////////

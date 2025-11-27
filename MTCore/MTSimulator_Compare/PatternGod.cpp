@@ -102,6 +102,11 @@ int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<Change
 	{
 		auto start = std::chrono::high_resolution_clock::now();
 		m_cudaEngine->Set_NewCurrentTimeLine(m_currentTL); // Update current time line in CUDA engine
+		auto settingNewTLTime = std::chrono::high_resolution_clock::now();
+		std::cout << "CUDA Engine - Setting New Current TL Time: " 
+			<< std::chrono::duration_cast<std::chrono::milliseconds>(settingNewTLTime - start).count() 
+			<< " ms" << std::endl;
+
 		totalScans = m_cudaEngine->ScanForOneMinPatterns_CUDA(cudaResults);
 		auto end = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();

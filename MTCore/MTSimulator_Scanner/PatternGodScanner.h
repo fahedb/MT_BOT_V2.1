@@ -8,7 +8,7 @@
 #include "LOGGER.H"
 #include "OrderStruct.h"
 #include "LayersEnums.h"
-
+#include "HttpServerSyncer.h"
 class PatternGodScanner
 {
 public:
@@ -16,6 +16,7 @@ public:
 
 	void Run()
 	{	
+		HttpServerSyncer::LoadAllConfigsToHttpCore(); // Load all configs to the HTTP Core
 		std::vector<ChangeNode*> history;
 		XAUUSD_OneMinTable table(Configrations::getInstance()->Get_DB_FileDir());
 		HistoryTimeLineLoader historyLoader(history, &table);

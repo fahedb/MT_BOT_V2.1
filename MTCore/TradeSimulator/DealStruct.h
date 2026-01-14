@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include "OrderType.h"
+#include "ClosureReason.h"
+
 struct Deal
 {
 	OrderType type; 
@@ -15,8 +17,7 @@ struct Deal
 	double profit; // in account currency
 	int profitInPips; // in pips
 
-	bool stopLossHit; // true if stop loss was hit
-	bool takeProfitHit; // true if take profit was hit
+	ClosureReason closeReason;
 
 	std::string symbol; // e.g., "XAUUSD"
 };

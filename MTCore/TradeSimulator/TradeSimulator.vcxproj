@@ -186,6 +186,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ClosureReason.h" />
     <ClInclude Include="DealStruct.h" />
     <ClInclude Include="MetaTraderSimulator.h" />
     <ClInclude Include="SimulatorActiveOrder.h" />

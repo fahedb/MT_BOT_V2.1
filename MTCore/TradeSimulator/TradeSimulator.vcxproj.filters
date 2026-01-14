@@ -11,6 +11,9 @@
     <Filter Include="DataStructs">
       <UniqueIdentifier>{3b4be95c-bbd1-41f2-a0f9-ce067945fd8e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Enums">
+      <UniqueIdentifier>{c5947b82-59bb-4761-8546-7b9b84c77b35}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MetaTraderSimulator.h">
@@ -21,6 +24,9 @@
     </ClInclude>
     <ClInclude Include="SimulatorActiveOrder.h">
       <Filter>DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="ClosureReason.h">
+      <Filter>Enums</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

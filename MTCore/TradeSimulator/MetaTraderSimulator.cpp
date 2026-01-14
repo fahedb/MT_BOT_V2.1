@@ -17,6 +17,26 @@ ActiveOrderInfo MetaTraderSimulator::ConvertOrderEntityToActiveOrderInfo(const O
 	return activeOrder;
 }
 
+void MetaTraderSimulator::CalcFloatingPnL()
+{
+	m_floatingPnL = 0.0;
+	for(const auto& order : m_activeOrders)
+	{
+		double priceDifference = 0.0;
+		if(order.type == OrderType::LONG)
+		{
+			priceDifference = m_currentPrice - order.openPrice;
+		}
+		else if(order.type == OrderType::SHORT)
+		{
+			priceDifference = order.openPrice - m_currentPrice;
+		}
+		double pnl = priceDifference * order.lotSize * m_contractSize;
+		m_floatingPnL += pnl;
+	}
+	m_equityBalance = m_acountBalance + m_floatingPnL;
+}
+
 void MetaTraderSimulator::ProcessActiveOrders()
 {
 	// Logic to process each active order based on current bar data
@@ -27,6 +47,16 @@ void MetaTraderSimulator::ProcessActiveOrders()
 	}
 	// Remove closed orders from active orders list
 	RemoveClosedOrders();
+}
+
+void MetaTraderSimulator::CalcUsedMargin()
+{
+	m_usedMargin = 0.0;
+	const double marginPerLot = (m_currentPrice * m_contractSize) / m_leverage;
+	for(const auto& order : m_activeOrders)
+	{
+		m_usedMargin += order.lotSize * marginPerLot;
+	}
 }
 
 bool MetaTraderSimulator::CheckOrderClosureConditionsAndCreateDeal(const ActiveOrderInfo& order)
@@ -53,19 +83,19 @@ bool MetaTraderSimulator::CheckOrderClosureConditionsAndCreateDeal(const ActiveO
 		// Check LONG order closure conditions
 		if(order.tpPips > 0)
 		{
-			double tpPrice = order.openPrice + (order.tpPips * pointMultiplier); // note: tpPips is positive
-			if(m_highPrice >= tpPrice)
-			{
-				// Create deal for take profit hit
-				CreateDealFromOrder(order, true);
-				return true;
-			}
-
 			double slPrice = order.openPrice - (order.slPips * pointMultiplier); // note: slPips is positive
 			if(m_lowPrice <= slPrice)
 			{
 				// Create deal for stop loss hit
-				CreateDealFromOrder(order, false);
+				CreateDealFromOrder(order, ClosureReason::STOP_LOSS_HIT);
+				return true;
+			}
+
+			double tpPrice = order.openPrice + (order.tpPips * pointMultiplier); // note: tpPips is positive
+			if(m_highPrice >= tpPrice)
+			{
+				// Create deal for take profit hit
+				CreateDealFromOrder(order, ClosureReason::TAKE_PROFIT_HIT);
 				return true;
 			}
 		}
@@ -75,27 +105,28 @@ bool MetaTraderSimulator::CheckOrderClosureConditionsAndCreateDeal(const ActiveO
 		// Check SHORT order closure conditions
 		if(order.tpPips < 0)
 		{
-			double tpPrice = order.openPrice + (order.tpPips * pointMultiplier); // note: tpPips is negative
-			if(m_lowPrice <= tpPrice)
-			{
-				// Create deal for take profit hit
-				CreateDealFromOrder(order, true);
-				return true;
-			}
-
 			double slPrice = order.openPrice + (order.slPips * pointMultiplier); // note: slPips is positive
 			if(m_highPrice >= slPrice)
 			{
 				// Create deal for stop loss hit
-				CreateDealFromOrder(order, false);
+				CreateDealFromOrder(order, ClosureReason::STOP_LOSS_HIT);
 				return true;
 			}
+
+			double tpPrice = order.openPrice + (order.tpPips * pointMultiplier); // note: tpPips is negative
+			if(m_lowPrice <= tpPrice)
+			{
+				// Create deal for take profit hit
+				CreateDealFromOrder(order, ClosureReason::TAKE_PROFIT_HIT);
+				return true;
+			}
+
 		}
 	}
 	return false; // Order remains active
 }
 
-void MetaTraderSimulator::CreateDealFromOrder(const ActiveOrderInfo& order, bool isTakeProfitHit)
+void MetaTraderSimulator::CreateDealFromOrder(const ActiveOrderInfo& order, ClosureReason closeReason)
 {
 	Deal deal;
 	deal.symbol = order.symbol;
@@ -105,11 +136,11 @@ void MetaTraderSimulator::CreateDealFromOrder(const ActiveOrderInfo& order, bool
 	deal.lotSize = order.lotSize;
 	deal.openPrice = order.openPrice;
 	deal.type = order.type;
-	deal.stopLossHit = !isTakeProfitHit;
-	deal.takeProfitHit = isTakeProfitHit;
+
+	deal.closeReason = closeReason;
 
 	// Determine close price based on whether take profit or stop loss was hit
-	if(isTakeProfitHit)
+	if(closeReason == ClosureReason::TAKE_PROFIT_HIT)
 	{
 		if(order.type == OrderType::LONG)
 		{
@@ -120,7 +151,7 @@ void MetaTraderSimulator::CreateDealFromOrder(const ActiveOrderInfo& order, bool
 			deal.closePrice = order.openPrice + (order.tpPips * m_pointMultiplier);
 		}
 	}
-	else
+	else if (closeReason == ClosureReason::STOP_LOSS_HIT)
 	{
 		if(order.type == OrderType::LONG)
 		{
@@ -131,6 +162,11 @@ void MetaTraderSimulator::CreateDealFromOrder(const ActiveOrderInfo& order, bool
 			deal.closePrice = order.openPrice + (order.slPips * m_pointMultiplier);
 		}
 	}
+	else // ClosureReason::NONE or other reasons -- Close by current price
+	{ 
+		deal.closePrice = m_currentPrice;
+	}
+
 	// Calculate profit and profit in pips
 	if(order.type == OrderType::LONG)
 	{
@@ -174,6 +210,18 @@ void MetaTraderSimulator::Set_NewOrder(OrderEntity* newOrder)
 
 	// Implementation for setting a new order in the simulation
 	ActiveOrderInfo activeOrder = ConvertOrderEntityToActiveOrderInfo(newOrder);
+	CalcFloatingPnL(); // Recalculate floating PnL before adding new order
+	CalcUsedMargin(); // Recalculate used margin before adding new order
+	
+	double freeMargin = Get_FreeMargin();
+	double requiredMargin = RequiredMargin(m_currentPrice, m_contractSize, activeOrder.lotSize, m_leverage);
+
+	if (freeMargin < requiredMargin)
+	{
+		Logger::getInstance().WriteLog("Insufficient margin to place new order. Free Margin: " + std::to_string(freeMargin) + ", Required Margin: " + std::to_string(requiredMargin), false, false, LogType::ERR);
+		return;
+	}
+
 	m_activeOrders.push_back(activeOrder);
 
 }
@@ -185,6 +233,13 @@ void MetaTraderSimulator::Set_NewCurrBarData(ChangeNode* newBarData)
 	m_currentPrice = newBarData->m_closePrice;
 	m_currentTimePoint = newBarData->point_DateTimeLong;
 	
+	// Recalculate floating PnL based on new current price
+	CalcFloatingPnL();
+	// Recalculate used margin 
+	CalcUsedMargin();
+	// Check for margin stop out conditions
+	MarginStopOutCheck();
+
 	if (!m_pointMultiplier) // If not set yet
 	{
 		int pointPlace = static_cast<int>(m_currentBarData->GetPoints());
@@ -192,4 +247,36 @@ void MetaTraderSimulator::Set_NewCurrBarData(ChangeNode* newBarData)
 	}
 	// After updating the current bar data, process active orders
 	ProcessActiveOrders();
+	// Recalculate floating PnL based on new current price
+	CalcFloatingPnL();
+	// Recalculate used margin 
+	CalcUsedMargin();
+	// Check for margin stop out conditions
+	MarginStopOutCheck();
+
+}
+
+void MetaTraderSimulator::MarginStopOutCheck()
+{
+	if(m_usedMargin <= 0.0)
+		return; // No used margin, no need to check
+
+	// Implementation for margin stop out check
+	const double marginLevel = (m_equityBalance / m_usedMargin) * 100.0; // Margin level in percentage
+	const double stopOutLevel = 50.0; // stop out level at 50%
+	if (marginLevel < stopOutLevel)
+	{
+		Logger::getInstance().WriteLog("Margin level below stop out level. Closing all active orders.", false, false, LogType::LOG);
+		// Close all active orders
+		for (auto& order : m_activeOrders)
+		{
+			CreateDealFromOrder(order, ClosureReason::STOP_OUT); // Assume all orders closed at stop loss
+			order.isActive = false; // Mark order as inactive
+		}
+		// Remove closed orders from active orders list
+		RemoveClosedOrders();
+		// Recalculate floating PnL and used margin after closing orders
+		CalcFloatingPnL();
+		CalcUsedMargin();
+	}
 }

@@ -14,7 +14,7 @@ public:
 	}
 	void Run()
 	{
-		MetaTraderSimulator mtSim(1, 10000.0, 0.1, 100.0, "XAUUSD");
+		MetaTraderSimulator mtSim(1, 10000.0, 0.1, 100.0, "XAUUSD", 100);
 
 		PatternGodScanner scanner;
 		scanner.Set_ExternalCurrTimeLineQueue(true);

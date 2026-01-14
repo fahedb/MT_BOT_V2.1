@@ -7,7 +7,7 @@
 ScoreResultsCachePolynom::ScoreResultsCachePolynom() 
 	: BaseTimeLineCache<std::pair<PolynomTimeLineKey, PolynomTimeLineKey>, ScoresResult>(
 		MTThreadPool::getInstance()->Get_ThreadsNum(),
-		Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->ScoreResultsCacheSizePerThread)
+		Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->EnableScoreCaching ? Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->ScoreResultsCacheSizePerThread : 0)
 {
 	// Constructor body can be empty as base class handles initialization
 }

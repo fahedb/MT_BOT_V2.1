@@ -135,6 +135,7 @@ void PolynomComparerPolicy::InitPolicy()
 {
 
     std::vector<std::pair<std::string, std::string>> allConfigs = { // Init all relevant configs for the policy
+		std::make_pair(CONFIG_DEF_ENABLE_POLYNOM_TIME_LINE_CACHING),
         std::make_pair(CONFIG_DEF_ENABLE_POLYNOM_SCAN),
         std::make_pair(CONFIGS_POLYNOM_LEN_FOR_SCAN),
         std::make_pair(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT_POLYNOM_COMPARER),
@@ -147,6 +148,7 @@ void PolynomComparerPolicy::InitPolicy()
 	m_allConfigs = allConfigs;
 
     EnablePolynomScan = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_ENABLE_POLYNOM_SCAN)) > 0 ? true : false;
+	EnablePolynomTimeLineCaching = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_ENABLE_POLYNOM_TIME_LINE_CACHING)) > 0 ? true : false;
 	ScoreToAct = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT_POLYNOM_COMPARER));
 	PolynomLen_ForScan = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIGS_POLYNOM_LEN_FOR_SCAN));
     weight_eval = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIGS_POLYNOM_EVAL_WEIGHT));

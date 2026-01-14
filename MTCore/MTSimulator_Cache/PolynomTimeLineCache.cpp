@@ -26,7 +26,18 @@ void PolynomTimeLineCache::ClearOldResults(bool forceSynchronous)
     m_cleaningInProgress.store(false); // Reset the flag 
 }
 
+bool PolynomTimeLineCache::ActPreCondition()
+{
+    PolynomComparerPolicy* polynomComparerPolicy = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
+    return polynomComparerPolicy->EnablePolynomTimeLineCaching;
+}
+
 void PolynomTimeLineCache::MergeIntoCache(robin_hood::unordered_map<PolynomTimeLineKey, PolynomTimeLine>& tempCache, CacheType cachT) {
+    
+    if(!ActPreCondition()) {
+        return; // Cache is not active, do not merge
+	}
+
     std::lock_guard<std::mutex> lock(m_cacheMutex); // Ensure thread safety
     for (auto& p : tempCache) {
         // Insert directly into the cache map
@@ -45,7 +56,7 @@ bool PolynomTimeLineCacheManager::PreConditionBuild()
 {
     // Check if the cache is enabled and if the polynom length is set
     PolynomComparerPolicy* polynomComparerPolicy = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
-    if (!polynomComparerPolicy->EnablePolynomScan || polynomComparerPolicy->PolynomLen_ForScan <= 0) {
+    if (!polynomComparerPolicy->EnablePolynomTimeLineCaching && (!polynomComparerPolicy->EnablePolynomScan || polynomComparerPolicy->PolynomLen_ForScan <= 0)) {
         Logger::getInstance().WriteLog("Polynom scan is not enabled or polynom length is not set.", true, true, LogType::ERR);
         return false; // Precondition failed
     }

@@ -84,12 +84,12 @@ bool PatternGodScanner::OneMinutePatternGodLogic(PatternGod* patternScan, Statis
 	logger.WriteLog("Start Checking for a potentail trade...", false, false);
 	// Layer 4, This layer should check for a potentail trade based on the stats generated
 	m_lastPlacedOrder = std::move(TradeLayerRun(stats));
-
+	if(m_lastPlacedOrder)
+		m_lastOrderGetPlaced = false;
 	DataExporter::Export_All_Statistics_Data(stats, m_lastPlacedOrder ? m_lastPlacedOrder->IsActive() : false);
 	DirectionStatsCache::getInstance()->Add_NewStat(stats, true);
 	logger.WriteLog("Done scanning and exporting data.");
 	return true;
-
 }
 
 bool PatternGodScanner::ScanPreCondition()
@@ -210,15 +210,25 @@ std::unique_ptr<OrderEntity> PatternGodScanner::TradeLayerRun(DirectionStats& st
 	// Layer 4, This layer should check for a potentail trade based on the stats generated
 	TradesManager* tradeMngr = TradesManager::getInstance();
 	LayerType initializedLayer = GetInitializedImporterLayerType();
+	//OrderEntity* tradeRes = nullptr;
+	
 	OrderEntity* tradeRes = nullptr;
+	std::unique_ptr<OrderEntity> tradeRes_Imp = nullptr;
 
 	if (initializedLayer == LayerType::TradeManagementLayer)
+		tradeRes_Imp = Get_TradeLayer_ImporterData_NextItem();
+	else
 		tradeRes = tradeMngr->CheckForTrade_PatternGod(stats);
+
+	if(tradeRes_Imp)
+		tradeRes = tradeRes_Imp.get();
 
 	if (tradeRes && tradeRes->IsActive())
 		InterfaceLayers_BKTSTExporter::getInstance().SendTradeData_TradeLayer(tradeRes); // Export the trade decession data
+	
 	if (!tradeRes)
 		return nullptr;
+
 	return std::make_unique<OrderEntity>(*tradeRes);
 }
 

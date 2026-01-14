@@ -58,6 +58,7 @@ public:
     int GetDayIdx(long long tp);
 
 private:
+	bool ActPreCondition(); // Check if the cache is active and ready for operations
 };
 
 

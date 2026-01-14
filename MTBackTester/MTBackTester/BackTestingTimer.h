@@ -3,6 +3,7 @@
 #include "HttpServerSyncer.h"
 #include "MetaTraderSimulator.h"
 
+#define CONST_FIRST_BATCH_SIZE 100
 class BackTestingTimer
 {
 public:
@@ -25,17 +26,26 @@ public:
 
 		Static_CurrentTimeLineRep* currTimeLineRep = Static_CurrentTimeLineRep::getInstance();
 		ExchangeData dataExch;
-		for (int i = 0; i < totalBars; i++)
+		Logger::getInstance().Set_LogsEnabled(false); // Disable logs for backtesting to improve performance
+
+		SendFirstBatchOfCurrTimeLineDataToScanner();
+
+		for (int i = CONST_FIRST_BATCH_SIZE; i < totalBars; i++)
 		{
+			// NOTE: There is a bug in m_backtest -- A lot of invalid data -- No Indicators data -- Need to fix before start backtesting seriously
 			dataExch.FutureVisionScan_ResetNewBarFlag(); // Reset the new bar flag before pushing a new bar
 			
 			currTimeLineRep->Set_NewBar(m_backTestData->at(i), true);
 			mtSim.Set_NewCurrBarData(m_backTestData->at(i));
+
+			ChangeNode* prevBar = m_backTestData->at(i - 1);
+			ChangeNode* currBar = m_backTestData->at(i);
+			
 			dataExch.Notify_NewBar_M1(); // Notify the scanner of the new bar
 
 			dataExch.Wait_ForScanToComplete(); // Wait for the scanner to process the new bar
 			mtSim.Set_NewOrder(scanner.Get_LastPlacedOrder()); // If there is a new order, set it in the simulator
-			
+			InjectDataToConsoleScreen(i + 1, totalBars, mtSim.Get_AccountBalance());
 		}
 
 
@@ -51,9 +61,10 @@ public:
 		
 	}
 private:
+	void SendFirstBatchOfCurrTimeLineDataToScanner();
 	std::vector<ChangeNode*>* m_backTestData;
 	DBMap* m_dateTimeToIdxMap;
-
+	void InjectDataToConsoleScreen(int currIdx, int fullDataNum, double accountBalance);
 private:
 };
 

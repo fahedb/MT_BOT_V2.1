@@ -7,6 +7,12 @@
 /// <Logger>
 int m_glob_logCounter = 0;
 
+void Logger::LogPatternPngs(std::vector<std::string> paths, std::string barP, std::string indL) {
+    if (!m_logsEnabled)
+        return;
+    std::thread(&Logger::Http_Send_Patterns, this, paths, barP, indL).detach();
+}
+
 void Logger::WriteLog(const std::string& log, bool newSection,bool sendToLogServer, LogType logType)
 {
     //m_glob_logCounter++;
@@ -14,7 +20,9 @@ void Logger::WriteLog(const std::string& log, bool newSection,bool sendToLogServ
 	//	return; // temporarily disabled
     //if(m_glob_logCounter > 1000000)
 	//	m_glob_logCounter = 0;
-	
+	if (!m_logsEnabled)
+		return;
+
     if (sendToLogServer && false) // temporarily disabled
     {
         MTThreadPool::getInstance()->enqueueTask([log, logType,this]() {

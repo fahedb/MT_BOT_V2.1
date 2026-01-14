@@ -27,10 +27,19 @@ public:
 
 	}
 	void Set_ExternalCurrTimeLineQueue(bool val) { m_externalCurrTimeLineQueue = val; }
-	OrderEntity* Get_LastPlacedOrder() { return m_lastPlacedOrder.get(); }
+	OrderEntity* Get_LastPlacedOrder()
+	{
+		if (m_lastOrderGetPlaced) // If the last placed order was already retrieved, return nullptr to avoid duplicates
+			return nullptr;
+
+		m_lastOrderGetPlaced = true;
+		return m_lastPlacedOrder.get();
+	}
+
 private:
 	std::string m_lastTimePoint;
 	int m_scansCounter;
+	bool m_lastOrderGetPlaced = false;
 	bool m_externalCurrTimeLineQueue = false;
 	void Run_PatternGod(TimeLine& historyTimeLine);
 	bool OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator, TimeLine* history);

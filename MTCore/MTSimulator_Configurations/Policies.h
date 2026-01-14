@@ -205,6 +205,7 @@ public:
     double weight_coeff = 0.2; // Weight for coefficient similarity score
 
     bool EnablePolynomScan = 0;
+	bool EnablePolynomTimeLineCaching = 0;
     int PolynomLen_ForScan = 5; // Length of the polynomial to scan
 
     int ScoreToAct = 0;

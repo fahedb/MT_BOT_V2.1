@@ -4,6 +4,8 @@
 #include "DealStruct.h"
 #include "SimulatorActiveOrder.h"
 #include "ClosureReason.h"
+#include "StatisticsDecession.h"
+#include "MTSimulatorDataExporter.h"
 
 class MetaTraderSimulator
 {
@@ -21,12 +23,19 @@ private:
 	double m_currentPrice; // Current price in the simulation
 	double m_pointMultiplier;
 	ChangeNode* m_currentBarData; // Current bar data in the simulation
+	DirectionStats m_lastDirectionStats; // Direction statistics for the simulation
+
+	std::vector<ChangeNode*> m_currDataVector; // Vector of current data points in the simulation
+	DBMap m_currDataDBMap; // DBMap for current data points
+
 	double m_lotForTrade; // Lot size for trades in the simulation
 	long long m_currentTimePoint; // Current time point in the simulation
 	std::string m_symbol; // Trading symbol for the simulation
 
 	std::vector<ActiveOrderInfo> m_activeOrders; // List of active orders in the simulation
 	std::vector<Deal> m_closedDeals; // List of closed deals in the simulation
+	MTSimulatorDataExporter* m_dataExporter; // Data exporter for simulation data
+
 private:
 	// Private methods for internal simulation logic can be added here
 	ActiveOrderInfo ConvertOrderEntityToActiveOrderInfo(const OrderEntity* order);
@@ -36,20 +45,32 @@ private:
 	void RemoveClosedOrders(); // Remove all isActive = false orders from m_activeOrders
 	void UpdateAcountBalance(const Deal& deal);
 public:
+	~MetaTraderSimulator()
+	{
+		if (m_dataExporter)
+		{
+			delete m_dataExporter;
+			m_dataExporter = nullptr;
+		}
+	}
+
 	MetaTraderSimulator(int simulationId, double initialBalance,double lotForTrade, double contractSize, std::string symbol, int leverage = 1)
 		: m_simulationId(simulationId), m_acountBalance(initialBalance), m_currentPrice(0.0), m_leverage(leverage > 0 ? leverage : 1)
 		, m_currentTimePoint(0), m_totalProfitInPips(0), m_currentBarData(nullptr), m_pointMultiplier(0.0)
 		, m_lotForTrade(lotForTrade), m_contractSize(contractSize)
 		, m_symbol(symbol)
 	{
+		m_equityBalance = m_acountBalance;
+		m_floatingPnL = 0.0;
+		m_usedMargin = 0.0;
+		m_dataExporter = new MTSimulatorDataExporter("MTSimExporter_Sim" + std::to_string(simulationId) ,simulationId, "C:\\MT_Simulator_Exports", 4);
 	}
 	// Geters:
 	double Get_AccountBalance() const { return m_acountBalance; }
 	int Get_SimulationId() const { return m_simulationId; }
 
 	// Seters:
-	void Set_NewOrder(OrderEntity* newOrder);
-
+	void Set_NewOrder(OrderEntity* newOrder, DirectionStats& stats);
 	void Set_NewCurrBarData(ChangeNode* newBarData);
 	void CalcFloatingPnL(); // Calculate floating PnL based on current active orders and current price
 	void CalcUsedMargin(); // Calculate used margin based on current active orders
@@ -57,6 +78,6 @@ public:
 	void MarginStopOutCheck(); // Check if margin level is below stop out level and close orders if necessary
 
 	static double RequiredMargin(double price, double contractSize, double lotSize, int leverage) { return (price * contractSize * lotSize) / leverage; }
-	
+
 };
 

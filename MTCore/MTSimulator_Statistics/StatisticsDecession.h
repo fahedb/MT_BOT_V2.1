@@ -22,7 +22,6 @@ public:
 
 	void Set_NewCurrentPeriod(std::vector<ChangeNode*>* currentTimeLine) { m_currentTL = currentTimeLine; }
 private:
-	void CalcPipsChange(ChangeNode* start, DirectionStats* stats, int futureLen);
 	CommonDirection CalcFirstPipsChange  (ChangeNode* start,double weight, DirectionStats* stats,int futureLen);
 	CommonDirection CalcGeneralPipsChange(ChangeNode* start,double weight, DirectionStats* stats,int futureLen);
 	CommonDirection CalcHighestPipsChange(ChangeNode* start,double weight, DirectionStats* stats,int futureLen);

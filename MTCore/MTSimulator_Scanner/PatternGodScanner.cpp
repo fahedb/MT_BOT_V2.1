@@ -8,7 +8,14 @@
 #include "HttpServerSyncer.h"
 #include "ScannerUtils.h"
 #include "DataExporter.h"
+OrderEntity* PatternGodScanner::Get_LastPlacedOrder()
+{
+	if (m_lastOrderGetPlaced) // If the last placed order was already retrieved, return nullptr to avoid duplicates
+		return nullptr;
 
+	m_lastOrderGetPlaced = true;
+	return m_lastPlacedOrder.get();
+}
 
 void PatternGodScanner::Run_PatternGod(TimeLine& historyTimeLine)
 {
@@ -77,17 +84,18 @@ bool PatternGodScanner::OneMinutePatternGodLogic(PatternGod* patternScan, Statis
 
 	// Layer 3, This layer should build the statistics data and export it
 	logger.WriteLog("Start detecting common direction...", false, false);
-	DirectionStats stats = StatisticsLayerRun(statisticsCalcucator, results, history, currentTimeLine);
+	m_lastStatisticsResult = StatisticsLayerRun(statisticsCalcucator, results, history, currentTimeLine);
 	logger.WriteLog("Done detecting common direction.", false, false);
 
 	// Start checking for petential trade through stats
 	logger.WriteLog("Start Checking for a potentail trade...", false, false);
 	// Layer 4, This layer should check for a potentail trade based on the stats generated
-	m_lastPlacedOrder = std::move(TradeLayerRun(stats));
+	m_lastPlacedOrder = std::move(TradeLayerRun(m_lastStatisticsResult));
 	if(m_lastPlacedOrder)
 		m_lastOrderGetPlaced = false;
-	DataExporter::Export_All_Statistics_Data(stats, m_lastPlacedOrder ? m_lastPlacedOrder->IsActive() : false);
-	DirectionStatsCache::getInstance()->Add_NewStat(stats, true);
+
+	DataExporter::Export_All_Statistics_Data(m_lastStatisticsResult, m_lastPlacedOrder ? m_lastPlacedOrder->IsActive() : false);
+	DirectionStatsCache::getInstance()->Add_NewStat(m_lastStatisticsResult, true);
 	logger.WriteLog("Done scanning and exporting data.");
 	return true;
 }

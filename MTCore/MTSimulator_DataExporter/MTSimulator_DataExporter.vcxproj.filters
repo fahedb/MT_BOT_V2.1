@@ -46,6 +46,18 @@
     <Filter Include="BackTestFileExporterLogic\Interface">
       <UniqueIdentifier>{05a4c0ff-6a63-49aa-ba95-0877eb34b900}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GenericExporter">
+      <UniqueIdentifier>{3b4797ba-d586-48d4-a944-54bd1c9963ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GenericExporter\Base">
+      <UniqueIdentifier>{7eeeb6e6-1aaf-4c08-b4f4-b1e49af8e21d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GenericExporter\GenericJson">
+      <UniqueIdentifier>{b6fc048f-3b3c-4831-ad87-b6bacccb7534}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GenericExporter\JsonBuilder">
+      <UniqueIdentifier>{1e0419d7-fcbc-457a-9fbc-9b91be6ff0e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JasonHandler.cpp">
@@ -80,6 +92,12 @@
     </ClCompile>
     <ClCompile Include="InterfaceLayers_BKTSTExporter.cpp">
       <Filter>BackTestFileExporterLogic\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericBaseExporter.cpp">
+      <Filter>GenericExporter\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericJsonExporter.cpp">
+      <Filter>GenericExporter\GenericJson</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +136,12 @@
     </ClInclude>
     <ClInclude Include="InterfaceLayers_BKTSTExporter.h">
       <Filter>BackTestFileExporterLogic\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericBaseExporter.h">
+      <Filter>GenericExporter\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericJsonExporter.h">
+      <Filter>GenericExporter\GenericJson</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

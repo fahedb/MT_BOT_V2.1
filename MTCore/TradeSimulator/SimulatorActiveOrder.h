@@ -13,4 +13,5 @@ struct ActiveOrderInfo
 	bool isActive;      // Indicates if the order is currently active
 	OrderType type; // Type of the order (LONG or SHORT)
 	std::string symbol; // Trading symbol, e.g., "XAUUSD"
+	int numOfBarsHeld = 0; // Number of bars the order has been held open
 };

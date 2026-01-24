@@ -14,6 +14,9 @@
     <Filter Include="Enums">
       <UniqueIdentifier>{c5947b82-59bb-4761-8546-7b9b84c77b35}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Simulator\Exporter">
+      <UniqueIdentifier>{70c5df40-1a09-40ad-b3f6-7a48e92d86d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MetaTraderSimulator.h">
@@ -28,10 +31,22 @@
     <ClInclude Include="ClosureReason.h">
       <Filter>Enums</Filter>
     </ClInclude>
+    <ClInclude Include="MTExportTagsDef.h">
+      <Filter>Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="MTSimulatorDataExporter.h">
+      <Filter>Simulator\Exporter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MetaTraderSimulator.cpp">
       <Filter>Simulator</Filter>
+    </ClCompile>
+    <ClCompile Include="MTExportDataStruct.h">
+      <Filter>DataStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="MTSimulatorDataExporter.cpp">
+      <Filter>Simulator\Exporter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

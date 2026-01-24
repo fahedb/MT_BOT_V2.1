@@ -144,7 +144,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\MTSimulator_TradeManager;..\MTSimulator_TimeLines;..\MTSimulator_Casts;..\MTSimulator_Logger;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TradeManager;..\MTSimulator_TimeLines;..\MTSimulator_Casts;..\MTSimulator_Logger;..\MTSimulator_DataExporter;..\MTSimulator_Statistics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -159,7 +159,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\MTSimulator_TradeManager;..\MTSimulator_TimeLines;..\MTSimulator_Casts;..\MTSimulator_Logger;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TradeManager;..\MTSimulator_TimeLines;..\MTSimulator_Casts;..\MTSimulator_Logger;..\MTSimulator_DataExporter;..\MTSimulator_Statistics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -175,7 +175,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\MTSimulator_TradeManager;..\MTSimulator_TimeLines;..\MTSimulator_Casts;..\MTSimulator_Logger;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TradeManager;..\MTSimulator_TimeLines;..\MTSimulator_Casts;..\MTSimulator_Logger;..\MTSimulator_DataExporter;..\MTSimulator_Statistics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -189,10 +189,14 @@
     <ClInclude Include="ClosureReason.h" />
     <ClInclude Include="DealStruct.h" />
     <ClInclude Include="MetaTraderSimulator.h" />
+    <ClInclude Include="MTExportTagsDef.h" />
+    <ClInclude Include="MTSimulatorDataExporter.h" />
     <ClInclude Include="SimulatorActiveOrder.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MetaTraderSimulator.cpp" />
+    <ClCompile Include="MTExportDataStruct.h" />
+    <ClCompile Include="MTSimulatorDataExporter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

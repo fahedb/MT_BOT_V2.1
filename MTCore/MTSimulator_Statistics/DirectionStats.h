@@ -71,7 +71,7 @@ public:
 	std::vector<TimeLineScored>*		Get_SimilarPatterns() { return &m_patterns_wScores; }
 	std::vector < std::pair<int, int>>	Get_Indexes_and_changePips(StatsType sType) { return GetGroupStats(sType).get_Indexes_and_changePips(); }
 	std::string							Get_TimePoint() const { return m_timePoint; }
-	CoinsPair							Get_PairCoint(CoinsPair& pair) { return m_pair; }
+	CoinsPair							Get_PairCoin() { return m_pair; }
 	
 	double								stddev(StatsType sType) { return GetGroupStats(sType).stddev(); }
 	double								mean(StatsType sType) { return GetGroupStats(sType).mean(); }
@@ -81,7 +81,7 @@ public:
 	void								Add_Patterns(std::vector<TimeLineScored>* patterns,bool moveMemory = false);
 	void								Add_CurrPattern(const TimeLine& currPatter,bool moveMemory = false);
 
-	void								Set_PairCoint(CoinsPair pair) { m_pair = pair; }
+	void								Set_PairCoin(CoinsPair pair) { m_pair = pair; }
 	void								Set_TimePoint(const std::string& timePoint) { m_timePoint = timePoint; }
 	void								Set_TradeRes(bool tradeRes) { m_tradeRes = tradeRes; }
 };

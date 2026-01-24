@@ -27,14 +27,8 @@ public:
 
 	}
 	void Set_ExternalCurrTimeLineQueue(bool val) { m_externalCurrTimeLineQueue = val; }
-	OrderEntity* Get_LastPlacedOrder()
-	{
-		if (m_lastOrderGetPlaced) // If the last placed order was already retrieved, return nullptr to avoid duplicates
-			return nullptr;
-
-		m_lastOrderGetPlaced = true;
-		return m_lastPlacedOrder.get();
-	}
+	OrderEntity* Get_LastPlacedOrder();
+	DirectionStats Get_LastStatisticsResult() const { return m_lastStatisticsResult; }
 
 private:
 	std::string m_lastTimePoint;
@@ -64,6 +58,7 @@ private:
 	template<typename QueueItemType>
 	QueueItemType Get_MyQueuedItem(); // Template function to get the next queued item from the importer (There is specific function for each layer to call this template)
 	std::unique_ptr<OrderEntity> m_lastPlacedOrder; // Keep track of the last placed order to avoid duplicates
+	DirectionStats m_lastStatisticsResult; // Keep track of the last statistics result to avoid duplicates
 	
 	LayerType GetInitializedImporterLayerType(); // Get the layer type that the importer is initialized to (If any)
 };

@@ -48,6 +48,7 @@
     <ClInclude Include="InterfaceLayers_BKTSTImporter.h">
       <Filter>BackTestFileImporterLogic\Interface</Filter>
     </ClInclude>
+    <ClInclude Include="GenericDataImporterToSQLDB.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ScoringLayerImporter.cpp">
@@ -68,5 +69,6 @@
     <ClCompile Include="InterfaceLayers_BKTSTImporter.cpp">
       <Filter>BackTestFileImporterLogic\Interface</Filter>
     </ClCompile>
+    <ClCompile Include="GenericDataImporterToSQLDB.cpp" />
   </ItemGroup>
 </Project>

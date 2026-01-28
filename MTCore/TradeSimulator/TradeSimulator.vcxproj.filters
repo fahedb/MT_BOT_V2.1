@@ -17,6 +17,9 @@
     <Filter Include="Simulator\Exporter">
       <UniqueIdentifier>{70c5df40-1a09-40ad-b3f6-7a48e92d86d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Simulator\Importer">
+      <UniqueIdentifier>{a8e4bbda-a032-4007-9d29-c1ee84bfcb2b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MetaTraderSimulator.h">
@@ -37,6 +40,9 @@
     <ClInclude Include="MTSimulatorDataExporter.h">
       <Filter>Simulator\Exporter</Filter>
     </ClInclude>
+    <ClInclude Include="AnalyzerBackTestDataImporter.h">
+      <Filter>Simulator\Importer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MetaTraderSimulator.cpp">
@@ -47,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="MTSimulatorDataExporter.cpp">
       <Filter>Simulator\Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="AnalyzerBackTestDataImporter.cpp">
+      <Filter>Simulator\Importer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -28,7 +28,7 @@ public:
 	}
 	void Set_ExternalCurrTimeLineQueue(bool val) { m_externalCurrTimeLineQueue = val; }
 	OrderEntity* Get_LastPlacedOrder();
-	DirectionStats Get_LastStatisticsResult() const { return m_lastStatisticsResult; }
+	DirectionStats* Get_LastStatisticsResult() { return &m_lastStatisticsResult; }
 
 private:
 	std::string m_lastTimePoint;

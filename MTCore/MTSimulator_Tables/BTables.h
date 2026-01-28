@@ -33,7 +33,7 @@ private:
 	std::vector<std::pair<char*, char*>> m_currFileIdxPlaces;
 	std::vector<int> m_currLineIdx;
 public: 
-	BTables(SQLHENV& henv, SQLHDBC& hdbc)
+	BTables(const SQLHENV& henv,const SQLHDBC& hdbc)
 	{
 		m_DBConnectionHandler = hdbc;
 		m_DBenvHandler = henv;

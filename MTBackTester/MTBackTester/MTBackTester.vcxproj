@@ -144,7 +144,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Logger;..\..\MTCore\TradeSimulator;..\..\MTCore\MTSimulator_Cache;..\..\MTCore\MTSimulator_Scanner;..\..\MTCore\MTSimulator_DataExporter;..\..\MTCore\MTSimulator_TradeManager;..\..\MTCore\MTSimulator_ResourcesManager;..\..\HTTPCore;..\..\MTCore\MTSimulator_TimeLines;..\..\MTCore\MTSimulator_Tables;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Configurations;..\..\MTCore\MTSimulator_Compare;..\..\MTCore\MTSimulator_DataLoader;..\..\MTCore\CUDA_UNIT</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Logger;..\..\MTCore\TradeSimulator;..\..\MTCore\MTSimulator_Cache;..\..\MTCore\MTSimulator_Scanner;..\..\MTCore\MTSimulator_DataExporter;..\..\MTCore\MTSimulator_TradeManager;..\..\MTCore\MTSimulator_ResourcesManager;..\..\HTTPCore;..\..\MTCore\MTSimulator_TimeLines;..\..\MTCore\MTSimulator_Tables;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Configurations;..\..\MTCore\MTSimulator_Compare;..\..\MTCore\MTSimulator_DataLoader;..\..\MTCore\CUDA_UNIT;..\..\MTCore\MTSimulator_DataImporter;..\..\MTCore\MTSimulator_DataBaseConnection</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -161,7 +161,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Logger;..\..\MTCore\TradeSimulator;..\..\MTCore\MTSimulator_Cache;..\..\MTCore\MTSimulator_Scanner;..\..\MTCore\MTSimulator_DataExporter;..\..\MTCore\MTSimulator_TradeManager;..\..\MTCore\MTSimulator_ResourcesManager;..\..\HTTPCore;..\..\MTCore\MTSimulator_TimeLines;..\..\MTCore\MTSimulator_Tables;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Configurations;..\..\MTCore\MTSimulator_Compare;..\..\MTCore\MTSimulator_DataLoader;..\..\MTCore\CUDA_UNIT</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Logger;..\..\MTCore\TradeSimulator;..\..\MTCore\MTSimulator_Cache;..\..\MTCore\MTSimulator_Scanner;..\..\MTCore\MTSimulator_DataExporter;..\..\MTCore\MTSimulator_TradeManager;..\..\MTCore\MTSimulator_ResourcesManager;..\..\HTTPCore;..\..\MTCore\MTSimulator_TimeLines;..\..\MTCore\MTSimulator_Tables;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Configurations;..\..\MTCore\MTSimulator_Compare;..\..\MTCore\MTSimulator_DataLoader;..\..\MTCore\CUDA_UNIT;..\..\MTCore\MTSimulator_DataImporter;..\..\MTCore\MTSimulator_DataBaseConnection</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -180,7 +180,7 @@
       <Optimization>Disabled</Optimization>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Logger;..\..\MTCore\TradeSimulator;..\..\MTCore\MTSimulator_Cache;..\..\MTCore\MTSimulator_Scanner;..\..\MTCore\MTSimulator_DataExporter;..\..\MTCore\MTSimulator_TradeManager;..\..\MTCore\MTSimulator_ResourcesManager;..\..\HTTPCore;..\..\MTCore\MTSimulator_TimeLines;..\..\MTCore\MTSimulator_Tables;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Configurations;..\..\MTCore\MTSimulator_Compare;..\..\MTCore\MTSimulator_DataLoader;..\..\MTCore\CUDA_UNIT</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\MTCore\MTSimulator_Logger;..\..\MTCore\TradeSimulator;..\..\MTCore\MTSimulator_Cache;..\..\MTCore\MTSimulator_Scanner;..\..\MTCore\MTSimulator_DataExporter;..\..\MTCore\MTSimulator_TradeManager;..\..\MTCore\MTSimulator_ResourcesManager;..\..\HTTPCore;..\..\MTCore\MTSimulator_TimeLines;..\..\MTCore\MTSimulator_Tables;..\..\MTCore\MTSimulator_Statistics;..\..\MTCore\MTSimulator_Configurations;..\..\MTCore\MTSimulator_Compare;..\..\MTCore\MTSimulator_DataLoader;..\..\MTCore\CUDA_UNIT;..\..\MTCore\MTSimulator_DataImporter;..\..\MTCore\MTSimulator_DataBaseConnection</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

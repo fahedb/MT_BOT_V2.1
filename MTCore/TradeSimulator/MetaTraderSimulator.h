@@ -23,7 +23,6 @@ private:
 	double m_currentPrice; // Current price in the simulation
 	double m_pointMultiplier;
 	ChangeNode* m_currentBarData; // Current bar data in the simulation
-	DirectionStats m_lastDirectionStats; // Direction statistics for the simulation
 
 	std::vector<ChangeNode*> m_currDataVector; // Vector of current data points in the simulation
 	DBMap m_currDataDBMap; // DBMap for current data points
@@ -70,7 +69,7 @@ public:
 	int Get_SimulationId() const { return m_simulationId; }
 
 	// Seters:
-	void Set_NewOrder(OrderEntity* newOrder, DirectionStats& stats);
+	void Set_NewOrder(OrderEntity* newOrder, DirectionStats* stats);
 	void Set_NewCurrBarData(ChangeNode* newBarData);
 	void CalcFloatingPnL(); // Calculate floating PnL based on current active orders and current price
 	void CalcUsedMargin(); // Calculate used margin based on current active orders

@@ -196,6 +196,8 @@
     <ClCompile Include="BTables.cpp" />
     <ClCompile Include="ConfigsTable.cpp" />
     <ClCompile Include="EURUSD_CurrentTable.cpp" />
+    <ClCompile Include="GenericJsonReader.cpp" />
+    <ClCompile Include="GenericSQLTable.cpp" />
     <ClCompile Include="SeqNumTable.cpp" />
     <ClCompile Include="XAUUSD_CurrentTable.cpp" />
     <ClCompile Include="XAUUSD_OneMinTable.cpp" />
@@ -206,6 +208,8 @@
     <ClInclude Include="ConfigsTable.h" />
     <ClInclude Include="DefinedTables.h" />
     <ClInclude Include="EURUSD_CurrentTable.h" />
+    <ClInclude Include="GenericJsonReader.h" />
+    <ClInclude Include="GenericSQLTable.h" />
     <ClInclude Include="SeqNumTable.h" />
     <ClInclude Include="XAUUSD_CurrentTable.h" />
     <ClInclude Include="XAUUSD_OneMinTable.h" />

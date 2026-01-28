@@ -22,15 +22,15 @@ public:
 		m_accountStateExporter = new GenericJsonExporter(exporterName + "_AccountState", dstPathTo + "\\" + exporterName + "_AccountState.json", batchSize);
 		m_directionStatsExporter = new GenericJsonExporter(exporterName + "_DirectionStats", dstPathTo + "\\" + exporterName + "_DirectionStats.json", batchSize);
 	}
-	void ExportCurrentSimulationState(double accountBalance, double equityBalance, double usedMargin, double freeMargin, double floatingPnL, double currProfit, const Deal& closedDeal, DirectionStats& stat); // Export current simulation state data
+	void ExportCurrentSimulationState(double accountBalance, double equityBalance, double usedMargin, double freeMargin, double floatingPnL, double currProfit, const Deal& closedDeal); // Export current simulation state data
+	void ExportDirectionStatsData(DirectionStats* stats); // Export direction statistics data
 
 private:
 	void ExportCurrentAccountState(double accountBalance, double equityBalance, double usedMargin, double freeMargin, double floatingPnL, double currProfit, long long currTimePoint);
 	void ExportClosedDealsData(const Deal& closedDeal);
-	void ExportDirectionStatsData(DirectionStats& stats); // Export direction statistics data
 
-	void ExportDirectionStatsVotedPercentages_Helper(DirectionStats& stats, nlohmann::json& json,  StatsType statsT);
-	void ExportPatterns_Helper(DirectionStats& stats, nlohmann::json& json);
+	void ExportDirectionStatsVotedPercentages_Helper(DirectionStats* stats, nlohmann::json& json,  StatsType statsT);
+	void ExportPatterns_Helper(DirectionStats* stats, nlohmann::json& json);
 
 	bool OpenDir(const std::string& folderName);
 

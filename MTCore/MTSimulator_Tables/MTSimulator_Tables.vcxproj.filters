@@ -48,6 +48,8 @@
     <ClCompile Include="SeqNumTable.cpp">
       <Filter>SeqNumTable</Filter>
     </ClCompile>
+    <ClCompile Include="GenericSQLTable.cpp" />
+    <ClCompile Include="GenericJsonReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XAUUSD_CurrentTable.h">
@@ -74,5 +76,7 @@
     <ClInclude Include="SeqNumTable.h">
       <Filter>SeqNumTable</Filter>
     </ClInclude>
+    <ClInclude Include="GenericSQLTable.h" />
+    <ClInclude Include="GenericJsonReader.h" />
   </ItemGroup>
 </Project>

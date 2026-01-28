@@ -16,7 +16,7 @@ CREATE TABLE dbo.BackTest_Deals (
     closeReason       NVARCHAR(32)    NOT NULL,
     numOfBarsHeld     INT              NOT NULL,
 
-    CONSTRAINT PK_BackTest_AccountStateEvents PRIMARY KEY (SimulationID, ticket)
+    CONSTRAINT PK_BackTest_Deals PRIMARY KEY (SimulationID, ticket)
 );
 
 CREATE TABLE dbo.BackTest_AccountStateEvents (
@@ -31,4 +31,24 @@ CREATE TABLE dbo.BackTest_AccountStateEvents (
 
     CONSTRAINT PK_BackTest_AccountStateEvents
         PRIMARY KEY (SimulationID, CurrTimePoint)
+);
+
+CREATE TABLE dbo.BackTest_DirectionStats (
+    SimulationID int not null,
+    TimePoint BIGINT NOT NULL,
+    CoinsPair NVARCHAR(7) NOT NULL,
+    VoteType NVARCHAR(10) not null,
+    TotalVotes int not null,
+    UpPercentage DECIMAL(18, 8) NOT NULL,
+    DownPercentage DECIMAL(18, 8) NOT NULL,
+    BlurPercentage DECIMAL(18, 8) NOT NULL,
+    Mean DECIMAL(18, 8) NOT NULL,
+    PureMean_Up DECIMAL(18, 8) NOT NULL,
+    PureMean_Down DECIMAL(18, 8) NOT NULL,
+    StdDev DECIMAL(18, 8) NOT NULL,
+    MeanIndexes DECIMAL(18, 8) NOT NULL,
+    TradeResult int not null
+
+        CONSTRAINT PK_BackTest_DirectionStats
+        PRIMARY KEY (SimulationID, VoteType, TimePoint)
 );

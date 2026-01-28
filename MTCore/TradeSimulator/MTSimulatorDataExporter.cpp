@@ -1,12 +1,11 @@
 #include "MTSimulatorDataExporter.h"
 #include "MTExportTagsDef.h"
+#include "Converts.h"
 
-
-void MTSimulatorDataExporter::ExportCurrentSimulationState(double accountBalance, double equityBalance, double usedMargin, double freeMargin, double floatingPnL, double currProfit, const Deal& closedDeal, DirectionStats& stat )
+void MTSimulatorDataExporter::ExportCurrentSimulationState(double accountBalance, double equityBalance, double usedMargin, double freeMargin, double floatingPnL, double currProfit, const Deal& closedDeal )
 {
 	ExportClosedDealsData(closedDeal);
 	ExportCurrentAccountState(accountBalance, equityBalance, usedMargin, freeMargin, floatingPnL, currProfit, closedDeal.closeTime);
-	ExportDirectionStatsData(stat);
 }
 
 void MTSimulatorDataExporter::ExportClosedDealsData(const Deal& closedDeal)
@@ -31,14 +30,18 @@ void MTSimulatorDataExporter::ExportClosedDealsData(const Deal& closedDeal)
 
 }
 
-void MTSimulatorDataExporter::ExportDirectionStatsData(DirectionStats& stats)
+void MTSimulatorDataExporter::ExportDirectionStatsData(DirectionStats* stats)
 {
 	// Implementation for exporting direction statistics data
 	// This can be expanded based on the specific fields in DirectionStats
+	if(!stats)
+		return;
+	// Json builder
 	nlohmann::json directionStatsJson;
-	directionStatsJson[DirectionStatsTag_TimePoint] = stats.Get_TimePoint();
-	directionStatsJson[DirectionStatsTag_Pair] = CoinsPairUtils::Get_PairType_str(stats.Get_PairCoin());
-	directionStatsJson[DirectionStatsTag_TotalVotes] = stats.Get_Total(StatsType::General);
+	directionStatsJson[DirectionStatsTag_TimePoint] = Converts::ToLongLong(stats->Get_TimePoint());
+	directionStatsJson[Tag_SimulationID] = m_simulationId;
+	directionStatsJson[DirectionStatsTag_Pair] = CoinsPairUtils::Get_PairType_str(stats->Get_PairCoin());
+	directionStatsJson[DirectionStatsTag_TotalVotes] = stats->Get_Total(StatsType::General);
 	
 	ExportDirectionStatsVotedPercentages_Helper(stats, directionStatsJson[DirectionStatsTag_General_VotedPercentages], StatsType::General);
 	ExportDirectionStatsVotedPercentages_Helper(stats, directionStatsJson[DirectionStatsTag_First_VotedPercentages], StatsType::First);
@@ -48,20 +51,23 @@ void MTSimulatorDataExporter::ExportDirectionStatsData(DirectionStats& stats)
 	m_directionStatsExporter->AddDataItem(directionStatsJson);
 }
 
-void MTSimulatorDataExporter::ExportDirectionStatsVotedPercentages_Helper(DirectionStats& stats, nlohmann::json& json, StatsType statsT)
+void MTSimulatorDataExporter::ExportDirectionStatsVotedPercentages_Helper(DirectionStats* stats, nlohmann::json& json, StatsType statsT)
 {
-	robin_hood::unordered_map<CommonDirection, double> votedPercentages = stats.Get_VotedPercentages(StatsType::General);
-	json[DirectionStatsTag_VeotedPercentages_TotalVotes] = stats.Get_Total(statsT);
-	json[DirectionStatsTag_VeotedPercentages_Mean] = stats.mean(statsT);
-	json[DirectionStatsTag_VeotedPercentages_PureMean_UP] = stats.Get_PureMean(statsT, CommonDirection::UP);
-	json[DirectionStatsTag_VeotedPercentages_PureMean_DOWN] = stats.Get_PureMean(statsT, CommonDirection::DOWN);
-	json[DirectionStatsTag_VeotedPercentages_StdDev] = stats.stddev(statsT);
-	json[DirectionStatsTag_VeotedPercentages_MeanIndexes] = stats.meanIndexes(statsT);
+	robin_hood::unordered_map<CommonDirection, double> votedPercentages = stats->Get_VotedPercentages(StatsType::General);
+	json[DirectionStatsTag_VeotedPercentages_TotalVotes] = stats->Get_Total(statsT);
+	json[DirectionStatsTag_VeotedPercentages_UP_Percent] = votedPercentages[CommonDirection::UP];
+	json[DirectionStatsTag_VeotedPercentages_DOWN_Percent] = votedPercentages[CommonDirection::DOWN];
+	json[DirectionStatsTag_VeotedPercentages_BLUR_Percent] = votedPercentages[CommonDirection::BLUR];
+	json[DirectionStatsTag_VeotedPercentages_Mean] = stats->mean(statsT);
+	json[DirectionStatsTag_VeotedPercentages_PureMean_UP] = stats->Get_PureMean(statsT, CommonDirection::UP);
+	json[DirectionStatsTag_VeotedPercentages_PureMean_DOWN] = stats->Get_PureMean(statsT, CommonDirection::DOWN);
+	json[DirectionStatsTag_VeotedPercentages_StdDev] = stats->stddev(statsT);
+	json[DirectionStatsTag_VeotedPercentages_MeanIndexes] = stats->meanIndexes(statsT);
 }
 
-void MTSimulatorDataExporter::ExportPatterns_Helper(DirectionStats& stats, nlohmann::json& json)
+void MTSimulatorDataExporter::ExportPatterns_Helper(DirectionStats* stats, nlohmann::json& json)
 {
-	std::vector<TimeLineScored>* patterns = stats.Get_SimilarPatterns();
+	std::vector<TimeLineScored>* patterns = stats->Get_SimilarPatterns();
 	for (const auto& pattern : *patterns) {
 		nlohmann::json patternJson;
 		patternJson[DirectionStatsTag_SimilarPattern_PatternTimePoint] = pattern.Get_TimeLine().Get_TimeLine()->front()->point_DateTimeLong;

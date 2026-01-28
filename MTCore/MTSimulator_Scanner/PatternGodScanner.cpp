@@ -95,7 +95,7 @@ bool PatternGodScanner::OneMinutePatternGodLogic(PatternGod* patternScan, Statis
 		m_lastOrderGetPlaced = false;
 
 	DataExporter::Export_All_Statistics_Data(m_lastStatisticsResult, m_lastPlacedOrder ? m_lastPlacedOrder->IsActive() : false);
-	DirectionStatsCache::getInstance()->Add_NewStat(m_lastStatisticsResult, true);
+	DirectionStatsCache::getInstance()->Add_NewStat(m_lastStatisticsResult, false);
 	logger.WriteLog("Done scanning and exporting data.");
 	return true;
 }

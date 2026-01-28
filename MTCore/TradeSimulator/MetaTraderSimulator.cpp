@@ -151,7 +151,7 @@ void MetaTraderSimulator::CreateDealFromOrder(const ActiveOrderInfo& order, Clos
 
 	deal.takeProfitPrice = order.type == OrderType::LONG ?
 		order.openPrice + (order.tpPips * m_pointMultiplier) :
-		order.openPrice + (order.tpPips * m_pointMultiplier);
+		order.openPrice - (order.tpPips * m_pointMultiplier);
 
 	deal.type = order.type;
 
@@ -193,7 +193,7 @@ void MetaTraderSimulator::CreateDealFromOrder(const ActiveOrderInfo& order, Clos
 		Get_FreeMargin(),
 		m_floatingPnL,
 		deal.profit,
-		deal,m_lastDirectionStats);
+		deal);
 }
 
 void MetaTraderSimulator::RemoveClosedOrders()
@@ -212,7 +212,7 @@ void MetaTraderSimulator::UpdateAcountBalance(const Deal& deal) {
 }
 
 // Seters:
-void MetaTraderSimulator::Set_NewOrder(OrderEntity* newOrder, DirectionStats& stats)
+void MetaTraderSimulator::Set_NewOrder(OrderEntity* newOrder, DirectionStats* stats)
 {
 	if (!newOrder) return;
 
@@ -221,7 +221,7 @@ void MetaTraderSimulator::Set_NewOrder(OrderEntity* newOrder, DirectionStats& st
 		Logger::getInstance().WriteLog("Current bar data is not set. Cannot add new order.", false, false, LogType::ERR);
 		return;
 	}
-	m_lastDirectionStats = std::move(stats);
+	m_dataExporter->ExportDirectionStatsData(stats);
 	// Implementation for setting a new order in the simulation
 	ActiveOrderInfo activeOrder = ConvertOrderEntityToActiveOrderInfo(newOrder);
 	CalcFloatingPnL(); // Recalculate floating PnL before adding new order

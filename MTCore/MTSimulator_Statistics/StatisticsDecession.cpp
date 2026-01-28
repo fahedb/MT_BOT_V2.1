@@ -54,7 +54,8 @@ DirectionStats StatisticsDecession::DetectCommonDirection(std::vector<std::pair<
 		return stats;
 
 	PatternGodStatisticsPolicy* policy = Configrations::getInstance()->Get_Policy<PatternGodStatisticsPolicy>(PolicyType::PatternGodStatisticsPolicy);
-	stats.Set_TimePoint(m_currentTL->at(m_currentTL->size() - 1)->point_DateTime);
+	stats.Set_TimePoint(std::to_string(m_currentTL->at(m_currentTL->size() - 1)->point_DateTimeLong));
+	stats.Set_PairCoin(CoinsPairUtils::Get_PairType(m_currentTL->at(m_currentTL->size() - 1)->symbol));
 	stats.Activate();
 
 	if (!futureLen)

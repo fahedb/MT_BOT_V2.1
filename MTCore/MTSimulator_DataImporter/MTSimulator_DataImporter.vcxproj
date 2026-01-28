@@ -144,7 +144,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Logger;..\MTSimulator_Configurations;..\MTSimulator_MTThreadPool;..\MTSimulator_Casts;..\MTSimulator_TradeManager;..\MTSimulator_Statistics;..\MTSimulator_ResourcesManager;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Logger;..\MTSimulator_Configurations;..\MTSimulator_MTThreadPool;..\MTSimulator_Casts;..\MTSimulator_TradeManager;..\MTSimulator_Statistics;..\MTSimulator_ResourcesManager;..\MTSimulator_Tables;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -159,7 +159,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Logger;..\MTSimulator_Configurations;..\MTSimulator_MTThreadPool;..\MTSimulator_Casts;..\MTSimulator_TradeManager;..\MTSimulator_Statistics;..\MTSimulator_ResourcesManager;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Logger;..\MTSimulator_Configurations;..\MTSimulator_MTThreadPool;..\MTSimulator_Casts;..\MTSimulator_TradeManager;..\MTSimulator_Statistics;..\MTSimulator_ResourcesManager;..\MTSimulator_Tables;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -175,7 +175,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Logger;..\MTSimulator_Configurations;..\MTSimulator_MTThreadPool;..\MTSimulator_Casts;..\MTSimulator_TradeManager;..\MTSimulator_Statistics;..\MTSimulator_ResourcesManager;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Logger;..\MTSimulator_Configurations;..\MTSimulator_MTThreadPool;..\MTSimulator_Casts;..\MTSimulator_TradeManager;..\MTSimulator_Statistics;..\MTSimulator_ResourcesManager;..\MTSimulator_Tables;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
@@ -188,6 +188,7 @@
   <ItemGroup>
     <ClInclude Include="BaseLayerImporter.h" />
     <ClInclude Include="FilterLayerDataImporter.h" />
+    <ClInclude Include="GenericDataImporterToSQLDB.h" />
     <ClInclude Include="InterfaceLayers_BKTSTImporter.h" />
     <ClInclude Include="QueueStruct.h" />
     <ClInclude Include="ScoringLayerImporter.h" />
@@ -197,6 +198,7 @@
   <ItemGroup>
     <ClCompile Include="BaseLayerImporter.inl" />
     <ClCompile Include="FilterLayerDataImporter.cpp" />
+    <ClCompile Include="GenericDataImporterToSQLDB.cpp" />
     <ClCompile Include="InterfaceLayers_BKTSTImporter.cpp" />
     <ClCompile Include="ScoringLayerImporter.cpp" />
     <ClCompile Include="StatisticsLayerDataImporter.cpp" />

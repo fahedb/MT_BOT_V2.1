@@ -44,7 +44,7 @@ public:
 			dataExch.Notify_NewBar_M1(); // Notify the scanner of the new bar
 
 			dataExch.Wait_ForScanToComplete(); // Wait for the scanner to process the new bar
-			DirectionStats stats = scanner.Get_LastStatisticsResult();
+			DirectionStats* stats = scanner.Get_LastStatisticsResult();
 			mtSim.Set_NewOrder(scanner.Get_LastPlacedOrder(), stats); // If there is a new order, set it in the simulator
 			InjectDataToConsoleScreen(i + 1, totalBars, mtSim.Get_AccountBalance());
 		}

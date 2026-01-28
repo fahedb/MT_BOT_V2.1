@@ -2,6 +2,7 @@
 #include "ExchangeData.h"
 #include "BackTestDataLoader.h"	
 #include "BackTestingTimer.h"
+#include "AnalyzerBackTestDataImporter.h"
 
 void DefualtProgramStart();
 
@@ -10,6 +11,8 @@ int main(int argc, char* argv[])
 	ProccessFlags::InitProccessFlags(argc, argv);
 	DefualtProgramStart();
 }
+
+
 
 void DefualtProgramStart() 
 {

@@ -1,4 +1,5 @@
 #include "TradesManager.h"
+int maximum(int a, int b) { return (a > b) ? a : b; }
 
 OrderEntity* TradesManager::CheckForTrade_PatternGod(DirectionStats& stats) // Function to check for trades for PatternGod and statistics Stats
 {
@@ -19,17 +20,22 @@ OrderEntity* TradesManager::CheckForTrade_PatternGod(DirectionStats& stats) // F
 
 	double mean = abs(stats.mean(StatsType::Highest));
 
-	double stopLoss = 0;
+	double pureMean = 0;
 	if (ordType != OrderType::NONE)
-		stopLoss = abs(stats.Get_PureMean(StatsType::Highest, highestDir == CommonDirection::UP ? CommonDirection::DOWN : CommonDirection::UP));
+		pureMean = abs(stats.Get_PureMean(StatsType::Highest, highestDir == CommonDirection::UP ? CommonDirection::DOWN : CommonDirection::UP));
 
 	
 	
 	if ((generalDir == highestDir || firstDir == highestDir) && ordType != OrderType::NONE)
 	{
 		order = new OrderEntity(ordType, stats.Get_TimePoint(), stats.Get_TimePoint(), CoinsPair::XAUUSD);
-		order->Set_TakeProfit(m_ordersPolicy->Dynamic_SL_TP ? static_cast<int>(mean) : m_ordersPolicy->TP_start);
-		order->Set_StopLoss(m_ordersPolicy->Dynamic_SL_TP ? static_cast<int>(stopLoss) : m_ordersPolicy->SL_start);
+		double orderStopLoss = m_ordersPolicy->Dynamic_SL_TP ? static_cast<int>(pureMean) : m_ordersPolicy->SL_start;
+		orderStopLoss = maximum(std::abs(orderStopLoss), std::abs(m_ordersPolicy->SL_start)); 
+		order->Set_StopLoss(orderStopLoss);
+
+		double orderTakeProfit = m_ordersPolicy->Dynamic_SL_TP ? static_cast<int>(mean) : m_ordersPolicy->TP_start;
+		orderTakeProfit = maximum(std::abs(orderTakeProfit), std::abs(m_ordersPolicy->TP_start));
+		order->Set_TakeProfit(orderTakeProfit);
 	}
 
 	if (order)

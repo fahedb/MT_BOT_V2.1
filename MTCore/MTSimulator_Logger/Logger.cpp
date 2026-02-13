@@ -6,6 +6,7 @@
 /// Logger class function, For logging data
 /// <Logger>
 int m_glob_logCounter = 0;
+void PrintMemoryUsage();
 
 void Logger::LogPatternPngs(std::vector<std::string> paths, std::string barP, std::string indL) {
     if (!m_logsEnabled)
@@ -18,8 +19,6 @@ void Logger::WriteLog(const std::string& log, bool newSection,bool sendToLogServ
     //m_glob_logCounter++;
     //if(m_glob_logCounter% 100 != 0) // Just to avoid too many logs
 	//	return; // temporarily disabled
-    //if(m_glob_logCounter > 1000000)
-	//	m_glob_logCounter = 0;
 	if (!m_logsEnabled)
 		return;
 
@@ -40,6 +39,15 @@ void Logger::WriteLog(const std::string& log, bool newSection,bool sendToLogServ
     std::lock_guard<std::mutex> lock(m_logMutex);
     OutputDebugStringA(logToPrint.c_str());
     std::cout << logToPrint;
+    
+    if(m_glob_logCounter > 1000000)
+		m_glob_logCounter = 0;
+#ifdef PRINT_MEMORY_USAGE
+    if (m_glob_logCounter % 100 == 0) // Just to avoid too many logs
+        PrintMemoryUsage();
+	m_glob_logCounter++;
+#endif // PRINT_MEMORY_USAGE
+
     
 }
 
@@ -69,3 +77,34 @@ std::string Logger::GetFormattedCurrTime()
     oss << std::put_time(&tm, "%H:%M:%S : ");
     return oss.str();
 }
+
+#ifdef PRINT_MEMORY_USAGE
+
+
+#include <psapi.h>
+#include <iostream>
+
+#pragma comment(lib, "psapi.lib")
+std::ofstream* memoryOutFile;
+
+void PrintMemoryUsage()
+{
+    if(!memoryOutFile)
+    {
+        memoryOutFile = new std::ofstream();
+		memoryOutFile->open("c:\\Temp\\mtScanner_memory_usage.txt", std::ios_base::app);
+	}
+
+    PROCESS_MEMORY_COUNTERS_EX pmc;
+
+    if (GetProcessMemoryInfo(GetCurrentProcess(),
+        (PROCESS_MEMORY_COUNTERS*)&pmc,
+        sizeof(pmc)))
+    {
+        SIZE_T workingSetMB = pmc.WorkingSetSize / 1024 / 1024;
+        SIZE_T privateMB = pmc.PrivateUsage / 1024 / 1024;
+
+		*memoryOutFile << "Working Set: " << workingSetMB << " MB, Private Usage: " << privateMB << " MB" << std::endl;
+    }
+}
+#endif // PRINT_MEMORY_USAGE

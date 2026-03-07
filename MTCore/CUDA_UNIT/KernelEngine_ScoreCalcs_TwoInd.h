@@ -1,5 +1,7 @@
 #pragma once
-#include "KernelEngine_ScoreCalcs_General.h"
+
+#include "CudaMemoryController.h"
+
 /// Candidate scan kernel for Two Indicators calculation
 __global__ void CandidateScan_Kernel_TwoInd(
 	const int* __restrict__ d_candidateIndices /*array of candidate indices to process */

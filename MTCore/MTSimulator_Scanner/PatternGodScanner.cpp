@@ -289,7 +289,7 @@ QueueItemType PatternGodScanner::Get_MyQueuedItem()
 
 	if (currTime > dataTime) // If the data time is less than the current time by 1 hour, loop till you get the right data
 	{
-		if (currTime - dataTime < 6000000)
+		if (currTime - dataTime < 600000000)
 		{
 
 			while (dataTime < currTime)

@@ -89,8 +89,15 @@ void TimeLineArrayBuilder::BuildTimeLineArrays(dataStream_t* outData, std::vecto
 					futuresPromisses.push_back(prom->get_future()); // Store the future for later synchronization
 
 					threadPool->enqueueTask([tl, prom, dataArray, indT, indL, barP, valT]() {
-						TimeLineArrayBuilder::BuildTimeLineArray(dataArray, tl, indT, indL, barP, valT);
-						prom->set_value();
+						try {
+							TimeLineArrayBuilder::BuildTimeLineArray(dataArray, tl, indT, indL, barP, valT);
+							prom->set_value();
+						}
+						catch (const std::exception& ex) { // Catch any standard exceptions
+							// Handle exceptions and set the promise to avoid hanging
+							std::cerr << "Exception in thread: " << ex.what() << std::endl;
+							prom->set_exception(std::current_exception()); // Set the exception to the promise to propagate it to the future
+						}
 						}, TaskPriority::High);
 
 
@@ -155,8 +162,17 @@ void TimeLineArrayBuilder::BuildTotalScoreArray(dataStream_t* inData, float* out
 		futuresPromisses.push_back(prom->get_future()); // Store the future for later synchronization
 
 		threadPool->enqueueTask([inData, prom, outData, resNum, i, chunkSize]() {
-			BuildTotalScoreArray_ChunkTask(inData, outData, resNum, i, chunkSize);
-			prom->set_value();
+			try {
+
+				BuildTotalScoreArray_ChunkTask(inData, outData, resNum, i, chunkSize);
+				prom->set_value();
+			}
+			catch (const std::exception& ex) { // Catch any standard exceptions
+				// Handle exceptions and set the promise to avoid hanging
+				std::cerr << "Exception in thread: " << ex.what() << std::endl;
+				prom->set_exception(std::current_exception()); // Set the exception to the promise to propagate it to the future
+			}
+
 			}, TaskPriority::High);
 
 

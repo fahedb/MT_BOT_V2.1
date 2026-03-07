@@ -44,8 +44,15 @@ void HistoryTimeLineLoader::ChangeNodeLoader(std::vector<std::vector<ChangeNode*
 		int chunkSize = m_chunkSize;
 		MTThreadPool::getInstance()->enqueueTask(
 			[t, chunkSize, tb, reads2D, prom]() {
+				try {
+
 				processChunk(t, chunkSize, tb, reads2D);
 				prom->set_value();
+				}
+				catch (const std::exception& ex) {
+					std::cerr << "Exception in thread: " << ex.what() << std::endl;
+					prom->set_exception(std::current_exception());
+				}
 			},
 			TaskPriority::High
 		);

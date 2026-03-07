@@ -61,10 +61,28 @@ public:
 		, const float* d_currIndY_MinValues, const float* d_currIndY_MaxValues			///
 		, const float* d_currIndY_MinSlopes, const float* d_currIndY_MaxSlopes			///
 		///////////////////////////////////////////////////////////////////////////////////
-
 		, int currTimeLineLen, int numOfResults , int weight);
 	
 
+	static void Calc_CandidateIndicator_ScoreCalcs(
+		const int* d_candidateIndices,
+		const int candidateCount,
+		float* d_results
+		//////////////////////////////////// Hist arrays //////////////////////////////////////////////////
+		, const float* d_histValues, const float* d_histSlopes											///
+		, const float* d_hist_MinValues, const float* d_hist_MaxValues									///
+		, const float* d_hist_MinSlopes, const float* d_hist_MaxSlopes									///
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+
+		//////////////////////////////////// Current arrays ///////////////////////////////////////////////
+		, const float* d_currValues, const float* d_currSlopes											///
+		, const float* d_curr_MinValues, const float* d_curr_MaxValues									///
+		, const float* d_curr_MinSlopes, const float* d_curr_MaxSlopes									///
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		, int currTimeLineLen, int numOfResults, IndicatorType indT, int weight);
+
+	
+	
 	static void Calc_Indicator_ScoreCalcs(float* d_results
 		//////////////////////////////////// Hist arrays //////////////////////////////////////////////////
 		, const float* d_histValues, const float* d_histSlopes											///

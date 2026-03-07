@@ -1,26 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CudaCompile Include="KernelEngine.cu">
-      <Filter>KernelEngines\General</Filter>
-    </CudaCompile>
     <CudaCompile Include="kernel.cu">
       <Filter>Tunnel</Filter>
     </CudaCompile>
     <CudaCompile Include="KernelEngine_ScoreCalcs.cu">
-      <Filter>KernelEngines\ScoreCalcs\Interface</Filter>
-    </CudaCompile>
-    <CudaCompile Include="KernelEngine_ScoreCalcs_General.cu">
-      <Filter>KernelEngines\ScoreCalcs\Helpers</Filter>
+      <Filter>ScoringEngines\KernelEngines\ScoreCalcs\Interface</Filter>
     </CudaCompile>
     <CudaCompile Include="KernelEngine_ScoreCalcs_RSI.cu">
-      <Filter>KernelEngines\ScoreCalcs\RSI</Filter>
+      <Filter>ScoringEngines\KernelEngines\ScoreCalcs\RSI</Filter>
     </CudaCompile>
     <CudaCompile Include="KernelEngine_ScoreCalcs_MA.cu">
-      <Filter>KernelEngines\ScoreCalcs\MA</Filter>
+      <Filter>ScoringEngines\KernelEngines\ScoreCalcs\MA</Filter>
     </CudaCompile>
     <CudaCompile Include="KernelEngine_ScoreCalcs_TwoInd.cu">
-      <Filter>KernelEngines\ScoreCalcs\DOUBLE_IND</Filter>
+      <Filter>ScoringEngines\KernelEngines\ScoreCalcs\DOUBLE_IND</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
@@ -31,13 +25,25 @@
       <Filter>MemoryStream\Setter</Filter>
     </ClCompile>
     <ClCompile Include="KernelExecutionContext.cpp" />
+    <ClCompile Include="CPUEngine_ScoreCalcs.cpp">
+      <Filter>ScoringEngines\CPUEngines\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="CPUEngine_ScoreCalcs_MA.cpp">
+      <Filter>ScoringEngines\CPUEngines\MA</Filter>
+    </ClCompile>
+    <ClCompile Include="CPUEngine_ScoreCalcs_RSI.cpp">
+      <Filter>ScoringEngines\CPUEngines\RSI</Filter>
+    </ClCompile>
+    <ClCompile Include="CPUEngine_ScoreCalcs_TwoInd.h">
+      <Filter>ScoringEngines\CPUEngines\DOUBLE_IND</Filter>
+    </ClCompile>
+    <ClCompile Include="CPUEngine_ScoreCalcs_TwoInd.cpp">
+      <Filter>ScoringEngines\CPUEngines\DOUBLE_IND</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPP_To_Cuda_Tunnel.h">
       <Filter>Tunnel</Filter>
-    </ClInclude>
-    <ClInclude Include="KernelEngine.h">
-      <Filter>KernelEngines\General</Filter>
     </ClInclude>
     <ClInclude Include="MTStreamsStructs.h">
       <Filter>MemoryStream\StreamStruct</Filter>
@@ -49,22 +55,31 @@
       <Filter>CudaMemory</Filter>
     </ClInclude>
     <ClInclude Include="KernelEngine_ScoreCalcs.h">
-      <Filter>KernelEngines\ScoreCalcs\Interface</Filter>
+      <Filter>ScoringEngines\KernelEngines\ScoreCalcs\Interface</Filter>
     </ClInclude>
     <ClInclude Include="KernelEngine_ScoreCalcs_General.h">
-      <Filter>KernelEngines\ScoreCalcs\Helpers</Filter>
+      <Filter>ScoringEngines\Helpers</Filter>
     </ClInclude>
     <ClInclude Include="KernelEngine_ScoreCalcs_RSI.h">
-      <Filter>KernelEngines\ScoreCalcs\RSI</Filter>
+      <Filter>ScoringEngines\KernelEngines\ScoreCalcs\RSI</Filter>
     </ClInclude>
     <ClInclude Include="KernelEngine_ScoreCalcs_MA.h">
-      <Filter>KernelEngines\ScoreCalcs\MA</Filter>
+      <Filter>ScoringEngines\KernelEngines\ScoreCalcs\MA</Filter>
     </ClInclude>
     <ClInclude Include="KernelEngine_ScoreCalcs_TwoInd.h">
-      <Filter>KernelEngines\ScoreCalcs\DOUBLE_IND</Filter>
+      <Filter>ScoringEngines\KernelEngines\ScoreCalcs\DOUBLE_IND</Filter>
     </ClInclude>
     <ClInclude Include="KernelExecutionContext.h" />
     <ClInclude Include="GPU_LaunchesParameters.h" />
+    <ClInclude Include="CPUEngine_ScoreCalcs.h">
+      <Filter>ScoringEngines\CPUEngines\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="CPUEngine_ScoreCalcs_MA.h">
+      <Filter>ScoringEngines\CPUEngines\MA</Filter>
+    </ClInclude>
+    <ClInclude Include="CPUEngine_ScoreCalcs_RSI.h">
+      <Filter>ScoringEngines\CPUEngines\RSI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CudaMemory">
@@ -72,15 +87,6 @@
     </Filter>
     <Filter Include="Tunnel">
       <UniqueIdentifier>{c88d99d5-b10e-4f44-a37e-6404836f1f43}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="KernelEngines">
-      <UniqueIdentifier>{f106a77e-a23f-4baf-a1fb-a6bc931585de}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="KernelEngines\General">
-      <UniqueIdentifier>{eb640b28-0d59-460d-ab57-595698a81b17}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="KernelEngines\ScoreCalcs">
-      <UniqueIdentifier>{66f503fb-e64b-4685-b578-57c0a76b14ca}</UniqueIdentifier>
     </Filter>
     <Filter Include="MemoryStream">
       <UniqueIdentifier>{3548666f-c04d-4cb3-8f22-8588bd065820}</UniqueIdentifier>
@@ -91,20 +97,44 @@
     <Filter Include="MemoryStream\Setter">
       <UniqueIdentifier>{e727cbff-2634-4638-9050-27a70b842b06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="KernelEngines\ScoreCalcs\Interface">
+    <Filter Include="ScoringEngines">
+      <UniqueIdentifier>{faae367e-d3c3-4e88-a854-6366d57ee80b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScoringEngines\CPUEngines">
+      <UniqueIdentifier>{5a4fbe91-fde7-4ab0-94e7-5fc2aa3927d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScoringEngines\KernelEngines">
+      <UniqueIdentifier>{f106a77e-a23f-4baf-a1fb-a6bc931585de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScoringEngines\KernelEngines\ScoreCalcs">
+      <UniqueIdentifier>{66f503fb-e64b-4685-b578-57c0a76b14ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScoringEngines\KernelEngines\ScoreCalcs\Interface">
       <UniqueIdentifier>{8fa390a7-9816-4a77-9e07-0228ef3bc21e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="KernelEngines\ScoreCalcs\RSI">
+    <Filter Include="ScoringEngines\KernelEngines\ScoreCalcs\RSI">
       <UniqueIdentifier>{64fc91f7-f4ec-4992-9dcf-31e154feba70}</UniqueIdentifier>
     </Filter>
-    <Filter Include="KernelEngines\ScoreCalcs\MA">
+    <Filter Include="ScoringEngines\KernelEngines\ScoreCalcs\MA">
       <UniqueIdentifier>{6364a129-77b0-429a-81f1-5f51cb4b60f2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="KernelEngines\ScoreCalcs\DOUBLE_IND">
+    <Filter Include="ScoringEngines\KernelEngines\ScoreCalcs\DOUBLE_IND">
       <UniqueIdentifier>{cf5ad6c1-b962-4db2-8025-2b47d569bd00}</UniqueIdentifier>
     </Filter>
-    <Filter Include="KernelEngines\ScoreCalcs\Helpers">
+    <Filter Include="ScoringEngines\Helpers">
       <UniqueIdentifier>{d0c2961b-6587-47aa-bfd4-e28bf3d56c75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScoringEngines\CPUEngines\Interface">
+      <UniqueIdentifier>{2917f883-1399-4208-a815-68adb5fd0640}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScoringEngines\CPUEngines\MA">
+      <UniqueIdentifier>{08b15e4b-c532-4f7f-9457-a557254b06b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScoringEngines\CPUEngines\RSI">
+      <UniqueIdentifier>{2a4a042e-4c6b-48f3-8b5c-0624e183066b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScoringEngines\CPUEngines\DOUBLE_IND">
+      <UniqueIdentifier>{1e8de0ca-24bc-49d4-90bc-389fa2a81942}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -1,5 +1,4 @@
 #include "CPP_To_Cuda_Tunnel.h"
-#include "KernelEngine.h"
 #include "KernelEngine_ScoreCalcs.h"
 
 #include "CudaMemoryController.h"
@@ -125,6 +124,48 @@ void CPP_To_Cuda_Tunnel::Calc_TwoIndicatorsRatio_ScoreCalcs(float* d_results
 	);
 }
 
+void CPP_To_Cuda_Tunnel::Calc_CandidateIndicator_ScoreCalcs(
+	const int* d_candidateIndices,
+	const int candidateCount,
+	float* d_results
+	//////////////////////////////////// Hist arrays //////////////////////////////////////////////////
+	, const float* d_histValues, const float* d_histSlopes											///
+	, const float* d_hist_MinValues, const float* d_hist_MaxValues									///
+	, const float* d_hist_MinSlopes, const float* d_hist_MaxSlopes									///
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//////////////////////////////////// Current arrays ///////////////////////////////////////////////
+	, const float* d_currValues, const float* d_currSlopes											///
+	, const float* d_curr_MinValues, const float* d_curr_MaxValues									///
+	, const float* d_curr_MinSlopes, const float* d_curr_MaxSlopes									///
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	, int currTimeLineLen, int numOfResults, IndicatorType indT, int weight)
+{
+	if(!d_results || numOfResults <= 0 || !d_candidateIndices || candidateCount <= 0)
+	{
+		std::cout << "Invalid input to Calc_CandidateIndicator_ScoreCalcs" << std::endl;
+		return;
+	}
+	if (indT == IndicatorType::EMA || indT == IndicatorType::ZLSMA)
+	{
+		CandidateCalcMA(d_candidateIndices, candidateCount,
+			d_histValues, d_histSlopes,
+			d_hist_MinValues, d_hist_MaxValues,
+			d_hist_MinSlopes, d_hist_MaxSlopes,
+			d_currValues, d_currSlopes,
+			d_curr_MinValues, d_curr_MaxValues,
+			d_curr_MinSlopes, d_curr_MaxSlopes,
+			d_results, currTimeLineLen, numOfResults, weight);
+	}
+	else if (indT == IndicatorType::RSI)
+	{
+		CandidateCalcRSI(d_candidateIndices, candidateCount,
+			d_histValues, d_histSlopes,
+			d_currValues, d_currSlopes,
+			d_results, currTimeLineLen, numOfResults, weight);
+	}
+}
+
 void CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(float* d_results
 	//////////////////////////////////// Hist arrays //////////////////////////////////////////////////
 	, const float* d_histValues, const float* d_histSlopes											///
@@ -145,7 +186,7 @@ void CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(float* d_results
 		return;
 	}
 
-	if(indT == IndicatorType::EMA)
+	if(indT == IndicatorType::EMA || indT == IndicatorType::ZLSMA)
 	{
 		// Call EMA scoring function
 		calcMA(d_histValues, d_histSlopes,
@@ -164,18 +205,6 @@ void CPP_To_Cuda_Tunnel::Calc_Indicator_ScoreCalcs(float* d_results
 			d_currValues, d_currSlopes,
 			d_results, currTimeLineLen, numOfResults, weight);
 		
-	}
-	else if (indT == IndicatorType::ZLSMA)
-	{
-		calcMA(d_histValues, d_histSlopes,
-			d_hist_MinValues, d_hist_MaxValues,
-			d_hist_MinSlopes, d_hist_MaxSlopes,
-
-			d_currValues, d_currSlopes,
-			d_curr_MinValues, d_curr_MaxValues,
-			d_curr_MinSlopes, d_curr_MaxSlopes,
-
-			d_results, currTimeLineLen, numOfResults, weight);
 	}
 }
 

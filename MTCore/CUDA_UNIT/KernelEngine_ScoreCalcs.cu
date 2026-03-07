@@ -133,9 +133,14 @@ void CandidateTwoIndCalc(
 	, float* d_results,
 	int patternLen, int histSize, float weight)
 {
-	const int starts = histSize - patternLen + 1;
-	const int threads = GPU_THREADS_NUM;
-	const int blocks = (starts + threads - 1) / threads;
+	if (candidateCount == 0)
+	{
+		std::cout << "CandidateTwoIndCalc: No candidates to process." << std::endl;
+		return;
+	}
+	const int outLen = histSize - patternLen + 1;
+	const int threads = GPU_THREADS_NUM_CANDIDATE_SCAN;
+	const int blocks = (candidateCount + threads - 1) / threads;
 	size_t shBytes = sizeof(float) * (4 * patternLen); // for curr vals and slopes caching
 	int histTileLen = threads + patternLen - 1;
 	shBytes += sizeof(float) * (histTileLen) * 4; // for hist vals and slopes caching
@@ -161,15 +166,61 @@ void CandidateTwoIndCalc(
 
 		d_results,
 		patternLen,
-		starts,
+		outLen,
 		weight
 		);
+
 	CheckCudaLanuchError("TwoIndCalc", blocks, threads, shBytes, patternLen, histSize);
 }
 
 
 // ----------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------
+void CandidateCalcMA(
+	const int* d_candidateIndices,
+	const int candidateCount,
+	/////////////////////////////////// Hist MA arrays /////////////////////////////////////////////
+	const float* d_histMA_values, const float* d_histMA_slopes,									////
+	////
+	const float* d_histMA_MinValues, const float* d_histMA_MaxValues,							////
+	const float* d_histMA_MinSlopes, const float* d_histMA_MaxSlopes,							////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////// Current MA arrays /////////////////////////////////////////////
+	const float* d_currMA_values, const float* d_currMA_slopes,									////
+	////
+	const float* d_currMA_MinValues, const float* d_currMA_MaxValues,							////
+	const float* d_currMA_MinSlopes, const float* d_currMA_MaxSlopes,							////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	float* d_results,
+	int patternLen, int histSize, float weight)
+{
+	if( candidateCount == 0)
+	{
+		std::cout << "CandidateCalcMA: No candidates to process." << std::endl;
+		return;
+	}
+	const int outLen = histSize - patternLen + 1;
+	const int threads = GPU_THREADS_NUM_CANDIDATE_SCAN;
+	const int blocks = (candidateCount + threads - 1) / threads;
+	size_t shBytes = sizeof(float) * (2 * patternLen); // curr values+slopes
+	shBytes += 2 * sizeof(float); // min/max caching
+
+	CandidateScan_Kernel_MA << <blocks, threads, shBytes >> > (
+		d_candidateIndices, candidateCount,
+		d_histMA_values, d_histMA_slopes,
+		d_histMA_MinValues, d_histMA_MaxValues,
+		d_histMA_MinSlopes, d_histMA_MaxSlopes,
+		d_currMA_values, d_currMA_slopes,
+		d_currMA_MinValues, d_currMA_MaxValues,
+		d_currMA_MinSlopes, d_currMA_MaxSlopes,
+		d_results,
+		patternLen,
+		outLen,
+		weight
+	);
+	CheckCudaLanuchError("CandidateCalcMA", blocks, threads, shBytes, patternLen, histSize);
+}
+
 
 // Full MA score kernel launcher
 void calcMA(
@@ -253,3 +304,38 @@ void calcRSI(
 #endif
 }
 
+
+// ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
+
+void CandidateCalcRSI(
+	const int* d_candidateIndices,
+	const int candidateCount,
+	const float* d_histRSI_values, const float* d_histRSI_slopes,
+	const float* d_currRSI_values, const float* d_currRSI_slopes,
+	float* d_results,
+	int patternLen, int histSize, float weight)
+{
+	if (candidateCount == 0)
+	{
+		std::cout << "CandidateCalcRSI: No candidates to process." << std::endl;
+		return;
+	}
+	const int outLen = histSize - patternLen + 1;
+	const int threads = GPU_THREADS_NUM_CANDIDATE_SCAN;
+	const int blocks = (candidateCount + threads - 1) / threads;
+	size_t shBytes = sizeof(float) * (2 * patternLen); // curr values+slopes
+
+	CandidateScan_Kernel_RSI << <blocks, threads, shBytes >> > (
+		d_candidateIndices, candidateCount,
+		d_histRSI_values,
+		d_histRSI_slopes,
+		d_currRSI_values,
+		d_currRSI_slopes,
+		d_results,
+		patternLen,
+		outLen,
+		weight
+	);
+	CheckCudaLanuchError("CandidateCalcRSI", blocks, threads, shBytes, patternLen, histSize);
+}

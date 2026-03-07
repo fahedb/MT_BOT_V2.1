@@ -5,6 +5,14 @@ void calcRSI(const float* d_histRSI_values, const float* d_histRSI_slopes,
 			 const float* d_currRSI_values, const float* d_currRSI_slopes, 
 			float* results,
 			int patternLen, int histSize, float weight);
+void CandidateCalcRSI(
+	const int* d_candidateIndices,
+	const int candidateCount,
+	const float* d_histRSI_values, const float* d_histRSI_slopes,
+	const float* d_currRSI_values, const float* d_currRSI_slopes,
+	float* d_results,
+	int patternLen, int histSize, float weight);
+
 
 void calcMA(
 	/////////////////////////////////// Hist MA arrays /////////////////////////////////////////////
@@ -24,7 +32,23 @@ void calcMA(
 	float* d_results,
 	int patternLen, int histSize, float weight);
 
-
+void CandidateCalcMA(
+	const int* d_candidateIndices,
+	const int candidateCount,
+	/////////////////////////////////// Hist MA arrays /////////////////////////////////////////////
+	const float* d_histMA_values, const float* d_histMA_slopes,									////
+	////
+	const float* d_histMA_MinValues, const float* d_histMA_MaxValues,							////
+	const float* d_histMA_MinSlopes, const float* d_histMA_MaxSlopes,							////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////// Current MA arrays /////////////////////////////////////////////
+	const float* d_currMA_values, const float* d_currMA_slopes,									////
+	////
+	const float* d_currMA_MinValues, const float* d_currMA_MaxValues,							////
+	const float* d_currMA_MinSlopes, const float* d_currMA_MaxSlopes,							////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	float* d_results,
+	int patternLen, int histSize, float weight);
 
 
 void TwoIndCalc(

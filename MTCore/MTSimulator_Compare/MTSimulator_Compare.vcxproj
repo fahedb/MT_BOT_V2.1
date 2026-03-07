@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -189,7 +189,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseScoringEngine.cpp" />
+    <ClCompile Include="CPUScoringEngine.cpp" />
     <ClCompile Include="CudaEngine_ScoreCalcs.cpp" />
+    <ClCompile Include="GPUScoring.cpp" />
     <ClCompile Include="MTSimulatorUtils.cpp" />
     <ClCompile Include="PatternGod.cpp" />
     <ClCompile Include="PatternGodUtils.cpp" />
@@ -204,7 +207,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComparersEnums.h" />
+    <ClInclude Include="BaseScoringEngine.h" />
+    <ClInclude Include="CPUScoringEngine.h" />
     <ClInclude Include="CudaEngine_ScoreCalcs.h" />
+    <ClInclude Include="GPUScoring.h" />
     <ClInclude Include="MTSimulatorUtils.h" />
     <ClInclude Include="PatternGod.h" />
     <ClInclude Include="PatternGodUtils.h" />

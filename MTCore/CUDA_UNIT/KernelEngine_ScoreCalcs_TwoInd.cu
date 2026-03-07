@@ -1,4 +1,5 @@
 #include "KernelEngine_ScoreCalcs_TwoInd.h"
+#include "KernelEngine_ScoreCalcs_General.h"
 
 __device__ __forceinline__ float SingleCalc_Device_TwoInd(
 	const float histXv,

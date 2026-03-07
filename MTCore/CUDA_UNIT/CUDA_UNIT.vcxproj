@@ -62,6 +62,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\MTSimulator_MTThreadPool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -81,6 +82,7 @@
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <AdditionalIncludeDirectories>..\MTSimulator_MTThreadPool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -103,6 +105,7 @@
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <AdditionalIncludeDirectories>..\MTSimulator_MTThreadPool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -118,9 +121,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="kernel.cu" />
-    <CudaCompile Include="KernelEngine.cu" />
     <CudaCompile Include="KernelEngine_ScoreCalcs.cu" />
-    <CudaCompile Include="KernelEngine_ScoreCalcs_General.cu" />
     <CudaCompile Include="KernelEngine_ScoreCalcs_MA.cu" />
     <CudaCompile Include="KernelEngine_ScoreCalcs_RSI.cu">
       <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Release|x64'">compute_86,sm_86</CodeGeneration>
@@ -131,9 +132,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPP_To_Cuda_Tunnel.h" />
+    <ClInclude Include="CPUEngine_ScoreCalcs.h" />
+    <ClInclude Include="CPUEngine_ScoreCalcs_MA.h" />
+    <ClInclude Include="CPUEngine_ScoreCalcs_RSI.h" />
     <ClInclude Include="CudaMemoryController.h" />
     <ClInclude Include="GPU_LaunchesParameters.h" />
-    <ClInclude Include="KernelEngine.h" />
     <ClInclude Include="KernelEngine_ScoreCalcs.h" />
     <ClInclude Include="KernelEngine_ScoreCalcs_General.h" />
     <ClInclude Include="KernelEngine_ScoreCalcs_MA.h" />
@@ -145,6 +148,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CPP_To_Cuda_Tunnel.cpp" />
+    <ClCompile Include="CPUEngine_ScoreCalcs.cpp" />
+    <ClCompile Include="CPUEngine_ScoreCalcs_MA.cpp" />
+    <ClCompile Include="CPUEngine_ScoreCalcs_RSI.cpp" />
+    <ClCompile Include="CPUEngine_ScoreCalcs_TwoInd.cpp" />
+    <ClCompile Include="CPUEngine_ScoreCalcs_TwoInd.h" />
     <ClCompile Include="KernelExecutionContext.cpp" />
     <ClCompile Include="StreamSetters.cpp" />
   </ItemGroup>

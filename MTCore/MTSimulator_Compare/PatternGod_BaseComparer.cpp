@@ -87,8 +87,16 @@ int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std
 		std::vector<std::pair<ChangeNode*, ScoresResult>>* localResultsNodes = &resultNodesPerThread[t];
 		tPool->enqueueTask(
 			[this, t, start, end, scoreToAct, &resultMutex, &local2DResultMutex, &maxScore, &resultNodes2D, localResultsNodes, prom]() {
-				this->ProccessScanChunk(start, end, t, scoreToAct, &resultMutex, &maxScore, localResultsNodes);
-				prom->set_value();
+				try {
+
+					this->ProccessScanChunk(start, end, t, scoreToAct, &resultMutex, &maxScore, localResultsNodes);
+					prom->set_value();
+				}
+				catch (const std::exception& ex) { // Catch any standard exceptions
+					// Handle exceptions and set the promise to avoid hanging
+					std::cerr << "Exception in thread: " << ex.what() << std::endl;
+					prom->set_exception(std::current_exception()); // Set the exception to the promise to propagate it to the future
+				}
 			},
 			TaskPriority::High
 		);

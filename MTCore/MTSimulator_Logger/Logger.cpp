@@ -25,7 +25,13 @@ void Logger::WriteLog(const std::string& log, bool newSection,bool sendToLogServ
     if (sendToLogServer && false) // temporarily disabled
     {
         MTThreadPool::getInstance()->enqueueTask([log, logType,this]() {
-            this->Http_Send_Log(log, logType);
+            try {
+                this->Http_Send_Log(log, logType);
+            }
+            catch (const std::exception& ex) { // Catch any standard exceptions
+                // Handle exceptions and log them
+                std::cerr << "Exception while sending log to server: " << ex.what() << std::endl;
+            }
             }, TaskPriority::Low);
     }
     std::string logToPrint = "";

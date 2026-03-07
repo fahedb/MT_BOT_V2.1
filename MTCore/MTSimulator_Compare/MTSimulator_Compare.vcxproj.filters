@@ -55,6 +55,9 @@
     <Filter Include="PatternGod\Comparers_CUDA\Scoring">
       <UniqueIdentifier>{fe26751b-f87c-4c8b-838c-701b3e30060f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BaseScoring">
+      <UniqueIdentifier>{c3c20895-edab-464a-bf6b-387f9e88bfa3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PatternGod_BaseComparer.cpp">
@@ -93,6 +96,11 @@
     <ClCompile Include="CudaEngine_ScoreCalcs.cpp">
       <Filter>PatternGod\Comparers_CUDA\Scoring</Filter>
     </ClCompile>
+    <ClCompile Include="BaseScoringEngine.cpp">
+      <Filter>BaseScoring</Filter>
+    </ClCompile>
+    <ClCompile Include="GPUScoring.cpp" />
+    <ClCompile Include="CPUScoringEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PatternGod_BaseComparer.h">
@@ -134,5 +142,10 @@
     <ClInclude Include="CudaEngine_ScoreCalcs.h">
       <Filter>PatternGod\Comparers_CUDA\Scoring</Filter>
     </ClInclude>
+    <ClInclude Include="BaseScoringEngine.h">
+      <Filter>BaseScoring</Filter>
+    </ClInclude>
+    <ClInclude Include="GPUScoring.h" />
+    <ClInclude Include="CPUScoringEngine.h" />
   </ItemGroup>
 </Project>

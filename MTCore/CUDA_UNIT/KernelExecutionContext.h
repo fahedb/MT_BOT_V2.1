@@ -6,10 +6,6 @@ class KernelExecutionContext_PatternGod
 public:
 	// Getters
 	float* Get_HostTotalScoresPtr() { return h_totalScores; }
-	int* Get_AfterFilterIndicesPtr(MemoryLocation memLoc);
-	int Get_AfterFilterIndicesCount() { return afterFilterIndicesCount; }
-
-	void Import_AfterFilterIndices(std::vector<int> inIndices);
 
 	dataStream_t* Get_ResultsDataStreamPtr(MemoryLocation memLoc); // Host or Device
 
@@ -19,9 +15,9 @@ public:
 	
 private:
 	// --- HOST SIDE ---
-	int* h_afterFilterIndices; // Host after filter indices array
-	int afterFilterIndicesCount;
+
 	float* h_totalScores; // Host total scores array
+	int totalScoresSize; // Size of the total scores array, based on history size
 	dataStream_t h_results; // Host results data stream 
 	
 	dataStream_t h_historyData; // Historic data stream
@@ -33,7 +29,6 @@ private:
 	dataStream_t h_currMaxValues; // Current max values stream
 
 	// --- DEVICE SIDE ---
-	int* d_afterFilterIndices; // Device after filter indices array
 	dataStream_t d_historyData; // Historic data stream
 	dataStream_t d_currentData; // Current data stream
 
@@ -50,11 +45,12 @@ private:
 
 	int m_historySize;
 	int m_currentSize;
+	bool m_availableDevice;
 
 	bool m_isHistoryAlreadySyncedToDevice = false;
 	bool m_isThereANewCurrentData = false;
 public:
-	KernelExecutionContext_PatternGod(int historySize, int currSize);
+	KernelExecutionContext_PatternGod(int historySize, int currSize, bool availableDevice = true);
 	~KernelExecutionContext_PatternGod() { Free(); };
 
 	void PrepareForNewScan();
@@ -63,6 +59,9 @@ public:
 	void SyncHistoryDataToDevice(bool forceSync = false);
 	void SyncCurrentDataToDevice(bool forceSync = false);
 
+	int GetResult(int index) { 
+		h_totalScores[index];
+	}
 private:
 	void Free();
 	void Allocate();

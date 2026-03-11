@@ -16,9 +16,6 @@
     <Filter Include="PatternGod\Comparers\Scoring">
       <UniqueIdentifier>{5cdff654-d2ec-44eb-8a53-5905b3024dfc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PatternGod\Fusion">
-      <UniqueIdentifier>{7cb7b22b-a879-4966-9eb8-eda938c12cc7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="PatternGod\Main">
       <UniqueIdentifier>{c568342c-8c74-441e-96ef-ec3591ee7245}</UniqueIdentifier>
     </Filter>
@@ -31,17 +28,11 @@
     <Filter Include="PatternGod\Utils\Src">
       <UniqueIdentifier>{05339c65-42f9-4027-b0cd-bd4d297e5ea5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PatternGod\Enums">
-      <UniqueIdentifier>{b27a118d-a5cd-4f37-8410-b8458c0f33ab}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Calcs">
       <UniqueIdentifier>{2c4c02e6-a0a7-4c10-acd2-214aff8e855e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Calcs\Polynom">
       <UniqueIdentifier>{671a9bde-90f9-4694-aa30-7d7d13236c92}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Calcs\Score">
-      <UniqueIdentifier>{c040d905-c2ab-4f00-9c1f-36930fd04720}</UniqueIdentifier>
     </Filter>
     <Filter Include="PatternGod\Filters">
       <UniqueIdentifier>{8c74ce40-6a9d-4b26-85f7-3c1eb3fe5ddb}</UniqueIdentifier>
@@ -49,14 +40,20 @@
     <Filter Include="PatternGod\Filters\Polynom">
       <UniqueIdentifier>{29a72ecf-6b42-4aa4-b039-f0394d8737d8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PatternGod\Comparers_CUDA">
-      <UniqueIdentifier>{82ea9a1e-6cc3-45cb-9683-d3fe7283b642}</UniqueIdentifier>
+    <Filter Include="PatternGod\Engines">
+      <UniqueIdentifier>{7cb7b22b-a879-4966-9eb8-eda938c12cc7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PatternGod\Comparers_CUDA\Scoring">
-      <UniqueIdentifier>{fe26751b-f87c-4c8b-838c-701b3e30060f}</UniqueIdentifier>
+    <Filter Include="PatternGod\Engines\Scoring">
+      <UniqueIdentifier>{b1eab154-e152-494d-8b99-26d3d23802c8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="BaseScoring">
-      <UniqueIdentifier>{c3c20895-edab-464a-bf6b-387f9e88bfa3}</UniqueIdentifier>
+    <Filter Include="PatternGod\Engines\Scoring\CPU">
+      <UniqueIdentifier>{0ff40a58-31a6-40db-8a74-e4bd37b5efcb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PatternGod\Engines\Scoring\GPU">
+      <UniqueIdentifier>{ea1fe813-9f71-4a68-a60a-0839f9410f49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PatternGod\Engines\Scoring\Base">
+      <UniqueIdentifier>{99932411-f4a5-4134-a559-a926a7a8d5b2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,12 +66,6 @@
     <ClCompile Include="PatternGod_ScoreComparer.cpp">
       <Filter>PatternGod\Comparers\Scoring</Filter>
     </ClCompile>
-    <ClCompile Include="PatternGod.cpp">
-      <Filter>PatternGod\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="PatternGod_ResultFusionEngine.cpp">
-      <Filter>PatternGod\Fusion</Filter>
-    </ClCompile>
     <ClCompile Include="PatternGodUtils.cpp">
       <Filter>PatternGod\Utils\Src</Filter>
     </ClCompile>
@@ -84,23 +75,24 @@
     <ClCompile Include="PolynomScoreCalcs.cpp">
       <Filter>Calcs\Polynom</Filter>
     </ClCompile>
-    <ClCompile Include="ScoreCalcs.cpp">
-      <Filter>Calcs\Score</Filter>
-    </ClCompile>
     <ClCompile Include="PolynomComparer.cpp">
       <Filter>Calcs\Polynom</Filter>
     </ClCompile>
     <ClCompile Include="PatternGod_PolynomFilterEngine.cpp">
       <Filter>PatternGod\Filters\Polynom</Filter>
     </ClCompile>
-    <ClCompile Include="CudaEngine_ScoreCalcs.cpp">
-      <Filter>PatternGod\Comparers_CUDA\Scoring</Filter>
+    <ClCompile Include="CPUScoringEngine.cpp">
+      <Filter>PatternGod\Engines\Scoring\CPU</Filter>
     </ClCompile>
     <ClCompile Include="BaseScoringEngine.cpp">
-      <Filter>BaseScoring</Filter>
+      <Filter>PatternGod\Engines\Scoring\Base</Filter>
     </ClCompile>
-    <ClCompile Include="GPUScoring.cpp" />
-    <ClCompile Include="CPUScoringEngine.cpp" />
+    <ClCompile Include="GPUScoringEngine.cpp">
+      <Filter>PatternGod\Engines\Scoring\GPU</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternGod.cpp">
+      <Filter>PatternGod\Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PatternGod_BaseComparer.h">
@@ -112,17 +104,8 @@
     <ClInclude Include="PatternGod_ScoreComparer.h">
       <Filter>PatternGod\Comparers\Scoring</Filter>
     </ClInclude>
-    <ClInclude Include="PatternGod.h">
-      <Filter>PatternGod\Main</Filter>
-    </ClInclude>
-    <ClInclude Include="PatternGod_ResultFusionEngine.h">
-      <Filter>PatternGod\Fusion</Filter>
-    </ClInclude>
     <ClInclude Include="PatternGodUtils.h">
       <Filter>PatternGod\Utils\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="ComparersEnums.h">
-      <Filter>PatternGod\Enums</Filter>
     </ClInclude>
     <ClInclude Include="MTSimulatorUtils.h">
       <Filter>PatternGod\Utils\Inc</Filter>
@@ -130,22 +113,23 @@
     <ClInclude Include="PolynomScoreCalcs.h">
       <Filter>Calcs\Polynom</Filter>
     </ClInclude>
-    <ClInclude Include="ScoreCalcs.h">
-      <Filter>Calcs\Score</Filter>
-    </ClInclude>
     <ClInclude Include="PolynomComparer.h">
       <Filter>Calcs\Polynom</Filter>
     </ClInclude>
     <ClInclude Include="PatternGod_PolynomFilterEngine.h">
       <Filter>PatternGod\Filters\Polynom</Filter>
     </ClInclude>
-    <ClInclude Include="CudaEngine_ScoreCalcs.h">
-      <Filter>PatternGod\Comparers_CUDA\Scoring</Filter>
+    <ClInclude Include="CPUScoringEngine.h">
+      <Filter>PatternGod\Engines\Scoring\CPU</Filter>
     </ClInclude>
     <ClInclude Include="BaseScoringEngine.h">
-      <Filter>BaseScoring</Filter>
+      <Filter>PatternGod\Engines\Scoring\Base</Filter>
     </ClInclude>
-    <ClInclude Include="GPUScoring.h" />
-    <ClInclude Include="CPUScoringEngine.h" />
+    <ClInclude Include="GPUScoringEngine.h">
+      <Filter>PatternGod\Engines\Scoring\GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternGod.h">
+      <Filter>PatternGod\Main</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

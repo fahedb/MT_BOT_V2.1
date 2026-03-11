@@ -193,7 +193,6 @@
     <ClCompile Include="BaseLayerDataExporter.cpp" />
     <ClCompile Include="CSVExportData.cpp" />
     <ClCompile Include="DataExporter.cpp" />
-    <ClCompile Include="FilterLayerDataExporter.cpp" />
     <ClCompile Include="GenericBaseExporter.cpp" />
     <ClCompile Include="GenericJsonExporter.cpp" />
     <ClCompile Include="InterfaceLayers_BKTSTExporter.cpp" />
@@ -208,7 +207,6 @@
     <ClInclude Include="BaseLayerDataExporter.h" />
     <ClInclude Include="CSVExportData.h" />
     <ClInclude Include="DataExporter.h" />
-    <ClInclude Include="FilterLayerDataExporter.h" />
     <ClInclude Include="GenericBaseExporter.h" />
     <ClInclude Include="GenericJsonExporter.h" />
     <ClInclude Include="InterfaceLayers_BKTSTExporter.h" />

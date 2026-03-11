@@ -1,6 +1,5 @@
 #pragma once
 #include "ScoringLayerImporter.h"
-#include "FilterLayerDataImporter.h"
 #include "StatisticsLayerDataImporter.h"
 #include "TradeLayerDataImporter.h"
 
@@ -44,7 +43,6 @@ private:
     bool ActPreCondition(LayerType layerType) const; // Check if the importers are initialized
 	void ResetImportersToNull(); // Reset all importers -- Need to call InitImporters after this function to use again
     ScoringLayerImporter* m_scoringLayerImporter = nullptr;
-    FilterLayerDataImporter* m_filterLayerImporter = nullptr;
     StatisticsLayerDataImporter* m_statisticsLayerImporter = nullptr;
     TradeLayerDataImporter* m_tradeLayerImporter = nullptr;
     std::string m_bktstName;
@@ -86,9 +84,6 @@ inline void InterfaceLayers_BKTSTImporter::Insert_BackToFront(QueueItemType item
 	case LayerType::ScoringLayer:
 		m_scoringLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueSt));
 		break;
-	case LayerType::FilterLayer:
-		m_filterLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueSt));
-		break;
 	case LayerType::StatisticsLayer:
 		m_statisticsLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueSt));
 		break;
@@ -120,8 +115,6 @@ T* InterfaceLayers_BKTSTImporter::GetLayerImporter(LayerType layerT)
 	{
 	case LayerType::ScoringLayer:
 		return static_cast<T*>(m_scoringLayerImporter);
-	case LayerType::FilterLayer:
-		return static_cast<T*>(m_filterLayerImporter);
 	case LayerType::StatisticsLayer:
 		return static_cast<T*>(m_statisticsLayerImporter);
 	case LayerType::TradeManagementLayer:
@@ -132,23 +125,14 @@ T* InterfaceLayers_BKTSTImporter::GetLayerImporter(LayerType layerT)
 }
 
 
-// ------------------ Scoring & Filter Layer Specialization ------------------
+// ------------------ Scoring Layer Specialization ------------------
 template<>
 inline ScoringLayer_QueueItemType // This explicit specialization is for scoring and filter layer -- both have the same QueueItemType
 InterfaceLayers_BKTSTImporter::Get_NextQueueItem<ScoringLayer_QueueItemType>() {
 	LayerType layerT = m_initializedLayerType;
     if (!ActPreCondition(layerT))
         return {};
-	
-	switch (layerT)
-	{
-	case LayerType::ScoringLayer:
-		return m_scoringLayerImporter->Get_NextItem().item;
-	case LayerType::FilterLayer:
-		return m_filterLayerImporter->Get_NextItem().item;
-	default:
-		return {};
-	}
+	return m_scoringLayerImporter->Get_NextItem().item;
 }
 
 template<>
@@ -157,11 +141,7 @@ inline long long InterfaceLayers_BKTSTImporter::Get_MyQueuedItem_TimePoint(const
 	LayerType layerT = m_initializedLayerType;
 	if (!ActPreCondition(layerT))
 		return -1;
-	if (layerT == LayerType::FilterLayer)
-		return m_filterLayerImporter->Get_DataTime(item);
-	else if (layerT == LayerType::ScoringLayer)
-		return m_scoringLayerImporter->Get_DataTime(item);
-	return -1;
+	return m_scoringLayerImporter->Get_DataTime(item);
 }
 
 
@@ -175,8 +155,6 @@ inline void InterfaceLayers_BKTSTImporter::Insert_BackToFront(ScoringLayer_Queue
 
 	if (layerT == LayerType::ScoringLayer)
 		m_scoringLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueStruct));
-	else if (layerT == LayerType::FilterLayer) // fixed: was checking ScoringLayer twice
-		m_filterLayerImporter->Insert_LoadedData_ToQueue_Front(std::move(queueStruct));
 	else {
 		Logger::getInstance().WriteLog("Insert_BackToFront:: Error in LayerType: " + std::to_string(static_cast<int>(layerT)), false, true, LogType::ERR);
 	}

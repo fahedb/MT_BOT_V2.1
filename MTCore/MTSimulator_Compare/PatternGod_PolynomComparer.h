@@ -21,7 +21,6 @@ private:
 	int m_polyLen = 5; // Length of the polynomial for comparison
 	void InitComaprer();
 	void InitMaxScorePossibleForTimeLine(int polyLen);
-	virtual void Set_ComparerType() { m_comparerType = PatternGodComparerType::PolynomComparer; } // Set the comparer type -- Pure virtual function
 	virtual ScoresResult CompareOneMinNodesPeriods(int startIdx, int threadIdx, int totalScoreToAct); // Compare one minute nodes periods in the history time line
 	
 	virtual void ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int totalScoreToAct

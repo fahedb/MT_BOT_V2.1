@@ -15,7 +15,7 @@
 #include "../Include/DLL_OrderStruct.mqh"
 #include "../Include/MT_Policy.mqh"
 
-#import "C:\\MTSOURCE\\MT_BOT_V2.1\\MTDll\\x64\\Debug\\MTDll.dll"
+#import "C:\\Users\\Administrator\\Documents\\GitHub\\MT_BOT_V2.1\\MTDll\\x64\Debug\\MTDll.dll"
 // Dll Functions def
 bool InsertNewBar_HTTP_M1(char&[],char&[],CandleData&);
 bool InsertNewBar_HTTP_M1_JSON_DB(char&[],char&[],CandleData&);
@@ -43,8 +43,8 @@ int OnInit()
 //---
    //TruncCurrTableForFreshStart();
     RefreshPolicy();
-    if(!MQLInfoInteger(MQL_TESTER))
-      Init_Last_Page_Of_Bars();
+    //if(!MQLInfoInteger(MQL_TESTER))
+    //  Init_Last_Page_Of_Bars();
      ticksCounter =0;
      //ExecuteNewOrder();
 //   bool resss = InsertNewPriceRecord(test,test,data);
@@ -99,6 +99,7 @@ void OnTick()
             }
           if(m_backTestBarCounter == 90)
             {
+               Sleep(60000);
                Init_Last_Page_Of_Bars();
                m_backTestBarCounter++;
             }
@@ -250,7 +251,7 @@ void BuildAndSendNewBarDetails(int current_min)
 void Init_Last_Page_Of_Bars()
 {
 
-for(int i =90;i > 0;i--)
+for(int i =60;i > 0;i--)
 {
    Bar_By_Shift(i);
 }
@@ -264,7 +265,6 @@ void Bar_By_Shift(int shift)
    string timePointStr = IntegerToString(1800 - shift);
    char timePointArr[];
    StringToCharArray(timePointStr,timePointArr);
-   
    CandleData data = Get_CandleData(shift);
    data.totalTicks = 0;
    data.upperTicks = 0;

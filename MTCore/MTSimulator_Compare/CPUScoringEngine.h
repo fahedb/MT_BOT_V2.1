@@ -6,8 +6,8 @@ class CPUScoringEngine : public BaseScoringEngine
 	public:
 	CPUScoringEngine(const std::vector<IndicatorLen>& lenFilter,
 					 const std::vector<BarPeriod>& barPeriodFilter,
-					 const std::vector<IndicatorType>& indicatorTypeFilter)
-		: BaseScoringEngine(lenFilter, barPeriodFilter, indicatorTypeFilter)
+					 const std::vector<IndicatorType>& indicatorTypeFilter, float threshold)
+		: BaseScoringEngine(lenFilter, barPeriodFilter, indicatorTypeFilter, threshold)
 	{
 	}
 protected:

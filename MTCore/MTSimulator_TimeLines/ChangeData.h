@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <vector>
 #include <math.h>
@@ -6,7 +7,6 @@
 #include "../../HTTPCore/ServicesDef.h"
 #include <iostream>
 #include <sstream>
-#pragma once
 
 #define INVALID_DATA -1;
 
@@ -30,18 +30,7 @@ public:
 	std::unordered_map<std::string, double> m_entitiesMap;
 	std::string symbol;
 
-	ChangeNode()
-	{
-		point_DateTime = "";
-		Increase_Decrease = false;
-		m_PointPlace = _Points::_Points_DEFUALT;
-		Increase_Decrease = false;
-		activePoint = false;
-		m_openPrice = INVALID_DATA;
-		m_closePrice = INVALID_DATA;
-		m_highPrice = INVALID_DATA;
-		m_lowPrice = INVALID_DATA;
-	}
+	ChangeNode();
 	~ChangeNode();
 	std::string point_DateTime;
 

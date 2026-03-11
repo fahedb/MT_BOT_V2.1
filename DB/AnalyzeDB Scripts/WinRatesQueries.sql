@@ -23,3 +23,7 @@ GROUP BY dealType;
 select min(AccountBalance) as Balace_DrawDown from BackTest_AccountStateEvents
 select min(EquityBalance) as Equity_DrawDown from BackTest_AccountStateEvents
 
+
+select * from BackTest_AccountStateEvents order by currtimepoint
+
+

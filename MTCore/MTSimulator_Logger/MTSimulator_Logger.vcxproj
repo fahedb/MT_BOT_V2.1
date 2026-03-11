@@ -192,11 +192,13 @@
   <ItemGroup>
     <ClCompile Include="HTTP_Lgger.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="ScopedPerTimer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="httplib.h" />
     <ClInclude Include="HTTP_Lgger.h" />
     <ClInclude Include="LOGGER.H" />
+    <ClInclude Include="ScopedPerfTimer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

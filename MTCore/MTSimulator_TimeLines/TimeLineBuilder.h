@@ -1,7 +1,7 @@
+#pragma once
 #include "TimeLine.h"
 #include "TimeLineScored.h"
 
-#pragma once
 /// <summary>
 /// Class to build time lines, there is diffrent methods that can help building time line 
 /// head should be the end of the timeline, patternLen is how many candles to take backward 

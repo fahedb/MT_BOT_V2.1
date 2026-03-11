@@ -2,9 +2,7 @@
 #include <future>
 #include "ChangeData.h"
 #include "PatternGodUtils.h"
-#include "ComparersEnums.h"
 
-typedef robin_hood::unordered_map<PatternGodComparerType, std::vector<std::pair<ChangeNode*, ScoresResult>>> PatternGodComparerResultsMap;
 
 class PatternGod_BaseComparer
 {
@@ -22,7 +20,6 @@ protected:
 	std::vector<int> m_cacheHits; // Counter for cache hits per thread
 	std::vector<int> m_cacheMisses; // Counter for cache misses per thread
 
-	PatternGodComparerType m_comparerType = PatternGodComparerType::NONE; // Type of the comparer
 
 	PatternGod_BaseComparer(std::vector<ChangeNode*>* history);
 	PatternGod_BaseComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr);
@@ -34,7 +31,6 @@ public:
 	virtual void RefreshComparer() = 0;
 	virtual void ResetMyCacheCounters(int threadIdx); // Reset cache counters for a specific thread
 
-	PatternGodComparerType Get_ComparerType() const { return m_comparerType; } // Get the comparer type
 	virtual int ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);
 
 	void Set_ScoreToAct(double scoreToAct) { m_ScoreToAct = scoreToAct; } // Set the score to act threshold
@@ -50,8 +46,6 @@ protected:
 	// This function compares one minute nodes periods in the history time line
 
 	virtual ScoresResult CompareOneMinNodesPeriods(int startIdx, int threadIdx, int totalScoreToAct) = 0; // Pure virtual function to be implemented by derived classes
-
-	virtual void Set_ComparerType() = 0; // Set the comparer type, to be implemented by derived classes (m_comparerType)
 
 	// ---------------------------------------------------------------------------------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------------------------------------------------------------------------------

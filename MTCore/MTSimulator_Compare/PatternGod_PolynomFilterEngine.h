@@ -1,8 +1,6 @@
 #pragma once
-#include "TimeLineBuilder.h"
-#include "PolynomScoreCalcs.h"
-#include "LOGGER.H"
-#include "Static_CurrentTimeLineRep.h"
+#include "ChangeData.h"
+#include "DBMap.h"
 
 class PatternGod_PolynomFilterEngine
 {
@@ -17,7 +15,5 @@ public:
 	void Set_CurrentTimeLine(std::vector<ChangeNode*>* curr) { m_currentTL = curr; }
 	bool ProccessPreCondition(int patternLen);
 	std::vector<std::pair<ChangeNode*, ScoresResult>> ProcessPatterns(std::vector<ChangeNode*>* headsOfPatterns, int patternLen);
-
-
 };
 

@@ -6,7 +6,7 @@
 
 dataStream_t* KernelExecutionContext_PatternGod::Get_IndicatorsStreamDataPtr(DataTimeType timeType, MemoryLocation memLoc)
 {
-	if (memLoc == MemoryLocation::HOST)
+	if (memLoc == MemoryLocation::HOST || !m_availableDevice)
 	{
 		if (timeType == DataTimeType::HISTORIC)
 			return &h_historyData;
@@ -22,23 +22,9 @@ dataStream_t* KernelExecutionContext_PatternGod::Get_IndicatorsStreamDataPtr(Dat
 	}
 }
 
-void KernelExecutionContext_PatternGod::Import_AfterFilterIndices(std::vector<int> inIndices)
-{
-	if(inIndices.size() != afterFilterIndicesCount)
-	{
-		std::cout << "KernelExecutionContext_PatternGod::Import_AfterFilterIndices - Mismatched size: " << inIndices.size() << " vs " << afterFilterIndicesCount << std::endl;
-		exit(-1);
-	}
-	// Copy the incoming indices to the host after filter indices
-	memcpy(h_afterFilterIndices, inIndices.data(), sizeof(int) * inIndices.size());
-	// Move to device
-	StreamSetters::MoveDataToDevice(h_afterFilterIndices, &d_afterFilterIndices, afterFilterIndicesCount);
-
-}
-
 dataStream_t* KernelExecutionContext_PatternGod::Get_ResultsDataStreamPtr(MemoryLocation memLoc)
 {
-	if (memLoc == MemoryLocation::HOST)
+	if (memLoc == MemoryLocation::HOST || !m_availableDevice)
 		return &h_results;
 	else // DEVICE
 		return &d_results;
@@ -46,7 +32,7 @@ dataStream_t* KernelExecutionContext_PatternGod::Get_ResultsDataStreamPtr(Memory
 
 dataStream_t* KernelExecutionContext_PatternGod::Get_MinValuesStreamPtr(DataTimeType timeType, MemoryLocation memLoc)
 {
-	if(memLoc == MemoryLocation::HOST)
+	if(memLoc == MemoryLocation::HOST || !m_availableDevice)
 	{
 		if (timeType == DataTimeType::HISTORIC)
 			return &h_histMinValues;
@@ -64,7 +50,7 @@ dataStream_t* KernelExecutionContext_PatternGod::Get_MinValuesStreamPtr(DataTime
 
 dataStream_t* KernelExecutionContext_PatternGod::Get_MaxValuesStreamPtr(DataTimeType timeType, MemoryLocation memLoc)
 {
-	if(memLoc == MemoryLocation::HOST)
+	if(memLoc == MemoryLocation::HOST || !m_availableDevice)
 	{
 		if (timeType == DataTimeType::HISTORIC)
 			return &h_histMaxValues;
@@ -80,8 +66,8 @@ dataStream_t* KernelExecutionContext_PatternGod::Get_MaxValuesStreamPtr(DataTime
 	}
 }
 
-KernelExecutionContext_PatternGod::KernelExecutionContext_PatternGod(int historySize, int currSize)
-	: m_historySize(historySize), m_currentSize(currSize)
+KernelExecutionContext_PatternGod::KernelExecutionContext_PatternGod(int historySize, int currSize, bool availableDevice)
+	: m_historySize(historySize), m_currentSize(currSize), m_availableDevice(availableDevice)
 {
 	Allocate();
 }
@@ -89,7 +75,7 @@ KernelExecutionContext_PatternGod::KernelExecutionContext_PatternGod(int history
 void KernelExecutionContext_PatternGod::Allocate()
 {
 	h_totalScores = new float[m_historySize]; // Total scores size is based on history size
-	h_afterFilterIndices = new int[GPU_THREADS_NUM * GPU_BLOCKS_AFTER_FILTER]; // After filter indices size is based on history size
+	totalScoresSize = m_historySize;
 
 	StreamSetters::AllocateDataStream(&h_results, m_historySize, MemoryLocation::HOST); // Results size is based on history size
 	
@@ -101,25 +87,19 @@ void KernelExecutionContext_PatternGod::Allocate()
 	StreamSetters::AllocateDataStream(&h_currMinValues, 1 /*Need only one Min for pattern */, MemoryLocation::HOST); // Current min values allocation -- Host side
 	StreamSetters::AllocateDataStream(&h_currMaxValues, 1 /*Need only one Max for pattern */, MemoryLocation::HOST); // Current max values allocation -- Host side
 
+	if (m_availableDevice)
+	{
+		StreamSetters::AllocateDataStream(&d_historyData, m_historySize, MemoryLocation::DEVICE); // History allocation -- Device side
+		StreamSetters::AllocateDataStream(&d_histMinValues, m_historySize, MemoryLocation::DEVICE); // Historic min values allocation -- Device side
+		StreamSetters::AllocateDataStream(&d_histMaxValues, m_historySize, MemoryLocation::DEVICE); // Historic max values allocation -- Device side
 
-	StreamSetters::AllocateDataStream(&d_historyData, m_historySize, MemoryLocation::DEVICE); // History allocation -- Device side
-	StreamSetters::AllocateDataStream(&d_histMinValues, m_historySize, MemoryLocation::DEVICE); // Historic min values allocation -- Device side
-	StreamSetters::AllocateDataStream(&d_histMaxValues, m_historySize, MemoryLocation::DEVICE); // Historic max values allocation -- Device side
+		StreamSetters::AllocateDataStream(&d_currentData, m_currentSize, MemoryLocation::DEVICE); // Current allocation -- Device side
+		StreamSetters::AllocateDataStream(&d_currMinValues, 1 /* Need only one min for pattern */, MemoryLocation::DEVICE); // Current min values allocation -- Device side
+		StreamSetters::AllocateDataStream(&d_currMaxValues, 1 /* Need only one max for pattern */, MemoryLocation::DEVICE); // Current max values allocation -- Device side
 
-	StreamSetters::AllocateDataStream(&d_currentData, m_currentSize, MemoryLocation::DEVICE); // Current allocation -- Device side
-	StreamSetters::AllocateDataStream(&d_currMinValues, 1 /* Need only one min for pattern */, MemoryLocation::DEVICE); // Current min values allocation -- Device side
-	StreamSetters::AllocateDataStream(&d_currMaxValues, 1 /* Need only one max for pattern */, MemoryLocation::DEVICE); // Current max values allocation -- Device side
+		StreamSetters::AllocateDataStream(&d_results, m_historySize, MemoryLocation::DEVICE); // Results size is based on history size
 
-	StreamSetters::AllocateDataStream(&d_results, m_historySize, MemoryLocation::DEVICE); // Results size is based on history size
-	
-	StreamSetters::MemoryAllocate(&d_afterFilterIndices, GPU_THREADS_NUM * GPU_BLOCKS_AFTER_FILTER, MemoryLocation::DEVICE);
-}
-int* KernelExecutionContext_PatternGod::Get_AfterFilterIndicesPtr(MemoryLocation memLoc)
-{
-	if (memLoc == MemoryLocation::HOST)
-		return h_afterFilterIndices;
-	else // DEVICE
-		return d_afterFilterIndices;
+	}
 }
 
 void KernelExecutionContext_PatternGod::PrepareForNewScan()
@@ -127,14 +107,13 @@ void KernelExecutionContext_PatternGod::PrepareForNewScan()
 	// 1. Reset host results stream to 0
 	StreamSetters::ResetDataStream_To0(&h_results, MemoryLocation::HOST);
 	// 2. Reset host total results array to 0
-	memset(h_totalScores, 0, sizeof(float) * m_historySize);
-	// 2. Reset host after filter indices array to 0
-	afterFilterIndicesCount = GPU_BLOCKS_AFTER_FILTER * GPU_THREADS_NUM;
-	memset(h_afterFilterIndices, 0, sizeof(int) * (afterFilterIndicesCount));
-	StreamSetters::MemoryReset(d_afterFilterIndices, afterFilterIndicesCount, MemoryLocation::DEVICE);
+	memset(h_totalScores, 0, sizeof(float) * totalScoresSize);
 
-	// 3. Reset device results stream to 0
-	StreamSetters::ResetDataStream_To0(&d_results, MemoryLocation::DEVICE);
+	if (m_availableDevice)
+	{
+		// 3. Reset device results stream to 0
+		StreamSetters::ResetDataStream_To0(&d_results, MemoryLocation::DEVICE);
+	}
 
 }
 
@@ -160,21 +139,30 @@ void KernelExecutionContext_PatternGod::Free()
 	StreamSetters::MemoryFreeDataStream(&h_histMaxValues, MemoryLocation::HOST);
 	StreamSetters::MemoryFreeDataStream(&h_currMinValues, MemoryLocation::HOST);
 	StreamSetters::MemoryFreeDataStream(&h_currMaxValues, MemoryLocation::HOST);
-	
+
 	StreamSetters::MemoryFreeDataStream(&h_results, MemoryLocation::HOST);
 
-	StreamSetters::MemoryFreeDataStream(&d_historyData, MemoryLocation::DEVICE);
-	StreamSetters::MemoryFreeDataStream(&d_currentData, MemoryLocation::DEVICE);
-	StreamSetters::MemoryFreeDataStream(&d_histMinValues, MemoryLocation::DEVICE);
-	StreamSetters::MemoryFreeDataStream(&d_histMaxValues, MemoryLocation::DEVICE);
-	StreamSetters::MemoryFreeDataStream(&d_currMinValues, MemoryLocation::DEVICE);
-	StreamSetters::MemoryFreeDataStream(&d_currMaxValues, MemoryLocation::DEVICE);
+	if (m_availableDevice)
+	{
+		StreamSetters::MemoryFreeDataStream(&d_historyData, MemoryLocation::DEVICE);
+		StreamSetters::MemoryFreeDataStream(&d_currentData, MemoryLocation::DEVICE);
+		StreamSetters::MemoryFreeDataStream(&d_histMinValues, MemoryLocation::DEVICE);
+		StreamSetters::MemoryFreeDataStream(&d_histMaxValues, MemoryLocation::DEVICE);
+		StreamSetters::MemoryFreeDataStream(&d_currMinValues, MemoryLocation::DEVICE);
+		StreamSetters::MemoryFreeDataStream(&d_currMaxValues, MemoryLocation::DEVICE);
 
-	StreamSetters::MemoryFreeDataStream(&d_results, MemoryLocation::DEVICE);
+		StreamSetters::MemoryFreeDataStream(&d_results, MemoryLocation::DEVICE);
+	}
 }
 
 void KernelExecutionContext_PatternGod::SyncHistoryDataToDevice(bool forceSync)
 {
+	if(!m_availableDevice)
+	{
+		std::cout << "KernelExecutionContext_PatternGod::SyncHistoryDataToDevice - No available device to sync to." << std::endl;
+		return;
+	}
+
 	if (!m_isHistoryAlreadySyncedToDevice || forceSync)
 	{
 		StreamSetters::MoveDataToDevice(&h_historyData, &d_historyData);
@@ -186,6 +174,12 @@ void KernelExecutionContext_PatternGod::SyncHistoryDataToDevice(bool forceSync)
 
 void KernelExecutionContext_PatternGod::SyncCurrentDataToDevice(bool forceSync)
 {
+	if(!m_availableDevice)
+	{
+		std::cout << "KernelExecutionContext_PatternGod::SyncCurrentDataToDevice - No available device to sync to." << std::endl;
+		return;
+	}
+
 	if (!m_isThereANewCurrentData || forceSync)
 	{
 		StreamSetters::MoveDataToDevice(&h_currentData, &d_currentData);

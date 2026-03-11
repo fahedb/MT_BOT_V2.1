@@ -116,6 +116,14 @@ double Get_Ema(ENUM_TIMEFRAMES timeFrame,int indL,int shift=0)
 
    double ema[2];
    int emaHandle = Get_EMAHandle(timeFrame,indL);
+   
+   int calcedBars = BarsCalculated(emaHandle);
+   if(calcedBars < shift )
+      {
+         Print("Critical: Calced Bars are: " + calcedBars);
+         return -1000;
+      }
+      
    int copied = CopyBuffer(emaHandle,0,shift,2,ema);
    if(copied <= 0)
    {

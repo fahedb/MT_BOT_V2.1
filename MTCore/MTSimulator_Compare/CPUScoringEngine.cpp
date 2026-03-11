@@ -88,34 +88,14 @@ void CPUScoringEngine::FullScan_SingleIndicator(float* results, const float* his
 		std::cout << "Invalid input to CPUScoringEngine::FullScan_SingleIndicator" << std::endl;
 		return;
 	}
-	if(indT == IndicatorType::EMA)
+	if(indT == IndicatorType::EMA || indT == IndicatorType::ZLSMA)
 	{
-		CandidateCalcMA_CPU(nullptr, 0,
-			histValues, histSlopes,
-			hist_MinValues, hist_MaxValues,
-			hist_MinSlopes, hist_MaxSlopes,
-			currValues, currSlopes,
-			curr_MinValues, curr_MaxValues,
-			curr_MinSlopes, curr_MaxSlopes,
-			results, currTimeLineLen, numOfResults, weight);
+		calcMA_CPU(histValues, histSlopes, hist_MinValues, hist_MaxValues, hist_MinSlopes, hist_MaxSlopes
+				, currValues, currSlopes, curr_MinValues, curr_MaxValues, curr_MinSlopes, curr_MaxSlopes
+				, results, currTimeLineLen, numOfResults + currTimeLineLen, weight);
 	}
 	else if(indT == IndicatorType::RSI)
 	{
-		CandidateCalcRSI_CPU(nullptr, 0,
-			histValues, histSlopes,
-			currValues, currSlopes,
-			results, currTimeLineLen, numOfResults, weight);
-		
-	}
-	else if (indT == IndicatorType::ZLSMA)
-	{
-		CandidateCalcMA_CPU(nullptr, 0,
-			histValues, histSlopes,
-			hist_MinValues, hist_MaxValues,
-			hist_MinSlopes, hist_MaxSlopes,
-			currValues, currSlopes,
-			curr_MinValues, curr_MaxValues,
-			curr_MinSlopes, curr_MaxSlopes,
-			results, currTimeLineLen, numOfResults, weight);
+		calcRSI_CPU(histValues, histSlopes, currValues, currSlopes, results, currTimeLineLen, numOfResults + currTimeLineLen, weight);
 	}
 }

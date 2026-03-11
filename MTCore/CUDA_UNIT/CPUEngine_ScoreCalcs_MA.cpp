@@ -47,7 +47,6 @@ void FullScan_CPU_MA(
 	const float currRange = currHighest - currLowest;
 	if(currRange <= eps) // If the current range is zero or negative, we cannot normalize properly, so we should skip the scoring for this pattern to avoid invalid calculations
 	{
-		std::cout << "Warning: Zero or negative current range. Skipping scoring for this pattern." << std::endl;
 		return;
 	}
 
@@ -61,7 +60,6 @@ void FullScan_CPU_MA(
 
 		if(histRange <= eps) // If the historical range is zero or negative, skip this index to avoid invalid calculations
 		{
-			std::cout << "Warning: Zero or negative historical range at index " << idx << ". Skipping this index." << std::endl;
 			continue;
 		}
 
@@ -119,7 +117,6 @@ void CandidateScan_CPU_MA(
 	const float currRange = currHighest - currLowest;
 	if(currRange <= eps) // If the current range is zero or negative, we cannot normalize properly, so we should skip the scoring for this pattern to avoid invalid calculations
 	{
-		std::cout << "Warning: Zero or negative current range. Skipping scoring for this pattern." << std::endl;
 		return;
 	}
 	const float invCurrRange = 1.0f / fmaxf(currRange, eps); // Inverse of current range for normalization, with check to prevent division by zero
@@ -138,7 +135,6 @@ void CandidateScan_CPU_MA(
 		const float histRange = histHighest - histLowest;
 		if(histRange <= eps) // If the historical range is zero or negative, skip this index to avoid invalid calculations
 		{
-			std::cout << "Warning: Zero or negative historical range at index " << idx << ". Skipping this index." << std::endl;
 			continue;
 		}
 		const float invHistRange = 1.0f / fmaxf(histRange, eps); // Inverse of historical range for normalization, with check to prevent division by zero

@@ -109,7 +109,6 @@ void FullScan_CPU_TwoInd(
 
 	if (currRange_LenX <= eps || currRange_LenY <= eps) // If the current range is zero or negative, we cannot normalize properly, so we should skip the scoring for this pattern to avoid invalid calculations
 	{
-		std::cout << "Warning: Zero or negative current range. Skipping scoring for this pattern." << std::endl;
 		return;
 	}
 
@@ -125,7 +124,6 @@ void FullScan_CPU_TwoInd(
 
 		if (histRange_LenX <= eps || histRange_LenY <= eps) // If the historical range is zero or negative, skip this index to avoid invalid calculations
 		{
-			std::cout << "Warning: Zero or negative historical range at index " << idx << ". Skipping this index." << std::endl;
 			continue;
 		}
 
@@ -224,7 +222,6 @@ void CandidateScan_CPU_TwoInd(
 
 	if (currRange_LenX <= eps || currRange_LenY <= eps) // If the current range is zero or negative, we cannot normalize properly, so we should skip the scoring for this pattern to avoid invalid calculations
 	{
-		std::cout << "Warning: Zero or negative current range. Skipping scoring for this pattern." << std::endl;
 		return;
 	}
 
@@ -247,7 +244,6 @@ void CandidateScan_CPU_TwoInd(
 
 		if (histRange_LenX <= eps || histRange_LenY <= eps) // If the historical range is zero or negative, skip this index to avoid invalid calculations
 		{
-			std::cout << "Warning: Zero or negative historical range at index " << idx << ". Skipping this index." << std::endl;
 			continue;
 		}
 

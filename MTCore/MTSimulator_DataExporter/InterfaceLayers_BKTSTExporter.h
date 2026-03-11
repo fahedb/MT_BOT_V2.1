@@ -1,6 +1,5 @@
 #pragma once
 #include "ScoringLayerDataExporter.h"
-#include "FilterLayerDataExporter.h"
 #include "StatisticsLayerDataExporter.h"
 #include "TradeLayerDataExporter.h"
 
@@ -25,7 +24,6 @@ public:
 	std::string Get_BKTSTName() const { return m_bktstName; }
 
     void SendSummeryData_ScoringLayer(std::string currTP, std::vector<std::pair<ChangeNode*, ScoresResult>> data);
-    void SendFilteredData_FilterLayer(std::string currTP, std::vector<std::pair<ChangeNode*, ScoresResult>>& data);
     void SendStatisticsData_StatisticsLayer(DirectionStats* stats);
     void SendTradeData_TradeLayer(OrderEntity* order);
 
@@ -39,7 +37,6 @@ private:
 	bool ActPreCondition() const; // Check if the exporters are initialized
 
 	ScoringLayerDataExporter* m_scoringLayerExporter = nullptr;
-	FilterLayerDataExporter* m_filterLayerExporter = nullptr;
 	StatisticsLayerDataExporter* m_statisticsLayerExporter = nullptr;
 	TradeLayerDataExporter* m_tradeLayerExporter = nullptr;
 	std::string m_bktstName;

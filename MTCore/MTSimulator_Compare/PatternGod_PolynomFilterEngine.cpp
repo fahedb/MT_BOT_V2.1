@@ -1,4 +1,8 @@
 #include "PatternGod_PolynomFilterEngine.h"
+#include "TimeLineBuilder.h"
+#include "PolynomScoreCalcs.h"
+#include "LOGGER.H"
+#include "Static_CurrentTimeLineRep.h"
 
 PatternGod_PolynomFilterEngine::PatternGod_PolynomFilterEngine(std::vector<ChangeNode*>* history) {
 	m_historyDB_Map = new DBMap();

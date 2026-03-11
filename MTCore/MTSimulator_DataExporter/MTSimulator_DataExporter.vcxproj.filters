@@ -28,9 +28,6 @@
     <Filter Include="BackTestFileExporterLogic\ScoringLayer">
       <UniqueIdentifier>{c732916f-4b72-47e3-98e0-66afda1e74d0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="BackTestFileExporterLogic\FilterLayer">
-      <UniqueIdentifier>{b34635c6-d3d6-4167-a0d4-47d3557bdb34}</UniqueIdentifier>
-    </Filter>
     <Filter Include="BackTestFileExporterLogic\StatisticsLayer">
       <UniqueIdentifier>{6db22d70-16a0-4824-a33b-44ff08535be4}</UniqueIdentifier>
     </Filter>
@@ -43,9 +40,6 @@
     <Filter Include="BackTestFileExporterLogic\Enums">
       <UniqueIdentifier>{375be879-a15e-42c2-bfb6-26ea4565ea60}</UniqueIdentifier>
     </Filter>
-    <Filter Include="BackTestFileExporterLogic\Interface">
-      <UniqueIdentifier>{05a4c0ff-6a63-49aa-ba95-0877eb34b900}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GenericExporter">
       <UniqueIdentifier>{3b4797ba-d586-48d4-a944-54bd1c9963ec}</UniqueIdentifier>
     </Filter>
@@ -57,6 +51,9 @@
     </Filter>
     <Filter Include="GenericExporter\JsonBuilder">
       <UniqueIdentifier>{1e0419d7-fcbc-457a-9fbc-9b91be6ff0e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackTestFileExporterLogic\Interface">
+      <UniqueIdentifier>{02f0e3ff-cf67-4c98-a887-761cdf66a09d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -87,17 +84,14 @@
     <ClCompile Include="TradeLayerDataExporter.cpp">
       <Filter>BackTestFileExporterLogic\TradeLayer</Filter>
     </ClCompile>
-    <ClCompile Include="FilterLayerDataExporter.cpp">
-      <Filter>BackTestFileExporterLogic\FilterLayer</Filter>
-    </ClCompile>
-    <ClCompile Include="InterfaceLayers_BKTSTExporter.cpp">
-      <Filter>BackTestFileExporterLogic\Interface</Filter>
-    </ClCompile>
     <ClCompile Include="GenericBaseExporter.cpp">
       <Filter>GenericExporter\Base</Filter>
     </ClCompile>
     <ClCompile Include="GenericJsonExporter.cpp">
       <Filter>GenericExporter\GenericJson</Filter>
+    </ClCompile>
+    <ClCompile Include="InterfaceLayers_BKTSTExporter.cpp">
+      <Filter>BackTestFileExporterLogic\Interface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,17 +125,14 @@
     <ClInclude Include="TradeLayerDataExporter.h">
       <Filter>BackTestFileExporterLogic\TradeLayer</Filter>
     </ClInclude>
-    <ClInclude Include="FilterLayerDataExporter.h">
-      <Filter>BackTestFileExporterLogic\FilterLayer</Filter>
-    </ClInclude>
-    <ClInclude Include="InterfaceLayers_BKTSTExporter.h">
-      <Filter>BackTestFileExporterLogic\Interface</Filter>
-    </ClInclude>
     <ClInclude Include="GenericBaseExporter.h">
       <Filter>GenericExporter\Base</Filter>
     </ClInclude>
     <ClInclude Include="GenericJsonExporter.h">
       <Filter>GenericExporter\GenericJson</Filter>
+    </ClInclude>
+    <ClInclude Include="InterfaceLayers_BKTSTExporter.h">
+      <Filter>BackTestFileExporterLogic\Interface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

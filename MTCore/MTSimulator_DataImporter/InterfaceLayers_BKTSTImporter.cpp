@@ -33,11 +33,6 @@ void InterfaceLayers_BKTSTImporter::InitImporters()
 			m_scoringLayerImporter->InitMyImporter();
 			m_scoringLayerImporter->Init_bktstPolicies();
 			break;
-		case LayerType::FilterLayer:
-			m_filterLayerImporter = new FilterLayerDataImporter(bktstPath, m_historyTL, m_historyDBMap);
-			m_filterLayerImporter->InitMyImporter();
-			m_filterLayerImporter->Init_bktstPolicies();
-			break;
 		case LayerType::StatisticsLayer:
 			m_statisticsLayerImporter = new StatisticsLayerDataImporter(bktstPath, m_historyTL, m_historyDBMap);
 			m_statisticsLayerImporter->InitMyImporter();
@@ -59,7 +54,7 @@ bool InterfaceLayers_BKTSTImporter::ActPreCondition(LayerType layerType) const
 	{
 		return false;
 	}
-	if (m_scoringLayerImporter == nullptr && m_filterLayerImporter == nullptr && m_statisticsLayerImporter == nullptr && m_tradeLayerImporter == nullptr)
+	if (m_scoringLayerImporter == nullptr && m_statisticsLayerImporter == nullptr && m_tradeLayerImporter == nullptr)
 	{
 		Logger::getInstance().WriteLog("InterfaceLayers_BKTSTImporter::ActPreCondition - All layer importers are null!", true, false, LogType::ERR);
 		return false;
@@ -75,13 +70,6 @@ bool InterfaceLayers_BKTSTImporter::ActPreCondition(LayerType layerType) const
 		if (!m_scoringLayerImporter)
 		{
 			Logger::getInstance().WriteLog("InterfaceLayers_BKTSTImporter::ActPreCondition - Scoring layer importer is null!", true, false, LogType::ERR);
-			return false;
-		}
-		break;
-	case LayerType::FilterLayer:
-		if (!m_filterLayerImporter)
-		{
-			Logger::getInstance().WriteLog("InterfaceLayers_BKTSTImporter::ActPreCondition - Filter layer importer is null!", true, false, LogType::ERR);
 			return false;
 		}
 		break;
@@ -138,11 +126,6 @@ void InterfaceLayers_BKTSTImporter::ResetImportersToNull()
 	{
 		delete m_scoringLayerImporter;
 		m_scoringLayerImporter = nullptr;
-	}
-	if (m_filterLayerImporter)
-	{
-		delete m_filterLayerImporter;
-		m_filterLayerImporter = nullptr;
 	}
 	if (m_statisticsLayerImporter)
 	{

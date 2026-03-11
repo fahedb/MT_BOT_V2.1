@@ -7,6 +7,8 @@
 class BaseScoringEngine
 {
 private:
+public:
+	float m_threshold; // Threshold for scoring, can be used in the scoring logic to determine if a pattern is considered a match or not. This can be set through the constructor or a setter function.
 	std::vector<IndicatorLen> m_indicatorLen_Filter;
 	std::vector<BarPeriod> m_barPeriod_Filter;
 	std::vector<IndicatorType> m_indicatorType_Filter;
@@ -18,14 +20,22 @@ private:
 public:
 	BaseScoringEngine(		const std::vector<IndicatorLen>& lenFilter,
 							const std::vector<BarPeriod>& barPeriodFilter, 
-							const std::vector<IndicatorType>& indicatorTypeFilter)
+							const std::vector<IndicatorType>& indicatorTypeFilter, float threshold)
 	{
 		m_indicatorLen_Filter = lenFilter;
 		m_barPeriod_Filter = barPeriodFilter;
 		m_indicatorType_Filter = indicatorTypeFilter;
+		m_threshold = threshold;
+	}
+	~BaseScoringEngine()
+	{
+		m_indicatorLen_Filter.clear();
+		m_indicatorType_Filter.clear();
+		m_barPeriod_Filter.clear();
+
 	}
 
-	BaseScoringEngine();
+	BaseScoringEngine(float threshold);
 
 	void Set_IndicatorLen_Filter(std::vector<IndicatorLen> lenFilter) { m_indicatorLen_Filter = lenFilter; }
 	void Set_BarPeriod_Filter(std::vector<BarPeriod> barPeriodFilter) { m_barPeriod_Filter = barPeriodFilter; }

@@ -11,6 +11,9 @@
     <Filter Include="HTTP_Logger">
       <UniqueIdentifier>{0c44f240-0b3e-427b-a448-052b84a8d89e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PerformanceLogger">
+      <UniqueIdentifier>{34c46ff2-5236-41c7-9951-74abc0cbc1ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logger.cpp">
@@ -18,6 +21,9 @@
     </ClCompile>
     <ClCompile Include="HTTP_Lgger.cpp">
       <Filter>HTTP_Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="ScopedPerTimer.cpp">
+      <Filter>PerformanceLogger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -29,6 +35,9 @@
     </ClInclude>
     <ClInclude Include="HTTP_Lgger.h">
       <Filter>HTTP_Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="ScopedPerfTimer.h">
+      <Filter>PerformanceLogger</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

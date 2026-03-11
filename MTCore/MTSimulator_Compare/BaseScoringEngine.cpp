@@ -1,8 +1,10 @@
 #include "BaseScoringEngine.h"
+#include "PatternGodUtils.h"
 #include "TimeLineArrayBuilder.h"
 
 #define COMAPRE_WEIGHT 10
 #define THRESHOLD_FOR_SCAN 0.1f //Need to make this configurable later, this is the minimum score for a candidate to be included
+
 
 // Sort indices ascending (by index), optionally remove duplicates.
 // Useful before launching Candidate kernels to improve memory locality and avoid races on d_scores[idx] += ...
@@ -81,7 +83,7 @@ size_t Get_NumElements_KernelMemoryContextHelper(dataStream_t* dataSt, Indicator
 		.m_valueTypes.at(static_cast<int>(val)).m_numElements;
 }
 
-BaseScoringEngine::BaseScoringEngine()
+BaseScoringEngine::BaseScoringEngine(float threshold)
 {
 	// Default constructor with no filters, meaning all lengths, bar periods, and indicator types will be included
 	IndicatorLenList lenList;
@@ -90,6 +92,7 @@ BaseScoringEngine::BaseScoringEngine()
 	m_barPeriod_Filter = barPList.periods;
 	IndicatorTypeList indTList;
 	m_indicatorType_Filter = indTList.types;
+	m_threshold = threshold;
 }
 
 std::vector<int> BaseScoringEngine::RunScan(const std::vector<int>& inputIndices) // This function will run the scan based on the enabled scan types and filters, and return the resulting indices that passed the scan
@@ -128,9 +131,10 @@ std::vector<int> BaseScoringEngine::RunScan(const std::vector<int>& inputIndices
 	int limit = static_cast<int>(histSize - currSize + 1);
 	float* totalScores = m_kernelMemoryContext->Get_HostTotalScoresPtr();
 	TimeLineArrayBuilder::BuildTotalScoreArray(m_kernelMemoryContext->Get_ResultsDataStreamPtr(MemoryLocation::HOST), totalScores, limit);
-
+	
+	
 	// Get top K scores indices based on the total scores array
-	int KtopScoresCount = inputIndices.size() ? inputIndices.size() * THRESHOLD_FOR_SCAN : limit * THRESHOLD_FOR_SCAN; // This is a placeholder for how many top scores to consider, can be made configurable
+	int KtopScoresCount = inputIndices.size() ? inputIndices.size() * m_threshold : limit * m_threshold; // This is a placeholder for how many top scores to consider, can be made configurable
 
 	KtopScoresCount = std::min(KtopScoresCount, limit); // Ensure we don't exceed the limit of available scores
 	KtopScoresCount = std::max(KtopScoresCount, 1); // Ensure at least one score is considered
@@ -140,8 +144,9 @@ std::vector<int> BaseScoringEngine::RunScan(const std::vector<int>& inputIndices
 		limit,
 		KtopScoresCount);
 
-	SortIndices(topKScoresIndices); // Sort the resulting indices for better memory access patterns in subsequent processing
+	PatternGodUtils::FilterDuplicateIndicesByScoreWindow(totalScores, topKScoresIndices, 30); // Filter out duplicate indices that are within a window of the current size, to avoid redundant processing of very similar patterns. This is especially useful when the scoring logic can produce high scores for patterns that are very close to each other in time, which might not be desirable to consider as separate candidates.
 
+	SortIndices(topKScoresIndices); // Sort the resulting indices for better memory access patterns in subsequent processing
 	return topKScoresIndices;
 }
 

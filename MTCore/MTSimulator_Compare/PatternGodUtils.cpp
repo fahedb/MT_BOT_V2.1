@@ -28,37 +28,139 @@ void PatternGodUtils::SortScores(std::vector<std::pair<ChangeNode*, ScoresResult
 
 }
 
-void PatternGodUtils::FilterDuplicatesTimeLines(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D, DBMap* historyDB_Map) // Filter out all timePoints that is in the same 30minuts
+void PatternGodUtils::FilterDuplicateIndicesByScoreWindow(
+	const float* scores,
+	std::vector<int>& indices,
+	int window)
 {
+	if (scores == nullptr || indices.empty())
+		return;
 
-	if (nodesResults2D.empty()) return;
+	// Sort candidate indices by score descending
+	std::sort(indices.begin(), indices.end(),
+		[scores](int a, int b)
+		{
+			return scores[a] > scores[b];
+		});
+
+	const int maxIdx = *std::max_element(indices.begin(), indices.end());
+
+	// blocked[i] == 1 means index i is suppressed by a stronger nearby result
+	std::vector<uint8_t> blocked(static_cast<size_t>(maxIdx + window + 1), 0);
+
+	std::vector<int> filtered;
+	filtered.reserve(indices.size());
+
+	for (int idx : indices)
+	{
+		if (idx < 0)
+			continue;
+
+		if (idx < static_cast<int>(blocked.size()) && blocked[idx])
+			continue;
+
+		filtered.push_back(idx);
+
+		const int from = std::max(0, idx - window);
+		const int to = std::min(maxIdx, idx + window);
+
+		for (int i = from; i <= to; ++i)
+			blocked[i] = 1;
+	}
+
+	// Optional: return in chronological order
+	std::sort(filtered.begin(), filtered.end());
+
+	indices = std::move(filtered);
+}
+
+
+void PatternGodUtils::FilterDuplicatesTimeLines(
+	std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D,
+	DBMap* historyDB_Map)
+{
+	if (nodesResults2D.empty() || historyDB_Map == nullptr)
+		return;
+
+	constexpr int kWindow = 30;
+
+	struct Candidate
+	{
+		ChangeNode* node;
+		ScoresResult scoreResult;
+		int idx;
+	};
+
+	std::vector<Candidate> candidates;
+	candidates.reserve(nodesResults2D.size());
+
+	int maxIdx = 0;
+
+	// Build flat candidate list with precomputed indices
+	for (const auto& entry : nodesResults2D)
+	{
+		ChangeNode* node = entry.first;
+		if (node == nullptr)
+			continue;
+
+		const int idx = historyDB_Map->GetIdx_Of_TimePoint(node->point_DateTimeLong);
+		if (idx < 0)
+			continue;
+
+		candidates.push_back(Candidate{ node, entry.second, idx });
+
+		if (idx > maxIdx)
+			maxIdx = idx;
+	}
+
+	if (candidates.empty())
+	{
+		nodesResults2D.clear();
+		return;
+	}
+
+	// Sort by score descending
+	std::sort(candidates.begin(), candidates.end(),
+		[](const Candidate& a, const Candidate& b)
+		{
+			return a.scoreResult.totalScore.total > b.scoreResult.totalScore.total;
+		});
+
+	// blocked[i] == 1 means this timeline index is already covered by a stronger result
+	std::vector<uint8_t> blocked(static_cast<size_t>(maxIdx + kWindow + 1), 0);
 
 	std::vector<std::pair<ChangeNode*, ScoresResult>> filtered;
-	std::unordered_set<int> usedIndices;
+	filtered.reserve(candidates.size());
 
-	for (const auto& result : nodesResults2D)
+	for (const Candidate& candidate : candidates)
 	{
-		int currIdx = historyDB_Map->GetIdx_Of_TimePoint(result.first->point_DateTimeLong);
-		bool isDuplicate = false;
+		const int idx = candidate.idx;
 
+		if (blocked[idx])
+			continue;
 
-		for (int offset = -15; offset <= 15; ++offset)
-		{
-			if (usedIndices.find(currIdx + offset) != usedIndices.end()) {
-				isDuplicate = true;
-				break;
-			}
-		}
+		filtered.push_back({ candidate.node, candidate.scoreResult });
 
-		if (!isDuplicate)
-		{
-			filtered.push_back(result);
-			usedIndices.insert(currIdx);
-		}
+		const int from = std::max(0, idx - kWindow);
+		const int to = std::min(maxIdx, idx + kWindow);
+
+		for (int i = from; i <= to; ++i)
+			blocked[i] = 1;
 	}
+
+	// Optional: sort back by timeline order
+	std::sort(filtered.begin(), filtered.end(),
+		[historyDB_Map](const auto& a, const auto& b)
+		{
+			const int idxA = historyDB_Map->GetIdx_Of_TimePoint(a.first->point_DateTimeLong);
+			const int idxB = historyDB_Map->GetIdx_Of_TimePoint(b.first->point_DateTimeLong);
+			return idxA < idxB;
+		});
 
 	nodesResults2D = std::move(filtered);
 }
+
+
 
 void PatternGodUtils::filterByHighScores(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D, int numOfTopResultToFilterOut)
 {
@@ -79,9 +181,9 @@ void PatternGodUtils::filterByHighScores(std::vector<std::pair<ChangeNode*, Scor
 	nodesResults2D.resize(numOfTopResultToFilterOut);
 }
 
-void PatternGodUtils::filterByThresholdScore(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D, double thresholdPercent)
+void PatternGodUtils::filterByThresholdScore(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D, double thresholdPercent, int minPatterns)
 {
-	if (nodesResults2D.empty()) return;
+	if (nodesResults2D.empty() || nodesResults2D.size() <= minPatterns) return;
 
 	double maxScore = nodesResults2D.front().second.totalScore.total;
 	double thresholdRatio = thresholdPercent; // score that is at least 95% of the max score

@@ -1,28 +1,29 @@
 #pragma once
-#include "PatternGod_BaseComparer.h"
+#include "KernelExecutionContext.h"
+#include "BaseScoringEngine.h"
+#include "ChangeData.h"
+#include <vector>
 
 #define NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN 10 // Number of skips for low score scan
 
-class PatternGod_ScoreComparer : public PatternGod_BaseComparer
+class PatternGod_ScoreComparer
 {
 public:
-	PatternGod_ScoreComparer(std::vector<ChangeNode*>* history) : PatternGod_BaseComparer(history) { InitComaprer(); }
-	PatternGod_ScoreComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr) : PatternGod_BaseComparer(history, curr) { InitComaprer(); }
+	PatternGod_ScoreComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr);
 
 	~PatternGod_ScoreComparer() {}
-	virtual void RefreshComparer()
-	{
-		InitComaprer(); // Reinitialize the comparer
-	}
+
+	void RunScan(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);
+	void Set_NewCurrentTimeLine(std::vector<ChangeNode*>* currentData);
 private:
+	std::vector<ChangeNode*>* m_historicData;
+	std::vector<ChangeNode*>* m_currentData;
+	std::vector <BaseScoringEngine*> m_scoringEngines; // Vector to hold different scoring engines for various indicators and combinations
+
+	KernelExecutionContext_PatternGod* m_kernelMemoryContext; // Kernel execution context for managing memory and data streams for CUDA calculations
 	void InitComaprer();
-
-	virtual void Set_ComparerType() { m_comparerType = PatternGodComparerType::ScoreComparer; } // Set the comparer type
-	virtual ScoresResult CompareOneMinNodesPeriods(int startIdx, int threadIdx, int totalScoreToAct); // Compare one minute nodes periods in the history time line
-
-	virtual void ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int scoreToAct
-		, std::mutex* maxResultLock, ScoresResult* maxScore
-		, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread) override;
+	void SetTimeLines(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* current);
+	BaseScoringEngine* CreateScoringEngineForIndicator(const std::string& filter);
 
 };
 

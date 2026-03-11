@@ -19,7 +19,6 @@ void PatternGod_PolynomComparer::InitComaprer()
 	PolynomComparerPolicy* polyCompPolicy = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
 	m_isEnabled = polyCompPolicy->EnablePolynomScan; // Get the enabled status from the policy
 	m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
-	Set_ComparerType(); // Initialize the comparer type
 	if (m_MaxScoreFound > 0)
 		m_ScoreToAct = static_cast<double>(m_MaxScoreFound - polyCompPolicy->Diff_Between_Max_And_ScoreToAct) / static_cast<double>(m_currentTL->size());
 	else

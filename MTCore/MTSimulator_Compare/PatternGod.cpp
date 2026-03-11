@@ -1,22 +1,17 @@
 #include "PatternGod.h"
-#include "TimeLineBuilder.h"
 #include "LOGGER.H"
 #include "CONFIGRATIONS.H"
 #include "CPP_To_Cuda_Tunnel.h"
+#include "ScopedPerfTimer.h"
+#include "TimeLineBuilder.h"
+#include "PatternGodUtils.h"
 
-void PatternGod::CudaInit()
+PatternGod::PatternGod(TimeLine* historyTLP)
 {
-	if (!m_currentTL || !m_historyTL)
-	{
-		Logger::getInstance().WriteLog("PatternGod::CudaInit - Current or History time line is not set", false, true, LogType::ERR);
-		return;
-	}
-
-	if (!m_cudaEngine && CPP_To_Cuda_Tunnel::IsCudaAvailable())
-	{
-		m_cudaEngine = new CudaEngine_ScoreCalcs(m_historyTL, m_currentTL); // Initialize the CUDA engine with history and current time lines
-		m_cudaEngineInitialized = true;
-	}
+	m_currentTL = nullptr; // Current time line will be set later, it is not available at the time of this constructor
+	m_historyTL = historyTLP->Get_TimeLine();
+	m_historyDB_Map = historyTLP->Get_DBMap();
+	m_historyDB_Owner = false; // Do not own the history DB map, it is managed by the TimeLine object
 }
 
 PatternGod::PatternGod(std::vector<ChangeNode*>* historyTimeLine, std::vector<ChangeNode*>* currentTimeLine)
@@ -31,26 +26,13 @@ PatternGod::PatternGod(std::vector<ChangeNode*>* historyTimeLine, std::vector<Ch
 
 }
 
-PatternGod::PatternGod(std::vector<ChangeNode*>* historyTimeLine)
-{
-	m_historyTL = historyTimeLine;
-	m_currentTL = nullptr; // Initialize current time line as nullptr
-
-	m_historyDB_Map = new DBMap(); // Initialize the history DB map
-	TimeLineBuilder::Build_TimeLineDB(m_historyTL, m_historyDB_Map); // Build the DB map for the history time line
-	m_historyDB_Owner = true; // Set ownership of the history DB map
-	InitComparers(); // Initialize the comparers with the history time line
-}
-
 void PatternGod::InitComparers() // Initialize the comparers with the history time line
 {
-	m_comparers.push_back(std::make_unique<PatternGod_PolynomComparer>(m_historyTL));
-	m_comparers.push_back(std::make_unique<PatternGod_ScoreComparer>(m_historyTL));
-	m_polynomFilterEngine = new PatternGod_PolynomFilterEngine(m_historyTL);
+	if (!m_polynomFilterEngine)
+		m_polynomFilterEngine = new PatternGod_PolynomFilterEngine(m_historyTL);
+	if (!m_scoreComparer)
+		m_scoreComparer = new PatternGod_ScoreComparer(m_historyTL, m_currentTL);
 	// *** Add more comparers as needed ***
-
-	if (m_currentTL)
-		Set_CurrentTimeLine(m_currentTL); // Set the current time line for all comparers if it exists
 }
 
 bool PatternGod::ScanPreCondition() const
@@ -66,76 +48,39 @@ bool PatternGod::ScanPreCondition() const
 		Logger::getInstance().WriteLog("Current time line is not set or is empty.", true, true, LogType::ERR);
 		return false; // Return false if the current time line is not set or is empty
 	}
+	if(m_scoreComparer == nullptr)
+	{
+		Logger::getInstance().WriteLog("Score comparer is not initialized.", true, true, LogType::ERR);
+		return false; // Return false if the score comparer is not initialized
+	}
+	if(m_polynomFilterEngine == nullptr)
+	{
+		Logger::getInstance().WriteLog("Polynom filter engine is not initialized.", true, true, LogType::ERR);
+		return false; // Return false if the polynom filter engine is not initialized
+	}
 	return true; // Return true if both time lines are valid
 }
 
-bool PatternGod::CudaPreCondition() const
-{
-	if(! m_cudaEngine)
-		{
-		Logger::getInstance().WriteLog("CUDA Engine is not initialized.", true, true, LogType::ERR);
-		return false; // Return false if the CUDA engine is not initialized
-	}
-	if (!m_cudaEngine->IsCudaDeviceAvailable())
-	{
-		Logger::getInstance().WriteLog("No CUDA device available.", true, true, LogType::ERR);
-		return false; // Return false if no CUDA device is available
-	}
-	return true; // Return true if CUDA preconditions are met
-}
-
-int PatternGod::ScanForOneMinPatterns_MultiThreaded(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D)
+int PatternGod::ScanForOneMinPatterns(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D)
 {
 	if (!ScanPreCondition())
 		return 0; // Return 0 if preconditions for scanning are not met
 
-	if (m_comparers.empty())
-		InitComparers(); // Initialize comparers if not already done
-
 	int totalScans = 0;
-	PatternGodComparerResultsMap resultPerComparer; // Map to hold results for each comparer
-	auto start = std::chrono::high_resolution_clock::now();
-	if(!m_cudaEngine)
-		CudaInit(); // Initialize CUDA engine if not already done
-	std::vector<std::pair<ChangeNode*, ScoresResult>> cudaResults;
-	if (m_cudaEngine && CudaPreCondition())
-	{
-		auto start = std::chrono::high_resolution_clock::now();
-		m_cudaEngine->Set_NewCurrentTimeLine(m_currentTL); // Update current time line in CUDA engine
-		auto settingNewTLTime = std::chrono::high_resolution_clock::now();
-		std::cout << "CUDA Engine - Setting New Current TL Time: " 
-			<< std::chrono::duration_cast<std::chrono::milliseconds>(settingNewTLTime - start).count() 
-			<< " ms" << std::endl;
-
-		totalScans = m_cudaEngine->ScanForOneMinPatterns_CUDA(cudaResults);
-		auto end = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-		Logger::getInstance().WriteLog("Performance: CUDA Scan Time: " + std::to_string(duration) + " ms", false, true, LogType::LOG);
-
-		resultPerComparer[PatternGodComparerType::CudaScoreComparer] = cudaResults; // Store CUDA results
-	}
-	else {
-		for (const auto& comparer : m_comparers)
-		{
-			resultPerComparer[comparer->Get_ComparerType()] = std::vector<std::pair<ChangeNode*, ScoresResult>>(); // Initialize the result vector for each comparer
-			if (comparer->IsScanEnabled())
-				totalScans += comparer->ScanForOneMinPatterns_MultiThreaded(resultPerComparer[comparer->Get_ComparerType()]); // Scan for patterns using each comparer
-		}
-	}
-
-	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-	Logger::getInstance().WriteLog("Performance: Total Scan Time: " + std::to_string(duration) + " ms", false, true, LogType::LOG);
-
-	TradeManagerPolicy* tradeManPolicy = Configrations::getInstance()->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy);
+	ScopedPerfTimer scoringPerf("PatternGod - ScanForOneMinPatterns_MultiThreaded"); // Performance timer for the entire scanning process
+	std::vector<std::pair<ChangeNode*, ScoresResult>> scoringResults;
 	
-	for(auto& resVec : resultPerComparer)
-	{
-		auto& tempVec = resultPerComparer[resVec.first];
-		// Add to resultNodes2D
-		resultNodes2D.insert(resultNodes2D.end(), tempVec.begin(), tempVec.end());
-	}
+	ScoringEngineScan(scoringResults); // Run the scoring engine scan to get initial scoring results
+	PolynomEngineFilter(scoringResults); // Run the polynom filter engine to pre-filter the scoring results based on patterns
+	resultNodes2D = scoringResults;
 	return totalScans; // Return the total number of scans performed
+}
+
+int PatternGod::ScoringEngineScan(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D)
+{
+	m_scoreComparer->Set_NewCurrentTimeLine(m_currentTL); // Update current time line in score comparer before scanning
+	m_scoreComparer->RunScan(resultNodes2D); // Run the score comparer to get scoring results for the current time line
+	return resultNodes2D.size(); // Return the number of scored patterns found
 }
 
 int PatternGod::PolynomEngineFilter(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D)
@@ -152,7 +97,7 @@ int PatternGod::PolynomEngineFilter(std::vector<std::pair<ChangeNode*, ScoresRes
 		&heads,
 		m_currentTL->size());
 	FilterLayerPolicy* filterLayerPolicy = Configrations::getInstance()->Get_Policy<FilterLayerPolicy>(PolicyType::FilterLayerPolicy);
-	PatternGodUtils::filterByThresholdScore(tempVec, filterLayerPolicy->Pattern_TopScore_ThresholdRatio);
+	PatternGodUtils::filterByThresholdScore(tempVec, filterLayerPolicy->Pattern_TopScore_ThresholdRatio, filterLayerPolicy->Pattern_Max_Patterns_To_Find);
 	PatternGodUtils::filterByHighScores(tempVec, filterLayerPolicy->Pattern_Max_Patterns_To_Find);
 	resultNodes2D = tempVec;
 }

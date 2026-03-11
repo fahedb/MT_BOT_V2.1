@@ -72,8 +72,6 @@ int PatternGod_BaseComparer::ScanForOneMinPatterns_MultiThreaded(std::vector<std
 	TradeManagerPolicy* tradeManPolicy = Configrations::getInstance()->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy);
 
 	MTThreadPool* tPool = MTThreadPool::getInstance();
-	std::string scannerName = Get_ComparerType() == PatternGodComparerType::PolynomComparer ? "Polynom " : "Score ";
-	Logger::getInstance().WriteLog(scannerName + "Scan Started", false, true, LogType::LOG); // Log before stop low priority tasks
 	tPool->Set_PauseLowPriorityTasks(true);
 
 	std::vector<std::future<void>> futures;

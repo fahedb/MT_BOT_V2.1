@@ -191,37 +191,30 @@
   <ItemGroup>
     <ClCompile Include="BaseScoringEngine.cpp" />
     <ClCompile Include="CPUScoringEngine.cpp" />
-    <ClCompile Include="CudaEngine_ScoreCalcs.cpp" />
-    <ClCompile Include="GPUScoring.cpp" />
+    <ClCompile Include="GPUScoringEngine.cpp" />
     <ClCompile Include="MTSimulatorUtils.cpp" />
     <ClCompile Include="PatternGod.cpp" />
     <ClCompile Include="PatternGodUtils.cpp" />
     <ClCompile Include="PatternGod_BaseComparer.cpp" />
     <ClCompile Include="PatternGod_PolynomComparer.cpp" />
     <ClCompile Include="PatternGod_PolynomFilterEngine.cpp" />
-    <ClCompile Include="PatternGod_ResultFusionEngine.cpp" />
     <ClCompile Include="PatternGod_ScoreComparer.cpp" />
     <ClCompile Include="PolynomComparer.cpp" />
     <ClCompile Include="PolynomScoreCalcs.cpp" />
-    <ClCompile Include="ScoreCalcs.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ComparersEnums.h" />
     <ClInclude Include="BaseScoringEngine.h" />
     <ClInclude Include="CPUScoringEngine.h" />
-    <ClInclude Include="CudaEngine_ScoreCalcs.h" />
-    <ClInclude Include="GPUScoring.h" />
+    <ClInclude Include="GPUScoringEngine.h" />
     <ClInclude Include="MTSimulatorUtils.h" />
     <ClInclude Include="PatternGod.h" />
     <ClInclude Include="PatternGodUtils.h" />
     <ClInclude Include="PatternGod_BaseComparer.h" />
     <ClInclude Include="PatternGod_PolynomComparer.h" />
     <ClInclude Include="PatternGod_PolynomFilterEngine.h" />
-    <ClInclude Include="PatternGod_ResultFusionEngine.h" />
     <ClInclude Include="PatternGod_ScoreComparer.h" />
     <ClInclude Include="PolynomComparer.h" />
     <ClInclude Include="PolynomScoreCalcs.h" />
-    <ClInclude Include="ScoreCalcs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

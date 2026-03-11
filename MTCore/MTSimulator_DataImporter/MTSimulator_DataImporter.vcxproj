@@ -187,7 +187,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BaseLayerImporter.h" />
-    <ClInclude Include="FilterLayerDataImporter.h" />
     <ClInclude Include="GenericDataImporterToSQLDB.h" />
     <ClInclude Include="InterfaceLayers_BKTSTImporter.h" />
     <ClInclude Include="QueueStruct.h" />
@@ -197,7 +196,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseLayerImporter.inl" />
-    <ClCompile Include="FilterLayerDataImporter.cpp" />
     <ClCompile Include="GenericDataImporterToSQLDB.cpp" />
     <ClCompile Include="InterfaceLayers_BKTSTImporter.cpp" />
     <ClCompile Include="ScoringLayerImporter.cpp" />

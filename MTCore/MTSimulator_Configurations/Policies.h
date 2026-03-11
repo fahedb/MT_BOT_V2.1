@@ -165,6 +165,7 @@ public:
     bool EnableScoreScan = 0;
     int ScoreToAct = 0;
     int Diff_Between_Max_And_ScoreToAct = 250; // Difference between maximum score and score to act
+    std::string scanFilters;
 private:
     void InitPolicy();
 };

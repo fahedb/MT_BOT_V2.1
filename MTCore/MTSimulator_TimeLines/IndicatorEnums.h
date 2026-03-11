@@ -63,6 +63,49 @@ enum class BarPeriod {
 	H4 = 5,
 	NONE = -1
 };
+
+class BarPeriodUtils
+{
+public:
+	static std::string BarPeriodToString(BarPeriod barP)
+	{
+		switch (barP)
+		{
+		case BarPeriod::M1:
+			return "M1";
+		case BarPeriod::M5:
+			return "M5";
+		case BarPeriod::M15:
+			return "M15";
+		case BarPeriod::M30:
+			return "M30";
+		case BarPeriod::H1:
+			return "H1";
+		case BarPeriod::H4:
+			return "H4";
+		default:
+			return "NONE";
+		}
+	}
+	static BarPeriod StringToBarPeriod(const std::string& str)
+	{
+		if (str == "M1")
+			return BarPeriod::M1;
+		else if (str == "M5")
+			return BarPeriod::M5;
+		else if (str == "M15")
+			return BarPeriod::M15;
+		else if (str == "M30")
+			return BarPeriod::M30;
+		else if (str == "H1")
+			return BarPeriod::H1;
+		else if (str == "H4")
+			return BarPeriod::H4;
+		else
+			return BarPeriod::NONE;
+	}
+};
+
 // <BarPeriodList>
 // This struct contains a list of available bar periods.
 #define BAR_PERIODS_COUNT 6 // Number of defined bar periods excluding NONE -- Need to be updated if new periods are added

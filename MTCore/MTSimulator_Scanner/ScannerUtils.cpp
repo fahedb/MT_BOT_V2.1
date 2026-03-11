@@ -1,5 +1,4 @@
 #include "ScannerUtils.h"
-#include "ScoreCalcs.h"
 #include "LOGGER.H"
 
 #include "PolynomTimeLineCache.h"
@@ -59,11 +58,7 @@ void ScannerUtils::InitScanObjectsBeforeScan(PatternGod* patternScan, Statistics
 	logger.WriteLog(startScanLog, true, true);
 
 	patternScan->Set_CurrentTimeLine(currentTimeLine); // Set a new Current Period for PatternScan object for the new scan
-	patternScan->RefreshComparers(); // Refresh the comparers to use the new current time line
 	statisticsCalcucator->Set_NewCurrentPeriod(currentTimeLine); // Set a new current period for Statistics calc
-
-	if (currTimeLineRep->Get_CurrTimeLine()->Get_TimeLineLen()) // Getting the max score possible for 2 nodes match
-		Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->maxScorePossibleForChangeNodes = ProxyScoreCalcs::CalcMaxScorePossible(currTimeLineRep->Get_CurrTimeLine()->Get_TimeLine()->at(0)).totalScore.total;
 }
 
 void ScannerUtils::InitPolicyExporters_BeforeScan()
@@ -74,10 +69,8 @@ void ScannerUtils::InitPolicyExporters_BeforeScan()
 	// Layer 1 Policies initialization
 	layerExporter.SendPolicyData(confs->Get_Policy<ScoringLayerPolicy>(PolicyType::ScoringLayerPolicy), LayerType::ScoringLayer);
 	layerExporter.SendPolicyData(confs->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy), LayerType::ScoringLayer);
-
-	// Layer 2 Policies initialization
-	layerExporter.SendPolicyData(confs->Get_Policy<FilterLayerPolicy>(PolicyType::FilterLayerPolicy), LayerType::FilterLayer);
-	layerExporter.SendPolicyData(confs->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy), LayerType::FilterLayer);
+	layerExporter.SendPolicyData(confs->Get_Policy<FilterLayerPolicy>(PolicyType::FilterLayerPolicy), LayerType::ScoringLayer);
+	layerExporter.SendPolicyData(confs->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy), LayerType::ScoringLayer);
 
 	// Layer 3 Policies initialization
 	layerExporter.SendPolicyData(confs->Get_Policy<PatternGodStatisticsPolicy>(PolicyType::PatternGodStatisticsPolicy), LayerType::StatisticsLayer);

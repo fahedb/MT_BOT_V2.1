@@ -8,6 +8,20 @@
 #include "HttpServerSyncer.h"
 #include "ScannerUtils.h"
 #include "DataExporter.h"
+
+void PatternGodScanner::Run()
+{
+	HttpServerSyncer::LoadAllConfigsToHttpCore(); // Load all configs to the HTTP Core
+	std::vector<ChangeNode*> history;
+	XAUUSD_OneMinTable table(Configrations::getInstance()->Get_DB_FileDir());
+	HistoryTimeLineLoader historyLoader(history, &table);
+	historyLoader.Run();
+	Logger::getInstance().WriteLog("About to run PatternGod !!", true, true, LogType::SPECIAL_LOG);
+	TimeLine historyTimeLine(&history);
+	Run_PatternGod(historyTimeLine);
+
+}
+
 OrderEntity* PatternGodScanner::Get_LastPlacedOrder()
 {
 	if (m_lastOrderGetPlaced) // If the last placed order was already retrieved, return nullptr to avoid duplicates
@@ -27,8 +41,8 @@ void PatternGodScanner::Run_PatternGod(TimeLine& historyTimeLine)
 	StatisticsDecession statisticsCalcucator(&historyTimeLine);
 
 	XAUUSD_CurrentTable table;
-
 	UpdateCurrTimeLine(&table);
+
 	ScoreCachingPolicy* scoreCachePolicy = confs->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
 	ConfigrationsPolicy* confPolicy = confs->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
 	scoreCachePolicy->ScoreResultsCacheSizePerThread = (historyTimeLine.Get_TimeLineLen() / confPolicy->ThreadsCount) * Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLineLen(); // Set the cache size per thread based on the history time line length and the number of threads
@@ -78,9 +92,6 @@ bool PatternGodScanner::OneMinutePatternGodLogic(PatternGod* patternScan, Statis
 
 	// Layer 1, This layer should score patterns from the history and get top X patterns
 	results = ScoringLayerRun(patternScan);
-
-	// Layer 2, This layer should filter out unwanted results
-	results = FilterLayerRun(patternScan, results);
 
 	// Layer 3, This layer should build the statistics data and export it
 	logger.WriteLog("Start detecting common direction...", false, false);
@@ -158,35 +169,14 @@ std::vector<std::pair<ChangeNode*, ScoresResult>> PatternGodScanner::ScoringLaye
 
 	if (initializedLayer == LayerType::ScoringLayer)
 	{
-		results = Get_FilterLayer_ImporterData_NextItem(); // Clear the filter layer data from the importer queue
+		results = Get_ScoringLayer_ImporterData_NextItem(); // Clear the filter layer data from the importer queue
 		return results; // If data is available from the importer, return it directly
 	}
 
 	// Layer 1, This layer should score patterns from the history and get top X patterns
-	if (patternScan->ScanForOneMinPatterns_MultiThreaded(results)) // Scan for patterns
+	if (patternScan->ScanForOneMinPatterns(results)) // Scan for patterns
 	{
 		InterfaceLayers_BKTSTExporter::getInstance().SendSummeryData_ScoringLayer(m_lastTimePoint, results); // Export the scoring data
-	}
-	return results;
-}
-
-std::vector<std::pair<ChangeNode*, ScoresResult>> PatternGodScanner::FilterLayerRun(PatternGod* patternScan, std::vector<std::pair<ChangeNode*, ScoresResult>>& results)
-{
-	std::vector<std::pair<ChangeNode*, ScoresResult>> importedResults;
-	LayerType initializedLayer = GetInitializedImporterLayerType();
-	if (static_cast<int>(initializedLayer) > static_cast<int>(LayerType::FilterLayer))
-		return importedResults; // If the importer is initialized to a layer after this one, return empty results
-
-	if (initializedLayer == LayerType::FilterLayer)
-	{
-		importedResults = Get_FilterLayer_ImporterData_NextItem(); // Clear the filter layer data from the importer queue
-		return importedResults; // If data is available from the importer, return it directly
-	}
-
-	// Layer 2, This layer should filter out unwanted results
-	if (patternScan->PolynomEngineFilter(results))
-	{
-		InterfaceLayers_BKTSTExporter::getInstance().SendFilteredData_FilterLayer(m_lastTimePoint, results); // Export the filtered scoring data
 	}
 	return results;
 }
@@ -243,12 +233,6 @@ std::unique_ptr<OrderEntity> PatternGodScanner::TradeLayerRun(DirectionStats& st
 std::vector<std::pair<ChangeNode*, ScoresResult>> PatternGodScanner::Get_ScoringLayer_ImporterData_NextItem()
 {
 	ScoringLayer_QueueItemType item = Get_MyQueuedItem<ScoringLayer_QueueItemType>();
-	return item.second;
-}
-
-std::vector<std::pair<ChangeNode*, ScoresResult>> PatternGodScanner::Get_FilterLayer_ImporterData_NextItem()
-{
-	FilterLayer_QueueItemType item = Get_MyQueuedItem<FilterLayer_QueueItemType>();
 	return item.second;
 }
 

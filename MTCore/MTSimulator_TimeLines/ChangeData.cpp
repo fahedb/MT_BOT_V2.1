@@ -6,6 +6,18 @@
 /////////// ChangeNode class Functions//////////
 /////////// Author: Fahed.b				  //////////
 ////////////////////////////////////////////////////
+ChangeNode::ChangeNode()
+{
+	point_DateTime = "";
+	Increase_Decrease = false;
+	m_PointPlace = _Points::_Points_DEFUALT;
+	Increase_Decrease = false;
+	activePoint = false;
+	m_openPrice = INVALID_DATA;
+	m_closePrice = INVALID_DATA;
+	m_highPrice = INVALID_DATA;
+	m_lowPrice = INVALID_DATA;
+}
 
  ChangeNode::~ChangeNode()
  {

@@ -65,19 +65,33 @@ IndicatorNode Get_Ind_Node(IndicatorType indT,int indL,int shift)
 {
   IndicatorNode node;
   node.len=indL;
+  
+  datetime barTime = iTime(_Symbol, PERIOD_M1, shift);
+
   StringToCharArray(DoubleToString(Get_IndicatorValue(indT,indL,PERIOD_M1,shift)),node.vals.M1);
-  StringToCharArray(DoubleToString(Get_IndicatorValue(indT,indL,PERIOD_M5,shift)),node.vals.M5);
-  StringToCharArray(DoubleToString(Get_IndicatorValue(indT,indL,PERIOD_M15,shift)),node.vals.M15);
-  StringToCharArray(DoubleToString(Get_IndicatorValue(indT,indL,PERIOD_M30,shift)),node.vals.M30);
-  StringToCharArray(DoubleToString(Get_IndicatorValue(indT,indL,PERIOD_H1,shift)),node.vals.H1);
-  StringToCharArray(DoubleToString(Get_IndicatorValue(indT,indL,PERIOD_H4,shift)),node.vals.H4);
+  
+  int shiftM5 = iBarShift(_Symbol, PERIOD_M5, barTime, false);
+  StringToCharArray(DoubleToString(Get_IndicatorValue(indT,indL,PERIOD_M5,shiftM5)),node.vals.M5);
+  
+  int shiftM15 = iBarShift(_Symbol, PERIOD_M15, barTime, false);
+  StringToCharArray(DoubleToString(Get_IndicatorValue(indT,indL,PERIOD_M15,shiftM15)),node.vals.M15);
+  
+  int shiftM30 = iBarShift(_Symbol, PERIOD_M30, barTime, false);
+  StringToCharArray(DoubleToString(Get_IndicatorValue(indT,indL,PERIOD_M30,shiftM30)),node.vals.M30);
+  
+  int shiftH1 = iBarShift(_Symbol, PERIOD_H1, barTime, false);
+  StringToCharArray(DoubleToString(Get_IndicatorValue(indT,indL,PERIOD_H1,shiftH1)),node.vals.H1);
+  
+  int shiftH4 = iBarShift(_Symbol, PERIOD_H4, barTime, false);
+  StringToCharArray(DoubleToString(Get_IndicatorValue(indT,indL,PERIOD_H4,shiftH4)),node.vals.H4);
+  
   
   StringToCharArray(DoubleToString(Get_IndicatorSlope(indT,indL,PERIOD_M1,shift)),node.vals.M1_Slope);
-  StringToCharArray(DoubleToString(Get_IndicatorSlope(indT,indL,PERIOD_M5,shift)),node.vals.M5_Slope);
-  StringToCharArray(DoubleToString(Get_IndicatorSlope(indT,indL,PERIOD_M15,shift)),node.vals.M15_Slope);
-  StringToCharArray(DoubleToString(Get_IndicatorSlope(indT,indL,PERIOD_M30,shift)),node.vals.M30_Slope);
-  StringToCharArray(DoubleToString(Get_IndicatorSlope(indT,indL,PERIOD_H1,shift)),node.vals.H1_Slope);
-  StringToCharArray(DoubleToString(Get_IndicatorSlope(indT,indL,PERIOD_H4,shift)),node.vals.H4_Slope);
+  StringToCharArray(DoubleToString(Get_IndicatorSlope(indT,indL,PERIOD_M5,shiftM5)),node.vals.M5_Slope);
+  StringToCharArray(DoubleToString(Get_IndicatorSlope(indT,indL,PERIOD_M15,shiftM15)),node.vals.M15_Slope);
+  StringToCharArray(DoubleToString(Get_IndicatorSlope(indT,indL,PERIOD_M30,shiftM30)),node.vals.M30_Slope);
+  StringToCharArray(DoubleToString(Get_IndicatorSlope(indT,indL,PERIOD_H1,shiftH1)),node.vals.H1_Slope);
+  StringToCharArray(DoubleToString(Get_IndicatorSlope(indT,indL,PERIOD_H4,shiftH4)),node.vals.H4_Slope);
     
   return node;
 }

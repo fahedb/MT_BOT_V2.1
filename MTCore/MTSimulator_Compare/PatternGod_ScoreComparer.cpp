@@ -1,149 +1,237 @@
 #include "PatternGod_ScoreComparer.h"
 #include <iomanip>
 #include <sstream>
-#include "ScoreCalcs.h"
-#include "Configrations.h"
 #include "Logger.h"
 #include <mutex>
 #include <future>
-#include "ScoreResultsCache.h"
-#include "ThreadPool.h"
-#include "MTSimulatorUtils.h"
-#include "PatternGodUtils.h"
+
+#include "Configrations.h"
+#include "TimeLineArrayBuilder.h"
+#include "CPP_To_Cuda_Tunnel.h"
+
+#include "GPUScoringEngine.h"
+#include "CPUScoringEngine.h"
+
+std::vector<std::string> SplitString(const std::string& str, char delimiter)
+{
+	std::vector<std::string> result;
+	std::stringstream ss(str);
+	std::string item;
+
+	while (std::getline(ss, item, delimiter))
+	{
+		result.push_back(item);
+	}
+
+	return result;
+}
+void PatternGod_ScoreComparer::Set_NewCurrentTimeLine(std::vector<ChangeNode*>* currentData)
+{
+	m_currentData = currentData;
+	dataStream_t* currDataSt = m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::HOST);
+	TimeLineArrayBuilder::BuildTimeLineArrays(currDataSt, m_currentData); // Build current data stream arrays
+
+	dataStream_t* currMinSt = m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::HOST);
+	dataStream_t* currMaxSt = m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::HOST);
+	int limit = 1; // For current data, limit is always 1
+	TimeLineArrayBuilder::BuildMinMaxArrays(currDataSt, currMinSt, currMaxSt, limit, m_currentData->size());
+
+	m_kernelMemoryContext->SyncCurrentDataToDevice(true); // Sync current data to device
+
+}
+
+PatternGod_ScoreComparer::PatternGod_ScoreComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr)
+{
+	SetTimeLines(history, curr);
+	InitComaprer();
+	
+}
+
+void PatternGod_ScoreComparer::RunScan(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D)
+{
+	if(m_scoringEngines.empty())
+	{
+		Logger::getInstance().WriteLog("No scoring engines initialized. RunScan will not execute.", true, true, LogType::ERR);
+		return;
+	}
+	std::vector<int> resultsIndices; // This will hold the indices of the results from the scoring engines. The actual scores can be retrieved from the kernel memory context or directly from the scoring engines depending on your implementation.
+	for(const auto& engine : m_scoringEngines)
+	{
+		
+		resultsIndices = engine->RunScan(resultsIndices);
+	}
+	
+	float* totalScores = m_kernelMemoryContext->Get_HostTotalScoresPtr();
+	int maxScore = 0;
+
+	for(int index : resultsIndices)
+	{
+		if(index < 0 || index >= m_historicData->size())
+		{
+			Logger::getInstance().WriteLog("Invalid index from scoring engine results: " + std::to_string(index), true, true, LogType::ERR);
+			continue;
+		}
+		ChangeNode* node = (*m_historicData)[index];
+
+		int score = totalScores[index];
+		ScoresResult scoreResult; // This is a placeholder. You would need to populate this ScoresResult based on the actual scores calculated by the scoring engines for this index.
+		scoreResult.totalScore.total = score;
+		scoreResult.SetLockedResult(true); // Lock the result to prevent further modifications if needed
+		resultNodes2D.emplace_back(node, scoreResult); // Add the node and its corresponding score result to the results vector
+		
+		if(score > maxScore)
+			maxScore = score; // Update max score for potential use in filtering or logging
+	}
+	Logger::getInstance().WriteLog("Scan completed. Total results: " + std::to_string(resultNodes2D.size()) + ", Max Score: " + std::to_string(maxScore), true, true, LogType::LOG);
+
+}
 
 void PatternGod_ScoreComparer::InitComaprer()
 {
-	ScoreComparerPolicy* scoreCompPolicy = Configrations::getInstance()->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy);
-	m_isEnabled = scoreCompPolicy->EnableScoreScan; // Get the enabled status from the policy
-	m_NumOfSkips_ForLowScoreScan = NUM_OF_SKIPS_FOR_LOW_SCORE_SCAN;
-	if (m_MaxScoreFound > 0)
-		m_ScoreToAct = static_cast<double>(m_MaxScoreFound - scoreCompPolicy->Diff_Between_Max_And_ScoreToAct) / static_cast<double>(m_currentTL->size()); // Set the score to act based on the max score found
-	else
-		m_ScoreToAct = scoreCompPolicy->ScoreToAct; // Get the score to act threshold from the policy
-	Set_ComparerType(); // Initialize the comparer type
-}
-
-ScoresResult PatternGod_ScoreComparer::CompareOneMinNodesPeriods(int startIdx, int threadIdx, int totalScoreToAct) // compare between periods of time in the history time line and the whole current time line
-{
-	ScoreCachingPolicy* scoreCachePolicy = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
-	ConfigrationsPolicy* confPolicy = Configrations::getInstance()->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
-	ScoresResult periodScore;
-
-	int currentSize = static_cast<int>(m_currentTL->size());
-	int historyRemaining = static_cast<int>(m_historyTL->size()) - startIdx;
-	int limit = (currentSize < historyRemaining) ? currentSize : historyRemaining;
-	int currTotalScore = 0;
-	int maxScorePossible = scoreCachePolicy->maxScorePossibleForChangeNodes;
-	int totalMinScoretoAct = limit * m_ScoreToAct;
-	ScoreResultsCache* scoreResultsCache = ScoreResultsCache::getInstance();
-	std::vector<std::pair<std::pair<long long, long long>, ScoresResult>> scoreResults;
-
-	scoreResults.reserve(limit); // Reserve space for the expected number of results to avoid multiple reallocations
-	const bool enableCaching = scoreCachePolicy->EnableScoreCaching;
-
-
-	for (int i = 0; i < limit; ++i)
+	Configrations* config = Configrations::getInstance();
+	ScoreComparerPolicy* policy = config->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy);
+	std::string scanFilters = policy->scanFilters;
+	if(scanFilters.empty())
 	{
-		int remainingCandles = limit - i;
-		int maxFutureScore = remainingCandles * maxScorePossible;
-		if (currTotalScore + maxFutureScore < totalMinScoretoAct) // If the current total score plus the maximum possible future score is less than the minimum score to act, skip further calculations
-			break;
-
-		if (enableCaching)
-		{
-			ScoresResult* cachedScore = nullptr;
-			try {
-				cachedScore = scoreResultsCache->GetScoreResult(m_historyTL->at(static_cast<size_t>(startIdx) + static_cast<size_t>(i))->point_DateTimeLong, m_currentTL->at(i)->point_DateTimeLong, threadIdx);
-			}
-			catch (const std::exception& e) {
-				Logger::getInstance().WriteLog("Error in getting cached result: " + std::string(e.what()), false, false, LogType::ERR);
-				return ScoresResult(); // Return an empty ScoresResult on error
-			}
-
-			if (cachedScore) // If score already calculated, use it
-			{
-				periodScore += *cachedScore;
-				currTotalScore += cachedScore->totalScore.total;
-				m_cacheHits[threadIdx]++;
-				continue;
-			}
-
-		}
-		ScoresResult myScore;
-		try {
-			// Compare the change nodes and calculate the score
-			// This function should be defined in ProxyScoreCalcs or similar utility class
-			// It compares two ChangeNode objects and returns a ScoresResult object
-			// If an error occurs, it will throw an exception which we catch below
-			myScore = ProxyScoreCalcs::CompareChangeNodes(m_currentTL->at(i), m_historyTL->at(static_cast<size_t>(startIdx) + static_cast<size_t>(i)));
-		}
-		catch (const std::exception& e) {
-			Logger::getInstance().WriteLog("Error in comparing change nodes: " + std::string(e.what()), false, false, LogType::ERR);
-			return ScoresResult(); // Return an empty ScoresResult on error
-		}
-
-		periodScore += myScore;
-		currTotalScore += myScore.totalScore.total;
-		m_cacheMisses[threadIdx]++;
-		if (enableCaching)
-		{
-			try {
-				// Cache the score result for future insertion in the ScoreResultsCache singletone class
-				ScoreResultsCacheUtils::CacheScoreResult_InTempVector(scoreResults, m_historyTL->at(static_cast<size_t>(startIdx) + static_cast<size_t>(i))->point_DateTimeLong, m_currentTL->at(i)->point_DateTimeLong, myScore);
-			}
-			catch (const std::exception& e) {
-				Logger::getInstance().WriteLog("Error in caching score result: " + std::string(e.what()), false, false, LogType::ERR);
-				return ScoresResult(); // Return an empty ScoresResult on error
-			}
-		}
+		scanFilters = "H4:0.20:S;H4&H1:0.70:D;H1:0.5:S;H1&M30:0.70:D;M30:0.5:S;M30&M15:0.70:D;M15:0.5:S;M15&M5:0.70:D;M5:0.5:S;M5&M1:0.7:D;M1:0.5:S;A:0.6:A";
+		Logger::getInstance().WriteLog("ScoreComparerPolicy scanFilters is empty. defulat value initialized: " + scanFilters, true, true, LogType::LOG);
 	}
 
-	if (enableCaching)
+	bool isCudaAvailable = CPP_To_Cuda_Tunnel::IsCudaAvailable();
+
+	std::vector<std::string> filterParts = SplitString(scanFilters, ';');
+	for(const std::string& part : filterParts)
 	{
-		ScoreResultsCacheUtils::CacheScoreResult_ToCache(scoreResults, threadIdx);
-	}
-
-	return periodScore;
-}
-
-void PatternGod_ScoreComparer::ProccessScanChunk(int startIdx, int endIdx, int threadIndex, int totalScoreToAct, std::mutex* maxResultLock, ScoresResult* maxScore, std::vector<std::pair<ChangeNode*, ScoresResult>>* resultNodesPerThread)
-{
-	m_cacheHits[threadIndex] = 0; // Reset cache hits for this thread
-	m_cacheMisses[threadIndex] = 0; // Reset cache misses for this thread
-	int estimatedItems = 100;
-	Logger& logger = Logger::getInstance();
-	resultNodesPerThread->reserve(estimatedItems);
-	int localScoreToAct = totalScoreToAct;
-	ScoresResult maxLocalScore;
-	const int currTlSize = m_currentTL->size(), histTlSize = m_historyTL->size();
-	for (int i = startIdx; i < endIdx; i++) {
-		ScoresResult resScore = PatternGod_ScoreComparer::CompareOneMinNodesPeriods(i, threadIndex, totalScoreToAct);
-
-		if (resScore.totalScore.total > localScoreToAct) {
-			if (i + currTlSize < histTlSize) {
-				resultNodesPerThread->emplace_back(m_historyTL->at(i + currTlSize - 1), resScore);
-			}
+		BaseScoringEngine* engine = CreateScoringEngineForIndicator(part);
+		std::cout << "Engine Details, " << "Period Filter size: " << std::to_string(engine->m_barPeriod_Filter.size()) << ", Threshold: " << engine->m_threshold;
+		if(engine)
+		{
+			m_scoringEngines.push_back(engine);
+			Logger::getInstance().WriteLog("Initialized " + std::string(isCudaAvailable ? "GPU" : "CPU") + " scoring engine for filter: " + part, true, true, LogType::LOG);
 		}
 		else
 		{
-			if (m_scanCounter % 8 != 0) // Every 8 scans, we do a full scan without skips to load cache better
-				i += m_NumOfSkips_ForLowScoreScan;
+			Logger::getInstance().WriteLog("Failed to initialize scoring engine for filter: " + part, true, true, LogType::ERR);
 		}
-		if (maxLocalScore.totalScore.total < resScore.totalScore.total)
-			maxLocalScore = resScore;
-
+		
 	}
 
-	{
-		std::lock_guard<std::mutex> lock(*maxResultLock);
-		if (maxScore->totalScore.total < maxLocalScore.totalScore.total)
-			*maxScore = maxLocalScore;
-	}
-	// Write logs for this thread
-	logger.WriteLog("Thread [" + std::to_string(threadIndex) + "] processed indices [" + std::to_string(startIdx) + " - " + std::to_string(endIdx - 1) + "]"
-		+ "\nfound " + std::to_string(resultNodesPerThread->size()) + " results"
-		+ "\nmax score: " + std::to_string(maxLocalScore.totalScore.total)
-		+ "\ncache hits : " + std::to_string(m_cacheHits[threadIndex])
-		+ "\ncache misses : " + std::to_string(m_cacheMisses[threadIndex])
-		, false, true, LogType::LOG);
 }
+
+void PatternGod_ScoreComparer::SetTimeLines(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* current)
+{
+	m_historicData = history;
+	m_currentData = current;
+	bool isCudaAvailable = CPP_To_Cuda_Tunnel::IsCudaAvailable();
+
+	m_kernelMemoryContext = new KernelExecutionContext_PatternGod(m_historicData->size(), m_currentData->size(), isCudaAvailable);
+
+	dataStream_t* histDataSt = m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::HOST);
+	TimeLineArrayBuilder::BuildTimeLineArrays(histDataSt, m_historicData); // Build historic data stream arrays
+
+	dataStream_t* histMinSt = m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::HOST);
+	dataStream_t* histMaxSt = m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::HOST);
+	int limit = static_cast<int>(m_historicData->size() - m_currentData->size()) + 1;
+	TimeLineArrayBuilder::BuildMinMaxArrays(histDataSt, histMinSt, histMaxSt, limit, m_currentData->size());
+	if(isCudaAvailable)
+		m_kernelMemoryContext->SyncHistoryDataToDevice(true); // Sync historic data to device
+
+	dataStream_t* currDataSt = m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::HOST);
+	TimeLineArrayBuilder::BuildTimeLineArrays(currDataSt, m_currentData); // Build current data stream arrays
+
+	dataStream_t* currMinSt = m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::HOST);
+	dataStream_t* currMaxSt = m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::HOST);
+	limit = 1; // For current data, limit is always 1
+	TimeLineArrayBuilder::BuildMinMaxArrays(currDataSt, currMinSt, currMaxSt, limit, m_currentData->size());
+	if(isCudaAvailable)
+		m_kernelMemoryContext->SyncCurrentDataToDevice(true); // Sync current data to device
+
+}
+// H4:0.20:S = H4 period, 0.20 threshold, Single indicator scan mode
+BaseScoringEngine* PatternGod_ScoreComparer::CreateScoringEngineForIndicator(const std::string& filter)
+{
+	std::vector<std::string> keyValue = SplitString(filter, ':');
+	bool isCudaAvailable = CPP_To_Cuda_Tunnel::IsCudaAvailable();
+
+	if (keyValue.size() != 3)
+	{
+		Logger::getInstance().WriteLog("Invalid scan filter format: " + filter, true, true, LogType::ERR);
+		return nullptr;
+	}
+	std::string indPeriodsStr = keyValue[0];
+	float threshold = std::stof(keyValue[1]);
+	if (threshold <= 0 || threshold > 1)
+	{
+		Logger::getInstance().WriteLog("Invalid threshold in scan filter: " + filter, true, true, LogType::ERR);
+		return nullptr;
+	}
+	
+	// For simplicity, we will create a generic CudaScoringEngine that can handle different indicators and lengths based on the filter. In a real implementation, you might want to have specific scoring engine classes for different indicators or combinations.
+	IndicatorLenList lenList; // Currently includes all lengths, but can be extended to filter specific lengths based on the filter string in the future
+	IndicatorTypeList indTypeList; // Currently filters only by bar period, but this can be extended to include indicator types and lengths in the future
+
+	std::vector<BarPeriod> barPeriodFilter;
+	
+	std::vector<std::string> periodsStrs = SplitString(indPeriodsStr, '&');
+	for(const std::string& perStr : periodsStrs)
+	{
+		if(perStr == "A") // If the period is "A", it means all periods, so we add all possible periods to the filter and break the loop
+		{
+			BarPeriodList allPeriods; // This will include all possible bar periods
+			barPeriodFilter = allPeriods.periods;
+			break;
+		}
+		BarPeriod bp = BarPeriodUtils::StringToBarPeriod(perStr);
+		if(bp == BarPeriod::NONE)
+		{
+			Logger::getInstance().WriteLog("Invalid bar period in scan filter: " + filter, true, true, LogType::ERR);
+			return nullptr;
+		}
+		barPeriodFilter.push_back(bp);
+	}
+
+	if (barPeriodFilter.empty())
+	{
+		Logger::getInstance().WriteLog("No valid bar periods found in scan filter: " + filter, true, true, LogType::ERR);
+		return nullptr;
+	}
+
+	BaseScoringEngine* engine = nullptr;
+	if(isCudaAvailable)
+	{
+
+		engine = new GPUScoringEngine(lenList.lengths, barPeriodFilter, indTypeList.types, threshold);
+	}
+	else
+	{
+		Logger::getInstance().WriteLog("CUDA is not available. CPU Engine going to be created for filter: " + filter, true, true, LogType::LOG);
+		engine = new CPUScoringEngine(lenList.lengths, barPeriodFilter, indTypeList.types, threshold);
+	}
+	engine->Set_KernelMemoryContext(m_kernelMemoryContext); // Set the kernel memory context for the scoring engine
+	std::cout << "Engine Details, " << "Period Filter size: " << std::to_string(engine->m_barPeriod_Filter.size()) << ", Threshold: " << engine->m_threshold;
+	std::string scanMode = keyValue[2];
+	if (scanMode == "S") // Single indicator scan
+	{
+		engine->Enable_SingleIndicatorScan(true);
+		engine->Enable_TwoIndicatorsRatioScan(false);
+	}
+	else if (scanMode == "D") // Dual indicators ratio scan
+	{
+		engine->Enable_SingleIndicatorScan(false);
+		engine->Enable_TwoIndicatorsRatioScan(true);
+	}
+	else if (scanMode == "A") // All scan modes
+	{
+		engine->Enable_SingleIndicatorScan(true);
+		engine->Enable_TwoIndicatorsRatioScan(true);
+	}
+	else
+	{
+		Logger::getInstance().WriteLog("Invalid scan mode in scan filter: " + filter, true, true, LogType::ERR);
+		delete engine; // Clean up the engine if it was created
+		return nullptr;
+	}
+	return engine;
+}
+
+

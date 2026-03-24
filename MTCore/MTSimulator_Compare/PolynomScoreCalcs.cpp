@@ -9,15 +9,10 @@ const IndicatorLenList m_glob_indLengths;
 const IndicatorValueTypeList m_glob_indValueTypes;
 const BarPeriodList m_glob_barPeriods;
 
-double CalcSinglePolynomScore(const Polynom* hist, const Polynom* curr, PolynomComparerPolicy* policy, const int weight = 10) {
+double CalcSinglePolynomScore(const Polynom* hist, const Polynom* curr, double wEval, double wRMSE, double wCoeff, const int weight = 10) {
 	if (!hist || !curr)
 		return 0.0;
-
-	double wEval = policy->weight_eval;
-	double wRMSE = policy->weight_rmse;
-	double wCoeff = policy->weight_coeff;
-
-
+	
 	double scoreEval = PolynomComparer::Compare_ByEval(*hist, *curr);
 	double scoreRMSE = PolynomComparer::Compare_ByRMSE(*hist, *curr);
 	double scoreCoeff = PolynomComparer::Compare_ByWeightedCoefficients(*hist, *curr);
@@ -26,7 +21,7 @@ double CalcSinglePolynomScore(const Polynom* hist, const Polynom* curr, PolynomC
 
 }
 
-ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histTL, std::vector<ChangeNode*>* currTL,int threadIdx, int& resCacheHits, int& resCacheMisses, int& polyCacheHits, int& polyCacheMisses, int maxScorePossibleForPolynom,int totalScoreToAct)
+ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histTL, std::vector<ChangeNode*>* currTL,int threadIdx, int& resCacheHits, int& resCacheMisses, int& polyCacheHits, int& polyCacheMisses, int maxScorePossibleForPolynom,int totalScoreToAct, const int polyLen, bool EnableScoreCaching, double wEval, double wRMSE, double wCoeff)
 {
 	if (histTL->empty() || currTL->empty())
 		return ScoresResult(); // Return an empty ScoresResult if either vector is empty
@@ -36,10 +31,7 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histT
 		return ScoresResult(); // Return an empty ScoresResult if the vectors are not of the same size
 	}
 	
-	const int polyLen = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy)->PolynomLen_ForScan;
 	ScoreResultsCachePolynom* scoreResultsCache = ScoreResultsCachePolynom::getInstance();
-	ScoreCachingPolicy* scoreCachePolicy = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
-
 	ScoresResult totalScore;
 	int totalCacheHits = 0;
 	int totalCacheMisses = 0;
@@ -63,7 +55,7 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histT
 			break; // Early exit if further calculations cannot affect the result
 
 		ScoresResult* foundRes = nullptr; // Initialize foundRes to nullptr
-		if (scoreCachePolicy->EnableScoreCaching)
+		if (EnableScoreCaching)
 			foundRes = TryFindCachedScore(PolynomTimeLineKey(histTL->at(i)->point_DateTimeLong, histTL->at(i + polyLen - 1)->point_DateTimeLong),
 				PolynomTimeLineKey(currTL->at(i)->point_DateTimeLong, currTL->at(i + polyLen - 1)->point_DateTimeLong)
 				, threadIdx); // Try to find the score in the cache
@@ -106,14 +98,14 @@ ScoresResult PolynomScoreCalcs::CompareTimeLines(std::vector<ChangeNode*>* histT
 		PolynomTimeLine* curr = currPoly ? currPoly : currLocal.get();
 
 
-		TimeLinePolynomScore localScore = CalcScore(hist->Get_PolynomPackage(), curr->Get_PolynomPackage());
+		TimeLinePolynomScore localScore = CalcScore(hist->Get_PolynomPackage(), curr->Get_PolynomPackage(), wEval, wRMSE, wCoeff);
 
 
 		totalScore += *localScore.GetScoreContainer(IndicatorValueType::Value);
 		totalScore += *localScore.GetScoreContainer(IndicatorValueType::Slope);
 
 		if (!foundRes)
-			TryStoreScoreInCache(partialVec1, partialVec2, localScore, threadIdx); // Try to store the score in the cache
+			TryStoreScoreInCache(partialVec1, partialVec2, localScore, threadIdx, EnableScoreCaching); // Try to store the score in the cache
 
 		// Cache the polynomials if they were not from cache
 		if (!histPoly)
@@ -153,7 +145,7 @@ bool PolynomScoreCalcs::IsEarlyExitAllowed(int maxScorePossibleForPolynom,int cu
 	return false; // Otherwise, do not allow early exit
 }
 
-TimeLinePolynomScore PolynomScoreCalcs::CalcScore(PolynomChangeNodePackage* hist, PolynomChangeNodePackage* curr)
+TimeLinePolynomScore PolynomScoreCalcs::CalcScore(PolynomChangeNodePackage* hist, PolynomChangeNodePackage* curr, double wEval, double wRMSE, double wCoeff)
 {
 	TimeLinePolynomScore score;
 	score.GetScoreContainer(IndicatorValueType::Value)->Reset(); // Reset the score to ensure it's empty before calculation
@@ -164,8 +156,6 @@ TimeLinePolynomScore PolynomScoreCalcs::CalcScore(PolynomChangeNodePackage* hist
 	}
 	// Calculate EMA scores for each polynomial
 
-	PolynomComparerPolicy* policy = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
-
 	for(const auto& indType : m_glob_indTypes.types)
 	{
 		for(const auto& indLen : m_glob_indLengths.lengths)
@@ -173,7 +163,7 @@ TimeLinePolynomScore PolynomScoreCalcs::CalcScore(PolynomChangeNodePackage* hist
 			for(const auto& valType : m_glob_indValueTypes.valueTypes)
 			{
 				auto polynomKey = PolynomKey(indType, indLen, valType);
-				score.GetScoreContainer(valType)->indicatorScores.at(static_cast<int>(indType)).m_scores[static_cast<int>(BarPeriod::M1)] += CalcSinglePolynomScore(hist->GetPolynom(polynomKey), curr->GetPolynom(polynomKey), policy);
+				score.GetScoreContainer(valType)->indicatorScores.at(static_cast<int>(indType)).m_scores[static_cast<int>(BarPeriod::M1)] += CalcSinglePolynomScore(hist->GetPolynom(polynomKey), curr->GetPolynom(polynomKey), wEval, wRMSE, wCoeff);
 			}
 		}
 	}
@@ -206,13 +196,14 @@ bool PolynomScoreCalcs::TryStoreScoreInCache(
 	const std::vector<ChangeNode*>& histSegment,
 	const std::vector<ChangeNode*>& currSegment,
 	TimeLinePolynomScore& score,
-	int threadIdx)
+	int threadIdx,
+	bool EnableScoreCaching
+)
 {
 	if (histSegment.empty() || currSegment.empty())
 		return false;
 
-	ScoreCachingPolicy* scoreCachePolicy = Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
-	if (!scoreCachePolicy->EnableScoreCaching)
+	if (!EnableScoreCaching)
 		return false;
 
 	ScoreResultsCachePolynom* cache = ScoreResultsCachePolynom::getInstance();

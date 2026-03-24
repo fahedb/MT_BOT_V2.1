@@ -1,13 +1,10 @@
 #include "ScoreResultsCachePolynom.h"
 #include "ThreadPool.h"
-#include "Configrations.h"
 #include "Converts.h"
 
 // Constructor implementation
-ScoreResultsCachePolynom::ScoreResultsCachePolynom() 
-	: BaseTimeLineCache<std::pair<PolynomTimeLineKey, PolynomTimeLineKey>, ScoresResult>(
-		MTThreadPool::getInstance()->Get_ThreadsNum(),
-		Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->EnableScoreCaching ? Configrations::getInstance()->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy)->ScoreResultsCacheSizePerThread : 0)
+ScoreResultsCachePolynom::ScoreResultsCachePolynom(int ThreadsNum, int cacheSizePerThread)
+	: BaseTimeLineCache<std::pair<PolynomTimeLineKey, PolynomTimeLineKey>, ScoresResult>(ThreadsNum, cacheSizePerThread)
 {
 	// Constructor body can be empty as base class handles initialization
 }

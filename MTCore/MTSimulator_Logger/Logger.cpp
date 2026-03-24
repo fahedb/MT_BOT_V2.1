@@ -43,18 +43,20 @@ void Logger::WriteLog(const std::string& log, bool newSection,bool sendToLogServ
     logToPrint += GetFormattedCurrTime() + log;
     
     std::lock_guard<std::mutex> lock(m_logMutex);
+
+#ifdef _WIN32
     OutputDebugStringA(logToPrint.c_str());
-    std::cout << logToPrint;
     
-    if(m_glob_logCounter > 1000000)
-		m_glob_logCounter = 0;
+    if (m_glob_logCounter > 1000000)
+        m_glob_logCounter = 0;
 #ifdef PRINT_MEMORY_USAGE
     if (m_glob_logCounter % 100 == 0) // Just to avoid too many logs
         PrintMemoryUsage();
-	m_glob_logCounter++;
+    m_glob_logCounter++;
 #endif // PRINT_MEMORY_USAGE
+#endif // _WIN32
 
-    
+    std::cout << logToPrint << std::endl;
 }
 
 void Logger::Http_Send_Patterns(std::vector<std::string> paths, std::string barP, std::string indL)

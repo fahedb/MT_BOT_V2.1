@@ -2,7 +2,6 @@
 #include "ChangeData.h"
 #include "XAUUSD_CurrentTable.h"
 #include "XAUUSD_OneMinTable.h"
-#include "ExchangeData.h"
 #include <future>
 #include "PolynomTimeLine.h"
 
@@ -17,9 +16,10 @@
 class HistoryTimeLineLoader
 {
 public:
-	HistoryTimeLineLoader(std::vector<ChangeNode*>& hitoryTimeLine,BasePricesTable* table) : 
+	HistoryTimeLineLoader(std::vector<ChangeNode*>& hitoryTimeLine,BasePricesTable* table, const std::string pathToFile) : 
 		m_hitoryTimeLine(hitoryTimeLine),
-		m_table(table)
+		m_table(table),
+		m_dbFileName(pathToFile)
 	{
 		m_chunkSize = 0;
 	}

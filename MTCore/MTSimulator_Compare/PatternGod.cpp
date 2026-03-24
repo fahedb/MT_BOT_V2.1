@@ -1,20 +1,11 @@
 #include "PatternGod.h"
 #include "LOGGER.H"
-#include "CONFIGRATIONS.H"
 #include "CPP_To_Cuda_Tunnel.h"
 #include "ScopedPerfTimer.h"
 #include "TimeLineBuilder.h"
 #include "PatternGodUtils.h"
 
-PatternGod::PatternGod(TimeLine* historyTLP)
-{
-	m_currentTL = nullptr; // Current time line will be set later, it is not available at the time of this constructor
-	m_historyTL = historyTLP->Get_TimeLine();
-	m_historyDB_Map = historyTLP->Get_DBMap();
-	m_historyDB_Owner = false; // Do not own the history DB map, it is managed by the TimeLine object
-}
-
-PatternGod::PatternGod(std::vector<ChangeNode*>* historyTimeLine, std::vector<ChangeNode*>* currentTimeLine)
+PatternGod::PatternGod(std::vector<ChangeNode*>* historyTimeLine, std::vector<ChangeNode*>* currentTimeLine, const std::string& scanFilters, const int polyLen, bool EnableScoreCaching, double wEval, double wRMSE, double wCoeff)
 {
 	m_historyTL = historyTimeLine;
 	m_currentTL = currentTimeLine;
@@ -22,16 +13,16 @@ PatternGod::PatternGod(std::vector<ChangeNode*>* historyTimeLine, std::vector<Ch
 	m_historyDB_Map = new DBMap(); // Initialize the history DB map
 	TimeLineBuilder::Build_TimeLineDB(m_historyTL, m_historyDB_Map); // Build the DB map for the history time line
 	m_historyDB_Owner = true;
-	InitComparers(); // Initialize the comparers with the history time line
+	InitComparers(scanFilters, polyLen, EnableScoreCaching, wEval, wRMSE, wCoeff); // Initialize the comparers with the history time line
 
 }
 
-void PatternGod::InitComparers() // Initialize the comparers with the history time line
+void PatternGod::InitComparers(const std::string& scanFilters, const int polyLen, bool EnableScoreCaching, double wEval, double wRMSE, double wCoeff) // Initialize the comparers with the history time line
 {
 	if (!m_polynomFilterEngine)
-		m_polynomFilterEngine = new PatternGod_PolynomFilterEngine(m_historyTL);
+		m_polynomFilterEngine = new PatternGod_PolynomFilterEngine(m_historyTL, polyLen, EnableScoreCaching, wEval, wRMSE, wCoeff);
 	if (!m_scoreComparer)
-		m_scoreComparer = new PatternGod_ScoreComparer(m_historyTL, m_currentTL);
+		m_scoreComparer = new PatternGod_ScoreComparer(m_historyTL, m_currentTL, scanFilters);
 	// *** Add more comparers as needed ***
 }
 
@@ -96,8 +87,7 @@ int PatternGod::PolynomEngineFilter(std::vector<std::pair<ChangeNode*, ScoresRes
 	auto tempVec = m_polynomFilterEngine->ProcessPatterns(
 		&heads,
 		m_currentTL->size());
-	FilterLayerPolicy* filterLayerPolicy = Configrations::getInstance()->Get_Policy<FilterLayerPolicy>(PolicyType::FilterLayerPolicy);
-	PatternGodUtils::filterByThresholdScore(tempVec, filterLayerPolicy->Pattern_TopScore_ThresholdRatio, filterLayerPolicy->Pattern_Max_Patterns_To_Find);
-	PatternGodUtils::filterByHighScores(tempVec, filterLayerPolicy->Pattern_Max_Patterns_To_Find);
+	PatternGodUtils::filterByThresholdScore(tempVec, 0.98, 20);
+	PatternGodUtils::filterByHighScores(tempVec, 20);
 	resultNodes2D = tempVec;
 }

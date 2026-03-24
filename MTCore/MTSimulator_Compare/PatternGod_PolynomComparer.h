@@ -6,7 +6,7 @@
 class PatternGod_PolynomComparer : public PatternGod_BaseComparer
 {
 public:
-	PatternGod_PolynomComparer(std::vector<ChangeNode*>* history) : PatternGod_BaseComparer(history) { InitComaprer(); }
+	PatternGod_PolynomComparer(std::vector<ChangeNode*>* history, ) : PatternGod_BaseComparer(history) { InitComaprer(); }
 	PatternGod_PolynomComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr) : PatternGod_BaseComparer(history, curr) { InitComaprer(); }
 
 	~PatternGod_PolynomComparer() {}

@@ -21,7 +21,7 @@
 class ScoreResultsCachePolynom : public BaseTimeLineCache<std::pair<PolynomTimeLineKey, PolynomTimeLineKey>, ScoresResult>
 {
 private:
-
+	static ScoreResultsCachePolynom* instancePtr; // Pointer to the singleton instance
 public:
 	bool StoreNewScoreResult(const std::pair<PolynomTimeLineKey, PolynomTimeLineKey>& timePointCombo, const ScoresResult& score, int threadIdx) 
 	{ return Insert(timePointCombo, score, CacheType::HISTORICAL, threadIdx); }
@@ -40,10 +40,22 @@ public:
 
 	// Static method to get the instance of the Singleton
 	static ScoreResultsCachePolynom* getInstance() {
-		static ScoreResultsCachePolynom instance; // Guaranteed to be destroyed and instantiated on first use
-		return &instance;
+		if (instancePtr == nullptr) {
+			throw std::runtime_error("ScoreResultsCachePolynom Singleton not initialized");
+		}
+		return instancePtr;
+	}
+
+	// Static method to init the instance of the Singleton
+	static ScoreResultsCachePolynom* Init(int ThreadsNum, int cacheSizePerThread)
+	{
+		if (instancePtr == nullptr)
+		{
+			instancePtr = new ScoreResultsCachePolynom(ThreadsNum, cacheSizePerThread);
+		}
+		return instancePtr;
 	}
 private:
-	ScoreResultsCachePolynom();
+	ScoreResultsCachePolynom(int ThreadsNum, int cacheSizePerThread);
 
 };

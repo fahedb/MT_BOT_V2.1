@@ -14,7 +14,7 @@ void PatternGodScanner::Run()
 	HttpServerSyncer::LoadAllConfigsToHttpCore(); // Load all configs to the HTTP Core
 	std::vector<ChangeNode*> history;
 	XAUUSD_OneMinTable table(Configrations::getInstance()->Get_DB_FileDir());
-	HistoryTimeLineLoader historyLoader(history, &table);
+	HistoryTimeLineLoader historyLoader(history, &table, Configrations::getInstance()->Get_DB_FileDir());
 	historyLoader.Run();
 	Logger::getInstance().WriteLog("About to run PatternGod !!", true, true, LogType::SPECIAL_LOG);
 	TimeLine historyTimeLine(&history);
@@ -121,7 +121,7 @@ bool PatternGodScanner::ScanPreCondition()
 	{
 		logger.WriteLog("No current time line.", false, true, LogType::ERR);
 		logger.WriteLog("Sleeping for 5 minutes.", false, true, LogType::ERR);
-		Sleep(1 * 60000);
+		std::this_thread::sleep_for(std::chrono::milliseconds(60000));
 		return false;
 	}
 

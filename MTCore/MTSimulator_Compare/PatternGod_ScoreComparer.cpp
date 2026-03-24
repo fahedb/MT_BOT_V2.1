@@ -5,7 +5,6 @@
 #include <mutex>
 #include <future>
 
-#include "Configrations.h"
 #include "TimeLineArrayBuilder.h"
 #include "CPP_To_Cuda_Tunnel.h"
 
@@ -40,10 +39,10 @@ void PatternGod_ScoreComparer::Set_NewCurrentTimeLine(std::vector<ChangeNode*>* 
 
 }
 
-PatternGod_ScoreComparer::PatternGod_ScoreComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr)
+PatternGod_ScoreComparer::PatternGod_ScoreComparer(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* curr, const std::string& scanFilters)
 {
 	SetTimeLines(history, curr);
-	InitComaprer();
+	InitComaprer(scanFilters);
 	
 }
 
@@ -86,20 +85,19 @@ void PatternGod_ScoreComparer::RunScan(std::vector<std::pair<ChangeNode*, Scores
 
 }
 
-void PatternGod_ScoreComparer::InitComaprer()
+void PatternGod_ScoreComparer::InitComaprer(std::string scanFilters)
 {
-	Configrations* config = Configrations::getInstance();
-	ScoreComparerPolicy* policy = config->Get_Policy<ScoreComparerPolicy>(PolicyType::ScoreComparerPolicy);
-	std::string scanFilters = policy->scanFilters;
+	std::string localScanFilters = scanFilters;
 	if(scanFilters.empty())
 	{
-		scanFilters = "H4:0.20:S;H4&H1:0.70:D;H1:0.5:S;H1&M30:0.70:D;M30:0.5:S;M30&M15:0.70:D;M15:0.5:S;M15&M5:0.70:D;M5:0.5:S;M5&M1:0.7:D;M1:0.5:S;A:0.6:A";
-		Logger::getInstance().WriteLog("ScoreComparerPolicy scanFilters is empty. defulat value initialized: " + scanFilters, true, true, LogType::LOG);
+		// F.1 = TIME FRAME, F.2 = THRESHOLD, F.3 = SCAN MODE (SINGLE INDICATOR OR COMBINATION OR ALL)
+		localScanFilters = "H4:0.20:S;H4&H1:0.70:D;H1:0.5:S;H1&M30:0.70:D;M30:0.5:S;M30&M15:0.70:D;M15:0.5:S;M15&M5:0.70:D;M5:0.5:S;M5&M1:0.7:D;M1:0.5:S;A:0.6:A";
+		Logger::getInstance().WriteLog("ScoreComparerPolicy scanFilters is empty. defulat value initialized: " + localScanFilters, true, true, LogType::LOG);
 	}
 
 	bool isCudaAvailable = CPP_To_Cuda_Tunnel::IsCudaAvailable();
 
-	std::vector<std::string> filterParts = SplitString(scanFilters, ';');
+	std::vector<std::string> filterParts = SplitString(localScanFilters, ';');
 	for(const std::string& part : filterParts)
 	{
 		BaseScoringEngine* engine = CreateScoringEngineForIndicator(part);

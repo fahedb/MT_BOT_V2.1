@@ -15,7 +15,7 @@
 void ScannerUtils::GoToSleep(int seconds)
 {
 	Logger::getInstance().WriteLog("Sleep for " + std::to_string(seconds) + " seconds...", false, false);
-	Sleep(seconds * 1000); // Sleep for 5 seconds before start a new scan
+	std::this_thread::sleep_for(std::chrono::milliseconds(seconds * 1000));
 }
 
 void ScannerUtils::ScoreResultsCacheCleanLogic(bool isScanActivated, int& scansNum)

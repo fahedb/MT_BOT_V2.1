@@ -4,11 +4,16 @@
 #include "LOGGER.H"
 #include "Static_CurrentTimeLineRep.h"
 
-PatternGod_PolynomFilterEngine::PatternGod_PolynomFilterEngine(std::vector<ChangeNode*>* history) {
+PatternGod_PolynomFilterEngine::PatternGod_PolynomFilterEngine(std::vector<ChangeNode*>* history, const int polyLen, bool EnableScoreCaching, double wEval, double wRMSE, double wCoeff) {
 	m_historyDB_Map = new DBMap();
 	m_historyTL = history;
 	TimeLineBuilder::Build_TimeLineDB(history, m_historyDB_Map);
 	m_currentTL = Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine();
+	m_polyLen = polyLen;
+	m_enableScoreCaching = EnableScoreCaching;
+	m_wEval = wEval;
+	m_wRMSE = wRMSE;
+	m_wCoeff = wCoeff;
 }
 PatternGod_PolynomFilterEngine::~PatternGod_PolynomFilterEngine() {
 	if (m_historyDB_Map != nullptr) {
@@ -65,7 +70,8 @@ std::vector<std::pair<ChangeNode*, ScoresResult>> PatternGod_PolynomFilterEngine
 			patternNodes.push_back(m_historyTL->at(startIdx + j));
 		}
 		int resCacheHits = 0, resCacheMisses = 0, polyCacheHits = 0, polyCacheMisses = 0;
-		ScoresResult scoreRes = PolynomScoreCalcs::CompareTimeLines(&patternNodes, m_currentTL, 0, resCacheHits, resCacheMisses, polyCacheHits, polyCacheMisses, 0, 0);
+
+		ScoresResult scoreRes = PolynomScoreCalcs::CompareTimeLines(&patternNodes, m_currentTL, 0, resCacheHits, resCacheMisses, polyCacheHits, polyCacheMisses, 0, 0, m_polyLen, m_enableScoreCaching, m_wEval, m_wRMSE, m_wCoeff);
 		patternsRes.emplace_back(head, scoreRes);
 		// For example, you might want to store them, analyze them, etc.
 	}

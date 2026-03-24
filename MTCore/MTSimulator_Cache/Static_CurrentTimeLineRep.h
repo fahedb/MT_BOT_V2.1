@@ -9,10 +9,15 @@
 
 class Static_CurrentTimeLineRep
 {
+private:
+	static Static_CurrentTimeLineRep* instancePtr; // Pointer to the singleton instance
 
+	int m_Pattern_CurrentTimeLineLen;
+	int m_TraceCurrTimeLineLen;
+    Static_CurrentTimeLineRep(int Pattern_CurrentTimeLineLen, int TraceCurrTimeLineLen);
 public:
+    static void Init(int Pattern_CurrentTimeLineLen, int TraceCurrTimeLineLen);
 
-    Static_CurrentTimeLineRep();
 
     void Set_NewBar(ChangeNode* changeNode, bool updateCurrTimeLine = false);
 
@@ -28,8 +33,10 @@ public:
 
     // Static method to get the instance of the Singleton
     static Static_CurrentTimeLineRep* getInstance() {
-        static Static_CurrentTimeLineRep instance; // Guaranteed to be destroyed and instantiated on first use
-        return &instance;
+        if(instancePtr == nullptr) {
+            throw std::runtime_error("Static_CurrentTimeLineRep Singleton not initialized");
+        }
+        return instancePtr;
     }
 private:
     TimeLine* m_currTimeLine;

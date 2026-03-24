@@ -31,13 +31,16 @@
     <Filter Include="Queues\Enums">
       <UniqueIdentifier>{3219ac72-c0c4-44c1-b5b1-35bbc1ebe4f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HTTP_server\Standard">
+      <UniqueIdentifier>{a1092a52-12ca-459e-ad98-065522573808}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTP_server\ComputeServer">
+      <UniqueIdentifier>{2545b1cc-382d-40ce-984d-b71f10db9344}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Run.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HTTPServer.cpp">
-      <Filter>HTTP_server</Filter>
     </ClCompile>
     <ClCompile Include="ExchangeData.cpp">
       <Filter>Source Files</Filter>
@@ -51,11 +54,17 @@
     <ClCompile Include="HTTPServicesQueues.cpp">
       <Filter>Queues</Filter>
     </ClCompile>
+    <ClCompile Include="HTTPServer.cpp">
+      <Filter>HTTP_server\Standard</Filter>
+    </ClCompile>
+    <ClCompile Include="HTTPCumputeServer.cpp">
+      <Filter>HTTP_server\ComputeServer</Filter>
+    </ClCompile>
+    <ClCompile Include="ServucesDefComputeUnit.h">
+      <Filter>Services</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HTTPServer.h">
-      <Filter>HTTP_server</Filter>
-    </ClInclude>
     <ClInclude Include="ExchangeData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -73,6 +82,12 @@
     </ClInclude>
     <ClInclude Include="HTTPQueuesEnums.h">
       <Filter>Queues\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="HTTPServer.h">
+      <Filter>HTTP_server\Standard</Filter>
+    </ClInclude>
+    <ClInclude Include="HTTPCumputeServer.h">
+      <Filter>HTTP_server\ComputeServer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

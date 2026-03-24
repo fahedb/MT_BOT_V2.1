@@ -178,7 +178,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Cache;..\MTSimulator_Configurations;..\MTSimulator_Logger;..\MTSimulator_Casts;..\MTSimulator_MTThreadPool;..\CUDA_UNIT;..\MTSimulator_DataImporter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\MTSimulator_TimeLines;..\MTSimulator_Cache;..\MTSimulator_Logger;..\MTSimulator_Casts;..\MTSimulator_MTThreadPool;..\CUDA_UNIT;..\MTSimulator_DataImporter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -195,8 +195,6 @@
     <ClCompile Include="MTSimulatorUtils.cpp" />
     <ClCompile Include="PatternGod.cpp" />
     <ClCompile Include="PatternGodUtils.cpp" />
-    <ClCompile Include="PatternGod_BaseComparer.cpp" />
-    <ClCompile Include="PatternGod_PolynomComparer.cpp" />
     <ClCompile Include="PatternGod_PolynomFilterEngine.cpp" />
     <ClCompile Include="PatternGod_ScoreComparer.cpp" />
     <ClCompile Include="PolynomComparer.cpp" />
@@ -209,8 +207,6 @@
     <ClInclude Include="MTSimulatorUtils.h" />
     <ClInclude Include="PatternGod.h" />
     <ClInclude Include="PatternGodUtils.h" />
-    <ClInclude Include="PatternGod_BaseComparer.h" />
-    <ClInclude Include="PatternGod_PolynomComparer.h" />
     <ClInclude Include="PatternGod_PolynomFilterEngine.h" />
     <ClInclude Include="PatternGod_ScoreComparer.h" />
     <ClInclude Include="PolynomComparer.h" />

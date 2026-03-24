@@ -28,8 +28,7 @@ void PolynomTimeLineCache::ClearOldResults(bool forceSynchronous)
 
 bool PolynomTimeLineCache::ActPreCondition()
 {
-    PolynomComparerPolicy* polynomComparerPolicy = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
-    return polynomComparerPolicy->EnablePolynomTimeLineCaching;
+    return m_enablePolynomTimeLineCaching;
 }
 
 void PolynomTimeLineCache::MergeIntoCache(robin_hood::unordered_map<PolynomTimeLineKey, PolynomTimeLine>& tempCache, CacheType cachT) {
@@ -55,8 +54,13 @@ void PolynomTimeLineCache::MergeIntoCache(robin_hood::unordered_map<PolynomTimeL
 bool PolynomTimeLineCacheManager::PreConditionBuild()
 {
     // Check if the cache is enabled and if the polynom length is set
-    PolynomComparerPolicy* polynomComparerPolicy = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
-    if (!polynomComparerPolicy->EnablePolynomTimeLineCaching && (!polynomComparerPolicy->EnablePolynomScan || polynomComparerPolicy->PolynomLen_ForScan <= 0)) {
+	PolynomTimeLineCache* cache = PolynomTimeLineCache::getInstance();
+    if(cache == nullptr) {
+        Logger::getInstance().WriteLog("PolynomTimeLineCache instance is not initialized.", true, true, LogType::ERR);
+        return false; // Cache instance not initialized
+	}
+
+    if (cache->m_enablePolynomTimeLineCaching && (!cache->m_enablePolynomScan || cache->m_polynomLen_ForScan <= 0)) {
         Logger::getInstance().WriteLog("Polynom scan is not enabled or polynom length is not set.", true, true, LogType::ERR);
         return false; // Precondition failed
     }
@@ -80,8 +84,8 @@ void PolynomTimeLineCacheManager::Build_PolynomTimeLines_InTempMap(const std::ve
     }
 
     // Create a PolynomTimeLine from the nodes
-    Configrations* config = Configrations::getInstance();
-    int polyLen = config->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy)->PolynomLen_ForScan;
+    PolynomTimeLineCache* cache = PolynomTimeLineCache::getInstance();
+    int polyLen = cache->m_polynomLen_ForScan;
 
     int buildCount = 0;
     int nodesSize = nodes.size();
@@ -164,8 +168,7 @@ int PolynomTimeLineCacheManager::Build_PoylnomTimeLines(const std::vector<Change
 
     // Create a PolynomTimeLine from the nodes
     PolynomTimeLineCache* cache = PolynomTimeLineCache::getInstance();
-    Configrations* config = Configrations::getInstance();
-    int polyLen = config->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy)->PolynomLen_ForScan;
+    int polyLen = cache->m_polynomLen_ForScan;
 
     int buildCount = 0;
     int nodesSize = nodes.size();

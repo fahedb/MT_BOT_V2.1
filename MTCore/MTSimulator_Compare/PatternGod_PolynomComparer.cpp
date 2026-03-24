@@ -1,5 +1,4 @@
 #include "PatternGod_PolynomComparer.h"
-#include "CONFIGRATIONS.H"
 #include "ThreadPool.h"
 #include "PolynomScoreCalcs.h"
 #include "Logger.h"

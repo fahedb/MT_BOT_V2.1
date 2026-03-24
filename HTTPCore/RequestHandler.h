@@ -5,7 +5,7 @@
 #include "httplib.h"
 #include <queue>
 #include <stack>
-
+#include "ConfigStruct.h"
 
 struct Http_OrderStruct
 {
@@ -14,17 +14,6 @@ struct Http_OrderStruct
 	int orderSeqNum = 0;
 	int stopLoss = 0;
 	int takeProfit = 0;
-};
-
-struct ConfigStruct
-{
-	std::string label;
-	std::string value;
-	std::string explain;
-	std::string policyCategory;
-	int m_permission =0 ;
-	int m_catagory = 0;
-	bool need_To_Update = false;
 };
 
 

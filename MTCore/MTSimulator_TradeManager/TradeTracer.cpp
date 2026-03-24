@@ -37,11 +37,11 @@ void TradeTracer::TraceTrades(TimeLine* historyTL)
 
 	while (true)
 	{
-		Sleep(10 * 1000);
+		std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 		if (!m_tradeTracingPolicy->EnableTradeTracing)
 		{
 			Logger::getInstance().WriteLog("Trade tracing is disabled, sleeping for 3 minutes", false, true, LogType::TRADE_TRACE_LOG);
-			Sleep(180 * 1000);
+			std::this_thread::sleep_for(std::chrono::milliseconds(1800000));
 			continue;
 		}
 

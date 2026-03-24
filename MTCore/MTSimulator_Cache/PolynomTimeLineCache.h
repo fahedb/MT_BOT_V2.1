@@ -1,6 +1,5 @@
 #pragma once
 #include "TimeLine.h"
-#include "CONFIGRATIONS.H"
 #include "PolynomTimeLine.h"
 #include "..\MyRobinHoodMap\HashingStructs.h"
 #include <memory>
@@ -20,24 +19,46 @@
 class PolynomTimeLineCache : public BaseTimeLineCache<PolynomTimeLineKey, PolynomTimeLine>
 {
 private:
-    std::mutex m_cacheMutex; // Mutex for thread safety
+    static PolynomTimeLineCache* instancePtr;
 
+    std::mutex m_cacheMutex; // Mutex for thread safety
+private:
+	friend class PolynomTimeLineCacheManager; // Allow the manager class to access private members for merging caches and building timelines
+	bool m_enablePolynomTimeLineCaching; // Flag to enable or disable polynomial timeline caching
+	bool m_enablePolynomScan; // Flag to enable or disable polynomial scanning
+	int m_polynomLen_ForScan; // Length of the polynomial for scanning, used in preconditions and building timelines
 public:
     PolynomTimeLineCache(const PolynomTimeLineCache&) = delete;
     PolynomTimeLineCache& operator=(const PolynomTimeLineCache&) = delete;
     PolynomTimeLineCache(PolynomTimeLineCache&&) = delete;
     PolynomTimeLineCache& operator=(PolynomTimeLineCache&&) = delete;
 
-    PolynomTimeLineCache() : BaseTimeLineCache<PolynomTimeLineKey, PolynomTimeLine>(
+    PolynomTimeLineCache(bool EnablePolynomTimeLineCaching, bool EnablePolynomScan, int PolynomLen_ForScan) : BaseTimeLineCache<PolynomTimeLineKey, PolynomTimeLine>(
         1,
 		50000)
     {
+		m_enablePolynomTimeLineCaching = EnablePolynomTimeLineCaching;
+		m_enablePolynomScan = EnablePolynomScan;
+		m_polynomLen_ForScan = PolynomLen_ForScan;
+
     }
-    
+
+    static PolynomTimeLineCache* Init(bool EnablePolynomTimeLineCaching, bool EnablePolynomScan, int PolynomLen_ForScan)
+    {
+        if (instancePtr == nullptr) 
+        {
+            instancePtr = new PolynomTimeLineCache(EnablePolynomTimeLineCaching, EnablePolynomScan, PolynomLen_ForScan);
+        }
+        return instancePtr;
+    }
+
     static PolynomTimeLineCache* getInstance() {
-        static PolynomTimeLineCache instance;
-        return &instance;
+        if (instancePtr == nullptr)
+            throw std::runtime_error("Singleton not initialized");
+        return instancePtr;
     }
+
+
     virtual void CleanTask(long long oldestTP, BaseCacheMap* relevantMap) override;
 	virtual long long GetStartTP(const PolynomTimeLineKey& key) override { return key.startTimePoint; } // Use the start time point of the key as the reference
     void InsertPolynomTimeLine(PolynomTimeLineKey& key, PolynomTimeLine&& polynomTl, CacheType cachT, bool externalLock = false) {  // Insert with a key and a PolynomTimeLine (move)

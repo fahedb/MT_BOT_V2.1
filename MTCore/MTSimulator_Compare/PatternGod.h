@@ -19,8 +19,7 @@ private:
 	std::vector<ChangeNode*>* m_currentTL;
 public:
 
-	PatternGod(std::vector<ChangeNode*>* historyTimeLine, std::vector<ChangeNode*>* currentTimeLine);
-	PatternGod(TimeLine* historyTLP);
+	PatternGod(std::vector<ChangeNode*>* historyTimeLine, std::vector<ChangeNode*>* currentTimeLine, const std::string& scanFilters, const int polyLen, bool EnableScoreCaching, double wEval, double wRMSE, double wCoeff);
 
 	~PatternGod()
 	{
@@ -39,7 +38,7 @@ public:
 	} // Update the current time line
 
 private:
-	void InitComparers(); // Initialize the comparers with the history time line
+	void InitComparers(const std::string& scanFilters, const int polyLen, bool EnableScoreCaching, double wEval, double wRMSE, double wCoeff); // Initialize the comparers with the history time line
 	bool ScanPreCondition() const;
 	int ScoringEngineScan(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);
 	int PolynomEngineFilter(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);

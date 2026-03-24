@@ -7,12 +7,6 @@
     <Filter Include="PatternGod\Comparers">
       <UniqueIdentifier>{f720ef9c-9cc3-4923-80c1-75440d4274b5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PatternGod\Comparers\Base">
-      <UniqueIdentifier>{42b35bae-b79c-4a4c-a0a3-ba33c2586020}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PatternGod\Comparers\Polynom">
-      <UniqueIdentifier>{e354b266-5e0c-495b-a56d-6298db0d011e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="PatternGod\Comparers\Scoring">
       <UniqueIdentifier>{5cdff654-d2ec-44eb-8a53-5905b3024dfc}</UniqueIdentifier>
     </Filter>
@@ -57,12 +51,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="PatternGod_BaseComparer.cpp">
-      <Filter>PatternGod\Comparers\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="PatternGod_PolynomComparer.cpp">
-      <Filter>PatternGod\Comparers\Polynom</Filter>
-    </ClCompile>
     <ClCompile Include="PatternGod_ScoreComparer.cpp">
       <Filter>PatternGod\Comparers\Scoring</Filter>
     </ClCompile>
@@ -95,12 +83,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PatternGod_BaseComparer.h">
-      <Filter>PatternGod\Comparers\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="PatternGod_PolynomComparer.h">
-      <Filter>PatternGod\Comparers\Polynom</Filter>
-    </ClInclude>
     <ClInclude Include="PatternGod_ScoreComparer.h">
       <Filter>PatternGod\Comparers\Scoring</Filter>
     </ClInclude>

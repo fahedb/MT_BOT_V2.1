@@ -1,15 +1,6 @@
 #include "PatternGodUtils.h"
-#include "CONFIGRATIONS.H"
 // Include for unordered_set
 #include <unordered_set>
-
-TradeManagerPolicy* m_glob_tradeMngrPolicy_PatternGodUtils = nullptr;
-
-void InitGlobPolicies()
-{
-	if (!m_glob_tradeMngrPolicy_PatternGodUtils)
-		m_glob_tradeMngrPolicy_PatternGodUtils = Configrations::getInstance()->Get_Policy<TradeManagerPolicy>(PolicyType::TradeManagerPolicy);
-}
 
 void PatternGodUtils::SortScores(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D) // Sort the scores from the high to the low, usuallu need to do this after filtering them
 {
@@ -164,7 +155,6 @@ void PatternGodUtils::FilterDuplicatesTimeLines(
 
 void PatternGodUtils::filterByHighScores(std::vector<std::pair<ChangeNode*, ScoresResult>>& nodesResults2D, int numOfTopResultToFilterOut)
 {
-	InitGlobPolicies(); // Ensure global policies are initialized
 
 	if (nodesResults2D.size() <= numOfTopResultToFilterOut) {
 		// If the vector has X or fewer elements, nothing needs to be done

@@ -146,7 +146,7 @@ void PolynomComparerPolicy::InitPolicy()
 
     };
 	m_allConfigs = allConfigs;
-
+    
     EnablePolynomScan = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_ENABLE_POLYNOM_SCAN)) > 0 ? true : false;
 	EnablePolynomTimeLineCaching = Converts::ToInt(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_ENABLE_POLYNOM_TIME_LINE_CACHING)) > 0 ? true : false;
 	ScoreToAct = Converts::ToDouble(ConfigsTableStaticProxy::Get_ConfigValue_DB(CONFIG_DEF_PATTERN_MIN_TOTAL_SCORE_TO_ACT_POLYNOM_COMPARER));

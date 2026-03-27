@@ -29,6 +29,8 @@ private:
 	bool OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator, TimeLine* history);
 	bool ScanPreCondition(); // Precondition function before start scanning
 	void UpdateCurrTimeLine(BasePricesTable* table); // Update the current timeline 
+
+	PatternGod* Create_PatternGod_ForScan(std::vector<ChangeNode*>* historyTimeLine, std::vector<ChangeNode*>* currTimeLine); // Create a PatternGod object for patterns Scanning
 private: 
 	// Layers run functions /////////////////////////////////////////////////////////////////////////////
 	std::vector<std::pair<ChangeNode*, ScoresResult>>	ScoringLayerRun(PatternGod* patternScan); // Layer 1, This layer should scan for patterns and score them

@@ -35,13 +35,22 @@ void PatternGodScanner::Run_PatternGod(TimeLine& historyTimeLine)
 {
 	Logger& logger = Logger::getInstance();
 	Configrations* confs = Configrations::getInstance();
-	std::thread tracer_thread(TradeTracer::RunTracer, &historyTimeLine);
+	ScoringLayerPolicy* scorePolicy = confs->Get_Policy<ScoringLayerPolicy>(PolicyType::ScoringLayerPolicy);
+	//std::thread tracer_thread(TradeTracer::RunTracer, &historyTimeLine);
 
-	PatternGod patternScaner(&historyTimeLine); // Init a PatternGod object for patterns Scanning
-	StatisticsDecession statisticsCalcucator(&historyTimeLine);
 
 	XAUUSD_CurrentTable table;
-	UpdateCurrTimeLine(&table);
+	while(!Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine() || Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine() || Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine()->size() < scorePolicy->Pattern_CurrentTimeLineLen)
+	{
+		logger.WriteLog("Waiting for current time line to be initialized...", false, true, LogType::LOG);
+		std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+		UpdateCurrTimeLine(&table);
+	}
+
+
+	PatternGod* patternScaner = Create_PatternGod_ForScan(historyTimeLine.Get_TimeLine(), Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine()); // Create the pattern scanner object for scanning
+	StatisticsDecession statisticsCalcucator(&historyTimeLine);
+
 
 	ScoreCachingPolicy* scoreCachePolicy = confs->Get_Policy<ScoreCachingPolicy>(PolicyType::ScoreCachingPolicy);
 	ConfigrationsPolicy* confPolicy = confs->Get_Policy<ConfigrationsPolicy>(PolicyType::ConfigrationsPolicy);
@@ -56,7 +65,7 @@ void PatternGodScanner::Run_PatternGod(TimeLine& historyTimeLine)
 	{
 		UpdateCurrTimeLine(&table);
 		std::chrono::steady_clock::time_point scanStartTime = std::chrono::steady_clock::now();
-		ScannerUtils::ScoreResultsCacheCleanLogic(OneMinutePatternGodLogic(&patternScaner, &statisticsCalcucator, &historyTimeLine), m_scansCounter); // Start scanning
+		ScannerUtils::ScoreResultsCacheCleanLogic(OneMinutePatternGodLogic(patternScaner, &statisticsCalcucator, &historyTimeLine), m_scansCounter); // Start scanning
 		std::chrono::steady_clock::time_point scanEndTime = std::chrono::steady_clock::now();
 		auto scanDuration = std::chrono::duration_cast<std::chrono::milliseconds>(scanEndTime - scanStartTime).count();
 		logger.WriteLog("Total Scan Duration: " + std::to_string(scanDuration) + " ms", false, true, LogType::LOG);
@@ -74,7 +83,7 @@ void PatternGodScanner::Run_PatternGod(TimeLine& historyTimeLine)
 		if (HttpServerSyncer::ShouldSubmitLayersExportersData())
 			InterfaceLayers_BKTSTExporter::getInstance().Sumbmit_All_Exporters_Data(); // Submit all exporters data every 20 scans
 	}
-	tracer_thread.join();
+	//tracer_thread.join();
 }
 
 bool PatternGodScanner::OneMinutePatternGodLogic(PatternGod* patternScan, StatisticsDecession* statisticsCalcucator, TimeLine* history)
@@ -156,6 +165,14 @@ void PatternGodScanner::UpdateCurrTimeLine(BasePricesTable* table)
 	{
 		HttpServerSyncer::UpdateCurrentTimeLine(table);
 	}
+}
+
+PatternGod* PatternGodScanner::Create_PatternGod_ForScan(std::vector<ChangeNode*>* historyTimeLine, std::vector<ChangeNode*>* currTimeLine)
+{
+	Configrations* confs = Configrations::getInstance();
+	PolynomComparerPolicy* polyPolicy = confs->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
+	PatternGod* patternScaner = new PatternGod(historyTimeLine, currTimeLine, "", polyPolicy->PolynomLen_ForScan, true, polyPolicy->weight_eval, polyPolicy->weight_rmse, polyPolicy->weight_coeff);
+	return patternScaner;
 }
 
 std::vector<std::pair<ChangeNode*, ScoresResult>> PatternGodScanner::ScoringLayerRun(PatternGod* patternScan)

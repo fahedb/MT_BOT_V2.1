@@ -4,6 +4,15 @@
 #include "ThreadPool.h"
 #include "Converts.h"
 
+PolynomTimeLineCache* PolynomTimeLineCache::Init(bool EnablePolynomTimeLineCaching, bool EnablePolynomScan, int PolynomLen_ForScan)
+{
+    if (instancePtr == nullptr)
+    {
+        instancePtr = new PolynomTimeLineCache(EnablePolynomTimeLineCaching, EnablePolynomScan, PolynomLen_ForScan);
+    }
+    return instancePtr;
+}
+
 void PolynomTimeLineCache::CleanTask(long long oldestTP, BaseCacheMap* cacheMap) // Cleaning task for a specific cache map
 {
     for (auto it = cacheMap->begin(); it != cacheMap->end(); ) {

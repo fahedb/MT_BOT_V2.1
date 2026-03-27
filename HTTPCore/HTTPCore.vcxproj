@@ -215,7 +215,7 @@
   <ItemGroup>
     <ClCompile Include="ExchangeData.cpp" />
     <ClCompile Include="HTTPClient.cpp" />
-    <ClCompile Include="HTTPCumputeServer.cpp" />
+    <ClCompile Include="HTTPComputeServer.cpp" />
     <ClCompile Include="HTTPServer.cpp" />
     <ClCompile Include="HTTPServicesQueues.cpp" />
     <ClCompile Include="RequestHandler.cpp" />
@@ -225,7 +225,7 @@
   <ItemGroup>
     <ClInclude Include="ExchangeData.h" />
     <ClInclude Include="HTTPClient.h" />
-    <ClInclude Include="HTTPCumputeServer.h" />
+    <ClInclude Include="HTTPComputeServer.h" />
     <ClInclude Include="HTTPQueuesEnums.h" />
     <ClInclude Include="HTTPServer.h" />
     <ClInclude Include="HTTPServicesQueues.h" />

@@ -9,6 +9,7 @@
 
 #include "Policies.h"
 #include "HttpServerSyncer.h"
+#include "CONFIGRATIONS.H"
 
 
 

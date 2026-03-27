@@ -33,7 +33,7 @@ void TradeTracer::TraceTrades(TimeLine* historyTL)
 	m_historyTL = historyTL;
 	m_statisticsEngine = new StatisticsDecession(historyTL);
 	
-	m_patternScanner = new PatternGod(historyTL);
+	m_patternScanner = nullptr;//new PatternGod(historyTL);
 
 	while (true)
 	{

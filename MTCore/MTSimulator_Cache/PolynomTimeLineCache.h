@@ -43,14 +43,7 @@ public:
 
     }
 
-    static PolynomTimeLineCache* Init(bool EnablePolynomTimeLineCaching, bool EnablePolynomScan, int PolynomLen_ForScan)
-    {
-        if (instancePtr == nullptr) 
-        {
-            instancePtr = new PolynomTimeLineCache(EnablePolynomTimeLineCaching, EnablePolynomScan, PolynomLen_ForScan);
-        }
-        return instancePtr;
-    }
+    static PolynomTimeLineCache* Init(bool EnablePolynomTimeLineCaching, bool EnablePolynomScan, int PolynomLen_ForScan);
 
     static PolynomTimeLineCache* getInstance() {
         if (instancePtr == nullptr)

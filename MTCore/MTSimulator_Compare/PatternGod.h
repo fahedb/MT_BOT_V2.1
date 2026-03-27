@@ -32,9 +32,7 @@ public:
 
 	int ScanForOneMinPatterns(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D);
 	void Set_CurrentTimeLine(std::vector<ChangeNode*>* currentTimeLine) { 
-		m_currentTL = currentTimeLine;
-		InitComparers(); // Initialize the comparers with the history time line
-	
+		m_currentTL = currentTimeLine;	
 	} // Update the current time line
 
 private:

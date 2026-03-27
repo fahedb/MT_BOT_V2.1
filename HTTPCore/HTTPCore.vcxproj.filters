@@ -57,11 +57,11 @@
     <ClCompile Include="HTTPServer.cpp">
       <Filter>HTTP_server\Standard</Filter>
     </ClCompile>
-    <ClCompile Include="HTTPCumputeServer.cpp">
-      <Filter>HTTP_server\ComputeServer</Filter>
-    </ClCompile>
     <ClCompile Include="ServucesDefComputeUnit.h">
       <Filter>Services</Filter>
+    </ClCompile>
+    <ClCompile Include="HTTPComputeServer.cpp">
+      <Filter>HTTP_server\ComputeServer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,7 +86,7 @@
     <ClInclude Include="HTTPServer.h">
       <Filter>HTTP_server\Standard</Filter>
     </ClInclude>
-    <ClInclude Include="HTTPCumputeServer.h">
+    <ClInclude Include="HTTPComputeServer.h">
       <Filter>HTTP_server\ComputeServer</Filter>
     </ClInclude>
   </ItemGroup>

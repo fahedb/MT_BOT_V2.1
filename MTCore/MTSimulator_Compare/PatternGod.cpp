@@ -64,7 +64,7 @@ int PatternGod::ScanForOneMinPatterns(std::vector<std::pair<ChangeNode*, ScoresR
 	ScoringEngineScan(scoringResults); // Run the scoring engine scan to get initial scoring results
 	PolynomEngineFilter(scoringResults); // Run the polynom filter engine to pre-filter the scoring results based on patterns
 	resultNodes2D = scoringResults;
-	return totalScans; // Return the total number of scans performed
+	return scoringResults.size(); // Return the total number of scans performed
 }
 
 int PatternGod::ScoringEngineScan(std::vector<std::pair<ChangeNode*, ScoresResult>>& resultNodes2D)

@@ -4,6 +4,8 @@
 #include "ThreadPool.h"
 #include "Converts.h"
 
+PolynomTimeLineCache* PolynomTimeLineCache::instancePtr = nullptr;
+
 PolynomTimeLineCache* PolynomTimeLineCache::Init(bool EnablePolynomTimeLineCaching, bool EnablePolynomScan, int PolynomLen_ForScan)
 {
     if (instancePtr == nullptr)

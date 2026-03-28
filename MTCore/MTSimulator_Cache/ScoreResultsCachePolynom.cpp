@@ -2,6 +2,9 @@
 #include "ThreadPool.h"
 #include "Converts.h"
 
+
+ScoreResultsCachePolynom* ScoreResultsCachePolynom::instancePtr = nullptr;
+
 // Constructor implementation
 ScoreResultsCachePolynom::ScoreResultsCachePolynom(int ThreadsNum, int cacheSizePerThread)
 	: BaseTimeLineCache<std::pair<PolynomTimeLineKey, PolynomTimeLineKey>, ScoresResult>(ThreadsNum, cacheSizePerThread)

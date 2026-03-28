@@ -1,16 +1,19 @@
 ﻿#include "ProccessFlags.h"
 #include "CONFIGRATIONS.H"
 #include "DataBaseConnection.h"
+#include "PolynomTimeLineCache.h"
 #include "ScoreResultsCachePolynom.h"
+#include "ThreadPool.h"
+
 
 #include "PatternGodScanner.h"
 void DefualtProgramStart();
 void LoadJson_Data_ToDBFile();
-
+void Init();
 
 int main(int argc, char* argv[])
 {
-	ScoreResultsCachePolynom* scoreResultsCache = ScoreResultsCachePolynom::getInstance();
+	Init();
 	ProccessFlags::InitProccessFlags(argc, argv);
 	
 	std::thread http_thread(ExchangeData::Start_DataExchange);
@@ -26,6 +29,13 @@ int main(int argc, char* argv[])
 
 void Init()
 {
+	PolynomComparerPolicy* polyPolicy = Configrations::getInstance()->Get_Policy<PolynomComparerPolicy>(PolicyType::PolynomComparerPolicy);
+
+	ScoreResultsCachePolynom::Init(MTThreadPool::getInstance()->Get_ThreadsNum(), 50000);
+	Static_CurrentTimeLineRep::Init(Configrations::getInstance()->Get_Policy<ScoringLayerPolicy>(PolicyType::ScoringLayerPolicy)->Pattern_CurrentTimeLineLen
+		, Configrations::getInstance()->Get_Policy<OrderTracerPolicy>(PolicyType::OrderTracerPolicy)->TraceCurrTimeLineLen);
+	PolynomTimeLineCache::Init(polyPolicy->EnablePolynomTimeLineCaching, polyPolicy->EnablePolynomScan, polyPolicy->PolynomLen_ForScan);
+
 	std::string connStr = Configrations::getInstance()->Get_ConnectionString();
 	DataBaseConnection::Set_ConnectionString(connStr);
 }

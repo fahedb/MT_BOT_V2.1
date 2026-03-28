@@ -208,7 +208,7 @@ std::string RequestHandler::Get_Next_DBCandle_M1()
 }
 
 std::string RequestHandler::GetStatus_Scanning() {
-	if (m_loadingDataStatus)
+	if (m_loadingDataStatus && !m_runningStatus)
 		return HTTP_PARAM_VALUE_Status_LoadingData;
 	if (m_runningStatus)
 		return HTTP_PARAM_VALUE_Status_Running;

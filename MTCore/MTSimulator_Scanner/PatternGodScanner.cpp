@@ -14,7 +14,7 @@ void PatternGodScanner::Run()
 	HttpServerSyncer::LoadAllConfigsToHttpCore(); // Load all configs to the HTTP Core
 	std::vector<ChangeNode*> history;
 	XAUUSD_OneMinTable table(Configrations::getInstance()->Get_DB_FileDir());
-	HistoryTimeLineLoader historyLoader(history, &table, Configrations::getInstance()->Get_DB_FileDir());
+	HistoryTimeLineLoader historyLoader(history, &table, Configrations::getInstance()->Get_DB_FileDir() + "\\" + table.GetDB_PhysicalFileName_Json());
 	historyLoader.Run();
 	Logger::getInstance().WriteLog("About to run PatternGod !!", true, true, LogType::SPECIAL_LOG);
 	TimeLine historyTimeLine(&history);
@@ -40,7 +40,7 @@ void PatternGodScanner::Run_PatternGod(TimeLine& historyTimeLine)
 
 
 	XAUUSD_CurrentTable table;
-	while(!Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine() || Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine() || Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine()->size() < scorePolicy->Pattern_CurrentTimeLineLen)
+	while(!Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine() || Static_CurrentTimeLineRep::getInstance()->Get_CurrTimeLine()->Get_TimeLine()->size() < scorePolicy->Pattern_CurrentTimeLineLen)
 	{
 		logger.WriteLog("Waiting for current time line to be initialized...", false, true, LogType::LOG);
 		std::this_thread::sleep_for(std::chrono::milliseconds(10000));

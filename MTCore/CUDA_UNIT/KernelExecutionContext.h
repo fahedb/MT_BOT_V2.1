@@ -18,6 +18,7 @@ private:
 
 	float* h_totalScores; // Host total scores array
 	int totalScoresSize; // Size of the total scores array, based on history size
+
 	dataStream_t h_results; // Host results data stream 
 	
 	dataStream_t h_historyData; // Historic data stream

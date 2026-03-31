@@ -1,6 +1,7 @@
 #include "BaseScoringEngine.h"
 #include "PatternGodUtils.h"
 #include "TimeLineArrayBuilder.h"
+#include "StreamSetters.h"
 
 #define COMAPRE_WEIGHT 10
 #define THRESHOLD_FOR_SCAN 0.1f //Need to make this configurable later, this is the minimum score for a candidate to be included
@@ -197,6 +198,12 @@ void BaseScoringEngine::RunScan_BarPeriod(IndicatorType indT, IndicatorLen indL,
 	int numResults = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
 	int currTimeLineLen = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
 
+
+	const int* h_indices = inputIndices.data();
+	int inputIndicesSize = static_cast<int>(inputIndices.size());
+	int* d_inputIndices;
+	StreamSetters::MoveDataToDevice(h_indices, &d_inputIndices, inputIndicesSize);
+
 	Scan_SingleIndicator(d_resData,
 		d_histValues, d_histSlopes,
 		d_histMinValues, d_histMaxValues,
@@ -204,7 +211,7 @@ void BaseScoringEngine::RunScan_BarPeriod(IndicatorType indT, IndicatorLen indL,
 		d_currValues, d_currSlopes,
 		d_currMinValues, d_currMaxValues,
 		d_currMinSlopes, d_currMaxSlopes,
-		currTimeLineLen, numResults, indT, COMAPRE_WEIGHT, inputIndices.data(), inputIndices.size());
+		currTimeLineLen, numResults, indT, COMAPRE_WEIGHT, d_inputIndices, inputIndicesSize);
 
 }
 
@@ -301,7 +308,11 @@ void BaseScoringEngine::RunScan_DualIndicators_BarPeriod(IndicatorType indT, Ind
 	int numResults = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
 	int currTimeLineLen = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
 
-
+	const int* h_indices = inputIndices.data();
+	int inputIndicesSize = static_cast<int>(inputIndices.size());
+	int* d_inputIndices;
+	StreamSetters::MoveDataToDevice(h_indices, &d_inputIndices, inputIndicesSize);
+	
 	// Implementation for scanning per indicator and length
 	Scan_DualIndicatorsRatio(
 		d_resData,
@@ -324,5 +335,5 @@ void BaseScoringEngine::RunScan_DualIndicators_BarPeriod(IndicatorType indT, Ind
 		d_currIndY_Values, d_currIndY_Slopes,
 		d_currIndY_MinValues, d_currIndY_MaxValues,
 		d_currIndY_MinSlopes, d_currIndY_MaxSlopes,
-		currTimeLineLen, numResults, COMAPRE_WEIGHT, inputIndices.data(), inputIndices.size());
+		currTimeLineLen, numResults, COMAPRE_WEIGHT, d_inputIndices, inputIndicesSize);
 }

@@ -48,7 +48,7 @@ void CudaMemoryCopyToHost(T* hostVar, T* deviceVar, int varNum)
     }
 }
 template<typename T>
-void CudaMemoryCopyToDevice(T* deviceVar, T* hostVar, int varNum)
+void CudaMemoryCopyToDevice(T* deviceVar, const T* hostVar, int varNum)
 {
     if(deviceVar == nullptr || hostVar == nullptr || varNum <= 0)
     {

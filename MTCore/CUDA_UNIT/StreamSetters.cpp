@@ -189,7 +189,7 @@ void StreamSetters::MoveDataToHost(dataStream_t* deviceDataSt, dataStream_t* hos
 	}
 }
 
-void StreamSetters::MoveDataToDevice(int* hostData, int** deviceData, int numElements)
+void StreamSetters::MoveDataToDevice(const int* hostData, int** deviceData, int numElements)
 {
 	CudaMemoryCopyToDevice<int>(*deviceData, hostData, numElements);
 }

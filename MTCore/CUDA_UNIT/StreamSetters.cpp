@@ -209,6 +209,13 @@ void StreamSetters::MemoryAllocate(int** existingData, int numElements, MemoryLo
 	}
 }
 
+void StreamSetters::MemoryFree(int** existingData, MemoryLocation memLoc)
+{
+	if (*existingData == nullptr)
+		return;
+	CudaMemoryFree(*existingData);
+}
+
 void StreamSetters::MemoryReset(int* array, int count, MemoryLocation memLoc)
 {
 	switch (memLoc)

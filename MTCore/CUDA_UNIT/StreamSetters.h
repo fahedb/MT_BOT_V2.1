@@ -19,7 +19,7 @@ public:
 	static void MoveDataToDevice(const int* hostData, int** deviceData, int numElements);
 
 	static void MemoryAllocate(int** existingData, int numElements, MemoryLocation memLoc);
-
+	static void MemoryFree(int** existingData, MemoryLocation memLoc);
 	static void MemoryReset(int* array, int count, MemoryLocation memLoc);
 };
 

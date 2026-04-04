@@ -126,6 +126,8 @@ std::vector<int> BaseScoringEngine::RunScan(const std::vector<int>& inputIndices
 		}
 	}
 
+	m_kernelMemoryContext->SyncResultsToHost();
+
 	int histSize = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), m_indicatorType_Filter.front(), m_indicatorLen_Filter.front(), m_barPeriod_Filter.front(), IndicatorValueType::Value);
 	int currSize = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), m_indicatorType_Filter.front(), m_indicatorLen_Filter.front(), m_barPeriod_Filter.front(), IndicatorValueType::Value);
 	
@@ -148,6 +150,12 @@ std::vector<int> BaseScoringEngine::RunScan(const std::vector<int>& inputIndices
 	PatternGodUtils::FilterDuplicateIndicesByScoreWindow(totalScores, topKScoresIndices, 30); // Filter out duplicate indices that are within a window of the current size, to avoid redundant processing of very similar patterns. This is especially useful when the scoring logic can produce high scores for patterns that are very close to each other in time, which might not be desirable to consider as separate candidates.
 
 	SortIndices(topKScoresIndices); // Sort the resulting indices for better memory access patterns in subsequent processing
+
+	for (int i = 0; i < 100; i++)
+	{
+		std::cout << totalScores[i];
+	}
+
 	return topKScoresIndices;
 }
 
@@ -201,8 +209,12 @@ void BaseScoringEngine::RunScan_BarPeriod(IndicatorType indT, IndicatorLen indL,
 
 	const int* h_indices = inputIndices.data();
 	int inputIndicesSize = static_cast<int>(inputIndices.size());
-	int* d_inputIndices;
-	StreamSetters::MoveDataToDevice(h_indices, &d_inputIndices, inputIndicesSize);
+	int* d_inputIndices = nullptr;
+
+	if (inputIndicesSize) {
+		StreamSetters::MemoryAllocate(&d_inputIndices, inputIndicesSize, MemoryLocation::DEVICE);
+		StreamSetters::MoveDataToDevice(h_indices, &d_inputIndices, inputIndicesSize);
+	}
 
 	Scan_SingleIndicator(d_resData,
 		d_histValues, d_histSlopes,
@@ -213,6 +225,7 @@ void BaseScoringEngine::RunScan_BarPeriod(IndicatorType indT, IndicatorLen indL,
 		d_currMinSlopes, d_currMaxSlopes,
 		currTimeLineLen, numResults, indT, COMAPRE_WEIGHT, d_inputIndices, inputIndicesSize);
 
+	StreamSetters::MemoryFree(&d_inputIndices, MemoryLocation::DEVICE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -310,8 +323,13 @@ void BaseScoringEngine::RunScan_DualIndicators_BarPeriod(IndicatorType indT, Ind
 
 	const int* h_indices = inputIndices.data();
 	int inputIndicesSize = static_cast<int>(inputIndices.size());
-	int* d_inputIndices;
-	StreamSetters::MoveDataToDevice(h_indices, &d_inputIndices, inputIndicesSize);
+	int* d_inputIndices = nullptr;
+	
+	if (inputIndicesSize)
+	{
+		StreamSetters::MemoryAllocate(&d_inputIndices, inputIndicesSize, MemoryLocation::DEVICE);
+		StreamSetters::MoveDataToDevice(h_indices, &d_inputIndices, inputIndicesSize);
+	}
 	
 	// Implementation for scanning per indicator and length
 	Scan_DualIndicatorsRatio(
@@ -336,4 +354,6 @@ void BaseScoringEngine::RunScan_DualIndicators_BarPeriod(IndicatorType indT, Ind
 		d_currIndY_MinValues, d_currIndY_MaxValues,
 		d_currIndY_MinSlopes, d_currIndY_MaxSlopes,
 		currTimeLineLen, numResults, COMAPRE_WEIGHT, d_inputIndices, inputIndicesSize);
+
+	StreamSetters::MemoryFree(&d_inputIndices, MemoryLocation::DEVICE);
 }

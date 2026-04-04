@@ -36,3 +36,5 @@ x64/
 /PYTH/Controller/venv
 /PYTH/Logger/venv
 /PYTH/AnalyzeDBInjector/venv
+\vcpkg
+\vcpkg_installed

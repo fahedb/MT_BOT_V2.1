@@ -125,11 +125,12 @@ std::vector<int> BaseScoringEngine::RunScan(const std::vector<int>& inputIndices
 			// This is a placeholder - actual implementation would depend on how results are stored and accessed
 		}
 	}
+	MemoryLocation myMemLoc = GetEngineType() == ScanEngineType::CPUEngine ? MemoryLocation::HOST : MemoryLocation::DEVICE;
+	if (myMemLoc == MemoryLocation::DEVICE)
+		m_kernelMemoryContext->SyncResultsToHost(); // Sync results back to host if we are using GPU engine, so we can access the total scores array on the host for further processing
 
-	m_kernelMemoryContext->SyncResultsToHost();
-
-	int histSize = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), m_indicatorType_Filter.front(), m_indicatorLen_Filter.front(), m_barPeriod_Filter.front(), IndicatorValueType::Value);
-	int currSize = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), m_indicatorType_Filter.front(), m_indicatorLen_Filter.front(), m_barPeriod_Filter.front(), IndicatorValueType::Value);
+	int histSize = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, myMemLoc), m_indicatorType_Filter.front(), m_indicatorLen_Filter.front(), m_barPeriod_Filter.front(), IndicatorValueType::Value);
+	int currSize = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, myMemLoc), m_indicatorType_Filter.front(), m_indicatorLen_Filter.front(), m_barPeriod_Filter.front(), IndicatorValueType::Value);
 	
 	int limit = static_cast<int>(histSize - currSize + 1);
 	float* totalScores = m_kernelMemoryContext->Get_HostTotalScoresPtr();
@@ -182,29 +183,31 @@ void BaseScoringEngine::RunScan_IndicatorLen(IndicatorType indT, IndicatorLen in
 
 void BaseScoringEngine::RunScan_BarPeriod(IndicatorType indT, IndicatorLen indL, BarPeriod barP, const std::vector<int>& inputIndices)
 {
-	float* d_resData = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_ResultsDataStreamPtr(MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
+	MemoryLocation myMemLoc = GetEngineType() == ScanEngineType::CPUEngine ? MemoryLocation::HOST : MemoryLocation::DEVICE;
 
-	const float* d_histValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
-	const float* d_histSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Slope);
+	float* d_resData = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_ResultsDataStreamPtr(myMemLoc), indT, indL, barP, IndicatorValueType::Value);
 
-	const float* d_histMinValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
-	const float* d_histMaxValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
+	const float* d_histValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, myMemLoc), indT, indL, barP, IndicatorValueType::Value);
+	const float* d_histSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, myMemLoc), indT, indL, barP, IndicatorValueType::Slope);
 
-	const float* d_histMinSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Slope);
-	const float* d_histMaxSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Slope);
+	const float* d_histMinValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, myMemLoc), indT, indL, barP, IndicatorValueType::Value);
+	const float* d_histMaxValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, myMemLoc), indT, indL, barP, IndicatorValueType::Value);
 
-	const float* d_currValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
-	const float* d_currSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Slope);
+	const float* d_histMinSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, myMemLoc), indT, indL, barP, IndicatorValueType::Slope);
+	const float* d_histMaxSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, myMemLoc), indT, indL, barP, IndicatorValueType::Slope);
 
-	const float* d_currMinValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
-	const float* d_currMaxValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
+	const float* d_currValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, myMemLoc), indT, indL, barP, IndicatorValueType::Value);
+	const float* d_currSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, myMemLoc), indT, indL, barP, IndicatorValueType::Slope);
 
-	const float* d_currMinSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Slope);
-	const float* d_currMaxSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Slope);
+	const float* d_currMinValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, myMemLoc), indT, indL, barP, IndicatorValueType::Value);
+	const float* d_currMaxValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, myMemLoc), indT, indL, barP, IndicatorValueType::Value);
+
+	const float* d_currMinSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, myMemLoc), indT, indL, barP, IndicatorValueType::Slope);
+	const float* d_currMaxSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, myMemLoc), indT, indL, barP, IndicatorValueType::Slope);
 
 	
-	int numResults = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
-	int currTimeLineLen = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, indL, barP, IndicatorValueType::Value);
+	int numResults = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, myMemLoc), indT, indL, barP, IndicatorValueType::Value);
+	int currTimeLineLen = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, myMemLoc), indT, indL, barP, IndicatorValueType::Value);
 
 
 	const int* h_indices = inputIndices.data();
@@ -277,51 +280,53 @@ void BaseScoringEngine::RunScan_DualIndicators_BarPeriod(IndicatorType indT, Ind
 	{
 		return; // Skip same length and same bar period
 	}
-	float* d_resData = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_ResultsDataStreamPtr(MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
+
+	MemoryLocation myMemLoc = GetEngineType() == ScanEngineType::CPUEngine ? MemoryLocation::HOST : MemoryLocation::DEVICE;
+	float* d_resData = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_ResultsDataStreamPtr(myMemLoc), indT, lenX, barPX, IndicatorValueType::Value);
 
 	////////////// Get IndX data //////////////////	
-	const float* d_histIndX_Values = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
-	const float* d_histIndX_Slopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Slope);
+	const float* d_histIndX_Values = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, myMemLoc), indT, lenX, barPX, IndicatorValueType::Value);
+	const float* d_histIndX_Slopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, myMemLoc), indT, lenX, barPX, IndicatorValueType::Slope);
 
-	const float* d_histIndX_MinValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
-	const float* d_histIndX_MaxValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
-	const float* d_histIndX_MinSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Slope);
-	const float* d_histIndX_MaxSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Slope);
+	const float* d_histIndX_MinValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, myMemLoc), indT, lenX, barPX, IndicatorValueType::Value);
+	const float* d_histIndX_MaxValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, myMemLoc), indT, lenX, barPX, IndicatorValueType::Value);
+	const float* d_histIndX_MinSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, myMemLoc), indT, lenX, barPX, IndicatorValueType::Slope);
+	const float* d_histIndX_MaxSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, myMemLoc), indT, lenX, barPX, IndicatorValueType::Slope);
 	////////////////////////////////////////////////
 
 	////////////// Get curr IndX data //////////////////
-	const float* d_currIndX_Values = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
-	const float* d_currIndX_Slopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Slope);
+	const float* d_currIndX_Values = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, myMemLoc), indT, lenX, barPX, IndicatorValueType::Value);
+	const float* d_currIndX_Slopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, myMemLoc), indT, lenX, barPX, IndicatorValueType::Slope);
 
-	const float* d_currIndX_MinValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
-	const float* d_currIndX_MaxValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Value);
-	const float* d_currIndX_MinSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Slope);
-	const float* d_currIndX_MaxSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, lenX, barPX, IndicatorValueType::Slope);
+	const float* d_currIndX_MinValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, myMemLoc), indT, lenX, barPX, IndicatorValueType::Value);
+	const float* d_currIndX_MaxValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, myMemLoc), indT, lenX, barPX, IndicatorValueType::Value);
+	const float* d_currIndX_MinSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, myMemLoc), indT, lenX, barPX, IndicatorValueType::Slope);
+	const float* d_currIndX_MaxSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, myMemLoc), indT, lenX, barPX, IndicatorValueType::Slope);
 	////////////////////////////////////////////////
 
 	////////////// Get hist IndY data //////////////////
-	const float* d_histIndY_Values = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
-	const float* d_histIndY_Slopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
+	const float* d_histIndY_Values = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, myMemLoc), indT, LenY, barPY, IndicatorValueType::Value);
+	const float* d_histIndY_Slopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, myMemLoc), indT, LenY, barPY, IndicatorValueType::Slope);
 
-	const float* d_histIndY_MinValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
-	const float* d_histIndY_MaxValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
-	const float* d_histIndY_MinSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
-	const float* d_histIndY_MaxSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
+	const float* d_histIndY_MinValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, myMemLoc), indT, LenY, barPY, IndicatorValueType::Value);
+	const float* d_histIndY_MaxValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, myMemLoc), indT, LenY, barPY, IndicatorValueType::Value);
+	const float* d_histIndY_MinSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::HISTORIC, myMemLoc), indT, LenY, barPY, IndicatorValueType::Slope);
+	const float* d_histIndY_MaxSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::HISTORIC, myMemLoc), indT, LenY, barPY, IndicatorValueType::Slope);
 	/////////////////////////////////////////////////
 
 	////////////// Get curr IndY data //////////////////
-	const float* d_currIndY_Values = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
-	const float* d_currIndY_Slopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
+	const float* d_currIndY_Values = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, myMemLoc), indT, LenY, barPY, IndicatorValueType::Value);
+	const float* d_currIndY_Slopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, myMemLoc), indT, LenY, barPY, IndicatorValueType::Slope);
 
-	const float* d_currIndY_MinValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
-	const float* d_currIndY_MaxValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
-	const float* d_currIndY_MinSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
-	const float* d_currIndY_MaxSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Slope);
+	const float* d_currIndY_MinValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, myMemLoc), indT, LenY, barPY, IndicatorValueType::Value);
+	const float* d_currIndY_MaxValues = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, myMemLoc), indT, LenY, barPY, IndicatorValueType::Value);
+	const float* d_currIndY_MinSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MinValuesStreamPtr(DataTimeType::CURRENT, myMemLoc), indT, LenY, barPY, IndicatorValueType::Slope);
+	const float* d_currIndY_MaxSlopes = Get_DataPointer_KernelMemoryContextHelper(m_kernelMemoryContext->Get_MaxValuesStreamPtr(DataTimeType::CURRENT, myMemLoc), indT, LenY, barPY, IndicatorValueType::Slope);
 	/////////////////////////////////////////////////
 
 
-	int numResults = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
-	int currTimeLineLen = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, MemoryLocation::DEVICE), indT, LenY, barPY, IndicatorValueType::Value);
+	int numResults = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::HISTORIC, myMemLoc), indT, LenY, barPY, IndicatorValueType::Value);
+	int currTimeLineLen = Get_NumElements_KernelMemoryContextHelper(m_kernelMemoryContext->Get_IndicatorsStreamDataPtr(DataTimeType::CURRENT, myMemLoc), indT, LenY, barPY, IndicatorValueType::Value);
 
 	const int* h_indices = inputIndices.data();
 	int inputIndicesSize = static_cast<int>(inputIndices.size());

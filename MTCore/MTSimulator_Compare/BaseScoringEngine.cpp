@@ -152,11 +152,6 @@ std::vector<int> BaseScoringEngine::RunScan(const std::vector<int>& inputIndices
 
 	SortIndices(topKScoresIndices); // Sort the resulting indices for better memory access patterns in subsequent processing
 
-	for (int i = 0; i < 100; i++)
-	{
-		std::cout << totalScores[i];
-	}
-
 	return topKScoresIndices;
 }
 
@@ -218,6 +213,7 @@ void BaseScoringEngine::RunScan_BarPeriod(IndicatorType indT, IndicatorLen indL,
 		StreamSetters::MemoryAllocate(&d_inputIndices, inputIndicesSize, MemoryLocation::DEVICE);
 		StreamSetters::MoveDataToDevice(h_indices, &d_inputIndices, inputIndicesSize);
 	}
+	const int* indicesToSend = GetEngineType() == ScanEngineType::GPUEngine ? d_inputIndices : h_indices;
 
 	Scan_SingleIndicator(d_resData,
 		d_histValues, d_histSlopes,
@@ -226,7 +222,7 @@ void BaseScoringEngine::RunScan_BarPeriod(IndicatorType indT, IndicatorLen indL,
 		d_currValues, d_currSlopes,
 		d_currMinValues, d_currMaxValues,
 		d_currMinSlopes, d_currMaxSlopes,
-		currTimeLineLen, numResults, indT, COMAPRE_WEIGHT, d_inputIndices, inputIndicesSize);
+		currTimeLineLen, numResults, indT, COMAPRE_WEIGHT, indicesToSend, inputIndicesSize);
 
 	if (GetEngineType() == ScanEngineType::GPUEngine && inputIndicesSize && d_inputIndices) {
 		StreamSetters::MemoryFree(&d_inputIndices, MemoryLocation::DEVICE);
@@ -337,7 +333,8 @@ void BaseScoringEngine::RunScan_DualIndicators_BarPeriod(IndicatorType indT, Ind
 		StreamSetters::MemoryAllocate(&d_inputIndices, inputIndicesSize, MemoryLocation::DEVICE);
 		StreamSetters::MoveDataToDevice(h_indices, &d_inputIndices, inputIndicesSize);
 	}
-	
+	const int* indicesToSend = GetEngineType() == ScanEngineType::GPUEngine ? d_inputIndices : h_indices;
+
 	// Implementation for scanning per indicator and length
 	Scan_DualIndicatorsRatio(
 		d_resData,
@@ -360,7 +357,7 @@ void BaseScoringEngine::RunScan_DualIndicators_BarPeriod(IndicatorType indT, Ind
 		d_currIndY_Values, d_currIndY_Slopes,
 		d_currIndY_MinValues, d_currIndY_MaxValues,
 		d_currIndY_MinSlopes, d_currIndY_MaxSlopes,
-		currTimeLineLen, numResults, COMAPRE_WEIGHT, d_inputIndices, inputIndicesSize);
+		currTimeLineLen, numResults, COMAPRE_WEIGHT, indicesToSend, inputIndicesSize);
 
 	if (GetEngineType() == ScanEngineType::GPUEngine && inputIndicesSize && d_inputIndices)
 		StreamSetters::MemoryFree(&d_inputIndices, MemoryLocation::DEVICE);

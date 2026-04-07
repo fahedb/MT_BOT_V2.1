@@ -4,7 +4,7 @@
 #include "Logger.h"
 #include <mutex>
 #include <future>
-
+#include "Converts.h"
 #include "TimeLineArrayBuilder.h"
 #include "CPP_To_Cuda_Tunnel.h"
 
@@ -98,9 +98,11 @@ void PatternGod_ScoreComparer::InitComaprer(std::string scanFilters)
 	bool isCudaAvailable = CPP_To_Cuda_Tunnel::IsCudaAvailable();
 
 	std::vector<std::string> filterParts = SplitString(localScanFilters, ';');
+	bool firstFilter = true;
 	for(const std::string& part : filterParts)
 	{
-		BaseScoringEngine* engine = CreateScoringEngineForIndicator(part);
+		BaseScoringEngine* engine = CreateScoringEngineForIndicator(part, !firstFilter);
+		firstFilter = false;
 		std::cout << "Engine Details, " << "Period Filter size: " << std::to_string(engine->m_barPeriod_Filter.size()) << ", Threshold: " << engine->m_threshold;
 		if(engine)
 		{
@@ -146,7 +148,7 @@ void PatternGod_ScoreComparer::SetTimeLines(std::vector<ChangeNode*>* history, s
 
 }
 // H4:0.20:S = H4 period, 0.20 threshold, Single indicator scan mode
-BaseScoringEngine* PatternGod_ScoreComparer::CreateScoringEngineForIndicator(const std::string& filter)
+BaseScoringEngine* PatternGod_ScoreComparer::CreateScoringEngineForIndicator(const std::string& filter, bool foceCPUEngine)
 {
 	std::vector<std::string> keyValue = SplitString(filter, ':');
 	bool isCudaAvailable = CPP_To_Cuda_Tunnel::IsCudaAvailable();
@@ -195,14 +197,18 @@ BaseScoringEngine* PatternGod_ScoreComparer::CreateScoringEngineForIndicator(con
 	}
 
 	BaseScoringEngine* engine = nullptr;
-	if(isCudaAvailable)
+	if(isCudaAvailable && !foceCPUEngine)
 	{
 
 		engine = new GPUScoringEngine(lenList.lengths, barPeriodFilter, indTypeList.types, threshold);
 	}
 	else
 	{
-		Logger::getInstance().WriteLog("CUDA is not available. CPU Engine going to be created for filter: " + filter, true, true, LogType::LOG);
+		if (foceCPUEngine)
+			Logger::getInstance().WriteLog("Forced CPU Engine creation for filter: " + filter, true, true, LogType::LOG);
+		else
+			Logger::getInstance().WriteLog("CUDA is not available. CPU Engine going to be created for filter: " + filter, true, true, LogType::LOG);
+
 		engine = new CPUScoringEngine(lenList.lengths, barPeriodFilter, indTypeList.types, threshold);
 	}
 	engine->Set_KernelMemoryContext(m_kernelMemoryContext); // Set the kernel memory context for the scoring engine

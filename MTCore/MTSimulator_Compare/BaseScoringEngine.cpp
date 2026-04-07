@@ -211,7 +211,7 @@ void BaseScoringEngine::RunScan_BarPeriod(IndicatorType indT, IndicatorLen indL,
 	int inputIndicesSize = static_cast<int>(inputIndices.size());
 	int* d_inputIndices = nullptr;
 
-	if (inputIndicesSize) {
+	if (GetEngineType() == ScanEngineType::GPUEngine && inputIndicesSize) {
 		StreamSetters::MemoryAllocate(&d_inputIndices, inputIndicesSize, MemoryLocation::DEVICE);
 		StreamSetters::MoveDataToDevice(h_indices, &d_inputIndices, inputIndicesSize);
 	}
@@ -225,7 +225,9 @@ void BaseScoringEngine::RunScan_BarPeriod(IndicatorType indT, IndicatorLen indL,
 		d_currMinSlopes, d_currMaxSlopes,
 		currTimeLineLen, numResults, indT, COMAPRE_WEIGHT, d_inputIndices, inputIndicesSize);
 
-	StreamSetters::MemoryFree(&d_inputIndices, MemoryLocation::DEVICE);
+	if (GetEngineType() == ScanEngineType::GPUEngine && inputIndicesSize && d_inputIndices) {
+		StreamSetters::MemoryFree(&d_inputIndices, MemoryLocation::DEVICE);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -325,7 +327,7 @@ void BaseScoringEngine::RunScan_DualIndicators_BarPeriod(IndicatorType indT, Ind
 	int inputIndicesSize = static_cast<int>(inputIndices.size());
 	int* d_inputIndices = nullptr;
 	
-	if (inputIndicesSize)
+	if (GetEngineType() == ScanEngineType::GPUEngine && inputIndicesSize)
 	{
 		StreamSetters::MemoryAllocate(&d_inputIndices, inputIndicesSize, MemoryLocation::DEVICE);
 		StreamSetters::MoveDataToDevice(h_indices, &d_inputIndices, inputIndicesSize);
@@ -355,5 +357,6 @@ void BaseScoringEngine::RunScan_DualIndicators_BarPeriod(IndicatorType indT, Ind
 		d_currIndY_MinSlopes, d_currIndY_MaxSlopes,
 		currTimeLineLen, numResults, COMAPRE_WEIGHT, d_inputIndices, inputIndicesSize);
 
-	StreamSetters::MemoryFree(&d_inputIndices, MemoryLocation::DEVICE);
+	if (GetEngineType() == ScanEngineType::GPUEngine && inputIndicesSize && d_inputIndices)
+		StreamSetters::MemoryFree(&d_inputIndices, MemoryLocation::DEVICE);
 }

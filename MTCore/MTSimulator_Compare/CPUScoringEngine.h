@@ -11,6 +11,8 @@ class CPUScoringEngine : public BaseScoringEngine
 	{
 	}
 protected:
+	virtual ScanEngineType GetEngineType() const override { return ScanEngineType::CPUEngine; }
+
 	virtual void Scan_SingleIndicator(float* d_results
 		//////////////////////////////////// Hist arrays //////////////////////////////////////////////////
 		, const float* d_histValues, const float* d_histSlopes											///

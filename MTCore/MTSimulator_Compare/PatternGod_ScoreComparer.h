@@ -23,7 +23,7 @@ private:
 	KernelExecutionContext_PatternGod* m_kernelMemoryContext; // Kernel execution context for managing memory and data streams for CUDA calculations
 	void InitComaprer(std::string scanFilters);
 	void SetTimeLines(std::vector<ChangeNode*>* history, std::vector<ChangeNode*>* current);
-	BaseScoringEngine* CreateScoringEngineForIndicator(const std::string& filter);
+	BaseScoringEngine* CreateScoringEngineForIndicator(const std::string& filter, bool foceCPUEngine);
 
 };
 

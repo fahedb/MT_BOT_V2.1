@@ -4,9 +4,18 @@
 #include "KernelExecutionContext.h"
 #include "Logger.h"
 
+enum class ScanEngineType
+{
+	CPUEngine = 0,
+	GPUEngine = 1
+};
+
 class BaseScoringEngine
 {
 private:
+
+protected:
+	virtual ScanEngineType GetEngineType() const = 0; // Pure virtual function to get the type of the scoring engine, to be implemented by derived classes
 public:
 	float m_threshold; // Threshold for scoring, can be used in the scoring logic to determine if a pattern is considered a match or not. This can be set through the constructor or a setter function.
 	std::vector<IndicatorLen> m_indicatorLen_Filter;

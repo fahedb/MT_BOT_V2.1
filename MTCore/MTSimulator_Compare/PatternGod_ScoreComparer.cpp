@@ -98,11 +98,12 @@ void PatternGod_ScoreComparer::InitComaprer(std::string scanFilters)
 	bool isCudaAvailable = CPP_To_Cuda_Tunnel::IsCudaAvailable();
 
 	std::vector<std::string> filterParts = SplitString(localScanFilters, ';');
-	bool firstFilter = true;
+	int engineCounter = 0;
 	for(const std::string& part : filterParts)
 	{
-		BaseScoringEngine* engine = CreateScoringEngineForIndicator(part, !firstFilter);
-		firstFilter = false;
+		BaseScoringEngine* engine = CreateScoringEngineForIndicator(part, engineCounter > 1);
+		
+		engineCounter++;
 		std::cout << "Engine Details, " << "Period Filter size: " << std::to_string(engine->m_barPeriod_Filter.size()) << ", Threshold: " << engine->m_threshold;
 		if(engine)
 		{

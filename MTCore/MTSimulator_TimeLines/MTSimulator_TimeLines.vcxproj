@@ -59,6 +59,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>true</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -145,7 +146,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_DISABLE_VECTOR_ANNOTATION;_DISABLE_STRING_ANNOTATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\MTSimulator_Logger;$(ProjectDir)\..\MTSimulator_Casts;..\MTSimulator_MTThreadPool;..\CUDA_UNIT;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -197,6 +198,8 @@
     <ClCompile Include="DBMap.cpp" />
     <ClCompile Include="GraphStructres.cpp" />
     <ClCompile Include="GraphUtils.cpp" />
+    <ClCompile Include="IndicatorMap.cpp" />
+    <ClCompile Include="IndicatorsStorage.cpp" />
     <ClCompile Include="IndicatorStructres.cpp" />
     <ClCompile Include="Polynom.cpp" />
     <ClCompile Include="PolynomBuilder.cpp" />
@@ -219,6 +222,8 @@
     <ClInclude Include="DBMap.h" />
     <ClInclude Include="GraphStructres.h" />
     <ClInclude Include="GraphUtils.h" />
+    <ClInclude Include="IndicatorMap.h" />
+    <ClInclude Include="IndicatorsStorage.h" />
     <ClInclude Include="INDICATORSTRUCTRES.H" />
     <ClInclude Include="IndicatorEnums.h" />
     <ClInclude Include="Polynom.h" />

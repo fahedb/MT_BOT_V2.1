@@ -73,13 +73,19 @@
     <Filter Include="TimeLine Core\TimeLine">
       <UniqueIdentifier>{2ac5a25f-0797-48a6-a41a-b55a5f73e0bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Indicators\IndicatorMemoryPool">
+      <UniqueIdentifier>{d1d443fa-c8d6-44b6-aad2-b60733d92b5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Indicators\IndicatorStructure">
+      <UniqueIdentifier>{45a48143-a890-4606-bf4b-a4b898320401}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Indicators\IndicatorMap">
+      <UniqueIdentifier>{880b46ae-da6d-450d-bcde-34f5757388f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DBMap.cpp">
       <Filter>TimeLine Core\Database</Filter>
-    </ClCompile>
-    <ClCompile Include="IndicatorStructres.cpp">
-      <Filter>Indicators</Filter>
     </ClCompile>
     <ClCompile Include="TimeLine.cpp">
       <Filter>TimeLine Core\TimeLine</Filter>
@@ -127,16 +133,19 @@
       <Filter>Change Data\SelectionNode</Filter>
     </ClCompile>
     <ClCompile Include="TimeLineArrayBuilder.cpp" />
+    <ClCompile Include="IndicatorsStorage.cpp">
+      <Filter>Indicators\IndicatorMemoryPool</Filter>
+    </ClCompile>
+    <ClCompile Include="IndicatorStructres.cpp">
+      <Filter>Indicators\IndicatorStructure</Filter>
+    </ClCompile>
+    <ClCompile Include="IndicatorMap.cpp">
+      <Filter>Indicators\IndicatorMap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DBMap.h">
       <Filter>TimeLine Core\Database</Filter>
-    </ClInclude>
-    <ClInclude Include="INDICATORSTRUCTRES.H">
-      <Filter>Indicators</Filter>
-    </ClInclude>
-    <ClInclude Include="IndicatorEnums.h">
-      <Filter>Indicators</Filter>
     </ClInclude>
     <ClInclude Include="TimeLine.h">
       <Filter>TimeLine Core\TimeLine</Filter>
@@ -190,5 +199,17 @@
       <Filter>Change Data\Enums</Filter>
     </ClInclude>
     <ClInclude Include="TimeLineArrayBuilder.h" />
+    <ClInclude Include="IndicatorsStorage.h">
+      <Filter>Indicators\IndicatorMemoryPool</Filter>
+    </ClInclude>
+    <ClInclude Include="INDICATORSTRUCTRES.H">
+      <Filter>Indicators\IndicatorStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="IndicatorEnums.h">
+      <Filter>Indicators\IndicatorStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="IndicatorMap.h">
+      <Filter>Indicators\IndicatorMap</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -14,15 +14,19 @@ class BasePricesTable : BTables
 {
 private:
 	std::string m_tableName;
+	std::vector<ChangeNode>* m_changeNodesPool;
+	IndicatorStorage* m_indicatorStorage;
 protected:
 	BasePricesTable(SQLHENV& henv, SQLHDBC& hdbc,const std::string& tableName) : BTables(henv, hdbc) {
 		m_tableName = tableName;
 	}
 	
 
-	BasePricesTable(const std::string& filename,const std::string& tableName) : BTables(filename)
+	BasePricesTable(const std::string& filename,const std::string& tableName, std::vector<ChangeNode>* changeNodesPool, IndicatorStorage* indicatorStorage) : BTables(filename)
 	{
 		m_tableName = tableName;
+		m_changeNodesPool = changeNodesPool;
+		m_indicatorStorage = indicatorStorage;
 	}
 
 

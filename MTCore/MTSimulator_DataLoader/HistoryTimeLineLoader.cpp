@@ -54,7 +54,8 @@ void HistoryTimeLineLoader::ChangeNodeLoader(std::vector<std::vector<ChangeNode*
 				}
 				catch (const std::exception& ex) {
 					std::cerr << "Exception in thread: " << ex.what() << std::endl;
-					prom->set_exception(std::current_exception());
+					//prom->set_exception(std::current_exception());
+					throw; // Rethrow the exception to be caught by the future
 				}
 			},
 			TaskPriority::High

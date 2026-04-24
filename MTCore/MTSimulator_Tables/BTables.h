@@ -8,6 +8,7 @@
 #define BTables_HEADER
 //#include "ProcessData.h"
 #define JSON_SLTRING_LEN 3400
+#define LIMIT_LAST_X_LINES 1000000 // Number of lines to skip in the begining of large files when multi threading read is enabled
 
 class BTables
 {
@@ -16,6 +17,7 @@ private:
 	SQLHENV m_DBenvHandler = 0;
 	std::vector<SQLSelectionNode*> m_allSelectedRows;
 	std::vector<FileSelectionNode*> m_allSelectedFileRows;
+	std::vector<int> m_lineCounterPerThread;
 	std::queue<JsonSelectionNode*> m_allSelectedJsonRows;
 	std::vector<std::vector<JsonSelectionNode*>> m_allSelectedJsonRows_MultiThreaded;
 	std::vector<int> m_jsonsThreadIdxsPlaces;
@@ -97,12 +99,12 @@ protected: // Function to Control json file
 		m_currFileIdxPlaces.at(threadIdx).second = currPtr; // Init the start ptr
 
 	}
+	int GetThreadLinesIdx(int threadIdx) { return m_lineCounterPerThread.at(threadIdx); }
 
-	JsonSelectionNode* GetNextSelection_newLogic(int threadIdx)
+	bool GetNextSelection_newLogic(int threadIdx, JsonSelectionNode& outJson)
 	{
 		char* startPtr = m_currFileIdxPlaces.at(threadIdx).first;
 		char* endPtr = m_currFileIdxPlaces.size() - 1 > threadIdx ? m_currFileIdxPlaces.at(threadIdx).second : m_endCharPtr;
-		//JsonSelectionNode* j = nullptr;
 		std::string currentLine;
 		currentLine.reserve(JSON_SLTRING_LEN);
 		if (*startPtr == '\n')
@@ -112,15 +114,16 @@ protected: // Function to Control json file
 			if (*startPtr == '\n') {
 				startPtr++; // To skip the new line in the next run
 				m_currFileIdxPlaces.at(threadIdx).first = startPtr;
-				return new JsonSelectionNode(nlohmann::json::parse(currentLine));
-
+				m_lineCounterPerThread.at(threadIdx)++;
+				outJson = JsonSelectionNode(nlohmann::json::parse(currentLine));
+				return true;
 			}
 			else {
 				currentLine += *startPtr;
 			}
 			startPtr++;
 		}
-		return nullptr;
+		return false;
 	}
 
 protected: // Function to control SQL DataBase

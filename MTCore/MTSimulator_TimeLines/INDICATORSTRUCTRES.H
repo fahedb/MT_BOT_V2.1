@@ -77,12 +77,7 @@ enum GravityType
 };
 
 struct IndicatorValues {
-	IndicatorValues() 
-	{
-		BarPeriodList barPeriods;
-		values.assign(barPeriods.periods.size(), 0.0); // Initialize the vector with zeros for each BarPeriod
-		slopes.assign(barPeriods.periods.size(), 0.0); // Initialize the vector with zeros for each BarPeriod
-	}
+	IndicatorValues();
 	void Set_SingleSlope(BarPeriod barP, double slope) { slopes[static_cast<int>(barP)] = slope; } // Set the slope for the specified BarPeriod
 	void Set_SingleValue(BarPeriod barP, double val) { values[static_cast<int>(barP)] = val; }// Set the value for the specified BarPeriod
 	
@@ -112,6 +107,7 @@ class BaseIndicator
 public:
 	virtual void SetValues(IndicatorValues curr, IndicatorValues prev);
 	BaseIndicator(IndicatorValues curr);
+	BaseIndicator() {}
 	IndicatorValues& Get_IndicatorValues() { return m_curr_BarValues; }
 	IndicatorValues* Get_IndicatorValues_Pointer() { return &m_curr_BarValues; }
 	virtual IndicatorType Get_IndicatorType() const = 0; // Pure virtual function to get the indicator type
@@ -125,6 +121,7 @@ class Volume_Ind : public BaseIndicator
 {
 public:
 	Volume_Ind(IndicatorValues curr) : BaseIndicator(curr) {};
+	Volume_Ind() : BaseIndicator() {}
 	virtual IndicatorType Get_IndicatorType() const override { return IndicatorType::VOLUME; } // Return the indicator type
 };
 
@@ -132,6 +129,8 @@ class RSI_Ind : public BaseIndicator
 {
 public:
 	RSI_Ind(IndicatorValues curr) : BaseIndicator(curr) {}
+	RSI_Ind() : BaseIndicator() {}
+	~RSI_Ind() {}
 	virtual IndicatorType Get_IndicatorType() const override { return IndicatorType::RSI; } // Return the indicator type
 
 };
@@ -140,6 +139,8 @@ class EMA_Ind :public BaseIndicator
 {
 public:
 	EMA_Ind(IndicatorValues curr) : BaseIndicator(curr) {}
+	EMA_Ind() : BaseIndicator() {}
+	~EMA_Ind() {}
 	virtual IndicatorType Get_IndicatorType() const override { return IndicatorType::EMA; } // Return the indicator type
 };
 
@@ -147,42 +148,11 @@ class ZLSMA_Ind :public BaseIndicator
 {
 public:
 	ZLSMA_Ind(IndicatorValues curr) : BaseIndicator(curr) {}
+	ZLSMA_Ind() : BaseIndicator() {}
+	~ZLSMA_Ind() {}
 	virtual IndicatorType Get_IndicatorType() const override { return IndicatorType::ZLSMA; } // Return the indicator type
 };
 
-
-class IndicatorMap
-{
-private:
-	std::vector<std::vector< BaseIndicator*>> m_vec;
-
-	BaseIndicator* Get_IndicatorObject(IndicatorType type, IndicatorValues val); // Getting a pointer of an allocated indicator Object
-public:
-	IndicatorMap(); // Contructor
-	~IndicatorMap()
-	{
-		if (m_vec.size())
-		{
-			for (auto& vec : m_vec)
-			{
-				for (auto& ind : vec)
-				{
-					delete ind; // Delete each BaseIndicator object
-				}
-			}
-			m_vec.clear();
-		}
-	}
-	void Set_Indicator(IndicatorType, IndicatorLen, IndicatorValues, bool forceInsert = false); // Function to create a new Indicator object
-	void Set_Ind_SingleValue(IndicatorType type, IndicatorLen len,BarPeriod barP,double val); // To Set indicator single value - by type, len and baePeriod
-	void Set_Ind_SingleSlope(IndicatorType type, IndicatorLen len, BarPeriod barP, double val); // To Set indicator single slope - by type, len and barPeriod
-	BaseIndicator* Get_Indicator(IndicatorType type, IndicatorLen len); // Get Indicator ptr
-	std::vector<std::vector< BaseIndicator*>>* Get_Indicators_Vec() { return &m_vec; } // Get the vector of indicators
-private:
-	void Set_IndValue(BaseIndicator*, BarPeriod, double);
-	void Set_IndSlope(BaseIndicator*, BarPeriod, double);
-	void Validate_Indicator(IndicatorType type, IndicatorLen len); // A function to check if there is an object for the relevant indicator, if not it will creat one and insert it in the map
-};
 
 
 class Indicators_Utils

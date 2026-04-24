@@ -17,11 +17,14 @@ int GenericJsonReader::InitFileMapForRead() { // Init indexes and maps, and retu
 }
 
 void GenericJsonReader::processChunk(int threadIndex, int chunkSize, GenericJsonReader* tableObj, std::vector<std::vector<nlohmann::json>>* reads2D) {
-	nlohmann::json jsonEntry = *tableObj->GetNextSelection_newLogic(threadIndex)->Get_Json();
+	JsonSelectionNode jsonNode;
+	bool res = tableObj->GetNextSelection_newLogic(threadIndex, jsonNode);
+	nlohmann::json jsonEntry = *jsonNode.Get_Json();
 
-	while (!jsonEntry.is_null()) {
+	while (res) {
 		reads2D->at(threadIndex).push_back(jsonEntry);
-		jsonEntry = *tableObj->GetNextSelection_newLogic(threadIndex)->Get_Json();
+		res = tableObj->GetNextSelection_newLogic(threadIndex, jsonNode);
+		jsonEntry = *jsonNode.Get_Json();
 	}
 }
 

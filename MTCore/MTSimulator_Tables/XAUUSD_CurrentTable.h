@@ -20,7 +20,7 @@ public:
 		ClearAll();
 		index = 0;
 	}
-	XAUUSD_CurrentTable(std::string& dir) : BasePricesTable(dir, DEF_TABLE_XAUUSD_CurrentPrices)
+	XAUUSD_CurrentTable(std::string& dir, std::vector<ChangeNode>* m_changeNodesPool, IndicatorStorage* indStorage) : BasePricesTable(dir, DEF_TABLE_XAUUSD_CurrentPrices, m_changeNodesPool, indStorage)
 	{
 		ClearAll();
 		index = 0;

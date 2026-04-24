@@ -3,6 +3,7 @@
 #include <vector>
 #include <math.h>
 #include "IndicatorStructres.h"
+#include "IndicatorMap.h"
 #include "nlohmann/json.hpp"
 #include "../../HTTPCore/ServicesDef.h"
 #include <iostream>
@@ -20,30 +21,19 @@ public:
 	double m_closePrice;
 	double m_highPrice;
 	double m_lowPrice;
-
+	int m_nodeIdx;
 	long long point_DateTimeLong = 0; // For fast access
 	int	Pip_Change=0;
 
 	bool Increase_Decrease = false;
 	bool activePoint=false;
 
-	std::unordered_map<std::string, double> m_entitiesMap;
 	std::string symbol;
 
 	ChangeNode();
+	ChangeNode(IndicatorStorage* indStorage, int changeNodeIndex);
 	~ChangeNode();
 	std::string point_DateTime;
-
-	double Get_Entity(const std::string& key)
-	{
-		auto it = m_entitiesMap.find(key);
-		if (it != m_entitiesMap.end()) {
-			return it->second;
-		}
-		return -1.0;
-	}
-	void Set_Entity(const std::string& key, double val) { m_entitiesMap[key] = val; }
-
 
 public:
 	void SetPoints(_Points points) { m_PointPlace = points; }

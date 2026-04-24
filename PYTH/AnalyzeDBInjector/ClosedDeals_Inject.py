@@ -5,7 +5,7 @@
 JSON_FILE_PATH = r"C:\\MT_Simulator_Exports\\TEST\\ClosedDeals.json"
 
 SQL_CONNECTION_STRING = (
-    "DRIVER={SQL Server};SERVER=localhost;DATABASE=Prices;Integrated Security=SSPI;"
+    "DRIVER={SQL Server};SERVER=localhost\\sqlexpress;DATABASE=Prices;Integrated Security=SSPI;"
 
 )
 

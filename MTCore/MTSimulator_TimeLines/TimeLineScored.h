@@ -41,7 +41,7 @@ public:
     TimeLineScored& operator=(TimeLineScored&& other) noexcept = default;
 
     // Accessors
-    TimeLine& Get_TimeLine() const { return *m_timeLine; }
+    TimeLine* Get_TimeLine() const { return m_timeLine.get(); }
     ScoresResult Get_Score() const { return m_score; }
 
     void Set_Score(ScoresResult score) { m_score = score; }

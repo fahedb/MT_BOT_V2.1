@@ -8,7 +8,6 @@
 #include "Converts.h"
 #include "Logger.h"
 
-#define LIMIT_LAST_X_LINES 1000000 // Number of lines to skip in the begining of large files when multi threading read is enabled
 
 
 bool BTables::InsertIntoDB(const std::string& insertSQL)
@@ -224,10 +223,14 @@ bool BTables::InitFileMap()
 	m_totalFileLines = 0; // Reset total lines count to force recount
 
 	m_startCharPtr = fileData;
+	int linesCount = GetFileLinesCount();
 	int threadsNum = MTThreadPool::getInstance()->Get_ThreadsNum();
+
+	int chunkSize = static_cast<long>(linesCount) / threadsNum;
 	for (int i = 0; i < threadsNum; i++)
 	{
 		m_currFileIdxPlaces.push_back(std::make_pair(fileData, fileData));
+		m_lineCounterPerThread.push_back(i * chunkSize);
 	}
 }
 

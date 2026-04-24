@@ -2,6 +2,7 @@
 #include "PatternGodScanner.h"
 #include "HttpServerSyncer.h"
 #include "MetaTraderSimulator.h"
+#include "Static_CurrentTimeLineRep.h"
 
 #define CONST_FIRST_BATCH_SIZE 100
 class BackTestingTimer
@@ -23,7 +24,7 @@ public:
 			scanner.Run(); // Run the scanner in a separate thread
 			});
 		size_t totalBars = m_backTestData->size();
-
+		
 		Static_CurrentTimeLineRep* currTimeLineRep = Static_CurrentTimeLineRep::getInstance();
 		ExchangeData dataExch;
 		Logger::getInstance().Set_LogsEnabled(false); // Disable logs for backtesting to improve performance
@@ -45,6 +46,8 @@ public:
 
 			dataExch.Wait_ForScanToComplete(); // Wait for the scanner to process the new bar
 			DirectionStats* stats = scanner.Get_LastStatisticsResult();
+			if(stats->Get_TimePoint() == "20250304032900000")
+				int debug = 1;
 			mtSim.Set_NewOrder(scanner.Get_LastPlacedOrder(), stats); // If there is a new order, set it in the simulator
 			InjectDataToConsoleScreen(i + 1, totalBars, mtSim.Get_AccountBalance());
 		}

@@ -214,14 +214,15 @@ void MetaTraderSimulator::UpdateAcountBalance(const Deal& deal) {
 // Seters:
 void MetaTraderSimulator::Set_NewOrder(OrderEntity* newOrder, DirectionStats* stats)
 {
-	if (!newOrder) return;
-
-	if(!m_currentBarData)
+	if (!m_currentBarData)
 	{
 		Logger::getInstance().WriteLog("Current bar data is not set. Cannot add new order.", false, false, LogType::ERR);
 		return;
 	}
+
 	m_dataExporter->ExportDirectionStatsData(stats);
+	if (!newOrder) return;
+
 	// Implementation for setting a new order in the simulation
 	ActiveOrderInfo activeOrder = ConvertOrderEntityToActiveOrderInfo(newOrder);
 	CalcFloatingPnL(); // Recalculate floating PnL before adding new order

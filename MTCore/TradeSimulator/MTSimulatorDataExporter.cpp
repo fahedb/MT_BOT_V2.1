@@ -67,13 +67,39 @@ void MTSimulatorDataExporter::ExportDirectionStatsVotedPercentages_Helper(Direct
 
 void MTSimulatorDataExporter::ExportPatterns_Helper(DirectionStats* stats, nlohmann::json& json)
 {
+	return; // cancelled temporarily as patterns export is not needed for now, and it can be heavy on performance. We can enable it later if we need to analyze patterns data.
 	std::vector<TimeLineScored>* patterns = stats->Get_SimilarPatterns();
-	for (const auto& pattern : *patterns) {
+	bool skippedTimeLineRecord = false;
+	for( int i =0 ; i < patterns->size(); i++)
+	{
 		nlohmann::json patternJson;
-		patternJson[DirectionStatsTag_SimilarPattern_PatternTimePoint] = pattern.Get_TimeLine().Get_TimeLine()->front()->point_DateTimeLong;
+
+		TimeLine* timeLine = patterns->at(i).Get_TimeLine();
+		if (!timeLine)
+		{
+			skippedTimeLineRecord = true;
+			continue;
+		}
+
+		std::vector<ChangeNode*>* timeLineVec = timeLine->Get_TimeLine();
+		if (!timeLineVec || !timeLineVec->size())
+		{
+			skippedTimeLineRecord = true;
+			continue;
+		}
+
+		ChangeNode* chN = timeLineVec->front();
+		if (!chN)
+		{
+			skippedTimeLineRecord = true;
+			continue;
+		}
+		patternJson[DirectionStatsTag_SimilarPattern_PatternTimePoint] = chN->point_DateTimeLong;
 		// Add other pattern details as needed
 		json.push_back(patternJson);
 	}
+	if (skippedTimeLineRecord)
+		Logger::getInstance().WriteLog("MTSimulatorDataExporter::ExportPatterns_Helper: Skipped time line records for stats json export, For time point: " + stats->Get_TimePoint(), false, false, LogType::LOG);
 }
 
 bool MTSimulatorDataExporter::OpenDir(const std::string& folderName)

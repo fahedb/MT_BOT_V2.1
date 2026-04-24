@@ -8,6 +8,21 @@
 ////////////////////////////////////////////////////
 ChangeNode::ChangeNode()
 {
+	m_nodeIdx = -1;
+	point_DateTime = "";
+	Increase_Decrease = false;
+	m_PointPlace = _Points::_Points_DEFUALT;
+	Increase_Decrease = false;
+	activePoint = false;
+	m_openPrice = INVALID_DATA;
+	m_closePrice = INVALID_DATA;
+	m_highPrice = INVALID_DATA;
+	m_lowPrice = INVALID_DATA;
+}
+
+ChangeNode::ChangeNode(IndicatorStorage* indStorage, int changeNodeIndex) : m_indMap(indStorage, changeNodeIndex)
+{
+	m_nodeIdx = changeNodeIndex;
 	point_DateTime = "";
 	Increase_Decrease = false;
 	m_PointPlace = _Points::_Points_DEFUALT;

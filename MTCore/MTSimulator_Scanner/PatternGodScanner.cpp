@@ -12,8 +12,10 @@
 void PatternGodScanner::Run()
 {
 	HttpServerSyncer::LoadAllConfigsToHttpCore(); // Load all configs to the HTTP Core
+	std::vector<ChangeNode> historyMemoryPool;
+	IndicatorStorage* indStorage = nullptr;
 	std::vector<ChangeNode*> history;
-	XAUUSD_OneMinTable table(Configrations::getInstance()->Get_DB_FileDir());
+	XAUUSD_OneMinTable table(Configrations::getInstance()->Get_DB_FileDir(), &historyMemoryPool, indStorage);
 	HistoryTimeLineLoader historyLoader(history, &table, Configrations::getInstance()->Get_DB_FileDir() + "\\" + table.GetDB_PhysicalFileName_Json());
 	historyLoader.Run();
 	Logger::getInstance().WriteLog("About to run PatternGod !!", true, true, LogType::SPECIAL_LOG);

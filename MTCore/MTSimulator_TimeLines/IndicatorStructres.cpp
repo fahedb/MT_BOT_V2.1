@@ -1,6 +1,8 @@
 #include "IndicatorStructres.h"
 #include "LOGGER.H"
 
+BarPeriodList m_g_barPeriods;
+
 ////////////////////////////////////////////////////
 /////////// Base Indicator class Functions//////////
 /////////// Author: Fahed.b				  //////////
@@ -277,144 +279,6 @@ ScoresResult operator*(double factor, const ScoresResult& score) // External fun
 // ------------------------------------------------------------------------------------------------------------
 
 
-////////////////////////////////////////////////////
-// IndicatorMap Class Functions		  //////////
-///			Author: Fahed.b				  //////////
-////////////////////////////////////////////////////
-
-
-IndicatorMap::IndicatorMap() 
-{
-	m_vec.resize(m_IndTypesLen); // Reserve space for 5 elements
-	
-	for (int i = 0; i < m_IndTypesLen; i++)
-	{
-		m_vec.at(i).resize(m_indLensLen); // Reserve space for 5 elements in each vector
-		for (int j = 0; j < m_indLensLen; j++)
-		{
-			m_vec.at(i).at(j) = nullptr; // Initialize each element to nullptr
-		}
-	}
-}
-
-// ------------------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------------------
-
-void IndicatorMap::Set_Indicator(IndicatorType type, IndicatorLen len, IndicatorValues val,bool forceInsert /*false*/)
-{
-	int typeIdx = static_cast<int>(type);
-	int lenIdx = static_cast<int>(len);
-	if (typeIdx < 0 || typeIdx >= m_indLensLen || lenIdx < 0 || lenIdx >= m_indLensLen)
-	{
-		Logger::getInstance().WriteLog("IndicatorMap::Set_Indicator : Invalid IndicatorType or IndicatorLen index.", false, true, LogType::ERR);
-		return;
-	}
-	m_vec.at(typeIdx).at(lenIdx) = Get_IndicatorObject(type, val); // Store the indicator in the vector
-}
-
-// ------------------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------------------
-
-// To Set indicator single value - by type, len and baePeriod
-void IndicatorMap::Set_Ind_SingleValue(IndicatorType type, IndicatorLen len, BarPeriod barP, double val)
-{
-	Validate_Indicator(type, len); // Create the Indicator obj if it's missing - by type and len
-	BaseIndicator* ind = Get_Indicator(type, len); // Getting the indicator ptr - by type and len
-	Set_IndValue(ind, barP, val); // Set a single indicator value - by barPeriod
-}
-
-// ------------------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------------------
-
-// To Set indicator single value - by type, len and baePeriod
-void IndicatorMap::Set_Ind_SingleSlope(IndicatorType type, IndicatorLen len, BarPeriod barP, double val) // To Set indicator single slope - by type, len and baePeriod
-{
-	Validate_Indicator(type, len); // Create the Indicator obj if it's missing - by type and len
-	BaseIndicator* ind = Get_Indicator(type, len); // Getting the indicator ptr - by type and len
-	Set_IndSlope(ind, barP, val); // Set a single indicator value - by barPeriod
-}
-
-// ------------------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------------------
-
-BaseIndicator* IndicatorMap::Get_Indicator(IndicatorType type, IndicatorLen len) // Function to Get Indicaor ptr
-{
-	int typeIdx = static_cast<int>(type);
-	int lenIdx = static_cast<int>((len));
-	if (typeIdx < 0 || typeIdx >= m_IndTypesLen || lenIdx < 0 || lenIdx >= m_indLensLen)
-	{
-		Logger::getInstance().WriteLog("IndicatorMap::Get_Indicator : Invalid IndicatorType or IndicatorLen index.", false, true, LogType::ERR);
-		return nullptr;
-	}
-	return m_vec.at(typeIdx).at(lenIdx); // Return the indicator from the vector
-}
-
-// ------------------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------------------
-
-void IndicatorMap::Set_IndValue(BaseIndicator* ind, BarPeriod barP, double val) // Function to create a new Indicator object
-{
-	if (!ind) {
-		Logger::getInstance().WriteLog("IndicatorMap::Set_IndValue : BaseIndicator pointer is null.", false, true, LogType::ERR);
-		return;
-	}
-	ind->Get_IndicatorValues_Pointer()->Set_SingleValue(barP, val); // Set the slope value for the specific BarPeriod
-}
-
-// ------------------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------------------
-
-void IndicatorMap::Set_IndSlope(BaseIndicator* ind, BarPeriod barP, double val)
-{
-	if (!ind) {
-		Logger::getInstance().WriteLog("IndicatorMap::Set_IndValue : BaseIndicator pointer is null.", false, true, LogType::ERR);
-		return;
-	}
-	ind->Get_IndicatorValues_Pointer()->Set_Value(IndicatorValueType::Slope, barP, val); // Set the slope value for the specific BarPeriod
-}
-
-// ------------------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------------------
-
-void IndicatorMap::Validate_Indicator(IndicatorType type, IndicatorLen len)
-{
-	int typeIdx = static_cast<int>(type);
-	int lenIdx = static_cast<int>(len);
-
-	if (typeIdx < 0 || typeIdx >= m_glob_indTypes.types.size() || lenIdx < 0 || lenIdx >= m_glob_indLens.lengths.size())
-	{
-		Logger::getInstance().WriteLog("IndicatorMap::Validate_Indicator : Invalid IndicatorType or IndicatorLen index.", false, true, LogType::ERR);
-		return;
-	}
-
-	if (!m_vec.at(typeIdx).at(lenIdx))
-	{
-		m_vec.at(typeIdx).at(lenIdx) = Get_IndicatorObject(type, IndicatorValues());
-	}
-}
-
-// ------------------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------------------
-
-BaseIndicator* IndicatorMap::Get_IndicatorObject(IndicatorType type, IndicatorValues val)
-{
-	switch (type)
-	{
-	case IndicatorType::EMA:
-		return new EMA_Ind(val);
-	case IndicatorType::RSI:
-		return new RSI_Ind(val);
-	case IndicatorType::ZLSMA:
-		return new ZLSMA_Ind(val);
-	case IndicatorType::VOLUME:
-		return new Volume_Ind(val);
-	default:
-		return nullptr;
-	}
-}
-
-// ------------------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////
 /////////// END OF IndicatorMap class Functions////
@@ -424,6 +288,12 @@ BaseIndicator* IndicatorMap::Get_IndicatorObject(IndicatorType type, IndicatorVa
 // IndicatorValues Struct Functions		  //////////
 ///			Author: Fahed.b				  //////////
 ////////////////////////////////////////////////////
+
+IndicatorValues::IndicatorValues()
+{
+	values.assign(m_g_barPeriods.periods.size(), 0.0); // Initialize the vector with zeros for each BarPeriod
+	slopes.assign(m_g_barPeriods.periods.size(), 0.0); // Initialize the vector with zeros for each BarPeriod
+}
 
 void IndicatorValues::Set_Value(IndicatorValueType valueType, BarPeriod barP, double val) // General function to set value or slope based on IndicatorValueType
 {

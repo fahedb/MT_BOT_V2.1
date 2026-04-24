@@ -14,9 +14,10 @@ private:
 
 	int m_Pattern_CurrentTimeLineLen;
 	int m_TraceCurrTimeLineLen;
-    Static_CurrentTimeLineRep(int Pattern_CurrentTimeLineLen, int TraceCurrTimeLineLen);
+    bool m_memoryDeleteAfterDoneUsing;
+    Static_CurrentTimeLineRep(int Pattern_CurrentTimeLineLen, int TraceCurrTimeLineLen, bool memoryDeleteAfterDoneUsing = true);
 public:
-    static void Init(int Pattern_CurrentTimeLineLen, int TraceCurrTimeLineLen);
+    static void Init(int Pattern_CurrentTimeLineLen, int TraceCurrTimeLineLen, bool memoryDeleteAfterDoneUsing = true);
 
 
     void Set_NewBar(ChangeNode* changeNode, bool updateCurrTimeLine = false);

@@ -3,10 +3,9 @@
 #include "ProcessData.h"
 #include "Converts.h"
 
-ChangeNode* ChangeDataBuilder::BuildChangeNode(JsonSelectionNode* selectionJ, const std::string& symbol)
+bool ChangeDataBuilder::BuildChangeNode(JsonSelectionNode* selectionJ,ChangeNode* chN, const std::string& symbol)
 {
 	Logger& logger = Logger::getInstance();
-	ChangeNode* chN = new ChangeNode();
 	std::map<std::string, std::string> mapy;
 	std::string keyBuffer;
 	Http_Utils::ExtractAllValues(*(selectionJ->Get_Json()), mapy, keyBuffer);
@@ -25,7 +24,7 @@ ChangeNode* ChangeDataBuilder::BuildChangeNode(JsonSelectionNode* selectionJ, co
 			{
 				logger.WriteLog("Error in Json Structure !!!\nExit building Node !!!", false, true);
 				logger.WriteLog("Error in Json Structure !!!\nExit building Node !!!", false, true, LogType::SPECIAL_LOG);
-				return nullptr;
+				return false;
 			}
 			auto indT = Http_Utils::Get_Enum_IndicatorType(CurrKey[2]);
 			auto indL = Http_Utils::Get_Enum_IdicatorLen(CurrKey[3]);
@@ -41,7 +40,16 @@ ChangeNode* ChangeDataBuilder::BuildChangeNode(JsonSelectionNode* selectionJ, co
 			chN->symbol = cleanedValue;
 		}
 		else {
-			chN->Set_Entity(CurrKey[1], Converts::ToDouble(cleanedValue));
+
+			if (CurrKey[1] == HTTP_BODY_MEMBER_OpenPrice)
+				chN->m_openPrice = Converts::ToDouble(cleanedValue);
+			else if (CurrKey[1] == HTTP_BODY_MEMBER_ClosePrice)
+				chN->m_closePrice = Converts::ToDouble(cleanedValue);
+			else if (CurrKey[1] == HTTP_BODY_MEMBER_HighPrice)
+				chN->m_highPrice = Converts::ToDouble(cleanedValue);
+			else if (CurrKey[1] == HTTP_BODY_MEMBER_LowPrice)
+				chN->m_lowPrice = Converts::ToDouble(cleanedValue);
+
 			if (!timePointSwitch)
 			{
 				chN->point_DateTime = CurrKey.at(0);
@@ -52,13 +60,9 @@ ChangeNode* ChangeDataBuilder::BuildChangeNode(JsonSelectionNode* selectionJ, co
 
 	}
 	chN->activePoint = true;
-	chN->Pip_Change = ProcessData::roundToDecimalPlaces(chN->Get_Entity(HTTP_BODY_MEMBER_ClosePrice), 2)
-		- ProcessData::roundToDecimalPlaces(chN->Get_Entity(HTTP_BODY_MEMBER_OpenPrice), 2);
+	chN->Pip_Change = ProcessData::roundToDecimalPlaces(chN->m_closePrice, 2)
+		- ProcessData::roundToDecimalPlaces(chN->m_openPrice, 2);
 
-	chN->m_openPrice = chN->Get_Entity(HTTP_BODY_MEMBER_OpenPrice);
-	chN->m_closePrice = chN->Get_Entity(HTTP_BODY_MEMBER_ClosePrice);
-	chN->m_highPrice = chN->Get_Entity(HTTP_BODY_MEMBER_HighPrice);
-	chN->m_lowPrice = chN->Get_Entity(HTTP_BODY_MEMBER_LowPrice);
 	chN->symbol = symbol;
 	chN->SetPoints(_PointsUtils::GetPointPlaceFromSymbol(symbol));
 	return chN;

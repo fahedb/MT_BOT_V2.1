@@ -36,7 +36,7 @@ CREATE TABLE dbo.BackTest_AccountStateEvents (
 CREATE TABLE dbo.BackTest_DirectionStats (
     SimulationID int not null,
     TimePoint BIGINT NOT NULL,
-    CoinsPair NVARCHAR(7) NOT NULL,
+    CoinsPair NVARCHAR(8) NOT NULL,
     VoteType NVARCHAR(10) not null,
     TotalVotes int not null,
     UpPercentage DECIMAL(18, 8) NOT NULL,
@@ -51,4 +51,53 @@ CREATE TABLE dbo.BackTest_DirectionStats (
 
         CONSTRAINT PK_BackTest_DirectionStats
         PRIMARY KEY (SimulationID, VoteType, TimePoint)
+);
+
+
+CREATE TABLE dbo.HistoryTimeLine
+(
+    TimePoint BIGINT NOT NULL,
+    CoinsPair NVARCHAR(8) NOT NULL,
+    OpenPrice DECIMAL(18,8),
+    ClosePrice DECIMAL(18,8),
+    HighPrice DECIMAL(18,8),
+    LowPrice DECIMAL(18,8),
+    CONSTRAINT UQ_HistoryTimeLine UNIQUE (TimePoint, CoinsPair)
+);
+
+CREATE TABLE dbo.HistoryIndicatorTimeLine
+(
+    TimePoint BIGINT NOT NULL,
+    CoinsPair NVARCHAR(8) NOT NULL,
+    IndicatorName NVARCHAR(10) NOT NULL,
+    TimeFrame NVARCHAR(4) NOT NULL,
+    IndLen int not null,
+    IndicatorValue DECIMAL(18,8),
+    IndicatorSlope DECIMAL(18,8),
+    CONSTRAINT UQ_HistoryIndicatorTimeLine 
+    UNIQUE (TimePoint, CoinsPair, IndicatorName, TimeFrame, IndLen)
+);
+
+CREATE TABLE dbo.CurrentTimeLine
+(
+    TimePoint BIGINT NOT NULL,
+    CoinsPair NVARCHAR(8) NOT NULL,
+    OpenPrice DECIMAL(18,8),
+    ClosePrice DECIMAL(18,8),
+    HighPrice DECIMAL(18,8),
+    LowPrice DECIMAL(18,8),
+    CONSTRAINT UQ_CurrentTimeLine UNIQUE (TimePoint, CoinsPair)
+);
+
+CREATE TABLE dbo.CurrentIndicatorTimeLine
+(
+    TimePoint BIGINT NOT NULL,
+    CoinsPair NVARCHAR(8) NOT NULL,
+    IndicatorName NVARCHAR(10) NOT NULL,
+    TimeFrame NVARCHAR(4) NOT NULL,
+    IndLen int not null,
+    IndicatorValue DECIMAL(18,8),
+    IndicatorSlope DECIMAL(18,8),
+    CONSTRAINT UQ_CurrentIndicatorTimeLine
+    UNIQUE (TimePoint, CoinsPair, IndicatorName, TimeFrame, IndLen)
 );

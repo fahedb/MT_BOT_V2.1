@@ -18,7 +18,7 @@ public:
 		ClearAll();
 		index = 0;
 	}
-	XAUUSD_OneMinTable(const std::string& dir) : BasePricesTable(dir, DEF_TABLE_XAUUSD_OneMinTimeLinePrices)
+	XAUUSD_OneMinTable(const std::string& dir, std::vector<ChangeNode>* m_changeNodesPool, IndicatorStorage* indStorage) : BasePricesTable(dir, DEF_TABLE_XAUUSD_OneMinTimeLinePrices, m_changeNodesPool, indStorage)
 	{
 		ClearAll();
 		index = 0;

@@ -75,7 +75,7 @@ DirectionStats StatisticsDecession::DetectCommonDirection(std::vector<std::pair<
 
 CommonDirection StatisticsDecession::CalcFirstPipsChange(ChangeNode* start,double weight, DirectionStats* stats,int futureLen)
 {
-	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTimeLong);
+	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTimeLong) + m_currentTL->size();
 	int pipsChangeToCount = m_glob_tradeMngrPolicy->Pattern_Min_PipsChange_ToCount;
 
 	int pipChange = 0;
@@ -113,7 +113,7 @@ CommonDirection StatisticsDecession::CalcGeneralPipsChange(ChangeNode* start, do
 {
 	int pipsChangeToCount = m_glob_tradeMngrPolicy->Pattern_Min_PipsChange_ToCount;
 
-	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTimeLong);
+	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTimeLong) + m_currentTL->size();
 	int pipChange = 0;
 	int candlesCounter = 0;
 
@@ -148,7 +148,7 @@ CommonDirection StatisticsDecession::CalcHighestPipsChange(ChangeNode* start, do
 {
 	int pipsChangeToCount = m_glob_tradeMngrPolicy->Pattern_Min_PipsChange_ToCount;
 
-	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTimeLong);
+	int indexStart = m_historyDB_Map->GetIdx_Of_TimePoint(start->point_DateTimeLong) + m_currentTL->size();
 	int pipChange = 0;
 	int candlesCounter = 0;
 

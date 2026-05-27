@@ -3,17 +3,18 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 import pyodbc
 
-
 # =========================
 # Configuration
 # =========================
-JSON_FILE_PATH = r"C:\\MTDB\\XAUUSD_M1_DATA_FULL.json"
+TIMEFRAMES = ["M1", "M15", "H1", "H4"]
+LENS = [10, 20, 30]
+JSON_FILE_PATH = r"C:\\MTDB\\XAUUSD_M1_DATA.json"
 COINS_PAIR = "XAUUSD"
 
 BATCH_SIZE = 1000
 
 # 🔥 FLAG לשליטה על אינדיקטורים
-ENABLE_INDICATORS = False
+ENABLE_INDICATORS = True
 
 
 SQL_SCALE = Decimal("0.00000001")
@@ -150,14 +151,23 @@ def process_file():
                     if isinstance(indicators, dict):
 
                         for indicator_name, indicator_lengths in indicators.items():
+
+                            if indicator_name == "ZLSMA":
+                                continue   
+
                             if not isinstance(indicator_lengths, dict):
                                 continue
 
                             for ind_len_key, ind_len_data in indicator_lengths.items():
+
                                 if not isinstance(ind_len_data, dict):
                                     continue
 
                                 ind_len = parse_ind_len(ind_len_key)
+                                
+                                if ind_len not in LENS:
+                                    continue
+                                    
                                 if ind_len is None:
                                     continue
 
@@ -175,6 +185,9 @@ def process_file():
                                 for timeframe in all_timeframes:
                                     indicator_value = to_decimal(values_block.get(timeframe))
                                     indicator_slope = to_decimal(slopes_block.get(timeframe))
+
+                                    if timeframe not in TIMEFRAMES:
+                                        continue
 
                                     indicator_rows.append(
                                         (

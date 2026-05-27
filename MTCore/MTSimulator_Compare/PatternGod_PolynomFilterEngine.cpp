@@ -56,7 +56,7 @@ std::vector<std::pair<ChangeNode*, ScoresResult>> PatternGod_PolynomFilterEngine
 		ChangeNode* head = headsOfPatterns->at(i);
 		if (head == nullptr) continue;
 		// Find the index of the *tail* in the history DB map
-		int startIdx = m_historyDB_Map->GetIdx_Of_TimePoint(head->point_DateTimeLong) - (patternLen - 1);
+		int startIdx = m_historyDB_Map->GetIdx_Of_TimePoint(head->point_DateTimeLong);
 
 		if (startIdx < 0) continue; // If the head is not found, skip to the next one
 		// Ensure we don't go out of bounds

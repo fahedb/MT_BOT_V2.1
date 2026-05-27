@@ -101,3 +101,57 @@ CREATE TABLE dbo.CurrentIndicatorTimeLine
     CONSTRAINT UQ_CurrentIndicatorTimeLine
     UNIQUE (TimePoint, CoinsPair, IndicatorName, TimeFrame, IndLen)
 );
+
+CREATE TABLE dbo.FutureStats (
+    SimulationID INT NOT NULL,
+    TimePoint BIGINT NOT NULL,
+    CoinsPair NVARCHAR(20) NOT NULL,
+
+    TP_HitIndex INT NULL,
+    SL_HitIndex INT NULL,
+    IsWin BIT NULL,
+    FirstHitType INT NULL
+);
+
+CREATE TABLE dbo.ML_ExperimentResults (
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+
+    SimulationID INT,
+    ModelType NVARCHAR(50),
+
+    MaxDepth INT NULL,
+
+    Accuracy FLOAT,
+
+    Threshold FLOAT,
+    TotalTrades INT,
+    WinRate FLOAT,
+
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
+
+use Prices
+CREATE TABLE dbo.ML_RuleResults
+(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+
+    RuleDescription NVARCHAR(200),
+    StatType NVARCHAR(20),
+
+    -- TRAIN
+    TrainTrades INT,
+    TrainWinRate FLOAT,
+    TrainEdge FLOAT,
+
+    -- TEST
+    TestTrades INT,
+    TestWinRate FLOAT,
+    TestEdge FLOAT,
+
+    -- ANALYSIS
+    Delta FLOAT,
+    Stability FLOAT,
+    Score FLOAT,
+
+    CreatedAt DATETIME DEFAULT GETDATE()
+);

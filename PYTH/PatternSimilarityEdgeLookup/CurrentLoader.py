@@ -22,7 +22,7 @@ INDICATORS = ["RSI", "EMA"]
 # =========================
 def load_candles():
 
-    print("\n=== Loading HISTORY candles ===")
+    print("\n=== Loading CURRENT candles ===")
 
     engine = create_engine(CONN_STR)
 

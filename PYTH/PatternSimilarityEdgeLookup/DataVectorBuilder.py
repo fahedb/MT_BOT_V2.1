@@ -8,7 +8,7 @@ TLLEN = 50
 GROUP_SIZE = 10
 
 TIMEFRAMES = ["M1", "M15", "H1"]
-LENS = [10, 20, 30]
+LENS = [10, 30]
 
 INDICATORS = ["RSI", "EMA"]
 

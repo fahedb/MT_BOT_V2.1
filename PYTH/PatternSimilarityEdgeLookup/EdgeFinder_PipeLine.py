@@ -12,7 +12,7 @@ from CalcFutureReturn import compute_future_stats
 # =========================
 # LOAD MATCHES
 # =========================
-def load_matches(path="matches_cache.json"):
+def load_matches(path="matches_cache_v2.json"):
     with open(path, "r") as f:
         data = json.load(f)
     return data["data"] if "data" in data else data
@@ -31,7 +31,7 @@ def build_index_map(candles):
 # =========================
 def build_dataset():
 
-    print("\n=== BUILD DATASET ===")
+    print("\n=== BUILD DATASET BY CurrTP ===")
 
     candles_hist, _ = load_history_data()
     candles_curr, _ = load_current_data()
@@ -50,18 +50,19 @@ def build_dataset():
 
         curr_tp = int(curr_tp_str)
 
-        # CURRENT FUTURE
         curr_future = get_future(curr_tp, df_curr, curr_map)
         curr_stats = compute_future_stats(curr_future)
 
         if curr_stats is None:
             continue
 
-        curr_return = curr_stats["Return"]
+        hist_returns = []
+        distances = []
 
         for m in match_list:
 
-            match_tp = m["MatchTP"]
+            match_tp = int(m["MatchTP"])
+            distance = float(m["Distance"])
 
             hist_future = get_future(match_tp, df_hist, hist_map)
             hist_stats = compute_future_stats(hist_future)
@@ -69,19 +70,33 @@ def build_dataset():
             if hist_stats is None:
                 continue
 
-            rows.append({
-                "Distance": m["Distance"],
-                "Rank": m["Rank"],
-                "HistReturn": hist_stats["Return"],
-                "CurrReturn": curr_return
-            })
+            hist_returns.append(float(hist_stats["Return"]))
+            distances.append(distance)
+
+        if len(hist_returns) == 0:
+            continue
+
+        weights = 1.0 / (np.array(distances) + 1e-9)
+
+        pred_return = np.average(hist_returns, weights=weights)
+
+        rows.append({
+            "CurrTP": curr_tp,
+            "CurrReturn": float(curr_stats["Return"]),
+            "PredReturn": float(pred_return),
+            "AvgHistReturn": float(np.mean(hist_returns)),
+            "MedianHistReturn": float(np.median(hist_returns)),
+            "MinDistance": float(np.min(distances)),
+            "AvgDistance": float(np.mean(distances)),
+            "MatchesCount": len(hist_returns),
+        })
 
         if i % 200 == 0:
             print(f"Processed {i}")
 
     df = pd.DataFrame(rows)
 
-    print(f"\nDataset built: {len(df)} rows")
+    print(f"\nDataset built: {len(df)} current patterns")
 
     return df
 
@@ -91,87 +106,64 @@ def build_dataset():
 # =========================
 def find_edge(df):
 
-    print("\n=== EDGE FINDER ===")
+    print("\n=== EDGE FINDER BY CONFIDENCE ===")
 
-    # 🔥 הכי חשוב — CURRENT
     baseline = df["CurrReturn"].mean()
-    print(f"Baseline Current Return: {baseline:.6f}")
+    print(f"Baseline Current Return: {baseline:.8f}")
+
+    df = df.copy()
+    df["PredAbs"] = df["PredReturn"].abs()
 
     results = []
 
-    # =========================
-    # DISTANCE THRESHOLDS
-    # =========================
-    distances = np.linspace(df["Distance"].min(), df["Distance"].max(), 30)
+    for q in [0.50, 0.60, 0.70, 0.80, 0.90, 0.95]:
 
-    for d in distances:
+        threshold = df["PredAbs"].quantile(q)
+        subset = df[df["PredAbs"] >= threshold]
 
-        subset = df[df["Distance"] <= d]
-
-        if len(subset) < 1000:
+        if len(subset) < 100:
             continue
 
+        acc = ((subset["PredReturn"] > 0) == (subset["CurrReturn"] > 0)).mean()
         avg_ret = subset["CurrReturn"].mean()
-        winrate = (subset["CurrReturn"] > 0).mean()
-
-        edge = avg_ret - baseline
 
         results.append({
-            "Type": "Distance",
-            "Threshold": d,
+            "TopConfidence": f"Top {int((1-q)*100)}%",
+            "Threshold": threshold,
             "Samples": len(subset),
-            "AvgReturn": avg_ret,
-            "WinRate": winrate,
-            "Edge": edge
-        })
-
-    # =========================
-    # RANK THRESHOLDS
-    # =========================
-    for r in range(1, 21):
-
-        subset = df[df["Rank"] <= r]
-
-        if len(subset) < 1000:
-            continue
-
-        avg_ret = subset["CurrReturn"].mean()
-        winrate = (subset["CurrReturn"] > 0).mean()
-
-        edge = avg_ret - baseline
-
-        results.append({
-            "Type": "Rank",
-            "Threshold": r,
-            "Samples": len(subset),
-            "AvgReturn": avg_ret,
-            "WinRate": winrate,
-            "Edge": edge
+            "DirectionAccuracy": acc,
+            "AvgCurrReturn": avg_ret,
+            "Edge": avg_ret - baseline
         })
 
     results_df = pd.DataFrame(results)
 
-    print("\n=== TOP EDGE SIGNALS ===")
-    print(results_df.sort_values("Edge", ascending=False).head(10))
+    print("\n=== TOP CONFIDENCE RESULTS ===")
+    print(results_df)
 
     return results_df
-
-
 # =========================
 # DEBUG ANALYSIS
 # =========================
 def debug_checks(df):
 
-    print("\n=== DEBUG ===")
+    print("\n=== DEBUG BY CurrTP ===")
 
-    # קורלציה אמיתית
-    corr = df[["Distance", "CurrReturn"]].corr()
-    print("\nDistance vs Current Return correlation:")
-    print(corr)
+    print("\nPrediction correlation:")
+    print(df[["PredReturn", "AvgHistReturn", "MedianHistReturn", "CurrReturn"]].corr())
 
-    print("\nHist vs Curr correlation:")
-    print(df[["HistReturn", "CurrReturn"]].corr())
+    df["PredUp"] = df["PredReturn"] > 0
+    df["RealUp"] = df["CurrReturn"] > 0
+    df["CorrectDirection"] = df["PredUp"] == df["RealUp"]
 
+    print("\nDirection Accuracy:")
+    print(df["CorrectDirection"].mean())
+
+    print("\nAvg Return when PredUp:")
+    print(df[df["PredUp"]]["CurrReturn"].mean())
+
+    print("\nAvg Return when PredDown:")
+    print(df[~df["PredUp"]]["CurrReturn"].mean())
 
 # =========================
 # MAIN

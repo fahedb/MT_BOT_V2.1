@@ -1,8 +1,8 @@
-#include "Normalizer.h"
+﻿#include "Normalizer.h"
 
 // Author: Fahed Elbatash
 // Date: 2025-08-11
-// MasterPieceSoft �
+// MasterPieceSoft ©
 
 ////////////////////////////////////////
 ///////ScoresResultRangeNormalizer//////

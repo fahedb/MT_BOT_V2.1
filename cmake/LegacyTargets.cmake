@@ -19,6 +19,8 @@ set(MTBOT_LEGACY_ROOT "${CMAKE_SOURCE_DIR}")
 # this code into libs/ with real module boundaries.
 # ===========================================================================
 set(MTBOT_LEGACY_INCLUDE_DIRS
+    "${MTBOT_LEGACY_ROOT}/third_party/robin_hood"
+    "${MTBOT_LEGACY_ROOT}/third_party/cpp-httplib"
     "${MTBOT_LEGACY_ROOT}/HTTPCore"
     "${MTBOT_LEGACY_ROOT}/MTCore/CUDA_UNIT"
     "${MTBOT_LEGACY_ROOT}/MTCore/MyRobinHoodMap"

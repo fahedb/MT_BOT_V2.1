@@ -1,4 +1,4 @@
-#include "DataBaseConnection.h"
+ï»¿#include "DataBaseConnection.h"
 std::string m_glob_connectionString;
 
 DataBaseConnection::DataBaseConnection(const std::string& serverName,const std::string& dataBase, const std::string& userName, const std::string& pass) {
@@ -130,7 +130,7 @@ bool DataBaseConnection::IsConnected() {
 
     ret = SQLGetConnectAttr(m_DBConnectionHandler, SQL_ATTR_CONNECTION_DEAD, &connStatus, 0, NULL);
 
-    return (SQL_SUCCEEDED(ret) && connStatus == SQL_CD_FALSE); // àí False - äçéáåø çé
+    return (SQL_SUCCEEDED(ret) && connStatus == SQL_CD_FALSE); // ×× False - ×”×—×™×‘×•×¨ ×—×™
 }
 
 void DataBaseConnection::Set_ConnectionString(std::string connStr)

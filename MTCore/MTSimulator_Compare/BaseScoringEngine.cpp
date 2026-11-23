@@ -1,4 +1,4 @@
-#include "BaseScoringEngine.h"
+ï»¿#include "BaseScoringEngine.h"
 #include "PatternGodUtils.h"
 #include "TimeLineArrayBuilder.h"
 #include "StreamSetters.h"
@@ -28,13 +28,13 @@ std::vector<int> Get_TopKScoresIndices(float* totalScores, int numOfResults, int
 	for (int i = 0; i < numOfResults; i++)
 		idx[i] = i;
 
-	// Stage 2: nth_element – O(N)
+	// Stage 2: nth_element â€“ O(N)
 	std::nth_element(
 		idx.begin(), idx.begin() + topKNum, idx.end(),
 		[&](int a, int b) { return totalScores[a] > totalScores[b]; }
 	);
 
-	// Stage 3: sort only the top K – O(K log K)
+	// Stage 3: sort only the top K â€“ O(K log K)
 	std::sort(
 		idx.begin(), idx.begin() + topKNum,
 		[&](int a, int b) { return totalScores[a] > totalScores[b]; }

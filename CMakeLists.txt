@@ -65,10 +65,13 @@ if(MSVC)
     # heap space" - even on a 64 GB machine. Control parallelism with
     # `cmake --build ... --parallel N` instead.
     add_compile_options(/permissive- /utf-8 /Zc:__cplusplus /Zc:preprocessor)
-    # _CRT_SECURE_NO_WARNINGS is NOT defined here: the vendored httplib.h and
-    # LOGGER.H define it themselves, and defining it again produced 124 C4005
-    # macro-redefinition warnings across the legacy tree.
-    add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
+    # No global Windows-header macros here. _CRT_SECURE_NO_WARNINGS, NOMINMAX
+    # and WIN32_LEAN_AND_MEAN are each already #defined by the legacy headers
+    # that need them (httplib.h, LOGGER.H, PROCESSDATA.H, DataBaseConnection.h,
+    # BaseLayerImporter.h, SelectionNodes.h). Defining them again produced 182
+    # C4005 macro-redefinition warnings, all self-inflicted. The pre-refactor
+    # .vcxproj files did not define them either, so leaving them out is also
+    # the faithful configuration. New code in libs/ declares what it needs.
 endif()
 
 include(cmake/MTBotWarnings.cmake)

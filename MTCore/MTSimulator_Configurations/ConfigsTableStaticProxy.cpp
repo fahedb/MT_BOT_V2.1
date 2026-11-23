@@ -1,4 +1,4 @@
-#include "ConfigsTableStaticProxy.h"
+ï»¿#include "ConfigsTableStaticProxy.h"
 #include "ConfigsTable.h"
 #include "Static_DBConnection.h"
 #include "Logger.h"
@@ -84,7 +84,7 @@ std::vector<std::string> ConfigsTableStaticProxy::Get_ConfigRow_DB(const std::st
 
     DataBaseConnection* dbConn = Static_DBConnection::getInstance()->GetConnection();
     if (!dbConn || !dbConn->IsConnected()) {
-        // DB connection failed — return default row
+        // DB connection failed â€” return default row
         return createDefaultRow(ConfigsTablesCols);
     }
 
@@ -108,7 +108,7 @@ std::vector<std::string> ConfigsTableStaticProxy::Get_ConfigRow_DB(const std::st
 		}
     }
 
-    // Not found in DB — return default row
+    // Not found in DB â€” return default row
     return createDefaultRow(confTable.tableCols());
 }
 

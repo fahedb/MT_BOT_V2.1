@@ -1,4 +1,4 @@
-#include "IndicatorStructres.h"
+ï»¿#include "IndicatorStructres.h"
 #include "LOGGER.H"
 
 BarPeriodList m_g_barPeriods;
@@ -259,7 +259,7 @@ ScoresResult operator*(const ScoresResult& score, double factor) // External fun
 
 	for (int idx = 0; idx < score.indicatorScores.size(); idx++)
 	{
-		IndicatorScore scaledScore = score.indicatorScores[idx] * factor; // ãåøù ùâí ìÎIndicatorScore éäéä operator*
+		IndicatorScore scaledScore = score.indicatorScores[idx] * factor; // ×“×•×¨×© ×©×’× ×œÖ¾IndicatorScore ×™×”×™×” operator*
 		result.indicatorScores[idx] = scaledScore;
 	}
 	result.calcTotalResult(); // Recalculate the total score after scaling

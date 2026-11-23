@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 #include <vector>
 #include <limits>
 
 /// <summary>
 /// Author: Fahed Elbatash
 /// /// Date: 2025-08-11
-/// MasterPieceSoft � 2025
+/// MasterPieceSoft © 2025
 /// </summary>
 
 

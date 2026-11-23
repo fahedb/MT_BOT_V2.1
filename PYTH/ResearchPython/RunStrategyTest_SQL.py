@@ -28,9 +28,12 @@ EDGE_LEVEL = "Top50"  # Top50 / Top40 / Top30 / Top20 / Top10 / Top5
 # SQL CONFIG
 # =========================
 
-CONN_STR = (
+# Connection string: override with the MTBOT_SQL_CONN environment variable.
+# See docs/CONFIGURATION.md (refactor plan Phase 0, finding E12).
+CONN_STR = os.environ.get(
+    "MTBOT_SQL_CONN",
     "mssql+pyodbc://localhost\\sqlexpress/Prices?"
-    "driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes"
+    "driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes",
 )
 
 SAVE_STRATEGY_RUN_TO_SQL = True

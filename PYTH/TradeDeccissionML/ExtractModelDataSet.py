@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from sqlalchemy import create_engine, text
 from pathlib import Path
@@ -5,9 +6,12 @@ from pathlib import Path
 # =========================
 # CONFIG
 # =========================
-CONN_STR = (
+# Connection string: override with the MTBOT_SQL_CONN environment variable.
+# See docs/CONFIGURATION.md (refactor plan Phase 0, finding E12).
+CONN_STR = os.environ.get(
+    "MTBOT_SQL_CONN",
     "mssql+pyodbc://localhost\\sqlexpress/Prices?"
-    "driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes"
+    "driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes",
 )
 
 OUTPUT_DIR = Path(r"C:\\MT_Simulator_Exports\\ML_DATA")

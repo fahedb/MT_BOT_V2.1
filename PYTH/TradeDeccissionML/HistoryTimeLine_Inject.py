@@ -1,3 +1,4 @@
+import os
 import json
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
@@ -46,11 +47,14 @@ def parse_ind_len(ind_len_key):
 
 
 def build_connection():
-    conn_str = (
+    # Override with the MTBOT_ODBC_CONN environment variable.
+    # See docs/CONFIGURATION.md (refactor plan Phase 0, finding E12).
+    conn_str = os.environ.get(
+        "MTBOT_ODBC_CONN",
         "DRIVER={SQL Server};"
         "SERVER=localhost\\sqlexpress;"
         "DATABASE=Prices;"
-        "Trusted_Connection=yes;"
+        "Trusted_Connection=yes;",
     )
     return pyodbc.connect(conn_str)
 

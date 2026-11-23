@@ -4,14 +4,18 @@
 
 JSON_FILE_PATH = r"C:\\MT_Simulator_Exports\\TEST\\ClosedDeals.json"
 
-SQL_CONNECTION_STRING = (
-    "DRIVER={SQL Server};SERVER=localhost\\sqlexpress;DATABASE=Prices;Integrated Security=SSPI;"
+# Connection string: override with the MTBOT_ODBC_CONN environment variable.
+# See docs/CONFIGURATION.md (refactor plan Phase 0, finding E12).
+SQL_CONNECTION_STRING = os.environ.get(
+    "MTBOT_ODBC_CONN",
+    "DRIVER={SQL Server};SERVER=localhost\\sqlexpress;DATABASE=Prices;Integrated Security=SSPI;",
 
 )
 
 COMMIT_EVERY = 1000   # 0 = commit once at end
 
 
+import os
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple

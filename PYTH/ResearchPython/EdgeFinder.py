@@ -17,9 +17,12 @@ from CalcFutureReturn.CalcFutureReturn import compute_future_stats
 # =========================
 # CONFIG
 # =========================
-CONN_STR = (
+# Connection string: override with the MTBOT_SQL_CONN environment variable.
+# See docs/CONFIGURATION.md (refactor plan Phase 0, finding E12).
+CONN_STR = os.environ.get(
+    "MTBOT_SQL_CONN",
     "mssql+pyodbc://localhost\\sqlexpress/Prices?"
-    "driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes"
+    "driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes",
 )
 
 MATCHES_DIR = "Matches"

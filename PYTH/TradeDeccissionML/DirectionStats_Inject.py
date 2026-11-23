@@ -1,3 +1,4 @@
+import os
 import argparse
 import json
 from pathlib import Path
@@ -9,8 +10,11 @@ import pyodbc
 # CONFIGURATION
 # ==========================
 
-SQL_CONNECTION_STRING = (
-    "DRIVER={SQL Server};SERVER=localhost\\sqlexpress;DATABASE=Prices;Integrated Security=SSPI;"
+# Connection string: override with the MTBOT_ODBC_CONN environment variable.
+# See docs/CONFIGURATION.md (refactor plan Phase 0, finding E12).
+SQL_CONNECTION_STRING = os.environ.get(
+    "MTBOT_ODBC_CONN",
+    "DRIVER={SQL Server};SERVER=localhost\\sqlexpress;DATABASE=Prices;Integrated Security=SSPI;",
 )
 
 TRADE_RESULT = 0

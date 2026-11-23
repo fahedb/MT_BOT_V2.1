@@ -15,7 +15,12 @@
 #include "../Include/DLL_OrderStruct.mqh"
 #include "../Include/MT_Policy.mqh"
 
-#import "C:\\Users\\Administrator\\Documents\\GitHub\\MT_BOT_V2.1\\MTDll\\x64\Debug\\MTDll.dll"
+// MQL5 resolves a bare DLL name against <terminal_data>\MQL5\Libraries, so the
+// build output must be copied (or linked) to that folder. #import needs a
+// compile-time literal, which is why this cannot be a parameter.
+// Previously an absolute path into one developer's user profile; see
+// docs/REFACTOR_PLAN.md finding E12 and docs/CONFIGURATION.md for deployment.
+#import "MTDll.dll"
 // Dll Functions def
 bool InsertNewBar_HTTP_M1(char&[],char&[],CandleData&);
 bool InsertNewBar_HTTP_M1_JSON_DB(char&[],char&[],CandleData&);

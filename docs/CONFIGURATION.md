@@ -27,6 +27,16 @@ else `C:\vcpkg`. The presets set `VCPKG_MANIFEST_MODE=OFF` so an existing
 classic-mode vcpkg installation is reused (fast, no network). CI runs in
 manifest mode and installs from `vcpkg.json` instead.
 
+**Keep the checkout path short.** The Visual Studio generator writes its
+compiler-probe projects under `build/<preset>/CMakeFiles/CMakeScratch/...`, and
+with a deep source path those filenames exceed Windows' 260-character limit.
+The symptom is a confusing configure failure during the compiler check:
+`MSB6003: The specified task executable "CL.exe" could not be run.
+System.IO.DirectoryNotFoundException`. Something like `C:\src\mtbot` is safe;
+a clone nested a hundred characters deep is not. Enabling long paths
+(`git config --global core.longpaths true` plus the Windows
+`LongPathsEnabled` policy) or using the `ninja-debug` preset also avoids it.
+
 ### Build options
 
 | Option | Default | Meaning |

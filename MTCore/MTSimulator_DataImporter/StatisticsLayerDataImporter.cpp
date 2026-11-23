@@ -24,6 +24,14 @@ QueueStruct<DirectionStats> StatisticsLayerDataImporter::Create_QueueItem(const 
 	ParseAndSetVotedStats(votedJson.at(StatsType_Utils::GetStatsTypeStr(StatsType::First)), StatsType::First, dirStats);
 	ParseAndSetVotedStats(votedJson.at(StatsType_Utils::GetStatsTypeStr(StatsType::General)), StatsType::General, dirStats);
 	ParseAndSetVotedStats(votedJson.at(StatsType_Utils::GetStatsTypeStr(StatsType::Highest)), StatsType::Highest, dirStats);
+
+	// Finding B3 (extended): this function parsed the line and then fell off
+	// the end without returning it, so every imported statistics item was
+	// undefined. Same idiom as TradeLayerDataImporter / ScoringLayerImporter.
+	QueueStruct<DirectionStats> queueItem;
+	queueItem.item = std::move(dirStats);
+	queueItem.lineIndex = lineIndex;
+	return queueItem;
 }
 
 void StatisticsLayerDataImporter::ParseAndSetVotedStats(const nlohmann::json& votedJson, StatsType sType, DirectionStats& dirStats)

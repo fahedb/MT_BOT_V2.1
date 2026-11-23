@@ -37,12 +37,40 @@ a clone nested a hundred characters deep is not. Enabling long paths
 (`git config --global core.longpaths true` plus the Windows
 `LongPathsEnabled` policy) or using the `ninja-debug` preset also avoids it.
 
+### Building the legacy engine
+
+```powershell
+cmake --preset vs2022-legacy
+cmake --build --preset vs2022-legacy
+```
+
+This adds `mt_legacy_core`: all 110 pre-refactor MTCore + HTTPCore sources as
+one static library (~244 MB in Debug). It needs the CUDA Toolkit headers
+(`CudaMemoryController.h` includes `<cuda_runtime.h>` even on the CPU path) and
+cairo (for `MTChart.cpp`; without it that one file is skipped and PNG export is
+disabled).
+
+**Build it serially.** The preset sets `jobs: 1` on purpose. The legacy sources
+pull in `robin_hood.h` plus heavy standard headers, and a parallel build of all
+110 translation units can exhaust the compiler heap — `C1060: compiler is out
+of heap space` — even on a 64 GB machine, if other applications are holding the
+system commit charge. If `C1060` appears anyway, close memory-hungry
+applications and check the headroom:
+
+```powershell
+Get-CimInstance Win32_OperatingSystem | Select-Object @{N='FreeVirtualMB';E={[math]::Round($_.FreeVirtualMemory/1KB)}}
+```
+
+Plenty of free *physical* memory with little free *virtual* memory still fails.
+Finding E17 in the plan; the Phase 1 header de-duplication and Phase 2's
+smaller translation units both reduce it.
+
 ### Build options
 
 | Option | Default | Meaning |
 |---|---|---|
 | `MTBOT_BUILD_TESTS` | `ON` | Build and register the test suite |
-| `MTBOT_BUILD_LEGACY_FULL` | `OFF` | Attempt the full pre-refactor library tree (Phase 1 work in progress) |
+| `MTBOT_BUILD_LEGACY_FULL` | `OFF` | Build `mt_legacy_core`, the whole pre-refactor engine. `ON` in the `vs2022-legacy` preset |
 | `MTBOT_ENABLE_CUDA` | `OFF` | Build the CUDA scoring kernels |
 | `MTBOT_WARNINGS_AS_ERRORS` | `OFF` | `/WX` for code written during the refactor; CI sets this `ON` |
 

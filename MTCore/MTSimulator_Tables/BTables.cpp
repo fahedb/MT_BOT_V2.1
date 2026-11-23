@@ -232,6 +232,7 @@ bool BTables::InitFileMap()
 		m_currFileIdxPlaces.push_back(std::make_pair(fileData, fileData));
 		m_lineCounterPerThread.push_back(i * chunkSize);
 	}
+	return true; // finding B3: the success path fell off the end (UB); every failure path above returns false.
 }
 
 long BTables::GetFileLinesCount()

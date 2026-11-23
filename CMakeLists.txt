@@ -57,8 +57,18 @@ endif()
 if(MSVC)
     # /permissive- and conforming preprocessor are prerequisites for the
     # C++20 migration; /utf-8 because several sources carry non-ASCII bytes.
-    add_compile_options(/permissive- /utf-8 /Zc:__cplusplus /Zc:preprocessor /MP)
-    add_compile_definitions(_CRT_SECURE_NO_WARNINGS NOMINMAX WIN32_LEAN_AND_MEAN)
+    #
+    # Deliberately NOT /MP: with the Visual Studio generator, MSBuild already
+    # runs projects in parallel, and /MP multiplies that by spawning N cl.exe
+    # per project. On the legacy tree (robin_hood.h plus heavy standard
+    # headers) that exhausts the compiler heap - "C1060: compiler is out of
+    # heap space" - even on a 64 GB machine. Control parallelism with
+    # `cmake --build ... --parallel N` instead.
+    add_compile_options(/permissive- /utf-8 /Zc:__cplusplus /Zc:preprocessor)
+    # _CRT_SECURE_NO_WARNINGS is NOT defined here: the vendored httplib.h and
+    # LOGGER.H define it themselves, and defining it again produced 124 C4005
+    # macro-redefinition warnings across the legacy tree.
+    add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
 endif()
 
 include(cmake/MTBotWarnings.cmake)

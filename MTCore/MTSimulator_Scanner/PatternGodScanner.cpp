@@ -318,4 +318,8 @@ QueueItemType PatternGodScanner::Get_MyQueuedItem()
 		return QueueItemType();
 	}
 
+	// Finding B3 (extended): reachable when the skip-forward loop overshoots
+	// and dataTime != currTime. Previously fell off the end (UB); now returns
+	// an empty item, consistent with the other no-usable-data paths above.
+	return QueueItemType();
 }

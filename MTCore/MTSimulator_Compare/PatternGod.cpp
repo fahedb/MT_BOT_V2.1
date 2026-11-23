@@ -90,4 +90,5 @@ int PatternGod::PolynomEngineFilter(std::vector<std::pair<ChangeNode*, ScoresRes
 	PatternGodUtils::filterByThresholdScore(tempVec, 0.98, 20);
 	PatternGodUtils::filterByHighScores(tempVec, 20);
 	resultNodes2D = tempVec;
+	return static_cast<int>(resultNodes2D.size()); // finding B3: fell off the end (UB). Matches ScoringEngineScan, which returns its result count.
 }

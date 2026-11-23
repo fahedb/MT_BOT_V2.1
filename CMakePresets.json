@@ -36,6 +36,15 @@
       }
     },
     {
+      "name": "vs2022-legacy",
+      "displayName": "VS 2022 x64 (Debug, full legacy tree)",
+      "description": "Adds mt_legacy_core, the whole pre-refactor engine. Needs the CUDA Toolkit headers and cairo. Build this one with --parallel 1 or 2: the legacy sources are memory-hungry to compile.",
+      "inherits": "vs2022-debug",
+      "cacheVariables": {
+        "MTBOT_BUILD_LEGACY_FULL": "ON"
+      }
+    },
+    {
       "name": "ninja-debug",
       "displayName": "Ninja (Debug)",
       "description": "Faster iteration; needs ninja and a developer command prompt on PATH.",
@@ -64,6 +73,12 @@
       "name": "vs2022-release",
       "configurePreset": "vs2022-release",
       "configuration": "Release"
+    },
+    {
+      "name": "vs2022-legacy",
+      "configurePreset": "vs2022-legacy",
+      "configuration": "Debug",
+      "jobs": 1
     },
     {
       "name": "ninja-debug",

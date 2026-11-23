@@ -58,7 +58,12 @@ DataBaseConnection::DataBaseConnection()
     if (m_glob_connectionString.length())
         connString = m_glob_connectionString;
     else
-        connString = "DRIVER={SQL Server};SERVER=localhost\SQLEXPRESS;DATABASE=Prices;Integrated Security=SSPI;";
+        // Finding B13: this literal had a single backslash. "\S" is not a valid
+        // escape sequence, so MSVC dropped it and the server name became
+        // "localhostSQLEXPRESS". The fallback could never connect, and it is
+        // only reached when the configured connection string is missing -
+        // i.e. exactly when it is needed.
+        connString = "DRIVER={SQL Server};SERVER=localhost\\SQLEXPRESS;DATABASE=Prices;Integrated Security=SSPI;";
 
     // convert to wchar string
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;

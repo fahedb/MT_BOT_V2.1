@@ -1,44 +1,112 @@
-# Visual Studio
+# ---------------------------------------------------------------------------
+# .gitignore
+#
+# Phase 0 note (see docs/REFACTOR_PLAN.md, finding E13):
+# the previous version ignored *.json and *.csv wholesale, which silently
+# untracked configuration, schema and fixture files. Generated data is now
+# ignored by PATH, never by extension.
+# ---------------------------------------------------------------------------
+
+# --- Visual Studio / MSBuild ---
 .vs/
 *.suo
 *.user
+*.aps
 *.dbmdl
 *.bak
-*.json
-*.csv
+*.sdf
+*.opendb
+*.VC.db
+*.VC.VC.opendb
 
-# Build results
-Debug/
-Release/
+# --- Build outputs ---
+[Dd]ebug/
+[Rr]elease/
 x64/
+x86/
+out/
+build/
+build-*/
+cmake-build-*/
 *.obj
 *.lib
 *.pdb
 *.exp
-*.log
+*.ilk
+*.idb
+*.ipdb
+*.iobj
+*.ipch
 *.tlog
 *.lastbuildstate
-*.idb
-*.ipch
-*.iobj
-*.ipdb
+*.recipe
 *.exe
 *.dll
-*.recipe
-*.pkl
+*.so
+*.dylib
 
-# Others
-*.cache
-*.tmp
-*.log
-*.sdf
-*.opendb
-*.VC.db
-*.session
+# --- CMake ---
+CMakeFiles/
+CMakeCache.txt
+CMakeUserPresets.json
+cmake_install.cmake
+compile_commands.json
+
+# --- vcpkg (manifest mode installs locally) ---
+vcpkg_installed/
+/vcpkg/
+
+# --- Python ---
+__pycache__/
 *.pyc
-/PYTH/Controller/venv
-/PYTH/Logger/venv
-/PYTH/AnalyzeDBInjector/venv
-\vcpkg
-\vcpkg_installed
+*.pyo
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- Logs and local caches ---
+*.log
+*.tmp
+*.cache
 Cache/
+Logs/
+
+# --- Generated data and research artefacts (by path, not by extension) ---
+# Large derived outputs: regenerate with the pipelines, do not version.
+PYTH/**/matches_cache.json
+PYTH/**/Matches/
+PYTH/**/*_distribution_analysis.csv
+PYTH/PatternSimilarityEdgeLookup/trade_excursions.csv
+PYTH/PatternSimilarityEdgeLookup/trade_simulation_results.csv
+research/**/Matches/
+research/attic/**/*.json
+data/
+artifacts/
+
+# Calibration / weight artefacts are build products of apps/mtcalibrate.
+# Track the manifest that describes them, not the binaries.
+config/calibration/*.bin
+config/weights/*.json
+
+# --- Secrets and machine-local settings ---
+.env
+*.secret
+**/Config.local.txt
+local.settings.json
+.claude/settings.local.json
+
+# ---------------------------------------------------------------------------
+# Explicitly tracked despite rules above (negations must come last)
+# ---------------------------------------------------------------------------
+!.gitattributes
+!.gitignore
+!config/**/*.toml
+!config/**/*.json.example
+!db/**/*.sql
+!docs/**
+!tests/golden/**
+!**/requirements.txt
+!TelegramController/Config.txt
+!TelegramLogger/Config.txt

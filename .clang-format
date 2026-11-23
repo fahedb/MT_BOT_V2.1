@@ -1,0 +1,41 @@
+# ---------------------------------------------------------------------------
+# Formatting for code written during and after the refactor.
+#
+# Pre-refactor sources are NOT reformatted yet: a tree-wide reformat would
+# destroy the ability to read diffs while the code is being restructured.
+# Phase 1 reformats each module in its own isolated commit, as the plan says.
+# ---------------------------------------------------------------------------
+BasedOnStyle: Google
+Language: Cpp
+Standard: c++20
+
+ColumnLimit: 100
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+AccessModifierOffset: -2
+
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: false
+BinPackParameters: false
+BreakConstructorInitializers: BeforeColon
+DerivePointerAlignment: false
+PointerAlignment: Left
+SeparateDefinitionBlocks: Always
+SpaceAfterTemplateKeyword: false
+
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^<gtest/'
+    Priority: 1
+  - Regex: '^<[a-z_]+>$'
+    Priority: 2
+  - Regex: '^<'
+    Priority: 3
+  - Regex: '^"mt_'
+    Priority: 4
+  - Regex: '.*'
+    Priority: 5

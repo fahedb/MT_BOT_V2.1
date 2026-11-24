@@ -82,8 +82,12 @@ PYTH/PatternSimilarityEdgeLookup/trade_excursions.csv
 PYTH/PatternSimilarityEdgeLookup/trade_simulation_results.csv
 research/**/Matches/
 research/attic/**/*.json
-data/
-artifacts/
+# Anchored to the repository root. Unanchored, "data/" also matched
+# libs/mt_data/include/mt/data/ and silently excluded those headers from the
+# first commit that added them - the same over-broad-pattern mistake that
+# finding E13 was about, reintroduced here and caught by the clean-clone check.
+/data/
+/artifacts/
 
 # Calibration / weight artefacts are build products of apps/mtcalibrate.
 # Track the manifest that describes them, not the binaries.

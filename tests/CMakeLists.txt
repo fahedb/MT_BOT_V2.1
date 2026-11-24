@@ -24,7 +24,10 @@ target_link_libraries(mt_gen_baseline PRIVATE mt_test_support)
 mtbot_set_warnings(mt_gen_baseline strict)
 set_target_properties(mt_gen_baseline PROPERTIES FOLDER "tests")
 
+include(GoogleTest)
+
 # --- unit tests ---------------------------------------------------------
+# Fast: the whole set runs in a few seconds, so it can gate every commit.
 add_executable(mt_tests
     unit/test_baseline_v0.cpp
     unit/test_characterisation.cpp
@@ -40,16 +43,39 @@ add_executable(mt_tests
 )
 target_link_libraries(mt_tests PRIVATE
     mt_test_support
-    mt_policy       # pulls in mt_aggregate -> mt_labels + mt_similarity
-    mt_retrieval
+    mt_engine       # pulls in mt_policy -> mt_aggregate -> mt_labels, mt_retrieval
     GTest::gtest
     GTest::gtest_main
 )
 mtbot_set_warnings(mt_tests strict)
 set_target_properties(mt_tests PROPERTIES FOLDER "tests")
 
-include(GoogleTest)
 gtest_discover_tests(mt_tests
     DISCOVERY_MODE PRE_TEST
     PROPERTIES LABELS "unit"
+)
+
+# --- integration tests --------------------------------------------------
+# Separate target because each one builds a full engine - channels,
+# calibration, embeddings and an ANN index over thousands of bars - and takes
+# seconds rather than milliseconds. Run with:
+#     ctest --preset vs2022-debug -L integration
+# or exclude them while iterating:
+#     ctest --preset vs2022-debug -LE integration
+add_executable(mt_integration_tests
+    integration/test_engine_end_to_end.cpp
+)
+target_link_libraries(mt_integration_tests PRIVATE
+    mt_test_support
+    mt_engine
+    GTest::gtest
+    GTest::gtest_main
+)
+mtbot_set_warnings(mt_integration_tests strict)
+set_target_properties(mt_integration_tests PROPERTIES FOLDER "tests")
+
+gtest_discover_tests(mt_integration_tests
+    DISCOVERY_MODE PRE_TEST
+    PROPERTIES LABELS "integration"
+    TEST_PREFIX "integration."
 )

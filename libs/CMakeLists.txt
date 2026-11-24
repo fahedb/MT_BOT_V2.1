@@ -25,6 +25,8 @@ target_link_libraries(mt_data INTERFACE mt_base)
 add_library(mt_features STATIC
     mt_features/src/standardise.cpp
     mt_features/src/channel.cpp
+    mt_features/src/indicators.cpp
+    mt_features/src/channel_set.cpp
 )
 target_include_directories(mt_features PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/mt_features/include")
 target_link_libraries(mt_features PUBLIC mt_data)
@@ -36,6 +38,7 @@ add_library(mt_similarity STATIC
     mt_similarity/src/distance.cpp
     mt_similarity/src/calibration.cpp
     mt_similarity/src/score.cpp
+    mt_similarity/src/calibrate.cpp
 )
 target_include_directories(mt_similarity PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/mt_similarity/include")
 target_link_libraries(mt_similarity PUBLIC mt_features)
@@ -79,3 +82,12 @@ target_include_directories(mt_policy PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/mt_poli
 target_link_libraries(mt_policy PUBLIC mt_aggregate)
 mtbot_set_warnings(mt_policy strict)
 set_target_properties(mt_policy PROPERTIES FOLDER "libs")
+
+# --- mt_engine: the whole pipeline, composed ------------------------------
+add_library(mt_engine STATIC
+    mt_engine/src/engine.cpp
+)
+target_include_directories(mt_engine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/mt_engine/include")
+target_link_libraries(mt_engine PUBLIC mt_policy mt_retrieval)
+mtbot_set_warnings(mt_engine strict)
+set_target_properties(mt_engine PROPERTIES FOLDER "libs")

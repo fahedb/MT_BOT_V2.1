@@ -42,7 +42,6 @@ target_link_libraries(mt_similarity PUBLIC mt_features)
 mtbot_set_warnings(mt_similarity strict)
 set_target_properties(mt_similarity PROPERTIES FOLDER "libs")
 
-if(0)  # placeholder: targets below are added as their sources land
 # --- mt_labels: forward labelling ----------------------------------------
 add_library(mt_labels STATIC
     mt_labels/src/label.cpp
@@ -67,7 +66,8 @@ add_library(mt_retrieval STATIC
     mt_retrieval/src/search.cpp
 )
 target_include_directories(mt_retrieval PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/mt_retrieval/include")
-target_link_libraries(mt_retrieval PUBLIC mt_similarity)
+find_package(hnswlib CONFIG REQUIRED)
+target_link_libraries(mt_retrieval PUBLIC mt_similarity PRIVATE hnswlib::hnswlib)
 mtbot_set_warnings(mt_retrieval strict)
 set_target_properties(mt_retrieval PROPERTIES FOLDER "libs")
 
@@ -79,4 +79,3 @@ target_include_directories(mt_policy PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/mt_poli
 target_link_libraries(mt_policy PUBLIC mt_aggregate)
 mtbot_set_warnings(mt_policy strict)
 set_target_properties(mt_policy PROPERTIES FOLDER "libs")
-endif()

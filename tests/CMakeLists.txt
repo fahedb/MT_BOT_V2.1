@@ -33,10 +33,15 @@ add_executable(mt_tests
     unit/test_features.cpp
     unit/test_similarity.cpp
     unit/test_scoring_acceptance.cpp
+    unit/test_labels.cpp
+    unit/test_aggregate.cpp
+    unit/test_retrieval.cpp
+    unit/test_policy.cpp
 )
 target_link_libraries(mt_tests PRIVATE
     mt_test_support
-    mt_similarity   # pulls in mt_features -> mt_data -> mt_base
+    mt_policy       # pulls in mt_aggregate -> mt_labels + mt_similarity
+    mt_retrieval
     GTest::gtest
     GTest::gtest_main
 )

@@ -5,7 +5,8 @@
   "description": "Forex pattern-similarity engine",
   "dependencies": [
     "nlohmann-json",
-    "gtest"
+    "gtest",
+    "hnswlib"
   ],
   "features": {
     "analyzer": {

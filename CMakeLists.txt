@@ -92,6 +92,7 @@ endif()
 
 # --- targets ------------------------------------------------------------
 include(cmake/LegacyTargets.cmake)
+add_subdirectory(libs)
 
 if(MTBOT_BUILD_TESTS)
     enable_testing()

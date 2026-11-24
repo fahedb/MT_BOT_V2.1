@@ -28,9 +28,15 @@ set_target_properties(mt_gen_baseline PROPERTIES FOLDER "tests")
 add_executable(mt_tests
     unit/test_baseline_v0.cpp
     unit/test_characterisation.cpp
+    unit/test_base.cpp
+    unit/test_data.cpp
+    unit/test_features.cpp
+    unit/test_similarity.cpp
+    unit/test_scoring_acceptance.cpp
 )
 target_link_libraries(mt_tests PRIVATE
     mt_test_support
+    mt_similarity   # pulls in mt_features -> mt_data -> mt_base
     GTest::gtest
     GTest::gtest_main
 )

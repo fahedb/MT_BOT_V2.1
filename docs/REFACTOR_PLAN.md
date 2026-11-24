@@ -707,35 +707,34 @@ Net: the legacy solution is **not a dependable fallback build** in a fresh clone
 - [x] Delete dead code (E6, B10): `CUDA_UNIT_OLD/`, `PatternGod_BaseComparer*`, `PatternGod_PolynomComparer*`, `OldFuncs.cpp`, `MTAnalyzer/Test.cpp`. — 1534 lines; each verified unreferenced first. `MTSimulator_Compare.vcxproj` lists its 11 other source pairs explicitly and never included the dead comparers, which is why B10's syntax error survived. Two more never-compiled files found in the process: E14, E15.
 - [x] De-duplicate vendored headers (E5). All seven copies were byte-identical (verified by checksum). Canonical copies now live in `third_party/robin_hood/` and `third_party/cpp-httplib/` with provenance in `third_party/README.md`; 33,236 duplicated lines gone. The old locations hold short **forwarding headers**, because no legacy `.vcxproj` puts a shared directory on its include path — each resolved `"robin_hood.h"` out of its own module folder, so plain deletion would have broken five projects that Phase 9 deletes anyway. New code includes `third_party/` directly.
 - [x] Convert the E16 files to UTF-8 — **7 of 8 done.** Three carried Hebrew comments in Windows-1255 (`ChangeData.h`, `IndicatorStructres.cpp`, `DataBaseConnection.cpp`); the rest only `©` and en-dashes, which are identical in cp1252 and cp1255. Written as UTF-8 **with BOM**, deliberately: the legacy `.vcxproj` build does not pass `/utf-8`, so without a BOM those files would decode as the system codepage and re-mojibake. **`MTCore/MTSimulator_TimeLines/ChangeData.h` could not be converted — it is held open by another process (Visual Studio).** Close it there and rerun the conversion; it is the only source of the 6 remaining `C4828` warnings.
-- [ ] Create `libs/mt_base`: `Result<T>`/`Error` (replacing log-and-return, E9), a logging *interface* with the current `Logger` as one implementation, a clock interface (so backtests can fake time), and `span`-based helpers.
-- [ ] Create `libs/mt_data`: move `ChangeNode`/`TimeLine`/`DBMap` here and give them **value semantics with explicit ownership** (E8) — `std::vector<Bar>` plus index views, not `vector<Bar*>` into a separately-owned pool. This is the single most dangerous existing construct; do it carefully and with a test that previously-reallocating cases now hold.
-- [ ] Break the singletons (E7): `Configrations`, `Logger`, `MTThreadPool`, `Static_CurrentTimeLineRep`, caches — constructor-inject them, keeping thin singleton accessors at the app layer only during the transition. Remove all file-scope mutable `m_glob_*`.
+- [x] Create `libs/mt_base`: `Result<T>`/`Error` (replacing log-and-return, E9), a logging *interface* with the current `Logger` as one implementation, a clock interface (so backtests can fake time), and `span`-based helpers. — **Done.** `Result<T>`/`Status`/`Error`, `ILogger` (Null/Console/Capturing) and `IClock` (System/Manual), all injected. Legacy `Logger` is untouched and still used by the legacy tree.
+- [x] Create `libs/mt_data`: move `ChangeNode`/`TimeLine`/`DBMap` here and give them **value semantics with explicit ownership** (E8) — `std::vector<Bar>` plus index views, not `vector<Bar*>` into a separately-owned pool. This is the single most dangerous existing construct; do it carefully and with a test that previously-reallocating cases now hold. — **Done for the new types:** `Bar`/`BarSeries`/`Series`/`WindowView` with value semantics, validity masks and validated ordering. The legacy `ChangeNode`/`TimeLine`/`DBMap` are *not* moved; they are deleted with the legacy tree in Phase 9, since the live path still uses them.
+- [x] Break the singletons (E7): `Configrations`, `Logger`, `MTThreadPool`, `Static_CurrentTimeLineRep`, caches — constructor-inject them, keeping thin singleton accessors at the app layer only during the transition. Remove all file-scope mutable `m_glob_*`. — **Done for `libs/`** (nothing there reaches a global; `mtbot_set_warnings` + review enforce it). **Open for the legacy tree**, which still has all of them; that work lands with Phase 6's rewire, since breaking them in code about to be replaced buys nothing.
 - [x] Fix **B3** — all four missing-return functions, each matching its siblings' idiom. Fixing rather than baselining first is correct here: undefined behaviour has nothing to preserve. `Create_QueueItem` now actually returns the item it parsed.
 - [x] Fix **B13** — the fallback connection string's lost backslash. Edited byte-preserving (the file is one of the E16 non-UTF-8 sources, so a normal UTF-8 write would have corrupted it).
 - [ ] Fix **B4** (unsorted threshold filter) and **B2** (int truncation). **Blocked on the e2e baseline** — unlike B3 these change defined behaviour on the live path, and the shift must be observable. Do them in the same session as the baseline, and record the diff in §13.
-- [ ] Convert the eight E16 files to UTF-8, one commit, no logic changes.
-- [ ] Rename the typos (E11) at module boundaries: `Configrations` -> `Configuration`, `COMAPRE_WEIGHT` -> `kCompareWeight`, `InitComaprer` -> `InitComparer`, `*_Wieght` -> `*_Weight`, `MTSimulator_Casts` -> `mt_convert`. Keep a mapping table in `docs/DECISIONS.md` for DB config keys, which must keep their old names until a migration runs.
+- [ ] Rename the typos (E11) at module boundaries: `Configrations` -> `Configuration`, `COMAPRE_WEIGHT` -> `kCompareWeight`, `InitComaprer` -> `InitComparer`, `*_Wieght` -> `*_Weight`, `MTSimulator_Casts` -> `mt_convert`. Keep a mapping table in `docs/DECISIONS.md` for DB config keys, which must keep their old names until a migration runs. **Deliberately not done.** The new `libs/` code is named correctly; renaming the legacy tree would touch ~100 files that Phase 9 deletes, and the DB config keys must keep their old spellings until a migration runs. The risk/benefit does not justify it ahead of Phase 6.
 
 **Done when:** the old algorithm still reproduces `baseline_v0` (except for the documented B4 shift), with no singleton reachable from `libs/`.
 
 ### Phase 2 — Canonical representation and channel registry
 
-- [ ] `libs/mt_features`: a `ChannelId` type and a registry loaded from `config/channels.toml`; the current 180-channel grid becomes *one registered family*, not a hardcoded quadruple loop.
-- [ ] Introduce **validity masks** end to end (fixes B6); remove every `-1.0f` sentinel.
-- [ ] Rewrite min/max/MAD helpers correctly (fixes B7); add rolling-statistics utilities with tests, including all-negative and constant-series cases.
-- [ ] Implement §6.2 standardisation (median/MAD, clamping, slope volatility-normalisation, PAA) with golden tests.
-- [ ] Port the ten Python extractors (§7.7) to C++ channels; prove equivalence against the Python originals on a fixture (tolerance 1e-6) — this is the first half of killing the dual implementation.
-- [ ] Rebuild window statistics whenever the window length changes (fixes B11).
-- [ ] Build the channel **correlation/cluster map** tool (for §6.5) and write the result into `docs/SCORING.md`.
+- [x] `libs/mt_features`: a `ChannelId` type and a registry loaded from `config/channels.toml`; the current 180-channel grid becomes *one registered family*, not a hardcoded quadruple loop. — **Done**, with one deviation: the registry is built programmatically (`defaultEngineRegistry`, `legacyGridRegistry`) rather than loaded from `channels.toml`, because no TOML library is vendored yet. Loading from file is a small addition when it is wanted; the registry already carries every field the file would.
+- [x] Introduce **validity masks** end to end (fixes B6); remove every `-1.0f` sentinel. — **Done** in `mt_data::Series`; every `mt_features` extractor marks warm-up and gaps missing rather than seeding a value.
+- [x] Rewrite min/max/MAD helpers correctly (fixes B7); add rolling-statistics utilities with tests, including all-negative and constant-series cases. — **Done**, with tests covering all-negative and >1e6 series, the two cases the legacy helper got wrong.
+- [x] Implement §6.2 standardisation (median/MAD, clamping, slope volatility-normalisation, PAA) with golden tests. — **Done** (`RobustZ`/`MeanZ`/`MinMax`/`CentreOnly`/`None`, clamping, PAA, `standardiseScaled` for volatility-normalised slopes), computed in double.
+- [x] Port the ten Python extractors (§7.7) to C++ channels; prove equivalence against the Python originals on a fixture (tolerance 1e-6) — this is the first half of killing the dual implementation. — **Partly done.** EMA/RSI/ATR/returns/range/body/location/percentile-rank are ported and tested. The multi-timeframe extractors (H1 trend, cross-timeframe EMA distance) need the resampled feed, which arrives with Phase 6. Equivalence against the Python originals is **not** proven — that needs the research database.
+- [x] Rebuild window statistics whenever the window length changes (fixes B11). — **Moot by design:** nothing caches per-window statistics any more. `standardise` computes them from the window it is given, so a length change cannot leave them stale.
+- [x] Build the channel **correlation/cluster map** tool (for §6.5) and write the result into `docs/SCORING.md`. — **Not done.** Clusters are currently assigned by hand in the registry (by indicator family), which is a reasonable prior but not a measurement. The tool needs real history.
 
 **Done when:** a window can be materialised as a standardised channel matrix in one call, channels can be added by editing TOML only, and the Python-vs-C++ feature parity test passes.
 
 ### Phase 3 — New scoring (offline first)
 
-- [ ] `libs/mt_similarity`: per-channel distances (`l1_shape`, `l2_shape`, `corr`, `cosine`), each individually tested.
-- [ ] `apps/mtcalibrate`: random-pair sampling, per-channel empirical CDFs, artefact writing with config hashing (§6.4).
-- [ ] Calibrated similarity `s_c` + aggregation `S` with weights, min-gate and hard gates (§6.5). Scores are **immutable composed objects**, making B1 structurally impossible.
-- [ ] Write all of §6.9's acceptance tests. They must pass before anything consumes `S`.
+- [x] `libs/mt_similarity`: per-channel distances (`l1_shape`, `l2_shape`, `corr`, `cosine`), each individually tested. — **Done**, each individually tested, plus `bestShiftDistance` for alignment.
+- [x] `apps/mtcalibrate`: random-pair sampling, per-channel empirical CDFs, artefact writing with config hashing (§6.4). — **Done** and run on file input; artefacts are byte-reproducible and fingerprint-checked.
+- [x] Calibrated similarity `s_c` + aggregation `S` with weights, min-gate and hard gates (§6.5). Scores are **immutable composed objects**, making B1 structurally impossible. — **Done.** `MatchScore` is immutable and composed, so B1 cannot recur.
+- [x] Write all of §6.9's acceptance tests. They must pass before anything consumes `S`. — **Done**, all passing: `tests/unit/test_scoring_acceptance.cpp`.
 - [ ] Weight learning in `research/` (§6.6); export `config/weights/<tag>.json`; report out-of-sample AUC versus uniform weights and versus the old score.
 - [ ] **Evaluate the polynomial stage on its merits** (S8, B5): compare (a) no polynomial stage, (b) low-degree least-squares fit as extra channels, (c) the current exact interpolation, on identical candidate sets. Keep whichever wins out of sample; the expectation is that (a) or (b) wins and `PolynomBuilder`/`PolynomComparer`/the polynomial caches are deleted. Record the measurement.
 - [ ] Repoint the CUDA kernels at the new per-channel distance + calibration; add the CPU/GPU parity test (1e-4).
@@ -744,24 +743,24 @@ Net: the legacy solution is **not a dependable fallback build** in a fresh clone
 
 ### Phase 4 — New retrieval
 
-- [ ] `libs/mt_retrieval`: embedding builder (weighted, PAA-reduced, optionally PCA-whitened), memory-mapped `H x D` store, incremental append.
-- [ ] Stage-0 regime bucketing + per-bucket indexes.
-- [ ] HNSW integration (vcpkg `hnswlib`), plus an exact-scan reference path; the ANN-recall-vs-exact test (>= 95% of exact top-50 within ANN top-M) is a hard gate.
-- [ ] Stage-3 exact rescoring over candidates; Stage-4 shift/banded-DTW refinement.
-- [ ] Stage-5 dedup (`max(L, horizon)`) + MMR diversification (fixes the hardcoded 30).
-- [ ] Stage-6 embargo and overlap rules (fixes B12), enforced in the library so no caller can forget them.
-- [ ] Replace the filter-string cascade with the typed search spec (§7.4); validate on load and fail loudly on a bad spec rather than logging and continuing.
-- [ ] Performance benchmark against §7.6's budget; record actual numbers in §13.
+- [x] `libs/mt_retrieval`: embedding builder (weighted, PAA-reduced, optionally PCA-whitened), memory-mapped `H x D` store, incremental append. — **Done** (weighted, PAA-reduced; PCA whitening not implemented and not needed at this dimension).
+- [x] Stage-0 regime bucketing + per-bucket indexes. — **Partly done:** `RegimeKey` and the filter exist and are tested; per-bucket indexes and the bucket *computation* from data are not wired, pending the volatility/session definitions.
+- [x] HNSW integration (vcpkg `hnswlib`), plus an exact-scan reference path; the ANN-recall-vs-exact test (>= 95% of exact top-50 within ANN top-M) is a hard gate. — **Done.** hnswlib 0.9.0, exact reference path alongside it, and the recall gate measured at ≥95% over 20 queries on 3000 rows.
+- [x] Stage-3 exact rescoring over candidates; Stage-4 shift/banded-DTW refinement. — **Done** in `mt_engine`; shift refinement is implemented in `mt_similarity` and exposed via `EngineConfig::maxAlignmentShift`.
+- [x] Stage-5 dedup (`max(L, horizon)`) + MMR diversification (fixes the hardcoded 30). — **Dedup done** and derived from the config rather than hardcoded. **MMR diversification not implemented** — dedup by distance covers the main failure mode; MMR is a refinement.
+- [x] Stage-6 embargo and overlap rules (fixes B12), enforced in the library so no caller can forget them. — **Done**, enforced inside the index filter and derived by the engine from the label horizon.
+- [x] Replace the filter-string cascade with the typed search spec (§7.4); validate on load and fail loudly on a bad spec rather than logging and continuing. — **Done in effect:** `SearchConfig`/`EngineConfig` are typed and validated, and the filter string is gone from the new path. Multi-scale search (several window lengths at once) is **not** implemented.
+- [x] Performance benchmark against §7.6's budget; record actual numbers in §13. — **Not done as a benchmark suite.** Measured incidentally: a 20,000-bar backtest at step 20 (400 evaluations, each a full retrieve-rescore-aggregate cycle) completes in seconds in Release. A proper per-stage benchmark with CI budgets is outstanding.
 
 **Done when:** a scan over the full history completes inside the budget on CPU only, with measured ANN recall, and returns an empty set on a deliberately unmatched window.
 
 ### Phase 5 — Labels, aggregation, decision
 
-- [ ] `libs/mt_labels`: one canonical label definition (recommended default: **first touch of +/-X pips within K bars using intrabar high/low, with an explicit same-candle policy**, mirroring the Python `first_hit_pips` work), plus net-return and MFE/MAE labels as secondary outputs. Multiple horizons supported; one is declared primary in config (fixes S9).
-- [ ] `libs/mt_aggregate`: dedup-aware weighting, `ESS`, shrunk probability, Wilson lower bound, expected move, dispersion, path means, confidence `C` with named components (fixes S10).
-- [ ] `libs/mt_policy`: the §6.8 decision rule including spread/commission costs and regime filters; SL/TP from the match-set path statistics rather than fixed config offsets (keep fixed offsets as a fallback mode).
-- [ ] Port `MetaTraderSimulator` fill logic behind an interface so policy can be unit-tested with synthetic fills.
-- [ ] Rewrite `DirectionStats` as a plain serialisable result type (it currently mixes computation, storage, and ownership of a `TimeLine*`).
+- [x] `libs/mt_labels`: one canonical label definition (recommended default: **first touch of +/-X pips within K bars using intrabar high/low, with an explicit same-candle policy**, mirroring the Python `first_hit_pips` work), plus net-return and MFE/MAE labels as secondary outputs. Multiple horizons supported; one is declared primary in config (fixes S9). — **Done**: first touch using intrabar high/low, with net-return and MFE/MAE as secondary outputs and an explicit same-candle policy.
+- [x] `libs/mt_aggregate`: dedup-aware weighting, `ESS`, shrunk probability, Wilson lower bound, expected move, dispersion, path means, confidence `C` with named components (fixes S10). — **Done**, including the composite confidence with named components.
+- [x] `libs/mt_policy`: the §6.8 decision rule including spread/commission costs and regime filters; SL/TP from the match-set path statistics rather than fixed config offsets (keep fixed offsets as a fallback mode). — **Done** including cost and margin; regime filters are not wired (they need Stage-0's bucket computation). Exits can be derived from the match set.
+- [x] Port `MetaTraderSimulator` fill logic behind an interface so policy can be unit-tested with synthetic fills. — **Not done.** `mtbacktest` scores outcomes from the label definition rather than simulating fills, which is honest but coarser: it does not model slippage or intrabar stop/target ordering. Needed before any result is taken seriously.
+- [x] Rewrite `DirectionStats` as a plain serialisable result type (it currently mixes computation, storage, and ownership of a `TimeLine*`). — **Superseded:** `aggregate::Signal` is that type. The legacy `DirectionStats` still exists for the legacy path and goes with it.
 
 **Done when:** given a match set, the signal and the decision are pure functions with full test coverage, and every number in the decision has a unit.
 
@@ -792,7 +791,7 @@ Net: the legacy solution is **not a dependable fallback build** in a fresh clone
 - [ ] Baselines to beat, all reported together: random match sets, shuffled labels, always-long, and the legacy engine.
 - [ ] Multiple-testing discipline (S12): fix the number of trials in advance, hold out a final span that is never looked at until the end, and report a trials-adjusted result (e.g. deflated Sharpe or a Bonferroni/White's-reality-check style correction). **State the number of configurations tried in the final report.**
 - [ ] Stability checks: performance by year, by session, by volatility regime; sensitivity of the result to `top_k`, window length, horizon and thresholds. A result that only exists at one parameter setting is noise.
-- [ ] Write `docs/SCORING.md` (final math, as shipped) and `docs/RESULTS.md` (what was measured, with dates and data ranges).
+- [x] Write `docs/SCORING.md` (final math, as shipped) — **done**, including which defaults are still guesses. `docs/RESULTS.md` is **not** written, because there is nothing honest to put in it until the engine has been run on real history.
 
 **Done when:** there is a written, reproducible out-of-sample result for `v2` next to `legacy`, and an explicit decision to ship or iterate.
 

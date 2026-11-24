@@ -1,10 +1,34 @@
 # MT_BOT_V2.1 — Total Refactor Plan
 
-**Document version:** 1.0
-**Written:** 2026-11-23
-**Status:** PLAN ONLY — no source file has been modified yet.
-**Repo root at time of writing:** `F:\MT_BOT_V2.1-main` (not a git repository yet)
-**Scale:** ~75,800 lines across 543 files, 7 Visual Studio solutions, 31 `.vcxproj`, C++ + CUDA + MQL5 + Python + T-SQL
+**Document version:** 1.2
+**Written:** 2026-11-23 · **Last updated:** 2026-11-23
+**Scale at the start:** ~75,800 lines across 543 files, 7 Visual Studio solutions, 31 `.vcxproj`, C++ + CUDA + MQL5 + Python + T-SQL
+
+---
+
+## Phase status
+
+| Phase | State | Notes |
+|---|---|---|
+| 0 — Freeze, scaffold, baseline | **Done** | git + tag, CMake/vcpkg, C++20, GoogleTest, CI, lint configs, paths parameterised. Full-engine baseline fell back to component-level; see below. |
+| 1 — Core extraction and hygiene | **Done except two items** | `libs/mt_base` + `mt_data`, legacy tree into CMake, dead code deleted, vendored headers consolidated, encoding fixed, B3 (×4) and B13 fixed. **Open:** B2/B4, and the one locked file. |
+| 2 — Representation and channel registry | **Done** | `mt_features`: indicators, `ChannelRegistry`, `ChannelSet`, robust standardisation, PAA. |
+| 3 — New scoring | **Machinery done; weights pending data** | Calibration, bounded decomposable score, §6.9 acceptance tests all passing. **Weight learning needs labelled history.** |
+| 4 — New retrieval | **Done** | Embeddings, exact + HNSW indexes, recall gate passing at ≥95%, embargo enforced in the index. |
+| 5 — Labels, aggregation, decision | **Done** | `mt_labels`, `mt_aggregate`, `mt_policy`, all tested. |
+| 6 — Live path rewire | **Not started** | Needs the MT5 feed and SQL Server. The engine it would call is finished and tested. |
+| 7 — Research harness unification | **Not started** | Needs pybind11 plus a live SQL Server. |
+| 8 — Validation | **Tooling done; result pending data** | `mtbacktest` runs walk-forward with costs and an honest rejection breakdown. **A real result needs real history.** |
+| 9 — Cleanup | **Partial** | Dead code and duplicate headers gone; `.sln` removal waits on Phase 6. |
+
+**What is genuinely blocked, and on what**
+
+* **Market data.** The end-to-end baseline (owed from Phase 0), channel-weight learning (Phase 3), and any validation result (Phase 8) all need real history: a SQL snapshot or a CSV export. Nothing substitutes for it, and a result derived from synthetic data would be meaningless.
+* **The live environment.** Phase 6 needs the MT5 terminal and the feed to verify anything; Phase 7 needs the research database.
+
+Everything that could be built and verified without those has been. The new engine runs end to end on CSV input today — see `apps/mtbacktest` and §13.
+
+---
 
 ---
 
@@ -888,5 +912,14 @@ Append one line per completed task or decision. Format: `YYYY-MM-DD — [phase] 
 * 2026-11-23 — [1] Note on environment: this machine currently has ~2 GB free virtual memory against a 126 GB commit limit (Unity, Visual Studio and Chrome resident), so legacy builds fail with `C1060` unless run serially, and sometimes even then. The library was built successfully at 11:58; later rebuild attempts in a fresh binary directory failed on memory alone, not on code. Not a project defect — recorded as E17 so nobody debugs it as one.
 * 2026-11-23 — [1] Vendored headers consolidated (E5): `robin_hood.h` ×5 and `httplib.h` ×2, all byte-identical, replaced by one copy each under `third_party/` plus forwarding headers at the old locations. 33,236 duplicated lines removed. `third_party/README.md` records versions (robin_hood 3.11.5, cpp-httplib 0.18.3) and says to prefer `std::unordered_map` in new code unless profiling disagrees.
 * 2026-11-23 — [1] Source encoding fixed (E16): 7 of 8 files converted from Windows-1255 to UTF-8 with BOM. Three contained real Hebrew comments, which now render correctly instead of as mojibake. `ChangeData.h` is locked by another process and is still pending — it is the last source of `C4828`.
+* 2026-11-23 — [1,2,3] `libs/` built and tested: `mt_base` (Result/Status/Error, ILogger, IClock — fixes E7/E9), `mt_data` (validity masks instead of the `-1.0f` sentinel, value semantics, validated bar series — fixes B6/E8), `mt_features` (robust median/MAD standardisation computed in double, PAA, channel registry with cluster-aware weights — fixes S1/S4/S5/B7/B8), `mt_similarity` (proper distances, empirical calibration, bounded immutable decomposable score — fixes S1/S2/S3/S7 and makes B1 impossible by construction). 92 tests. The §6.9 acceptance contract is `tests/unit/test_scoring_acceptance.cpp` and it passes.
+* 2026-11-23 — [3] Honest adjustment to the §6.9 invariance tests: they assert 0.01 score points, not 1e-6. Invariance is exact in real arithmetic and the implementation centres and scales in double, but the inputs are float32 — shifting a ~1800 price series to ~1938, or scaling it to ~18000, moves every sample onto a different float32 grid. Measured residuals: 2.2e-5 and 1.8e-3 points. A genuine invariance bug moves the score by whole points.
+* 2026-11-23 — [4,5] `mt_labels` (canonical first-touch label using intrabar high/low, same-candle policy, gap rejection, embargo helpers — fixes S9/B12), `mt_aggregate` (de-overlap, ESS, Beta shrinkage, Wilson bound — fixes S10), `mt_retrieval` (embeddings, exact + hnswlib indexes, **ANN recall vs exact top-50 measured at ≥95%**, embargo enforced inside the index, distance cut enabling an empty result), `mt_policy` (pure decision function with cost accounting). 158 unit tests.
+* 2026-11-23 — [2,6] `mt_features` indicator extraction (EMA/RSI/ATR/differences/percentile rank) with *missing* rather than seeded values during warm-up, plus `ChannelSet` and `defaultEngineRegistry()` — 9 channels in 5 clusters, all computable from one OHLC series. `mt_engine::PatternEngine` composes the full §7.1 pipeline and derives the embargo and dedup radius from the label horizon itself rather than trusting the caller.
+* 2026-11-23 — [8] `apps/mtcalibrate` and `apps/mtbacktest` built and **run on file input**. Both read plain CSV deliberately, so the engine can be calibrated and evaluated on real history before any live plumbing is rewired. `tools/make_synthetic_bars.py` generates fixtures so the tools can be tried without a database.
+* 2026-11-23 — [8] **The result that matters.** Same engine, same config, two synthetic datasets, 400 bars evaluated each:
+  * planted deterministic motif → 24 trades, 24 wins. Expected, and only a sanity check: the motif is deterministic by construction.
+  * **pure random walk → 0 trades.** 375 of 400 bars refused as `too_noisy`, 24 as `no_direction`.
+  The second is the point. The legacy cascade kept a fixed *fraction* of candidates at every stage, so it always produced its twenty least-bad matches and voted on them; it had no way to output "nothing". Finding S7, fixed and demonstrated end to end. This is a property test of the engine, **not** evidence about the trading idea — that requires real data and §8's protocol.
 * 2026-11-23 — [1] **Legacy build warnings: 457 → 9**, zero errors, 16/16 tests green. The remaining nine are 6 × `C4828` from the one locked file and 3 × `C4101` unreferenced locals. Of the original 457, 182 were self-inflicted by the Phase 0 build files (duplicate `_CRT_SECURE_NO_WARNINGS`, `NOMINMAX`, `WIN32_LEAN_AND_MEAN` defines that the legacy headers already set) and 317 were the encoding problem. Worth stating plainly: a 75,000-line codebase that had never been compiled with warnings on now builds nearly clean, and the defects that mattered (B3 ×4, B13) came out of that first warning-enabled build.
 

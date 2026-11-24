@@ -77,6 +77,53 @@ smaller translation units both reduce it.
 The legacy Visual Studio solutions (`MTScanner.sln` and the rest) are still
 present and untouched. They are retired in Phase 6, not before.
 
+## The tools
+
+Both read plain CSV — `timestamp,open,high,low,close[,volume]`, with the
+timestamp either epoch milliseconds or `YYYY-MM-DD HH:MM:SS` — so the engine
+can be calibrated and evaluated on real history before any of the live
+plumbing is rewired. Exporting from the existing tables is a one-line query.
+
+No data to hand? Generate some:
+
+```powershell
+python tools\make_synthetic_bars.py --out bars.csv --bars 20000
+```
+
+### mtcalibrate
+
+Builds the calibration artefact, without which there is no comparable
+similarity and therefore no meaningful score.
+
+```powershell
+.\build\vs2022-release\bin\Release\mtcalibrate.exe --bars bars.csv --out cal.bin --symbol XAUUSD --window 48 --paa 12 --pairs 200000
+```
+
+It prints each channel's distance quantiles at 1% / 50% / 99%, so the
+calibration can be sanity-checked rather than trusted as a silent binary.
+
+**Fit it on training data only.** A calibration whose span includes the period
+you then evaluate on is a look-ahead: the null distribution already knows about
+the future (finding S11).
+
+### mtbacktest
+
+```powershell
+.\build\vs2022-release\bin\Release\mtbacktest.exe --bars bars.csv --calibration cal.bin --window 48 --paa 12 --cost 20 --min-score 70 --step 20
+```
+
+`--window` and `--paa` must match what `mtcalibrate` used, or the calibration is
+refused — standardisation changes invalidate it, and the registry fingerprint
+catches that.
+
+It evaluates only bars after the calibration span, subtracts `--cost` on every
+trade, and reports *why* it declined each untraded bar. A run that reports
+`trades: 0` is a working engine saying nothing in history resembles the
+present — which is the behaviour the previous design could not produce.
+
+It also prints what it is not. A single split with no baselines and no trial
+accounting is not evidence; section 8 of the plan says what would be.
+
 ## Tests
 
 ```powershell
@@ -84,7 +131,12 @@ ctest --preset vs2022-debug          # all tests
 .\build\vs2022-debug\bin\Debug\mt_tests.exe --gtest_filter=BaselineV0.*
 ```
 
-Two groups:
+```powershell
+ctest --preset vs2022-debug -LE integration   # 158 unit tests, ~36 s
+ctest --preset vs2022-debug -L integration    # 10 integration tests, ~53 s
+```
+
+Groups:
 
 * **`BaselineV0.*`** — the pre-refactor scoring math must still reproduce
   `tests/golden/baseline_v0/`. Regenerate those files only on purpose:
@@ -93,6 +145,16 @@ Two groups:
 * **`Finding_*.*`** — characterisation tests that pin down the defects listed
   in section 4 of the plan. They assert today's behaviour, including where it
   is wrong, and get rewritten by the phase that fixes each finding.
+* **`ScoringAcceptance.*`** — the contract from section 6.9 for the new
+  scoring: identity, symmetry, level and scale invariance, monotonicity under
+  noise, bounded outlier influence, calibration uniformity, and refusal of a
+  mismatched calibration. If one of these fails, the scoring system is no
+  longer the one the plan specified.
+* **`HnswSearch.RecallAgainstExactMeetsTheGate`** — the ANN index must find at
+  least 95% of what brute force finds. This is what makes the retrieval swap
+  safe rather than hopeful.
+* **`EngineEndToEnd.*`** (integration) — the whole chain on a planted motif,
+  including that it stands aside when there is nothing to find.
 
 ## Environment variables
 

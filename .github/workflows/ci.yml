@@ -46,8 +46,20 @@ jobs:
       - name: Build
         run: cmake --build build --config ${{ matrix.config }} --parallel
 
-      - name: Test
-        run: ctest --test-dir build -C ${{ matrix.config }} --output-on-failure
+      # Unit tests gate every commit: fast, and they cover the scoring contract
+      # from plan section 6.9 plus the golden baseline of the pre-refactor math.
+      - name: Unit tests
+        run: >
+          ctest --test-dir build -C ${{ matrix.config }}
+          --label-exclude integration --output-on-failure
+
+      # Integration tests each build a full engine - channels, calibration,
+      # embeddings and an ANN index over thousands of bars - so they are slower
+      # and run separately rather than being skipped.
+      - name: Integration tests
+        run: >
+          ctest --test-dir build -C ${{ matrix.config }}
+          --label-regex integration --output-on-failure
 
       # The golden files are a committed artefact. If a change was supposed to
       # move the numbers, regenerate them in the same commit and say why in the
